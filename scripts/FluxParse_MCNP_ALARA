@@ -1,10 +1,10 @@
 ######################################################################
 #FluxParse_MCNP_ALARA
 ######################################################################
-#This scripts is used for converting a raw MCNP mesh tally output file
+#This python script is used for converting a raw MCNP mesh tally output file
 #into an ALARA input file.
 #
-#The script takes 3 command line arguments: the path to the input file,
+#The script takes 3 command line arguments: the path of the input file,
 #the path of the outpile file, and the normalization factor.
 #
 # Created by Elliott Biondo, Biondo@wisc.edu, working under Professor 
