@@ -46,7 +46,7 @@ for t in range(0, j):
           for s in range(0,k):
                    pointoutput+=str(float(InputLines[m+s*j + t][42:53])*Norm)+'\n'
           Output.write(pointoutput + '\n')
-	
+
 print 'File creation sucessful'
 Input.close()
 Output.close()
