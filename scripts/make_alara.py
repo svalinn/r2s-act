@@ -52,10 +52,10 @@ for i in range(1,numzones+1):
     zonemats=readinp[i+1].strip().split()
     if float(zonemats[0])==1.0:
         matname='\t'+'zone_'+str(i)+'\t'+'void'+'\n'
-            alara_input.write(matname)  
+        alara_input.write(matname)  
     else:
         matname='\t'+'zone_'+str(i)+'\t'+'mix_'+str(i)+'\n'
-            alara_input.write(matname)
+        alara_input.write(matname)
 alara_input.write('end\n\n')
 
 # Write ALARA mixture definitions to file
