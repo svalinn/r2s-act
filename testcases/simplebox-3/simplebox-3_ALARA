@@ -34,35 +34,35 @@ material_lib ALARA_elelib
 element_lib  ALARA_matlib
 
 mixture	mix_14
-	material mat_1	0.14 1
+	material mat_1	1 0.14
 end
 
 mixture	mix_15
-	material mat_1	0.0410368 1
+	material mat_1	1 0.0410368
 end
 
 mixture	mix_17
-	material mat_1	0.0600619 1
+	material mat_1	1 0.0600619
 end
 
 mixture	mix_18
-	material mat_1	0.0188358 1
+	material mat_1	1 0.0188358
 end
 
 mixture	mix_23
-	material mat_1	0.0536783 1
+	material mat_1	1 0.0536783
 end
 
 mixture	mix_24
-	material mat_1	0.0163517 1
+	material mat_1	1 0.0163517
 end
 
 mixture	mix_26
-	material mat_1	0.0249363 1
+	material mat_1	1 0.0249363
 end
 
 mixture	mix_27
-	material mat_1	0.00830148 1
+	material mat_1	1 0.00830148
 end
 
 mat_loading
@@ -107,7 +107,7 @@ end
 
 dump_file DumpFiles/simplebox3.dump
 
-data_library FEINDlib CINDER FENDL THERMAL
+data_library FENDL2
 
 cooling
 	0 s
@@ -119,10 +119,6 @@ output zone
 end
 
 truncation  1e-8
-
-##/filespace/groups/cnerg/opt/CINDER90/fendlg-2.0_175
-
-
 
 
 
