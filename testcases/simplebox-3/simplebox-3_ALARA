@@ -1,0 +1,128 @@
+geometry rectangular
+
+volume
+	3.7037037037	zone_1
+	3.7037037037	zone_2
+	3.7037037037	zone_3
+	3.7037037037	zone_4
+	3.7037037037	zone_5
+	3.7037037037	zone_6
+	3.7037037037	zone_7
+	3.7037037037	zone_8
+	3.7037037037	zone_9
+	3.7037037037	zone_10
+	3.7037037037	zone_11
+	3.7037037037	zone_12
+	3.7037037037	zone_13
+	3.7037037037	zone_14
+	3.7037037037	zone_15
+	3.7037037037	zone_16
+	3.7037037037	zone_17
+	3.7037037037	zone_18
+	3.7037037037	zone_19
+	3.7037037037	zone_20
+	3.7037037037	zone_21
+	3.7037037037	zone_22
+	3.7037037037	zone_23
+	3.7037037037	zone_24
+	3.7037037037	zone_25
+	3.7037037037	zone_26
+	3.7037037037	zone_27
+end
+
+material_lib ALARA_elelib
+element_lib  ALARA_matlib
+
+mixture	mix_14
+	material mat_1	0.14 1
+end
+
+mixture	mix_15
+	material mat_1	0.0410368 1
+end
+
+mixture	mix_17
+	material mat_1	0.0600619 1
+end
+
+mixture	mix_18
+	material mat_1	0.0188358 1
+end
+
+mixture	mix_23
+	material mat_1	0.0536783 1
+end
+
+mixture	mix_24
+	material mat_1	0.0163517 1
+end
+
+mixture	mix_26
+	material mat_1	0.0249363 1
+end
+
+mixture	mix_27
+	material mat_1	0.00830148 1
+end
+
+mat_loading
+	zone_1	void
+	zone_2	void
+	zone_3	void
+	zone_4	void
+	zone_5	void
+	zone_6	void
+	zone_7	void
+	zone_8	void
+	zone_9	void
+	zone_10	void
+	zone_11	void
+	zone_12	void
+	zone_13	void
+	zone_14	mix_14
+	zone_15	mix_15
+	zone_16	void
+	zone_17	mix_17
+	zone_18	mix_18
+	zone_19	void
+	zone_20	void
+	zone_21	void
+	zone_22	void
+	zone_23	mix_23
+	zone_24	mix_24
+	zone_25	void
+	zone_26	mix_26
+	zone_27	mix_27
+end
+
+flux flux1 fluxin_simplebox-3 1 0 default
+
+schedule total
+	1 d flux1 cycle1 0 s
+end
+
+pulsehistory cycle1
+	1 	0 d
+end
+
+dump_file DumpFiles/simplebox3.dump
+
+data_library FEINDlib CINDER FENDL THERMAL
+
+cooling
+	0 s
+end
+output zone
+	number_density
+	specific_activity
+	total_heat	
+end
+
+truncation  1e-8
+
+##/filespace/groups/cnerg/opt/CINDER90/fendlg-2.0_175
+
+
+
+
+
