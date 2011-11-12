@@ -67,7 +67,7 @@ for i in range(1,numzones+1):
         mixname='mixture'+'\t'+'mix_'+str(i)+'\n'
         alara_input.write(mixname)
         for j in range(1,nummats):
-            mixdef='\t'+'mat_'+str(matID[j])+'\t'+str(float(zonemats[j]))+'\n'
+            mixdef='\tmaterial\t'+'mat_'+str(matID[j])+'\t'+str(1)+'\t'+str(float(zonemats[j]))+'\n'
             alara_input.write(mixdef)
         alara_input.write('end\n\n')
 
