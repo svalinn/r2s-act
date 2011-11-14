@@ -32,6 +32,7 @@ class PhtnSrcReader(object):
         """ reads in lines and stores them in blocks on a per-heading basis
          e.g. headings are isotope identifiers or TOTAL
         """
+
         fr = open(self.inputFileName, 'r')
 
         line = fr.readline()
@@ -86,35 +87,54 @@ class PhtnSrcReader(object):
         # return #what to return?
         
 
-    def get_total(self):
-        """Method expects that read() has been successfully called and searches 
-          headingList to find which entry in probList is the totals
-        ~ This is more robust than assuming last entry in probList, but slower
+    def get_total(self, meshcellnum=0):
+        """ Method searches headingList to find which entry in probList is the
+        the desired TOTAL, and returns the corresponding TOTAL block.
+        Method expects that read() has been successfully called.
+        If meshcellnum has a value, n, the nth (starting from zero) total entry
+        is returned. Otherwise it returns the first total entry.
         """
         
-        found = False
+        found = False # records whether a total entry was found
+        totcnt = 0
         
         if len(self.headingList) and len(self.probList):
             for cnt, set in enumerate(self.headingList):
                 if set == "TOTAL":
-                    self.totalsList = self.probList[cnt]
-                    found = True
+                    
+                    if totcnt == meshcellnum:
+                        found = True
+                        self.totalsList = self.probList[cnt]
+                        break
+
+                    totcnt += 1
+                    
         else:
             print "totalsList or probList was empty. read() was probably not called"
         
         if not found:
-            print "no 'TOTAL' entry was found in photon source file."
+            print "'TOTAL' entry {0} was not found in photon source
+            file.".format(meshcellnum)
             
         else:
             return self.totalsList
                 
             
-    def format_print_total_mcnp(self, coolingstep=0):
-        """Method returns a block under heading TOTAL
+    def format_total_mcnp(self, coolingstep=0):
+        """Method returns a formatted list of strings that is the block under
+        heading TOTAL for some cooling step
+        Method expects that get_total() has been successfully called.
+        If self.totalsList does not exist (e.g. get_total has not been called),
+        the method quits.
         If 'coolingstep' is specified, returns the block under TOTAL
         corresponding with the cooling step.
         """
         
+        if not len(self.totalsList):
+            print "object's variable 'totalsList' has not been set.
+            format_total_mcnp will now return ['0']"
+            return ['0']
+
         try:
             self.totalsList[coolingstep]
         except:
@@ -134,12 +154,35 @@ class PhtnSrcReader(object):
         mcnpWrap.wdith = 80
         mcnpWrap.break_on_hyphens = False
 
-        print mcnpWrap.wrap(grandTotal),'\n'
-
-        for x in mcnpWrap.wrap(grandTotal):
-            print x
-
+        grandTotal = mcnpWrap.wrap(grandTotal)
 
         return grandTotal
 
+
+    def total_source_strengths(self, coolingstep=0):
+        """Method parses all "TOTAL" sections and creates and returns a list of
+        the sum of source strengths.  This list can be used to determine the
+        mesh cell strength. NOTE that volume normalization of resulting list may
+        be needed, depending on the mesh.
+        If 'coolingstep' is specified, returns the block under TOTAL
+        corresponding with the cooling step.
+        """
+       
+        self.meshstrengths = list()
+
+        # Search through all headings for those called TOTAL.
+        # For each of these, sum the entries in the corresponding source
+        # strengths block, and make a list of these sums (self.meshstrengths)
+        if len(self.headingList) and len(self.probList):
+            for cnt, set in enumerate(self.headingList):
+                if set == "TOTAL": 
+                    
+                    thistotal = [item for sublist in self.probList[cnt][coolingstep] for item in sublist]
+                    
+                    self.meshstrengths.append(sum(map(float,thistotal)))
+                    
+        else:
+            print "totalsList or probList was empty. read() was probably not called"
+
+        return self.meshstrengths
 
