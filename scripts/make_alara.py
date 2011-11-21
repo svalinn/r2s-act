@@ -18,22 +18,25 @@ alara_input = open(sys.argv[2], 'w')
 # Determine order of material IDs
 matID = readinp[0].strip().split()
 del matID[0]
-for i in range(0,len(matID)):
-    matID[i]=int(matID[i])
+matID=map(int ,matID)
 nummats=len(matID)
 print 'Materials order: ', matID
 
 # Determine intervals of mesh 
 dimID = readinp[1].strip().split()
 del dimID[0]
-for i in range(0,len(dimID)):
-    dimID[i]=int(dimID[i])
+dimID=map(int ,dimID)
 print 'Number of xyz intervals: ', dimID
 
 # Calculate volume per mesh element assuming equal volume for all elements
-totalvolume = float(raw_input('Enter the volume: '))
+totalvolume = raw_input('Enter the volume: ')
+try : 
+	float(totalvolume)
+except :
+	print >>sys.stderr, "Invalid entry for volume."
+	sys.exit(1)
 numzones=(dimID[0]*dimID[1]*dimID[2])
-elementvolume = totalvolume/numzones
+elementvolume = float(totalvolume)/numzones
 print 'Volume per mesh element: ', elementvolume
 
 # Write ALARA geometry card to file
@@ -71,4 +74,6 @@ for i in range(1,numzones+1):
             alara_input.write(mixdef)
         alara_input.write('end\n\n')
 
+input.close()
+alara_input.close()
 
