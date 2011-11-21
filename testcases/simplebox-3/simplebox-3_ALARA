@@ -172,8 +172,12 @@ material_lib	ALARA_matlib
 element_lib	ALARA_elelib
 data_library alaralib fendl2bin
 
-cooling 
+cooling
+	1	s
+	1	m
+	1	h
 	1	d
+	1	y
 end
 
 dump_file	dump.file
