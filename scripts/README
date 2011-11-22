@@ -5,5 +5,9 @@ FluxParse_MCNP_ALARA.py - a script to parse raw MCNP mesh tally files to ALARA f
 make_alara.py:
  
 obj_phtn_src.py:
-Script defines a class for handling the phtn_src file output from ALARA.  Methods parse the file into a list of headers (isotope identifiers) and a list of source strengths.  Currently only supports a single mesh element.  May eventually convert phtn_src to a format that can be input into MCNP.
+Script defines a class for handling the phtn_src file output from ALARA 2.9+.  
+Methods parse the file into three equal-length lists: headers (isotope identifiers), cooling steps,
+and source strengths in each mesh cell.  
+Currently supports up to 994 mesh elements with the gen_sdef_probabilities method.
+May eventually convert phtn_src to a format that can be input into MCNP with a source.F90 routine.
 

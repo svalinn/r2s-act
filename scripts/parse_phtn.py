@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 
 # This is an example script that reads in a phtn_src file to the object variable
-# 'thing'.
+#  'thing', and then calls several methods, culminating in a file named "phtn_sdef"
+#  being produced.
 
 # Steps:
 # -create object
 # -call object's read method
-# -look at some of the contents of the object's variables
-# -call get_total method to get the total entries for the 7th mesh cell
-# -call format_total_mcnp method to formate a single total entry for MCNP input
-# (e.g. when putting the source strengths into an SI card by hand)
-# -call total_source_strengths method which generates a list of total source
-# strengths for each mesh cell
+# -call get_isotope method to get the total entries for the 7th mesh cell
+# -look at a list of unformatted cooling times.
+# -call isotope_source_strengths method which generates a list of total source
+#   strengths for each mesh cell
+# -call gen_sdef_probabilities which generates an sdef carde with required SI,
+#   SP, DS and TR cards
 
 import obj_phtn_src as psr
 
@@ -19,16 +20,19 @@ thing = psr.PhtnSrcReader("/filespace/people/r/relson/r2s-act-work/r2s-act/testc
 
 thing.read()
 
-print thing.headingList
-print thing.probList[0]
-for x in thing.probList[2][0]:
-    print x
-print 'AND'
-for x in thing.probList[2][1]:
-    print x
+# -1 specifies values for all mesh cells; second parameter is isotope identifier,
+# and defaults to "TOTAL"
+thing.get_isotope(-1)#, "na-25") 
 
-thing.get_total(7)
-print '\n'
-thing.format_total_mcnp()
-print "lahdidahhh"
-print thing.total_source_strengths(0)
+print "Cooling steps are:\n", thing.coolingSteps, "\n"
+
+thing.isotope_source_strengths(0) #parameter is cooling step
+
+# Method's argument is a 3x3 list for x y z, with each sub list of form
+#  [min, max, mesh intervals]. Unused second parameter is output file name.
+# Produces file 'phtn_sdef' which can be copied into an MCNP deck by hand.
+thing.gen_sdef_probabilities([[0,10,3],[0,10,3],[0,10,3]])
+
+
+print len(thing.meshstrengths)
+print thing.meshstrengths
