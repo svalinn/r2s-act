@@ -4,7 +4,15 @@
 #  'thing', and then calls several methods, culminating in a file named "phtn_sdef"
 #  being produced.
 
-# Steps:
+################
+# INSTRUCTIONS:
+# -Generate your phtn_src file, and point to it when creating the object 'thing'
+# -If interested in a specific isotope, change thing.get_isotope()'s argument
+# -Define the meshing limits and number of coarse meshes for x, y, z in the line
+#  'thing.gen_sdef_probabilities....'
+################
+
+# General summary of steps file takes:
 # -create object
 # -call object's read method
 # -call get_isotope method to get the total entries for the 7th mesh cell
@@ -16,13 +24,14 @@
 
 import obj_phtn_src as psr
 
-thing = psr.PhtnSrcReader("/filespace/people/r/relson/r2s-act-work/r2s-act/testcases/simplebox-3/phtn_src")
+thing = psr.PhtnSrcReader("../testcases/simplebox-3/phtn_src")
 
 thing.read()
 
-# -1 specifies values for all mesh cells; second parameter is isotope identifier,
-# and defaults to "TOTAL"
-thing.get_isotope()#, "na-25") 
+# Optional 1st parameter is isotope identifier, and defaults to "TOTAL"
+thing.get_isotope()
+# Alternate example, getting source strengths for na-25 instead of totals.
+#thing.get_isotope("na-25") 
 
 print "Cooling steps are:\n", thing.coolingSteps, "\n"
 
