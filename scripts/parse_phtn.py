@@ -22,7 +22,7 @@ thing.read()
 
 # -1 specifies values for all mesh cells; second parameter is isotope identifier,
 # and defaults to "TOTAL"
-thing.get_isotope(-1)#, "na-25") 
+thing.get_isotope()#, "na-25") 
 
 print "Cooling steps are:\n", thing.coolingSteps, "\n"
 
@@ -34,5 +34,5 @@ thing.isotope_source_strengths(0) #parameter is cooling step
 thing.gen_sdef_probabilities([[0,10,3],[0,10,3],[0,10,3]])
 
 
-print len(thing.meshstrengths)
-print thing.meshstrengths
+#print len(thing.meshstrengths)
+#print thing.meshstrengths

@@ -11,3 +11,5 @@ and source strengths in each mesh cell.
 Currently supports up to 994 mesh elements with the gen_sdef_probabilities method.
 May eventually convert phtn_src to a format that can be input into MCNP with a source.F90 routine.
 
+parse_phtn.py:
+Script demos the use of obj_phtn_src.py

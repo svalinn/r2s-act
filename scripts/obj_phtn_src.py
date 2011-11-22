@@ -29,32 +29,22 @@ class PhtnSrcReader(object):
         
     
     def read(self):
-        """ reads in lines and stores them in blocks on a per-heading basis
-         e.g. headings are isotope identifiers or TOTAL
+        """ Method opens and reads in lines and stores them in blocks on a 
+        per-heading basis, e.g. headings are isotope identifiers or "TOTAL"
         """
 
         fr = open(self.inputFileName, 'r')
-
-        hcnt = 0;
-        pcnt = 1;
         
-        self.headingList = list()
-        self.coolingStepsList = list()
-        self.probList = list()
+        self.headingList = list() # contains every line's list of isotope IDs
+        self.coolingStepsList = list() # contains every line's list of cooling steps   
+        self.probList = list() # contains every line's list of probabilities
         
         self.coolingSteps = list() # list of just the different cooling steps
-        self.phtnList = list()
-        
-        # justReadAHeading = False
-        # wasBlank = False
+        self.phtnList = list() # contains every line in string.split() form
         
         needCoolStepCnt = True
 
         # Read through the file...
-        # Events of interest:
-        #  Blank lines signify either a new isotope, or a new set of probabilities
-        #  Lines specifying isotopes are id'd by alphabetical characters
-        #  Lines with photon source strengths are id'd by number
         
         line = fr.readline()
         
@@ -67,7 +57,8 @@ class PhtnSrcReader(object):
             if needCoolStepCnt:
             # then we add next cooling step name
                 # if we already started a list of cooling steps and shutdown
-                if len(self.coolingSteps) and lineParts[1] == "shutdown": #self.coolingSteps[0]:
+                if len(self.coolingSteps) and lineParts[1] == "shutdown": 
+                        #alternately: == self.coolingSteps[0]:
                     needCoolStepCnt = False
                 else:
                     if lineParts[1] != "shutdown":
@@ -90,7 +81,9 @@ class PhtnSrcReader(object):
             line = fr.readline()
         
         # return #what to return?
-    
+   
+
+    # DEPRECATED
     def read_pre_alara_2_9(self):
         """ reads in lines and stores them in blocks on a per-heading basis
          e.g. headings are isotope identifiers or TOTAL
@@ -151,63 +144,44 @@ class PhtnSrcReader(object):
         # return #what to return?
         
 
-    def get_isotope(self, meshcellnum=0, isotope="TOTAL"):
+    def get_isotope(self, isotope="TOTAL"):
         """ Method searches headingList to find which entry in probList is the
         the desired TOTAL, and returns the corresponding TOTAL block, which can 
         include multiple cooling steps.
         To get a specific cooling step's total, call isotope_source_strength
         Method expects that read() has been successfully called.
-        If meshcellnum has a value, n >=0, the nth (starting from zero) total entry
-        is returned. Otherwise it returns the first total entry.
-        If meshcellnum is -1, totals from all mesh cells are combined into a 
-        list of lists.
         """
-        
-        found = False # records whether a total entry was found
-        totcnt = 0
         
         meshcnt = -1
 
-        
+        # If the lists with headings and probabilities have contents...
         if len(self.headingList) and len(self.probList):
-            self.totalsList = list()
             self.totalHeadingList = list()
             self.totalProbList = list()
             self.totalCoolingStepsList = list()
-        
+            
+            # Go through all entries in headingList
             for cnt, set in enumerate(self.headingList):
                 
+                # and save those that match the specified isotope.
                 if set == isotope:
                     
                     if self.coolingStepsList[cnt] == ["shutdown"]:
-                        #self.totalsList.append([])
                         self.totalHeadingList.append([])
                         self.totalProbList.append([])
                         self.totalCoolingStepsList.append([])
                         meshcnt += 1
                         
-                    #self.totalsList[cnt].append(self.)
                     self.totalHeadingList[meshcnt].append(self.headingList[cnt])
                     self.totalProbList[meshcnt].append(self.probList[cnt])
                     self.totalCoolingStepsList[meshcnt].append(self.coolingStepsList[cnt])
                         
-                    
-                    # if int(totcnt/len(self.CoolingSteps)) == meshcellnum:
-                        # found = True
-                        # self.totalsList.append(self.probList[cnt])
-                        # break
-                    # elif meshcellnum == -1:
-                        
-                        # self.totalsList.append(self.probList[cnt])
-
-                    # totcnt += 1
-                    
         else:
             print "totalsList or probList was empty. read() was probably not called"
         
-        if not found:
-            print "'TOTAL' entry {0} was not found in photon source." \
-            "file.".format(meshcellnum)
+        if len(self.totalHeadingList) == 0:
+            print "{0} was not found in photon source." \
+            "file.".format(isotope)
             
         else:
             return self.totalHeadingList
@@ -296,7 +270,8 @@ class PhtnSrcReader(object):
         try:
             nmesh = len(self.meshstrengths) + 1
         except:
-            print "ERROR: total_source_strengths needs to be called before gen_sdef_probabilties"
+            print "ERROR: total_source_strengths needs to be called before" \
+                    "gen_sdef_probabilties"
             return [0]
 
         if nmesh > 994:
@@ -334,7 +309,8 @@ class PhtnSrcReader(object):
         cards.extend(mcnpWrap.wrap(card))
 
         summeshstrengths = sum(self.meshstrengths)
-        strnormmeshstrengths = map(str, map(lambda x: x/summeshstrengths, self.meshstrengths))
+        strnormmeshstrengths = \
+                map(str, map(lambda x: x/summeshstrengths, self.meshstrengths))
         
         # SP card
         card = ["sp995 D"] # D for discrete cummulative probabilities
@@ -385,6 +361,7 @@ class PhtnSrcReader(object):
             # sum up source strengths in mesh cell
             meshcell = map(float, meshcells[self.coolingstep])
             summeshstrengths = sum(meshcell)
+            
             # then normalize the source strengths in the mesh cell to total 1 (unnecessary...)
             normmeshcell = map(str, map(lambda x: x/summeshstrengths, meshcell))
             
@@ -404,9 +381,16 @@ class PhtnSrcReader(object):
             for y in range(meshform[1][2]):
                 for z in range(meshform[2][2]):
                     cnt += 1
-                    cards.append(" ".join(["tr"+str(cnt),str(xval+2*x*xval), str(yval+2*y*yval), str(zval+2*z*zval)]))
+                    cards.append(" ".join( \
+                            ["tr"+str(cnt), str(xval+2*x*xval), \
+                            str(yval+2*y*yval), str(zval+2*z*zval)]\
+                            ))
         
         # write all cards to the outfile specified when function was called.
         fw = open(outfile, 'w')
         fw.writelines("\n".join(cards))
         fw.close()
+        print "SDEF card has been generated in file '{0}'".format(outfile)
+        
+        return
+
