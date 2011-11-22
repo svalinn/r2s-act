@@ -382,8 +382,10 @@ class PhtnSrcReader(object):
                 for z in range(meshform[2][2]):
                     cnt += 1
                     cards.append(" ".join( \
-                            ["tr"+str(cnt), str(xval+2*x*xval), \
-                            str(yval+2*y*yval), str(zval+2*z*zval)]\
+                            ["tr"+str(cnt), \
+                            str(meshform[0][0]+xval+2*x*xval), \
+                            str(meshform[1][0]+yval+2*y*yval), \
+                            str(meshform[2][0]+zval+2*z*zval)]\
                             ))
         
         # write all cards to the outfile specified when function was called.
