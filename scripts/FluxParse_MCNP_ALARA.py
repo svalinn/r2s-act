@@ -44,9 +44,10 @@ Norm=float(sys.argv[3])
 for t in range(0, j):
           pointoutput=''
           for s in range(0,k):
-                   pointoutput+=str(float(InputLines[m+s*j + t][42:53])*Norm)+'\n'
-          Output.write(pointoutput + '\n')
-
+                  pointoutput+=str(float(InputLines[m+s*j + t][42:53])*Norm)+' '
+                  if (s+1)%8 == 0 & s != (k-1):
+			pointoutput+='\n'
+          Output.write(pointoutput + '\n\n')
 print 'File creation sucessful'
 Input.close()
 Output.close()
