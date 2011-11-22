@@ -1,0 +1,8 @@
+# density: 19.1 g per cm3
+#                 Density  Number  wt-percent  Z
+#
+u_nat                19.1     1
+                              u    1.0    92
+
+mat_1 1.00 1
+na 1 11

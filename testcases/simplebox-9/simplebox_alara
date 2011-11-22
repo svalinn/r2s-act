@@ -1,0 +1,4422 @@
+##  3D Activation Milestone 0: Simple Box
+
+geometry rectangular
+
+volume
+	1.37174211248	zone_1
+	1.37174211248	zone_2
+	1.37174211248	zone_3
+	1.37174211248	zone_4
+	1.37174211248	zone_5
+	1.37174211248	zone_6
+	1.37174211248	zone_7
+	1.37174211248	zone_8
+	1.37174211248	zone_9
+	1.37174211248	zone_10
+	1.37174211248	zone_11
+	1.37174211248	zone_12
+	1.37174211248	zone_13
+	1.37174211248	zone_14
+	1.37174211248	zone_15
+	1.37174211248	zone_16
+	1.37174211248	zone_17
+	1.37174211248	zone_18
+	1.37174211248	zone_19
+	1.37174211248	zone_20
+	1.37174211248	zone_21
+	1.37174211248	zone_22
+	1.37174211248	zone_23
+	1.37174211248	zone_24
+	1.37174211248	zone_25
+	1.37174211248	zone_26
+	1.37174211248	zone_27
+	1.37174211248	zone_28
+	1.37174211248	zone_29
+	1.37174211248	zone_30
+	1.37174211248	zone_31
+	1.37174211248	zone_32
+	1.37174211248	zone_33
+	1.37174211248	zone_34
+	1.37174211248	zone_35
+	1.37174211248	zone_36
+	1.37174211248	zone_37
+	1.37174211248	zone_38
+	1.37174211248	zone_39
+	1.37174211248	zone_40
+	1.37174211248	zone_41
+	1.37174211248	zone_42
+	1.37174211248	zone_43
+	1.37174211248	zone_44
+	1.37174211248	zone_45
+	1.37174211248	zone_46
+	1.37174211248	zone_47
+	1.37174211248	zone_48
+	1.37174211248	zone_49
+	1.37174211248	zone_50
+	1.37174211248	zone_51
+	1.37174211248	zone_52
+	1.37174211248	zone_53
+	1.37174211248	zone_54
+	1.37174211248	zone_55
+	1.37174211248	zone_56
+	1.37174211248	zone_57
+	1.37174211248	zone_58
+	1.37174211248	zone_59
+	1.37174211248	zone_60
+	1.37174211248	zone_61
+	1.37174211248	zone_62
+	1.37174211248	zone_63
+	1.37174211248	zone_64
+	1.37174211248	zone_65
+	1.37174211248	zone_66
+	1.37174211248	zone_67
+	1.37174211248	zone_68
+	1.37174211248	zone_69
+	1.37174211248	zone_70
+	1.37174211248	zone_71
+	1.37174211248	zone_72
+	1.37174211248	zone_73
+	1.37174211248	zone_74
+	1.37174211248	zone_75
+	1.37174211248	zone_76
+	1.37174211248	zone_77
+	1.37174211248	zone_78
+	1.37174211248	zone_79
+	1.37174211248	zone_80
+	1.37174211248	zone_81
+	1.37174211248	zone_82
+	1.37174211248	zone_83
+	1.37174211248	zone_84
+	1.37174211248	zone_85
+	1.37174211248	zone_86
+	1.37174211248	zone_87
+	1.37174211248	zone_88
+	1.37174211248	zone_89
+	1.37174211248	zone_90
+	1.37174211248	zone_91
+	1.37174211248	zone_92
+	1.37174211248	zone_93
+	1.37174211248	zone_94
+	1.37174211248	zone_95
+	1.37174211248	zone_96
+	1.37174211248	zone_97
+	1.37174211248	zone_98
+	1.37174211248	zone_99
+	1.37174211248	zone_100
+	1.37174211248	zone_101
+	1.37174211248	zone_102
+	1.37174211248	zone_103
+	1.37174211248	zone_104
+	1.37174211248	zone_105
+	1.37174211248	zone_106
+	1.37174211248	zone_107
+	1.37174211248	zone_108
+	1.37174211248	zone_109
+	1.37174211248	zone_110
+	1.37174211248	zone_111
+	1.37174211248	zone_112
+	1.37174211248	zone_113
+	1.37174211248	zone_114
+	1.37174211248	zone_115
+	1.37174211248	zone_116
+	1.37174211248	zone_117
+	1.37174211248	zone_118
+	1.37174211248	zone_119
+	1.37174211248	zone_120
+	1.37174211248	zone_121
+	1.37174211248	zone_122
+	1.37174211248	zone_123
+	1.37174211248	zone_124
+	1.37174211248	zone_125
+	1.37174211248	zone_126
+	1.37174211248	zone_127
+	1.37174211248	zone_128
+	1.37174211248	zone_129
+	1.37174211248	zone_130
+	1.37174211248	zone_131
+	1.37174211248	zone_132
+	1.37174211248	zone_133
+	1.37174211248	zone_134
+	1.37174211248	zone_135
+	1.37174211248	zone_136
+	1.37174211248	zone_137
+	1.37174211248	zone_138
+	1.37174211248	zone_139
+	1.37174211248	zone_140
+	1.37174211248	zone_141
+	1.37174211248	zone_142
+	1.37174211248	zone_143
+	1.37174211248	zone_144
+	1.37174211248	zone_145
+	1.37174211248	zone_146
+	1.37174211248	zone_147
+	1.37174211248	zone_148
+	1.37174211248	zone_149
+	1.37174211248	zone_150
+	1.37174211248	zone_151
+	1.37174211248	zone_152
+	1.37174211248	zone_153
+	1.37174211248	zone_154
+	1.37174211248	zone_155
+	1.37174211248	zone_156
+	1.37174211248	zone_157
+	1.37174211248	zone_158
+	1.37174211248	zone_159
+	1.37174211248	zone_160
+	1.37174211248	zone_161
+	1.37174211248	zone_162
+	1.37174211248	zone_163
+	1.37174211248	zone_164
+	1.37174211248	zone_165
+	1.37174211248	zone_166
+	1.37174211248	zone_167
+	1.37174211248	zone_168
+	1.37174211248	zone_169
+	1.37174211248	zone_170
+	1.37174211248	zone_171
+	1.37174211248	zone_172
+	1.37174211248	zone_173
+	1.37174211248	zone_174
+	1.37174211248	zone_175
+	1.37174211248	zone_176
+	1.37174211248	zone_177
+	1.37174211248	zone_178
+	1.37174211248	zone_179
+	1.37174211248	zone_180
+	1.37174211248	zone_181
+	1.37174211248	zone_182
+	1.37174211248	zone_183
+	1.37174211248	zone_184
+	1.37174211248	zone_185
+	1.37174211248	zone_186
+	1.37174211248	zone_187
+	1.37174211248	zone_188
+	1.37174211248	zone_189
+	1.37174211248	zone_190
+	1.37174211248	zone_191
+	1.37174211248	zone_192
+	1.37174211248	zone_193
+	1.37174211248	zone_194
+	1.37174211248	zone_195
+	1.37174211248	zone_196
+	1.37174211248	zone_197
+	1.37174211248	zone_198
+	1.37174211248	zone_199
+	1.37174211248	zone_200
+	1.37174211248	zone_201
+	1.37174211248	zone_202
+	1.37174211248	zone_203
+	1.37174211248	zone_204
+	1.37174211248	zone_205
+	1.37174211248	zone_206
+	1.37174211248	zone_207
+	1.37174211248	zone_208
+	1.37174211248	zone_209
+	1.37174211248	zone_210
+	1.37174211248	zone_211
+	1.37174211248	zone_212
+	1.37174211248	zone_213
+	1.37174211248	zone_214
+	1.37174211248	zone_215
+	1.37174211248	zone_216
+	1.37174211248	zone_217
+	1.37174211248	zone_218
+	1.37174211248	zone_219
+	1.37174211248	zone_220
+	1.37174211248	zone_221
+	1.37174211248	zone_222
+	1.37174211248	zone_223
+	1.37174211248	zone_224
+	1.37174211248	zone_225
+	1.37174211248	zone_226
+	1.37174211248	zone_227
+	1.37174211248	zone_228
+	1.37174211248	zone_229
+	1.37174211248	zone_230
+	1.37174211248	zone_231
+	1.37174211248	zone_232
+	1.37174211248	zone_233
+	1.37174211248	zone_234
+	1.37174211248	zone_235
+	1.37174211248	zone_236
+	1.37174211248	zone_237
+	1.37174211248	zone_238
+	1.37174211248	zone_239
+	1.37174211248	zone_240
+	1.37174211248	zone_241
+	1.37174211248	zone_242
+	1.37174211248	zone_243
+	1.37174211248	zone_244
+	1.37174211248	zone_245
+	1.37174211248	zone_246
+	1.37174211248	zone_247
+	1.37174211248	zone_248
+	1.37174211248	zone_249
+	1.37174211248	zone_250
+	1.37174211248	zone_251
+	1.37174211248	zone_252
+	1.37174211248	zone_253
+	1.37174211248	zone_254
+	1.37174211248	zone_255
+	1.37174211248	zone_256
+	1.37174211248	zone_257
+	1.37174211248	zone_258
+	1.37174211248	zone_259
+	1.37174211248	zone_260
+	1.37174211248	zone_261
+	1.37174211248	zone_262
+	1.37174211248	zone_263
+	1.37174211248	zone_264
+	1.37174211248	zone_265
+	1.37174211248	zone_266
+	1.37174211248	zone_267
+	1.37174211248	zone_268
+	1.37174211248	zone_269
+	1.37174211248	zone_270
+	1.37174211248	zone_271
+	1.37174211248	zone_272
+	1.37174211248	zone_273
+	1.37174211248	zone_274
+	1.37174211248	zone_275
+	1.37174211248	zone_276
+	1.37174211248	zone_277
+	1.37174211248	zone_278
+	1.37174211248	zone_279
+	1.37174211248	zone_280
+	1.37174211248	zone_281
+	1.37174211248	zone_282
+	1.37174211248	zone_283
+	1.37174211248	zone_284
+	1.37174211248	zone_285
+	1.37174211248	zone_286
+	1.37174211248	zone_287
+	1.37174211248	zone_288
+	1.37174211248	zone_289
+	1.37174211248	zone_290
+	1.37174211248	zone_291
+	1.37174211248	zone_292
+	1.37174211248	zone_293
+	1.37174211248	zone_294
+	1.37174211248	zone_295
+	1.37174211248	zone_296
+	1.37174211248	zone_297
+	1.37174211248	zone_298
+	1.37174211248	zone_299
+	1.37174211248	zone_300
+	1.37174211248	zone_301
+	1.37174211248	zone_302
+	1.37174211248	zone_303
+	1.37174211248	zone_304
+	1.37174211248	zone_305
+	1.37174211248	zone_306
+	1.37174211248	zone_307
+	1.37174211248	zone_308
+	1.37174211248	zone_309
+	1.37174211248	zone_310
+	1.37174211248	zone_311
+	1.37174211248	zone_312
+	1.37174211248	zone_313
+	1.37174211248	zone_314
+	1.37174211248	zone_315
+	1.37174211248	zone_316
+	1.37174211248	zone_317
+	1.37174211248	zone_318
+	1.37174211248	zone_319
+	1.37174211248	zone_320
+	1.37174211248	zone_321
+	1.37174211248	zone_322
+	1.37174211248	zone_323
+	1.37174211248	zone_324
+	1.37174211248	zone_325
+	1.37174211248	zone_326
+	1.37174211248	zone_327
+	1.37174211248	zone_328
+	1.37174211248	zone_329
+	1.37174211248	zone_330
+	1.37174211248	zone_331
+	1.37174211248	zone_332
+	1.37174211248	zone_333
+	1.37174211248	zone_334
+	1.37174211248	zone_335
+	1.37174211248	zone_336
+	1.37174211248	zone_337
+	1.37174211248	zone_338
+	1.37174211248	zone_339
+	1.37174211248	zone_340
+	1.37174211248	zone_341
+	1.37174211248	zone_342
+	1.37174211248	zone_343
+	1.37174211248	zone_344
+	1.37174211248	zone_345
+	1.37174211248	zone_346
+	1.37174211248	zone_347
+	1.37174211248	zone_348
+	1.37174211248	zone_349
+	1.37174211248	zone_350
+	1.37174211248	zone_351
+	1.37174211248	zone_352
+	1.37174211248	zone_353
+	1.37174211248	zone_354
+	1.37174211248	zone_355
+	1.37174211248	zone_356
+	1.37174211248	zone_357
+	1.37174211248	zone_358
+	1.37174211248	zone_359
+	1.37174211248	zone_360
+	1.37174211248	zone_361
+	1.37174211248	zone_362
+	1.37174211248	zone_363
+	1.37174211248	zone_364
+	1.37174211248	zone_365
+	1.37174211248	zone_366
+	1.37174211248	zone_367
+	1.37174211248	zone_368
+	1.37174211248	zone_369
+	1.37174211248	zone_370
+	1.37174211248	zone_371
+	1.37174211248	zone_372
+	1.37174211248	zone_373
+	1.37174211248	zone_374
+	1.37174211248	zone_375
+	1.37174211248	zone_376
+	1.37174211248	zone_377
+	1.37174211248	zone_378
+	1.37174211248	zone_379
+	1.37174211248	zone_380
+	1.37174211248	zone_381
+	1.37174211248	zone_382
+	1.37174211248	zone_383
+	1.37174211248	zone_384
+	1.37174211248	zone_385
+	1.37174211248	zone_386
+	1.37174211248	zone_387
+	1.37174211248	zone_388
+	1.37174211248	zone_389
+	1.37174211248	zone_390
+	1.37174211248	zone_391
+	1.37174211248	zone_392
+	1.37174211248	zone_393
+	1.37174211248	zone_394
+	1.37174211248	zone_395
+	1.37174211248	zone_396
+	1.37174211248	zone_397
+	1.37174211248	zone_398
+	1.37174211248	zone_399
+	1.37174211248	zone_400
+	1.37174211248	zone_401
+	1.37174211248	zone_402
+	1.37174211248	zone_403
+	1.37174211248	zone_404
+	1.37174211248	zone_405
+	1.37174211248	zone_406
+	1.37174211248	zone_407
+	1.37174211248	zone_408
+	1.37174211248	zone_409
+	1.37174211248	zone_410
+	1.37174211248	zone_411
+	1.37174211248	zone_412
+	1.37174211248	zone_413
+	1.37174211248	zone_414
+	1.37174211248	zone_415
+	1.37174211248	zone_416
+	1.37174211248	zone_417
+	1.37174211248	zone_418
+	1.37174211248	zone_419
+	1.37174211248	zone_420
+	1.37174211248	zone_421
+	1.37174211248	zone_422
+	1.37174211248	zone_423
+	1.37174211248	zone_424
+	1.37174211248	zone_425
+	1.37174211248	zone_426
+	1.37174211248	zone_427
+	1.37174211248	zone_428
+	1.37174211248	zone_429
+	1.37174211248	zone_430
+	1.37174211248	zone_431
+	1.37174211248	zone_432
+	1.37174211248	zone_433
+	1.37174211248	zone_434
+	1.37174211248	zone_435
+	1.37174211248	zone_436
+	1.37174211248	zone_437
+	1.37174211248	zone_438
+	1.37174211248	zone_439
+	1.37174211248	zone_440
+	1.37174211248	zone_441
+	1.37174211248	zone_442
+	1.37174211248	zone_443
+	1.37174211248	zone_444
+	1.37174211248	zone_445
+	1.37174211248	zone_446
+	1.37174211248	zone_447
+	1.37174211248	zone_448
+	1.37174211248	zone_449
+	1.37174211248	zone_450
+	1.37174211248	zone_451
+	1.37174211248	zone_452
+	1.37174211248	zone_453
+	1.37174211248	zone_454
+	1.37174211248	zone_455
+	1.37174211248	zone_456
+	1.37174211248	zone_457
+	1.37174211248	zone_458
+	1.37174211248	zone_459
+	1.37174211248	zone_460
+	1.37174211248	zone_461
+	1.37174211248	zone_462
+	1.37174211248	zone_463
+	1.37174211248	zone_464
+	1.37174211248	zone_465
+	1.37174211248	zone_466
+	1.37174211248	zone_467
+	1.37174211248	zone_468
+	1.37174211248	zone_469
+	1.37174211248	zone_470
+	1.37174211248	zone_471
+	1.37174211248	zone_472
+	1.37174211248	zone_473
+	1.37174211248	zone_474
+	1.37174211248	zone_475
+	1.37174211248	zone_476
+	1.37174211248	zone_477
+	1.37174211248	zone_478
+	1.37174211248	zone_479
+	1.37174211248	zone_480
+	1.37174211248	zone_481
+	1.37174211248	zone_482
+	1.37174211248	zone_483
+	1.37174211248	zone_484
+	1.37174211248	zone_485
+	1.37174211248	zone_486
+	1.37174211248	zone_487
+	1.37174211248	zone_488
+	1.37174211248	zone_489
+	1.37174211248	zone_490
+	1.37174211248	zone_491
+	1.37174211248	zone_492
+	1.37174211248	zone_493
+	1.37174211248	zone_494
+	1.37174211248	zone_495
+	1.37174211248	zone_496
+	1.37174211248	zone_497
+	1.37174211248	zone_498
+	1.37174211248	zone_499
+	1.37174211248	zone_500
+	1.37174211248	zone_501
+	1.37174211248	zone_502
+	1.37174211248	zone_503
+	1.37174211248	zone_504
+	1.37174211248	zone_505
+	1.37174211248	zone_506
+	1.37174211248	zone_507
+	1.37174211248	zone_508
+	1.37174211248	zone_509
+	1.37174211248	zone_510
+	1.37174211248	zone_511
+	1.37174211248	zone_512
+	1.37174211248	zone_513
+	1.37174211248	zone_514
+	1.37174211248	zone_515
+	1.37174211248	zone_516
+	1.37174211248	zone_517
+	1.37174211248	zone_518
+	1.37174211248	zone_519
+	1.37174211248	zone_520
+	1.37174211248	zone_521
+	1.37174211248	zone_522
+	1.37174211248	zone_523
+	1.37174211248	zone_524
+	1.37174211248	zone_525
+	1.37174211248	zone_526
+	1.37174211248	zone_527
+	1.37174211248	zone_528
+	1.37174211248	zone_529
+	1.37174211248	zone_530
+	1.37174211248	zone_531
+	1.37174211248	zone_532
+	1.37174211248	zone_533
+	1.37174211248	zone_534
+	1.37174211248	zone_535
+	1.37174211248	zone_536
+	1.37174211248	zone_537
+	1.37174211248	zone_538
+	1.37174211248	zone_539
+	1.37174211248	zone_540
+	1.37174211248	zone_541
+	1.37174211248	zone_542
+	1.37174211248	zone_543
+	1.37174211248	zone_544
+	1.37174211248	zone_545
+	1.37174211248	zone_546
+	1.37174211248	zone_547
+	1.37174211248	zone_548
+	1.37174211248	zone_549
+	1.37174211248	zone_550
+	1.37174211248	zone_551
+	1.37174211248	zone_552
+	1.37174211248	zone_553
+	1.37174211248	zone_554
+	1.37174211248	zone_555
+	1.37174211248	zone_556
+	1.37174211248	zone_557
+	1.37174211248	zone_558
+	1.37174211248	zone_559
+	1.37174211248	zone_560
+	1.37174211248	zone_561
+	1.37174211248	zone_562
+	1.37174211248	zone_563
+	1.37174211248	zone_564
+	1.37174211248	zone_565
+	1.37174211248	zone_566
+	1.37174211248	zone_567
+	1.37174211248	zone_568
+	1.37174211248	zone_569
+	1.37174211248	zone_570
+	1.37174211248	zone_571
+	1.37174211248	zone_572
+	1.37174211248	zone_573
+	1.37174211248	zone_574
+	1.37174211248	zone_575
+	1.37174211248	zone_576
+	1.37174211248	zone_577
+	1.37174211248	zone_578
+	1.37174211248	zone_579
+	1.37174211248	zone_580
+	1.37174211248	zone_581
+	1.37174211248	zone_582
+	1.37174211248	zone_583
+	1.37174211248	zone_584
+	1.37174211248	zone_585
+	1.37174211248	zone_586
+	1.37174211248	zone_587
+	1.37174211248	zone_588
+	1.37174211248	zone_589
+	1.37174211248	zone_590
+	1.37174211248	zone_591
+	1.37174211248	zone_592
+	1.37174211248	zone_593
+	1.37174211248	zone_594
+	1.37174211248	zone_595
+	1.37174211248	zone_596
+	1.37174211248	zone_597
+	1.37174211248	zone_598
+	1.37174211248	zone_599
+	1.37174211248	zone_600
+	1.37174211248	zone_601
+	1.37174211248	zone_602
+	1.37174211248	zone_603
+	1.37174211248	zone_604
+	1.37174211248	zone_605
+	1.37174211248	zone_606
+	1.37174211248	zone_607
+	1.37174211248	zone_608
+	1.37174211248	zone_609
+	1.37174211248	zone_610
+	1.37174211248	zone_611
+	1.37174211248	zone_612
+	1.37174211248	zone_613
+	1.37174211248	zone_614
+	1.37174211248	zone_615
+	1.37174211248	zone_616
+	1.37174211248	zone_617
+	1.37174211248	zone_618
+	1.37174211248	zone_619
+	1.37174211248	zone_620
+	1.37174211248	zone_621
+	1.37174211248	zone_622
+	1.37174211248	zone_623
+	1.37174211248	zone_624
+	1.37174211248	zone_625
+	1.37174211248	zone_626
+	1.37174211248	zone_627
+	1.37174211248	zone_628
+	1.37174211248	zone_629
+	1.37174211248	zone_630
+	1.37174211248	zone_631
+	1.37174211248	zone_632
+	1.37174211248	zone_633
+	1.37174211248	zone_634
+	1.37174211248	zone_635
+	1.37174211248	zone_636
+	1.37174211248	zone_637
+	1.37174211248	zone_638
+	1.37174211248	zone_639
+	1.37174211248	zone_640
+	1.37174211248	zone_641
+	1.37174211248	zone_642
+	1.37174211248	zone_643
+	1.37174211248	zone_644
+	1.37174211248	zone_645
+	1.37174211248	zone_646
+	1.37174211248	zone_647
+	1.37174211248	zone_648
+	1.37174211248	zone_649
+	1.37174211248	zone_650
+	1.37174211248	zone_651
+	1.37174211248	zone_652
+	1.37174211248	zone_653
+	1.37174211248	zone_654
+	1.37174211248	zone_655
+	1.37174211248	zone_656
+	1.37174211248	zone_657
+	1.37174211248	zone_658
+	1.37174211248	zone_659
+	1.37174211248	zone_660
+	1.37174211248	zone_661
+	1.37174211248	zone_662
+	1.37174211248	zone_663
+	1.37174211248	zone_664
+	1.37174211248	zone_665
+	1.37174211248	zone_666
+	1.37174211248	zone_667
+	1.37174211248	zone_668
+	1.37174211248	zone_669
+	1.37174211248	zone_670
+	1.37174211248	zone_671
+	1.37174211248	zone_672
+	1.37174211248	zone_673
+	1.37174211248	zone_674
+	1.37174211248	zone_675
+	1.37174211248	zone_676
+	1.37174211248	zone_677
+	1.37174211248	zone_678
+	1.37174211248	zone_679
+	1.37174211248	zone_680
+	1.37174211248	zone_681
+	1.37174211248	zone_682
+	1.37174211248	zone_683
+	1.37174211248	zone_684
+	1.37174211248	zone_685
+	1.37174211248	zone_686
+	1.37174211248	zone_687
+	1.37174211248	zone_688
+	1.37174211248	zone_689
+	1.37174211248	zone_690
+	1.37174211248	zone_691
+	1.37174211248	zone_692
+	1.37174211248	zone_693
+	1.37174211248	zone_694
+	1.37174211248	zone_695
+	1.37174211248	zone_696
+	1.37174211248	zone_697
+	1.37174211248	zone_698
+	1.37174211248	zone_699
+	1.37174211248	zone_700
+	1.37174211248	zone_701
+	1.37174211248	zone_702
+	1.37174211248	zone_703
+	1.37174211248	zone_704
+	1.37174211248	zone_705
+	1.37174211248	zone_706
+	1.37174211248	zone_707
+	1.37174211248	zone_708
+	1.37174211248	zone_709
+	1.37174211248	zone_710
+	1.37174211248	zone_711
+	1.37174211248	zone_712
+	1.37174211248	zone_713
+	1.37174211248	zone_714
+	1.37174211248	zone_715
+	1.37174211248	zone_716
+	1.37174211248	zone_717
+	1.37174211248	zone_718
+	1.37174211248	zone_719
+	1.37174211248	zone_720
+	1.37174211248	zone_721
+	1.37174211248	zone_722
+	1.37174211248	zone_723
+	1.37174211248	zone_724
+	1.37174211248	zone_725
+	1.37174211248	zone_726
+	1.37174211248	zone_727
+	1.37174211248	zone_728
+	1.37174211248	zone_729
+end
+
+mat_loading
+	zone_1	mix_1
+	zone_2	mix_2
+	zone_3	mix_3
+	zone_4	mix_4
+	zone_5	mix_5
+	zone_6	mix_6
+	zone_7	mix_7
+	zone_8	mix_8
+	zone_9	mix_9
+	zone_10	mix_10
+	zone_11	mix_11
+	zone_12	mix_12
+	zone_13	mix_13
+	zone_14	mix_14
+	zone_15	mix_15
+	zone_16	mix_16
+	zone_17	mix_17
+	zone_18	mix_18
+	zone_19	mix_19
+	zone_20	mix_20
+	zone_21	mix_21
+	zone_22	mix_22
+	zone_23	mix_23
+	zone_24	mix_24
+	zone_25	mix_25
+	zone_26	mix_26
+	zone_27	mix_27
+	zone_28	mix_28
+	zone_29	mix_29
+	zone_30	mix_30
+	zone_31	mix_31
+	zone_32	mix_32
+	zone_33	mix_33
+	zone_34	mix_34
+	zone_35	mix_35
+	zone_36	mix_36
+	zone_37	mix_37
+	zone_38	mix_38
+	zone_39	mix_39
+	zone_40	mix_40
+	zone_41	mix_41
+	zone_42	mix_42
+	zone_43	mix_43
+	zone_44	mix_44
+	zone_45	mix_45
+	zone_46	mix_46
+	zone_47	mix_47
+	zone_48	mix_48
+	zone_49	mix_49
+	zone_50	mix_50
+	zone_51	mix_51
+	zone_52	mix_52
+	zone_53	mix_53
+	zone_54	mix_54
+	zone_55	mix_55
+	zone_56	mix_56
+	zone_57	mix_57
+	zone_58	mix_58
+	zone_59	mix_59
+	zone_60	mix_60
+	zone_61	mix_61
+	zone_62	mix_62
+	zone_63	mix_63
+	zone_64	mix_64
+	zone_65	mix_65
+	zone_66	mix_66
+	zone_67	mix_67
+	zone_68	mix_68
+	zone_69	mix_69
+	zone_70	mix_70
+	zone_71	mix_71
+	zone_72	mix_72
+	zone_73	mix_73
+	zone_74	mix_74
+	zone_75	mix_75
+	zone_76	mix_76
+	zone_77	mix_77
+	zone_78	mix_78
+	zone_79	mix_79
+	zone_80	mix_80
+	zone_81	mix_81
+	zone_82	mix_82
+	zone_83	mix_83
+	zone_84	mix_84
+	zone_85	mix_85
+	zone_86	mix_86
+	zone_87	mix_87
+	zone_88	mix_88
+	zone_89	mix_89
+	zone_90	mix_90
+	zone_91	mix_91
+	zone_92	mix_92
+	zone_93	mix_93
+	zone_94	mix_94
+	zone_95	mix_95
+	zone_96	mix_96
+	zone_97	mix_97
+	zone_98	mix_98
+	zone_99	mix_99
+	zone_100	mix_100
+	zone_101	mix_101
+	zone_102	mix_102
+	zone_103	mix_103
+	zone_104	mix_104
+	zone_105	mix_105
+	zone_106	mix_106
+	zone_107	mix_107
+	zone_108	mix_108
+	zone_109	mix_109
+	zone_110	mix_110
+	zone_111	mix_111
+	zone_112	mix_112
+	zone_113	mix_113
+	zone_114	mix_114
+	zone_115	mix_115
+	zone_116	mix_116
+	zone_117	mix_117
+	zone_118	mix_118
+	zone_119	mix_119
+	zone_120	mix_120
+	zone_121	mix_121
+	zone_122	mix_122
+	zone_123	mix_123
+	zone_124	mix_124
+	zone_125	mix_125
+	zone_126	mix_126
+	zone_127	mix_127
+	zone_128	mix_128
+	zone_129	mix_129
+	zone_130	mix_130
+	zone_131	mix_131
+	zone_132	mix_132
+	zone_133	mix_133
+	zone_134	mix_134
+	zone_135	mix_135
+	zone_136	mix_136
+	zone_137	mix_137
+	zone_138	mix_138
+	zone_139	mix_139
+	zone_140	mix_140
+	zone_141	mix_141
+	zone_142	mix_142
+	zone_143	mix_143
+	zone_144	mix_144
+	zone_145	mix_145
+	zone_146	mix_146
+	zone_147	mix_147
+	zone_148	mix_148
+	zone_149	mix_149
+	zone_150	mix_150
+	zone_151	mix_151
+	zone_152	mix_152
+	zone_153	mix_153
+	zone_154	mix_154
+	zone_155	mix_155
+	zone_156	mix_156
+	zone_157	mix_157
+	zone_158	mix_158
+	zone_159	mix_159
+	zone_160	mix_160
+	zone_161	mix_161
+	zone_162	mix_162
+	zone_163	mix_163
+	zone_164	mix_164
+	zone_165	mix_165
+	zone_166	mix_166
+	zone_167	mix_167
+	zone_168	mix_168
+	zone_169	mix_169
+	zone_170	mix_170
+	zone_171	mix_171
+	zone_172	mix_172
+	zone_173	mix_173
+	zone_174	mix_174
+	zone_175	mix_175
+	zone_176	mix_176
+	zone_177	mix_177
+	zone_178	mix_178
+	zone_179	mix_179
+	zone_180	mix_180
+	zone_181	mix_181
+	zone_182	mix_182
+	zone_183	mix_183
+	zone_184	mix_184
+	zone_185	mix_185
+	zone_186	mix_186
+	zone_187	mix_187
+	zone_188	mix_188
+	zone_189	mix_189
+	zone_190	mix_190
+	zone_191	mix_191
+	zone_192	mix_192
+	zone_193	mix_193
+	zone_194	mix_194
+	zone_195	mix_195
+	zone_196	mix_196
+	zone_197	mix_197
+	zone_198	mix_198
+	zone_199	mix_199
+	zone_200	mix_200
+	zone_201	mix_201
+	zone_202	mix_202
+	zone_203	mix_203
+	zone_204	mix_204
+	zone_205	mix_205
+	zone_206	mix_206
+	zone_207	mix_207
+	zone_208	mix_208
+	zone_209	mix_209
+	zone_210	mix_210
+	zone_211	mix_211
+	zone_212	mix_212
+	zone_213	mix_213
+	zone_214	mix_214
+	zone_215	mix_215
+	zone_216	mix_216
+	zone_217	mix_217
+	zone_218	mix_218
+	zone_219	mix_219
+	zone_220	mix_220
+	zone_221	mix_221
+	zone_222	mix_222
+	zone_223	mix_223
+	zone_224	mix_224
+	zone_225	mix_225
+	zone_226	mix_226
+	zone_227	mix_227
+	zone_228	mix_228
+	zone_229	mix_229
+	zone_230	mix_230
+	zone_231	mix_231
+	zone_232	mix_232
+	zone_233	mix_233
+	zone_234	mix_234
+	zone_235	mix_235
+	zone_236	mix_236
+	zone_237	mix_237
+	zone_238	mix_238
+	zone_239	mix_239
+	zone_240	mix_240
+	zone_241	mix_241
+	zone_242	mix_242
+	zone_243	mix_243
+	zone_244	mix_244
+	zone_245	mix_245
+	zone_246	mix_246
+	zone_247	mix_247
+	zone_248	mix_248
+	zone_249	mix_249
+	zone_250	mix_250
+	zone_251	mix_251
+	zone_252	mix_252
+	zone_253	mix_253
+	zone_254	mix_254
+	zone_255	mix_255
+	zone_256	mix_256
+	zone_257	mix_257
+	zone_258	mix_258
+	zone_259	mix_259
+	zone_260	mix_260
+	zone_261	mix_261
+	zone_262	mix_262
+	zone_263	mix_263
+	zone_264	mix_264
+	zone_265	mix_265
+	zone_266	mix_266
+	zone_267	mix_267
+	zone_268	mix_268
+	zone_269	mix_269
+	zone_270	mix_270
+	zone_271	mix_271
+	zone_272	mix_272
+	zone_273	mix_273
+	zone_274	mix_274
+	zone_275	mix_275
+	zone_276	mix_276
+	zone_277	mix_277
+	zone_278	mix_278
+	zone_279	mix_279
+	zone_280	mix_280
+	zone_281	mix_281
+	zone_282	mix_282
+	zone_283	mix_283
+	zone_284	mix_284
+	zone_285	mix_285
+	zone_286	mix_286
+	zone_287	mix_287
+	zone_288	mix_288
+	zone_289	mix_289
+	zone_290	mix_290
+	zone_291	mix_291
+	zone_292	mix_292
+	zone_293	mix_293
+	zone_294	mix_294
+	zone_295	mix_295
+	zone_296	mix_296
+	zone_297	mix_297
+	zone_298	mix_298
+	zone_299	mix_299
+	zone_300	mix_300
+	zone_301	mix_301
+	zone_302	mix_302
+	zone_303	mix_303
+	zone_304	mix_304
+	zone_305	mix_305
+	zone_306	mix_306
+	zone_307	mix_307
+	zone_308	mix_308
+	zone_309	mix_309
+	zone_310	mix_310
+	zone_311	mix_311
+	zone_312	mix_312
+	zone_313	mix_313
+	zone_314	mix_314
+	zone_315	mix_315
+	zone_316	mix_316
+	zone_317	mix_317
+	zone_318	mix_318
+	zone_319	mix_319
+	zone_320	mix_320
+	zone_321	mix_321
+	zone_322	mix_322
+	zone_323	mix_323
+	zone_324	mix_324
+	zone_325	mix_325
+	zone_326	mix_326
+	zone_327	mix_327
+	zone_328	mix_328
+	zone_329	mix_329
+	zone_330	mix_330
+	zone_331	mix_331
+	zone_332	mix_332
+	zone_333	mix_333
+	zone_334	mix_334
+	zone_335	mix_335
+	zone_336	mix_336
+	zone_337	mix_337
+	zone_338	mix_338
+	zone_339	mix_339
+	zone_340	mix_340
+	zone_341	mix_341
+	zone_342	mix_342
+	zone_343	mix_343
+	zone_344	mix_344
+	zone_345	mix_345
+	zone_346	mix_346
+	zone_347	mix_347
+	zone_348	mix_348
+	zone_349	mix_349
+	zone_350	mix_350
+	zone_351	mix_351
+	zone_352	mix_352
+	zone_353	mix_353
+	zone_354	mix_354
+	zone_355	mix_355
+	zone_356	mix_356
+	zone_357	mix_357
+	zone_358	mix_358
+	zone_359	mix_359
+	zone_360	mix_360
+	zone_361	mix_361
+	zone_362	mix_362
+	zone_363	mix_363
+	zone_364	mix_364
+	zone_365	mix_365
+	zone_366	mix_366
+	zone_367	mix_367
+	zone_368	mix_368
+	zone_369	mix_369
+	zone_370	mix_370
+	zone_371	mix_371
+	zone_372	mix_372
+	zone_373	mix_373
+	zone_374	mix_374
+	zone_375	mix_375
+	zone_376	mix_376
+	zone_377	mix_377
+	zone_378	mix_378
+	zone_379	mix_379
+	zone_380	mix_380
+	zone_381	mix_381
+	zone_382	mix_382
+	zone_383	mix_383
+	zone_384	mix_384
+	zone_385	mix_385
+	zone_386	mix_386
+	zone_387	mix_387
+	zone_388	mix_388
+	zone_389	mix_389
+	zone_390	mix_390
+	zone_391	mix_391
+	zone_392	mix_392
+	zone_393	mix_393
+	zone_394	mix_394
+	zone_395	mix_395
+	zone_396	mix_396
+	zone_397	mix_397
+	zone_398	mix_398
+	zone_399	mix_399
+	zone_400	mix_400
+	zone_401	mix_401
+	zone_402	mix_402
+	zone_403	mix_403
+	zone_404	mix_404
+	zone_405	mix_405
+	zone_406	mix_406
+	zone_407	mix_407
+	zone_408	mix_408
+	zone_409	mix_409
+	zone_410	mix_410
+	zone_411	mix_411
+	zone_412	mix_412
+	zone_413	mix_413
+	zone_414	mix_414
+	zone_415	mix_415
+	zone_416	mix_416
+	zone_417	mix_417
+	zone_418	mix_418
+	zone_419	mix_419
+	zone_420	mix_420
+	zone_421	mix_421
+	zone_422	mix_422
+	zone_423	mix_423
+	zone_424	mix_424
+	zone_425	mix_425
+	zone_426	mix_426
+	zone_427	mix_427
+	zone_428	mix_428
+	zone_429	mix_429
+	zone_430	mix_430
+	zone_431	mix_431
+	zone_432	mix_432
+	zone_433	mix_433
+	zone_434	mix_434
+	zone_435	mix_435
+	zone_436	mix_436
+	zone_437	mix_437
+	zone_438	mix_438
+	zone_439	mix_439
+	zone_440	mix_440
+	zone_441	mix_441
+	zone_442	mix_442
+	zone_443	mix_443
+	zone_444	mix_444
+	zone_445	mix_445
+	zone_446	mix_446
+	zone_447	mix_447
+	zone_448	mix_448
+	zone_449	mix_449
+	zone_450	mix_450
+	zone_451	mix_451
+	zone_452	mix_452
+	zone_453	mix_453
+	zone_454	mix_454
+	zone_455	mix_455
+	zone_456	mix_456
+	zone_457	mix_457
+	zone_458	mix_458
+	zone_459	mix_459
+	zone_460	mix_460
+	zone_461	mix_461
+	zone_462	mix_462
+	zone_463	mix_463
+	zone_464	mix_464
+	zone_465	mix_465
+	zone_466	mix_466
+	zone_467	mix_467
+	zone_468	mix_468
+	zone_469	mix_469
+	zone_470	mix_470
+	zone_471	mix_471
+	zone_472	mix_472
+	zone_473	mix_473
+	zone_474	mix_474
+	zone_475	mix_475
+	zone_476	mix_476
+	zone_477	mix_477
+	zone_478	mix_478
+	zone_479	mix_479
+	zone_480	mix_480
+	zone_481	mix_481
+	zone_482	mix_482
+	zone_483	mix_483
+	zone_484	mix_484
+	zone_485	mix_485
+	zone_486	mix_486
+	zone_487	mix_487
+	zone_488	mix_488
+	zone_489	mix_489
+	zone_490	mix_490
+	zone_491	mix_491
+	zone_492	mix_492
+	zone_493	mix_493
+	zone_494	mix_494
+	zone_495	mix_495
+	zone_496	mix_496
+	zone_497	mix_497
+	zone_498	mix_498
+	zone_499	mix_499
+	zone_500	mix_500
+	zone_501	mix_501
+	zone_502	mix_502
+	zone_503	mix_503
+	zone_504	mix_504
+	zone_505	mix_505
+	zone_506	mix_506
+	zone_507	mix_507
+	zone_508	mix_508
+	zone_509	mix_509
+	zone_510	mix_510
+	zone_511	mix_511
+	zone_512	mix_512
+	zone_513	mix_513
+	zone_514	mix_514
+	zone_515	mix_515
+	zone_516	mix_516
+	zone_517	mix_517
+	zone_518	mix_518
+	zone_519	mix_519
+	zone_520	mix_520
+	zone_521	mix_521
+	zone_522	mix_522
+	zone_523	mix_523
+	zone_524	mix_524
+	zone_525	mix_525
+	zone_526	mix_526
+	zone_527	mix_527
+	zone_528	mix_528
+	zone_529	mix_529
+	zone_530	mix_530
+	zone_531	mix_531
+	zone_532	mix_532
+	zone_533	mix_533
+	zone_534	mix_534
+	zone_535	mix_535
+	zone_536	mix_536
+	zone_537	mix_537
+	zone_538	mix_538
+	zone_539	mix_539
+	zone_540	mix_540
+	zone_541	mix_541
+	zone_542	mix_542
+	zone_543	mix_543
+	zone_544	mix_544
+	zone_545	mix_545
+	zone_546	mix_546
+	zone_547	mix_547
+	zone_548	mix_548
+	zone_549	mix_549
+	zone_550	mix_550
+	zone_551	mix_551
+	zone_552	mix_552
+	zone_553	mix_553
+	zone_554	mix_554
+	zone_555	mix_555
+	zone_556	mix_556
+	zone_557	mix_557
+	zone_558	mix_558
+	zone_559	mix_559
+	zone_560	mix_560
+	zone_561	mix_561
+	zone_562	mix_562
+	zone_563	mix_563
+	zone_564	mix_564
+	zone_565	mix_565
+	zone_566	mix_566
+	zone_567	mix_567
+	zone_568	mix_568
+	zone_569	mix_569
+	zone_570	mix_570
+	zone_571	mix_571
+	zone_572	mix_572
+	zone_573	mix_573
+	zone_574	mix_574
+	zone_575	mix_575
+	zone_576	mix_576
+	zone_577	mix_577
+	zone_578	mix_578
+	zone_579	mix_579
+	zone_580	mix_580
+	zone_581	mix_581
+	zone_582	mix_582
+	zone_583	mix_583
+	zone_584	mix_584
+	zone_585	mix_585
+	zone_586	mix_586
+	zone_587	mix_587
+	zone_588	mix_588
+	zone_589	mix_589
+	zone_590	mix_590
+	zone_591	mix_591
+	zone_592	mix_592
+	zone_593	mix_593
+	zone_594	mix_594
+	zone_595	mix_595
+	zone_596	mix_596
+	zone_597	mix_597
+	zone_598	mix_598
+	zone_599	mix_599
+	zone_600	mix_600
+	zone_601	mix_601
+	zone_602	mix_602
+	zone_603	mix_603
+	zone_604	mix_604
+	zone_605	mix_605
+	zone_606	mix_606
+	zone_607	mix_607
+	zone_608	mix_608
+	zone_609	mix_609
+	zone_610	mix_610
+	zone_611	mix_611
+	zone_612	mix_612
+	zone_613	mix_613
+	zone_614	mix_614
+	zone_615	mix_615
+	zone_616	mix_616
+	zone_617	mix_617
+	zone_618	mix_618
+	zone_619	mix_619
+	zone_620	mix_620
+	zone_621	mix_621
+	zone_622	mix_622
+	zone_623	mix_623
+	zone_624	mix_624
+	zone_625	mix_625
+	zone_626	mix_626
+	zone_627	mix_627
+	zone_628	mix_628
+	zone_629	mix_629
+	zone_630	mix_630
+	zone_631	mix_631
+	zone_632	mix_632
+	zone_633	mix_633
+	zone_634	mix_634
+	zone_635	mix_635
+	zone_636	mix_636
+	zone_637	mix_637
+	zone_638	mix_638
+	zone_639	mix_639
+	zone_640	mix_640
+	zone_641	mix_641
+	zone_642	mix_642
+	zone_643	mix_643
+	zone_644	mix_644
+	zone_645	mix_645
+	zone_646	mix_646
+	zone_647	mix_647
+	zone_648	mix_648
+	zone_649	mix_649
+	zone_650	mix_650
+	zone_651	mix_651
+	zone_652	mix_652
+	zone_653	mix_653
+	zone_654	mix_654
+	zone_655	mix_655
+	zone_656	mix_656
+	zone_657	mix_657
+	zone_658	mix_658
+	zone_659	mix_659
+	zone_660	mix_660
+	zone_661	mix_661
+	zone_662	mix_662
+	zone_663	mix_663
+	zone_664	mix_664
+	zone_665	mix_665
+	zone_666	mix_666
+	zone_667	mix_667
+	zone_668	mix_668
+	zone_669	mix_669
+	zone_670	mix_670
+	zone_671	mix_671
+	zone_672	mix_672
+	zone_673	mix_673
+	zone_674	mix_674
+	zone_675	mix_675
+	zone_676	mix_676
+	zone_677	mix_677
+	zone_678	mix_678
+	zone_679	mix_679
+	zone_680	mix_680
+	zone_681	mix_681
+	zone_682	mix_682
+	zone_683	mix_683
+	zone_684	mix_684
+	zone_685	mix_685
+	zone_686	mix_686
+	zone_687	mix_687
+	zone_688	mix_688
+	zone_689	mix_689
+	zone_690	mix_690
+	zone_691	mix_691
+	zone_692	mix_692
+	zone_693	mix_693
+	zone_694	mix_694
+	zone_695	mix_695
+	zone_696	mix_696
+	zone_697	mix_697
+	zone_698	mix_698
+	zone_699	mix_699
+	zone_700	mix_700
+	zone_701	mix_701
+	zone_702	mix_702
+	zone_703	mix_703
+	zone_704	mix_704
+	zone_705	mix_705
+	zone_706	mix_706
+	zone_707	mix_707
+	zone_708	mix_708
+	zone_709	mix_709
+	zone_710	mix_710
+	zone_711	mix_711
+	zone_712	mix_712
+	zone_713	mix_713
+	zone_714	mix_714
+	zone_715	mix_715
+	zone_716	mix_716
+	zone_717	mix_717
+	zone_718	mix_718
+	zone_719	mix_719
+	zone_720	mix_720
+	zone_721	mix_721
+	zone_722	mix_722
+	zone_723	mix_723
+	zone_724	mix_724
+	zone_725	mix_725
+	zone_726	mix_726
+	zone_727	mix_727
+	zone_728	mix_728
+	zone_729	mix_729
+end
+
+mixture	mix_1
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_2
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_3
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_4
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_5
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_6
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_7
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_8
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_9
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_10
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_11
+	material	mat_1	1	1.0
+end
+
+mixture	mix_12
+	material	mat_1	1	1.0
+end
+
+mixture	mix_13
+	material	mat_1	1	1.0
+end
+
+mixture	mix_14
+	material	mat_1	1	1.0
+end
+
+mixture	mix_15
+	material	mat_1	1	1.0
+end
+
+mixture	mix_16
+	material	mat_1	1	1.0
+end
+
+mixture	mix_17
+	material	mat_1	1	1.0
+end
+
+mixture	mix_18
+	material	mat_1	1	1.0
+end
+
+mixture	mix_19
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_20
+	material	mat_1	1	1.0
+end
+
+mixture	mix_21
+	material	mat_1	1	1.0
+end
+
+mixture	mix_22
+	material	mat_1	1	1.0
+end
+
+mixture	mix_23
+	material	mat_1	1	1.0
+end
+
+mixture	mix_24
+	material	mat_1	1	1.0
+end
+
+mixture	mix_25
+	material	mat_1	1	1.0
+end
+
+mixture	mix_26
+	material	mat_1	1	1.0
+end
+
+mixture	mix_27
+	material	mat_1	1	1.0
+end
+
+mixture	mix_28
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_29
+	material	mat_1	1	1.0
+end
+
+mixture	mix_30
+	material	mat_1	1	1.0
+end
+
+mixture	mix_31
+	material	mat_1	1	1.0
+end
+
+mixture	mix_32
+	material	mat_1	1	1.0
+end
+
+mixture	mix_33
+	material	mat_1	1	1.0
+end
+
+mixture	mix_34
+	material	mat_1	1	1.0
+end
+
+mixture	mix_35
+	material	mat_1	1	1.0
+end
+
+mixture	mix_36
+	material	mat_1	1	1.0
+end
+
+mixture	mix_37
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_38
+	material	mat_1	1	1.0
+end
+
+mixture	mix_39
+	material	mat_1	1	1.0
+end
+
+mixture	mix_40
+	material	mat_1	1	1.0
+end
+
+mixture	mix_41
+	material	mat_1	1	1.0
+end
+
+mixture	mix_42
+	material	mat_1	1	1.0
+end
+
+mixture	mix_43
+	material	mat_1	1	1.0
+end
+
+mixture	mix_44
+	material	mat_1	1	1.0
+end
+
+mixture	mix_45
+	material	mat_1	1	1.0
+end
+
+mixture	mix_46
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_47
+	material	mat_1	1	1.0
+end
+
+mixture	mix_48
+	material	mat_1	1	1.0
+end
+
+mixture	mix_49
+	material	mat_1	1	1.0
+end
+
+mixture	mix_50
+	material	mat_1	1	1.0
+end
+
+mixture	mix_51
+	material	mat_1	1	1.0
+end
+
+mixture	mix_52
+	material	mat_1	1	1.0
+end
+
+mixture	mix_53
+	material	mat_1	1	1.0
+end
+
+mixture	mix_54
+	material	mat_1	1	1.0
+end
+
+mixture	mix_55
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_56
+	material	mat_1	1	1.0
+end
+
+mixture	mix_57
+	material	mat_1	1	1.0
+end
+
+mixture	mix_58
+	material	mat_1	1	1.0
+end
+
+mixture	mix_59
+	material	mat_1	1	1.0
+end
+
+mixture	mix_60
+	material	mat_1	1	1.0
+end
+
+mixture	mix_61
+	material	mat_1	1	1.0
+end
+
+mixture	mix_62
+	material	mat_1	1	1.0
+end
+
+mixture	mix_63
+	material	mat_1	1	1.0
+end
+
+mixture	mix_64
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_65
+	material	mat_1	1	1.0
+end
+
+mixture	mix_66
+	material	mat_1	1	1.0
+end
+
+mixture	mix_67
+	material	mat_1	1	1.0
+end
+
+mixture	mix_68
+	material	mat_1	1	1.0
+end
+
+mixture	mix_69
+	material	mat_1	1	1.0
+end
+
+mixture	mix_70
+	material	mat_1	1	1.0
+end
+
+mixture	mix_71
+	material	mat_1	1	1.0
+end
+
+mixture	mix_72
+	material	mat_1	1	1.0
+end
+
+mixture	mix_73
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_74
+	material	mat_1	1	1.0
+end
+
+mixture	mix_75
+	material	mat_1	1	1.0
+end
+
+mixture	mix_76
+	material	mat_1	1	1.0
+end
+
+mixture	mix_77
+	material	mat_1	1	1.0
+end
+
+mixture	mix_78
+	material	mat_1	1	1.0
+end
+
+mixture	mix_79
+	material	mat_1	1	1.0
+end
+
+mixture	mix_80
+	material	mat_1	1	1.0
+end
+
+mixture	mix_81
+	material	mat_1	1	1.0
+end
+
+mixture	mix_82
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_83
+	material	mat_1	1	1.0
+end
+
+mixture	mix_84
+	material	mat_1	1	1.0
+end
+
+mixture	mix_85
+	material	mat_1	1	1.0
+end
+
+mixture	mix_86
+	material	mat_1	1	1.0
+end
+
+mixture	mix_87
+	material	mat_1	1	1.0
+end
+
+mixture	mix_88
+	material	mat_1	1	1.0
+end
+
+mixture	mix_89
+	material	mat_1	1	1.0
+end
+
+mixture	mix_90
+	material	mat_1	1	1.0
+end
+
+mixture	mix_91
+	material	mat_1	1	1.0
+end
+
+mixture	mix_92
+	material	mat_1	1	1.0
+end
+
+mixture	mix_93
+	material	mat_1	1	1.0
+end
+
+mixture	mix_94
+	material	mat_1	1	1.0
+end
+
+mixture	mix_95
+	material	mat_1	1	1.0
+end
+
+mixture	mix_96
+	material	mat_1	1	1.0
+end
+
+mixture	mix_97
+	material	mat_1	1	1.0
+end
+
+mixture	mix_98
+	material	mat_1	1	1.0
+end
+
+mixture	mix_99
+	material	mat_1	1	1.0
+end
+
+mixture	mix_100
+	material	mat_1	1	1.0
+end
+
+mixture	mix_101
+	material	mat_1	1	1.0
+end
+
+mixture	mix_102
+	material	mat_1	1	1.0
+end
+
+mixture	mix_103
+	material	mat_1	1	1.0
+end
+
+mixture	mix_104
+	material	mat_1	1	1.0
+end
+
+mixture	mix_105
+	material	mat_1	1	1.0
+end
+
+mixture	mix_106
+	material	mat_1	1	1.0
+end
+
+mixture	mix_107
+	material	mat_1	1	1.0
+end
+
+mixture	mix_108
+	material	mat_1	1	1.0
+end
+
+mixture	mix_109
+	material	mat_1	1	1.0
+end
+
+mixture	mix_110
+	material	mat_1	1	1.0
+end
+
+mixture	mix_111
+	material	mat_1	1	1.0
+end
+
+mixture	mix_112
+	material	mat_1	1	1.0
+end
+
+mixture	mix_113
+	material	mat_1	1	1.0
+end
+
+mixture	mix_114
+	material	mat_1	1	1.0
+end
+
+mixture	mix_115
+	material	mat_1	1	1.0
+end
+
+mixture	mix_116
+	material	mat_1	1	1.0
+end
+
+mixture	mix_117
+	material	mat_1	1	1.0
+end
+
+mixture	mix_118
+	material	mat_1	1	1.0
+end
+
+mixture	mix_119
+	material	mat_1	1	1.0
+end
+
+mixture	mix_120
+	material	mat_1	1	1.0
+end
+
+mixture	mix_121
+	material	mat_1	1	1.0
+end
+
+mixture	mix_122
+	material	mat_1	1	1.0
+end
+
+mixture	mix_123
+	material	mat_1	1	1.0
+end
+
+mixture	mix_124
+	material	mat_1	1	1.0
+end
+
+mixture	mix_125
+	material	mat_1	1	1.0
+end
+
+mixture	mix_126
+	material	mat_1	1	1.0
+end
+
+mixture	mix_127
+	material	mat_1	1	1.0
+end
+
+mixture	mix_128
+	material	mat_1	1	1.0
+end
+
+mixture	mix_129
+	material	mat_1	1	1.0
+end
+
+mixture	mix_130
+	material	mat_1	1	1.0
+end
+
+mixture	mix_131
+	material	mat_1	1	1.0
+end
+
+mixture	mix_132
+	material	mat_1	1	1.0
+end
+
+mixture	mix_133
+	material	mat_1	1	1.0
+end
+
+mixture	mix_134
+	material	mat_1	1	1.0
+end
+
+mixture	mix_135
+	material	mat_1	1	1.0
+end
+
+mixture	mix_136
+	material	mat_1	1	1.0
+end
+
+mixture	mix_137
+	material	mat_1	1	1.0
+end
+
+mixture	mix_138
+	material	mat_1	1	1.0
+end
+
+mixture	mix_139
+	material	mat_1	1	1.0
+end
+
+mixture	mix_140
+	material	mat_1	1	1.0
+end
+
+mixture	mix_141
+	material	mat_1	1	1.0
+end
+
+mixture	mix_142
+	material	mat_1	1	1.0
+end
+
+mixture	mix_143
+	material	mat_1	1	1.0
+end
+
+mixture	mix_144
+	material	mat_1	1	1.0
+end
+
+mixture	mix_145
+	material	mat_1	1	1.0
+end
+
+mixture	mix_146
+	material	mat_1	1	1.0
+end
+
+mixture	mix_147
+	material	mat_1	1	1.0
+end
+
+mixture	mix_148
+	material	mat_1	1	1.0
+end
+
+mixture	mix_149
+	material	mat_1	1	1.0
+end
+
+mixture	mix_150
+	material	mat_1	1	1.0
+end
+
+mixture	mix_151
+	material	mat_1	1	1.0
+end
+
+mixture	mix_152
+	material	mat_1	1	1.0
+end
+
+mixture	mix_153
+	material	mat_1	1	1.0
+end
+
+mixture	mix_154
+	material	mat_1	1	1.0
+end
+
+mixture	mix_155
+	material	mat_1	1	1.0
+end
+
+mixture	mix_156
+	material	mat_1	1	1.0
+end
+
+mixture	mix_157
+	material	mat_1	1	1.0
+end
+
+mixture	mix_158
+	material	mat_1	1	1.0
+end
+
+mixture	mix_159
+	material	mat_1	1	1.0
+end
+
+mixture	mix_160
+	material	mat_1	1	1.0
+end
+
+mixture	mix_161
+	material	mat_1	1	1.0
+end
+
+mixture	mix_162
+	material	mat_1	1	1.0
+end
+
+mixture	mix_163
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_164
+	material	mat_1	1	1.0
+end
+
+mixture	mix_165
+	material	mat_1	1	1.0
+end
+
+mixture	mix_166
+	material	mat_1	1	1.0
+end
+
+mixture	mix_167
+	material	mat_1	1	1.0
+end
+
+mixture	mix_168
+	material	mat_1	1	1.0
+end
+
+mixture	mix_169
+	material	mat_1	1	1.0
+end
+
+mixture	mix_170
+	material	mat_1	1	1.0
+end
+
+mixture	mix_171
+	material	mat_1	1	1.0
+end
+
+mixture	mix_172
+	material	mat_1	1	1.0
+end
+
+mixture	mix_173
+	material	mat_1	1	1.0
+end
+
+mixture	mix_174
+	material	mat_1	1	1.0
+end
+
+mixture	mix_175
+	material	mat_1	1	1.0
+end
+
+mixture	mix_176
+	material	mat_1	1	1.0
+end
+
+mixture	mix_177
+	material	mat_1	1	1.0
+end
+
+mixture	mix_178
+	material	mat_1	1	1.0
+end
+
+mixture	mix_179
+	material	mat_1	1	1.0
+end
+
+mixture	mix_180
+	material	mat_1	1	1.0
+end
+
+mixture	mix_181
+	material	mat_1	1	1.0
+end
+
+mixture	mix_182
+	material	mat_1	1	1.0
+end
+
+mixture	mix_183
+	material	mat_1	1	1.0
+end
+
+mixture	mix_184
+	material	mat_1	1	1.0
+end
+
+mixture	mix_185
+	material	mat_1	1	1.0
+end
+
+mixture	mix_186
+	material	mat_1	1	1.0
+end
+
+mixture	mix_187
+	material	mat_1	1	1.0
+end
+
+mixture	mix_188
+	material	mat_1	1	1.0
+end
+
+mixture	mix_189
+	material	mat_1	1	1.0
+end
+
+mixture	mix_190
+	material	mat_1	1	1.0
+end
+
+mixture	mix_191
+	material	mat_1	1	1.0
+end
+
+mixture	mix_192
+	material	mat_1	1	1.0
+end
+
+mixture	mix_193
+	material	mat_1	1	1.0
+end
+
+mixture	mix_194
+	material	mat_1	1	1.0
+end
+
+mixture	mix_195
+	material	mat_1	1	1.0
+end
+
+mixture	mix_196
+	material	mat_1	1	1.0
+end
+
+mixture	mix_197
+	material	mat_1	1	1.0
+end
+
+mixture	mix_198
+	material	mat_1	1	1.0
+end
+
+mixture	mix_199
+	material	mat_1	1	1.0
+end
+
+mixture	mix_200
+	material	mat_1	1	1.0
+end
+
+mixture	mix_201
+	material	mat_1	1	1.0
+end
+
+mixture	mix_202
+	material	mat_1	1	1.0
+end
+
+mixture	mix_203
+	material	mat_1	1	1.0
+end
+
+mixture	mix_204
+	material	mat_1	1	1.0
+end
+
+mixture	mix_205
+	material	mat_1	1	1.0
+end
+
+mixture	mix_206
+	material	mat_1	1	1.0
+end
+
+mixture	mix_207
+	material	mat_1	1	1.0
+end
+
+mixture	mix_208
+	material	mat_1	1	1.0
+end
+
+mixture	mix_209
+	material	mat_1	1	1.0
+end
+
+mixture	mix_210
+	material	mat_1	1	1.0
+end
+
+mixture	mix_211
+	material	mat_1	1	1.0
+end
+
+mixture	mix_212
+	material	mat_1	1	1.0
+end
+
+mixture	mix_213
+	material	mat_1	1	1.0
+end
+
+mixture	mix_214
+	material	mat_1	1	1.0
+end
+
+mixture	mix_215
+	material	mat_1	1	1.0
+end
+
+mixture	mix_216
+	material	mat_1	1	1.0
+end
+
+mixture	mix_217
+	material	mat_1	1	1.0
+end
+
+mixture	mix_218
+	material	mat_1	1	1.0
+end
+
+mixture	mix_219
+	material	mat_1	1	1.0
+end
+
+mixture	mix_220
+	material	mat_1	1	1.0
+end
+
+mixture	mix_221
+	material	mat_1	1	1.0
+end
+
+mixture	mix_222
+	material	mat_1	1	1.0
+end
+
+mixture	mix_223
+	material	mat_1	1	1.0
+end
+
+mixture	mix_224
+	material	mat_1	1	1.0
+end
+
+mixture	mix_225
+	material	mat_1	1	1.0
+end
+
+mixture	mix_226
+	material	mat_1	1	1.0
+end
+
+mixture	mix_227
+	material	mat_1	1	1.0
+end
+
+mixture	mix_228
+	material	mat_1	1	1.0
+end
+
+mixture	mix_229
+	material	mat_1	1	1.0
+end
+
+mixture	mix_230
+	material	mat_1	1	1.0
+end
+
+mixture	mix_231
+	material	mat_1	1	1.0
+end
+
+mixture	mix_232
+	material	mat_1	1	1.0
+end
+
+mixture	mix_233
+	material	mat_1	1	1.0
+end
+
+mixture	mix_234
+	material	mat_1	1	1.0
+end
+
+mixture	mix_235
+	material	mat_1	1	1.0
+end
+
+mixture	mix_236
+	material	mat_1	1	1.0
+end
+
+mixture	mix_237
+	material	mat_1	1	1.0
+end
+
+mixture	mix_238
+	material	mat_1	1	1.0
+end
+
+mixture	mix_239
+	material	mat_1	1	1.0
+end
+
+mixture	mix_240
+	material	mat_1	1	1.0
+end
+
+mixture	mix_241
+	material	mat_1	1	1.0
+end
+
+mixture	mix_242
+	material	mat_1	1	1.0
+end
+
+mixture	mix_243
+	material	mat_1	1	1.0
+end
+
+mixture	mix_244
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_245
+	material	mat_1	1	1.0
+end
+
+mixture	mix_246
+	material	mat_1	1	1.0
+end
+
+mixture	mix_247
+	material	mat_1	1	1.0
+end
+
+mixture	mix_248
+	material	mat_1	1	1.0
+end
+
+mixture	mix_249
+	material	mat_1	1	1.0
+end
+
+mixture	mix_250
+	material	mat_1	1	1.0
+end
+
+mixture	mix_251
+	material	mat_1	1	1.0
+end
+
+mixture	mix_252
+	material	mat_1	1	1.0
+end
+
+mixture	mix_253
+	material	mat_1	1	1.0
+end
+
+mixture	mix_254
+	material	mat_1	1	1.0
+end
+
+mixture	mix_255
+	material	mat_1	1	1.0
+end
+
+mixture	mix_256
+	material	mat_1	1	1.0
+end
+
+mixture	mix_257
+	material	mat_1	1	1.0
+end
+
+mixture	mix_258
+	material	mat_1	1	1.0
+end
+
+mixture	mix_259
+	material	mat_1	1	1.0
+end
+
+mixture	mix_260
+	material	mat_1	1	1.0
+end
+
+mixture	mix_261
+	material	mat_1	1	1.0
+end
+
+mixture	mix_262
+	material	mat_1	1	1.0
+end
+
+mixture	mix_263
+	material	mat_1	1	1.0
+end
+
+mixture	mix_264
+	material	mat_1	1	1.0
+end
+
+mixture	mix_265
+	material	mat_1	1	1.0
+end
+
+mixture	mix_266
+	material	mat_1	1	1.0
+end
+
+mixture	mix_267
+	material	mat_1	1	1.0
+end
+
+mixture	mix_268
+	material	mat_1	1	1.0
+end
+
+mixture	mix_269
+	material	mat_1	1	1.0
+end
+
+mixture	mix_270
+	material	mat_1	1	1.0
+end
+
+mixture	mix_271
+	material	mat_1	1	1.0
+end
+
+mixture	mix_272
+	material	mat_1	1	1.0
+end
+
+mixture	mix_273
+	material	mat_1	1	1.0
+end
+
+mixture	mix_274
+	material	mat_1	1	1.0
+end
+
+mixture	mix_275
+	material	mat_1	1	1.0
+end
+
+mixture	mix_276
+	material	mat_1	1	1.0
+end
+
+mixture	mix_277
+	material	mat_1	1	1.0
+end
+
+mixture	mix_278
+	material	mat_1	1	1.0
+end
+
+mixture	mix_279
+	material	mat_1	1	1.0
+end
+
+mixture	mix_280
+	material	mat_1	1	1.0
+end
+
+mixture	mix_281
+	material	mat_1	1	1.0
+end
+
+mixture	mix_282
+	material	mat_1	1	1.0
+end
+
+mixture	mix_283
+	material	mat_1	1	1.0
+end
+
+mixture	mix_284
+	material	mat_1	1	1.0
+end
+
+mixture	mix_285
+	material	mat_1	1	1.0
+end
+
+mixture	mix_286
+	material	mat_1	1	1.0
+end
+
+mixture	mix_287
+	material	mat_1	1	1.0
+end
+
+mixture	mix_288
+	material	mat_1	1	1.0
+end
+
+mixture	mix_289
+	material	mat_1	1	1.0
+end
+
+mixture	mix_290
+	material	mat_1	1	1.0
+end
+
+mixture	mix_291
+	material	mat_1	1	1.0
+end
+
+mixture	mix_292
+	material	mat_1	1	1.0
+end
+
+mixture	mix_293
+	material	mat_1	1	1.0
+end
+
+mixture	mix_294
+	material	mat_1	1	1.0
+end
+
+mixture	mix_295
+	material	mat_1	1	1.0
+end
+
+mixture	mix_296
+	material	mat_1	1	1.0
+end
+
+mixture	mix_297
+	material	mat_1	1	1.0
+end
+
+mixture	mix_298
+	material	mat_1	1	1.0
+end
+
+mixture	mix_299
+	material	mat_1	1	1.0
+end
+
+mixture	mix_300
+	material	mat_1	1	1.0
+end
+
+mixture	mix_301
+	material	mat_1	1	1.0
+end
+
+mixture	mix_302
+	material	mat_1	1	1.0
+end
+
+mixture	mix_303
+	material	mat_1	1	1.0
+end
+
+mixture	mix_304
+	material	mat_1	1	1.0
+end
+
+mixture	mix_305
+	material	mat_1	1	1.0
+end
+
+mixture	mix_306
+	material	mat_1	1	1.0
+end
+
+mixture	mix_307
+	material	mat_1	1	1.0
+end
+
+mixture	mix_308
+	material	mat_1	1	1.0
+end
+
+mixture	mix_309
+	material	mat_1	1	1.0
+end
+
+mixture	mix_310
+	material	mat_1	1	1.0
+end
+
+mixture	mix_311
+	material	mat_1	1	1.0
+end
+
+mixture	mix_312
+	material	mat_1	1	1.0
+end
+
+mixture	mix_313
+	material	mat_1	1	1.0
+end
+
+mixture	mix_314
+	material	mat_1	1	1.0
+end
+
+mixture	mix_315
+	material	mat_1	1	1.0
+end
+
+mixture	mix_316
+	material	mat_1	1	1.0
+end
+
+mixture	mix_317
+	material	mat_1	1	1.0
+end
+
+mixture	mix_318
+	material	mat_1	1	1.0
+end
+
+mixture	mix_319
+	material	mat_1	1	1.0
+end
+
+mixture	mix_320
+	material	mat_1	1	1.0
+end
+
+mixture	mix_321
+	material	mat_1	1	1.0
+end
+
+mixture	mix_322
+	material	mat_1	1	1.0
+end
+
+mixture	mix_323
+	material	mat_1	1	1.0
+end
+
+mixture	mix_324
+	material	mat_1	1	1.0
+end
+
+mixture	mix_325
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_326
+	material	mat_1	1	1.0
+end
+
+mixture	mix_327
+	material	mat_1	1	1.0
+end
+
+mixture	mix_328
+	material	mat_1	1	1.0
+end
+
+mixture	mix_329
+	material	mat_1	1	1.0
+end
+
+mixture	mix_330
+	material	mat_1	1	1.0
+end
+
+mixture	mix_331
+	material	mat_1	1	1.0
+end
+
+mixture	mix_332
+	material	mat_1	1	1.0
+end
+
+mixture	mix_333
+	material	mat_1	1	1.0
+end
+
+mixture	mix_334
+	material	mat_1	1	1.0
+end
+
+mixture	mix_335
+	material	mat_1	1	1.0
+end
+
+mixture	mix_336
+	material	mat_1	1	1.0
+end
+
+mixture	mix_337
+	material	mat_1	1	1.0
+end
+
+mixture	mix_338
+	material	mat_1	1	1.0
+end
+
+mixture	mix_339
+	material	mat_1	1	1.0
+end
+
+mixture	mix_340
+	material	mat_1	1	1.0
+end
+
+mixture	mix_341
+	material	mat_1	1	1.0
+end
+
+mixture	mix_342
+	material	mat_1	1	1.0
+end
+
+mixture	mix_343
+	material	mat_1	1	1.0
+end
+
+mixture	mix_344
+	material	mat_1	1	1.0
+end
+
+mixture	mix_345
+	material	mat_1	1	1.0
+end
+
+mixture	mix_346
+	material	mat_1	1	1.0
+end
+
+mixture	mix_347
+	material	mat_1	1	1.0
+end
+
+mixture	mix_348
+	material	mat_1	1	1.0
+end
+
+mixture	mix_349
+	material	mat_1	1	1.0
+end
+
+mixture	mix_350
+	material	mat_1	1	1.0
+end
+
+mixture	mix_351
+	material	mat_1	1	1.0
+end
+
+mixture	mix_352
+	material	mat_1	1	1.0
+end
+
+mixture	mix_353
+	material	mat_1	1	1.0
+end
+
+mixture	mix_354
+	material	mat_1	1	1.0
+end
+
+mixture	mix_355
+	material	mat_1	1	1.0
+end
+
+mixture	mix_356
+	material	mat_1	1	1.0
+end
+
+mixture	mix_357
+	material	mat_1	1	1.0
+end
+
+mixture	mix_358
+	material	mat_1	1	1.0
+end
+
+mixture	mix_359
+	material	mat_1	1	1.0
+end
+
+mixture	mix_360
+	material	mat_1	1	1.0
+end
+
+mixture	mix_361
+	material	mat_1	1	1.0
+end
+
+mixture	mix_362
+	material	mat_1	1	1.0
+end
+
+mixture	mix_363
+	material	mat_1	1	1.0
+end
+
+mixture	mix_364
+	material	mat_1	1	1.0
+end
+
+mixture	mix_365
+	material	mat_1	1	1.0
+end
+
+mixture	mix_366
+	material	mat_1	1	1.0
+end
+
+mixture	mix_367
+	material	mat_1	1	1.0
+end
+
+mixture	mix_368
+	material	mat_1	1	1.0
+end
+
+mixture	mix_369
+	material	mat_1	1	1.0
+end
+
+mixture	mix_370
+	material	mat_1	1	1.0
+end
+
+mixture	mix_371
+	material	mat_1	1	1.0
+end
+
+mixture	mix_372
+	material	mat_1	1	1.0
+end
+
+mixture	mix_373
+	material	mat_1	1	1.0
+end
+
+mixture	mix_374
+	material	mat_1	1	1.0
+end
+
+mixture	mix_375
+	material	mat_1	1	1.0
+end
+
+mixture	mix_376
+	material	mat_1	1	1.0
+end
+
+mixture	mix_377
+	material	mat_1	1	1.0
+end
+
+mixture	mix_378
+	material	mat_1	1	1.0
+end
+
+mixture	mix_379
+	material	mat_1	1	1.0
+end
+
+mixture	mix_380
+	material	mat_1	1	1.0
+end
+
+mixture	mix_381
+	material	mat_1	1	1.0
+end
+
+mixture	mix_382
+	material	mat_1	1	1.0
+end
+
+mixture	mix_383
+	material	mat_1	1	1.0
+end
+
+mixture	mix_384
+	material	mat_1	1	1.0
+end
+
+mixture	mix_385
+	material	mat_1	1	1.0
+end
+
+mixture	mix_386
+	material	mat_1	1	1.0
+end
+
+mixture	mix_387
+	material	mat_1	1	1.0
+end
+
+mixture	mix_388
+	material	mat_1	1	1.0
+end
+
+mixture	mix_389
+	material	mat_1	1	1.0
+end
+
+mixture	mix_390
+	material	mat_1	1	1.0
+end
+
+mixture	mix_391
+	material	mat_1	1	1.0
+end
+
+mixture	mix_392
+	material	mat_1	1	1.0
+end
+
+mixture	mix_393
+	material	mat_1	1	1.0
+end
+
+mixture	mix_394
+	material	mat_1	1	1.0
+end
+
+mixture	mix_395
+	material	mat_1	1	1.0
+end
+
+mixture	mix_396
+	material	mat_1	1	1.0
+end
+
+mixture	mix_397
+	material	mat_1	1	1.0
+end
+
+mixture	mix_398
+	material	mat_1	1	1.0
+end
+
+mixture	mix_399
+	material	mat_1	1	1.0
+end
+
+mixture	mix_400
+	material	mat_1	1	1.0
+end
+
+mixture	mix_401
+	material	mat_1	1	1.0
+end
+
+mixture	mix_402
+	material	mat_1	1	1.0
+end
+
+mixture	mix_403
+	material	mat_1	1	1.0
+end
+
+mixture	mix_404
+	material	mat_1	1	1.0
+end
+
+mixture	mix_405
+	material	mat_1	1	1.0
+end
+
+mixture	mix_406
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_407
+	material	mat_1	1	1.0
+end
+
+mixture	mix_408
+	material	mat_1	1	1.0
+end
+
+mixture	mix_409
+	material	mat_1	1	1.0
+end
+
+mixture	mix_410
+	material	mat_1	1	1.0
+end
+
+mixture	mix_411
+	material	mat_1	1	1.0
+end
+
+mixture	mix_412
+	material	mat_1	1	1.0
+end
+
+mixture	mix_413
+	material	mat_1	1	1.0
+end
+
+mixture	mix_414
+	material	mat_1	1	1.0
+end
+
+mixture	mix_415
+	material	mat_1	1	1.0
+end
+
+mixture	mix_416
+	material	mat_1	1	1.0
+end
+
+mixture	mix_417
+	material	mat_1	1	1.0
+end
+
+mixture	mix_418
+	material	mat_1	1	1.0
+end
+
+mixture	mix_419
+	material	mat_1	1	1.0
+end
+
+mixture	mix_420
+	material	mat_1	1	1.0
+end
+
+mixture	mix_421
+	material	mat_1	1	1.0
+end
+
+mixture	mix_422
+	material	mat_1	1	1.0
+end
+
+mixture	mix_423
+	material	mat_1	1	1.0
+end
+
+mixture	mix_424
+	material	mat_1	1	1.0
+end
+
+mixture	mix_425
+	material	mat_1	1	1.0
+end
+
+mixture	mix_426
+	material	mat_1	1	1.0
+end
+
+mixture	mix_427
+	material	mat_1	1	1.0
+end
+
+mixture	mix_428
+	material	mat_1	1	1.0
+end
+
+mixture	mix_429
+	material	mat_1	1	1.0
+end
+
+mixture	mix_430
+	material	mat_1	1	1.0
+end
+
+mixture	mix_431
+	material	mat_1	1	1.0
+end
+
+mixture	mix_432
+	material	mat_1	1	1.0
+end
+
+mixture	mix_433
+	material	mat_1	1	1.0
+end
+
+mixture	mix_434
+	material	mat_1	1	1.0
+end
+
+mixture	mix_435
+	material	mat_1	1	1.0
+end
+
+mixture	mix_436
+	material	mat_1	1	1.0
+end
+
+mixture	mix_437
+	material	mat_1	1	1.0
+end
+
+mixture	mix_438
+	material	mat_1	1	1.0
+end
+
+mixture	mix_439
+	material	mat_1	1	1.0
+end
+
+mixture	mix_440
+	material	mat_1	1	1.0
+end
+
+mixture	mix_441
+	material	mat_1	1	1.0
+end
+
+mixture	mix_442
+	material	mat_1	1	1.0
+end
+
+mixture	mix_443
+	material	mat_1	1	1.0
+end
+
+mixture	mix_444
+	material	mat_1	1	1.0
+end
+
+mixture	mix_445
+	material	mat_1	1	1.0
+end
+
+mixture	mix_446
+	material	mat_1	1	1.0
+end
+
+mixture	mix_447
+	material	mat_1	1	1.0
+end
+
+mixture	mix_448
+	material	mat_1	1	1.0
+end
+
+mixture	mix_449
+	material	mat_1	1	1.0
+end
+
+mixture	mix_450
+	material	mat_1	1	1.0
+end
+
+mixture	mix_451
+	material	mat_1	1	1.0
+end
+
+mixture	mix_452
+	material	mat_1	1	1.0
+end
+
+mixture	mix_453
+	material	mat_1	1	1.0
+end
+
+mixture	mix_454
+	material	mat_1	1	1.0
+end
+
+mixture	mix_455
+	material	mat_1	1	1.0
+end
+
+mixture	mix_456
+	material	mat_1	1	1.0
+end
+
+mixture	mix_457
+	material	mat_1	1	1.0
+end
+
+mixture	mix_458
+	material	mat_1	1	1.0
+end
+
+mixture	mix_459
+	material	mat_1	1	1.0
+end
+
+mixture	mix_460
+	material	mat_1	1	1.0
+end
+
+mixture	mix_461
+	material	mat_1	1	1.0
+end
+
+mixture	mix_462
+	material	mat_1	1	1.0
+end
+
+mixture	mix_463
+	material	mat_1	1	1.0
+end
+
+mixture	mix_464
+	material	mat_1	1	1.0
+end
+
+mixture	mix_465
+	material	mat_1	1	1.0
+end
+
+mixture	mix_466
+	material	mat_1	1	1.0
+end
+
+mixture	mix_467
+	material	mat_1	1	1.0
+end
+
+mixture	mix_468
+	material	mat_1	1	1.0
+end
+
+mixture	mix_469
+	material	mat_1	1	1.0
+end
+
+mixture	mix_470
+	material	mat_1	1	1.0
+end
+
+mixture	mix_471
+	material	mat_1	1	1.0
+end
+
+mixture	mix_472
+	material	mat_1	1	1.0
+end
+
+mixture	mix_473
+	material	mat_1	1	1.0
+end
+
+mixture	mix_474
+	material	mat_1	1	1.0
+end
+
+mixture	mix_475
+	material	mat_1	1	1.0
+end
+
+mixture	mix_476
+	material	mat_1	1	1.0
+end
+
+mixture	mix_477
+	material	mat_1	1	1.0
+end
+
+mixture	mix_478
+	material	mat_1	1	1.0
+end
+
+mixture	mix_479
+	material	mat_1	1	1.0
+end
+
+mixture	mix_480
+	material	mat_1	1	1.0
+end
+
+mixture	mix_481
+	material	mat_1	1	1.0
+end
+
+mixture	mix_482
+	material	mat_1	1	1.0
+end
+
+mixture	mix_483
+	material	mat_1	1	1.0
+end
+
+mixture	mix_484
+	material	mat_1	1	1.0
+end
+
+mixture	mix_485
+	material	mat_1	1	1.0
+end
+
+mixture	mix_486
+	material	mat_1	1	1.0
+end
+
+mixture	mix_487
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_488
+	material	mat_1	1	1.0
+end
+
+mixture	mix_489
+	material	mat_1	1	1.0
+end
+
+mixture	mix_490
+	material	mat_1	1	1.0
+end
+
+mixture	mix_491
+	material	mat_1	1	1.0
+end
+
+mixture	mix_492
+	material	mat_1	1	1.0
+end
+
+mixture	mix_493
+	material	mat_1	1	1.0
+end
+
+mixture	mix_494
+	material	mat_1	1	1.0
+end
+
+mixture	mix_495
+	material	mat_1	1	1.0
+end
+
+mixture	mix_496
+	material	mat_1	1	1.0
+end
+
+mixture	mix_497
+	material	mat_1	1	1.0
+end
+
+mixture	mix_498
+	material	mat_1	1	1.0
+end
+
+mixture	mix_499
+	material	mat_1	1	1.0
+end
+
+mixture	mix_500
+	material	mat_1	1	1.0
+end
+
+mixture	mix_501
+	material	mat_1	1	1.0
+end
+
+mixture	mix_502
+	material	mat_1	1	1.0
+end
+
+mixture	mix_503
+	material	mat_1	1	1.0
+end
+
+mixture	mix_504
+	material	mat_1	1	1.0
+end
+
+mixture	mix_505
+	material	mat_1	1	1.0
+end
+
+mixture	mix_506
+	material	mat_1	1	1.0
+end
+
+mixture	mix_507
+	material	mat_1	1	1.0
+end
+
+mixture	mix_508
+	material	mat_1	1	1.0
+end
+
+mixture	mix_509
+	material	mat_1	1	1.0
+end
+
+mixture	mix_510
+	material	mat_1	1	1.0
+end
+
+mixture	mix_511
+	material	mat_1	1	1.0
+end
+
+mixture	mix_512
+	material	mat_1	1	1.0
+end
+
+mixture	mix_513
+	material	mat_1	1	1.0
+end
+
+mixture	mix_514
+	material	mat_1	1	1.0
+end
+
+mixture	mix_515
+	material	mat_1	1	1.0
+end
+
+mixture	mix_516
+	material	mat_1	1	1.0
+end
+
+mixture	mix_517
+	material	mat_1	1	1.0
+end
+
+mixture	mix_518
+	material	mat_1	1	1.0
+end
+
+mixture	mix_519
+	material	mat_1	1	1.0
+end
+
+mixture	mix_520
+	material	mat_1	1	1.0
+end
+
+mixture	mix_521
+	material	mat_1	1	1.0
+end
+
+mixture	mix_522
+	material	mat_1	1	1.0
+end
+
+mixture	mix_523
+	material	mat_1	1	1.0
+end
+
+mixture	mix_524
+	material	mat_1	1	1.0
+end
+
+mixture	mix_525
+	material	mat_1	1	1.0
+end
+
+mixture	mix_526
+	material	mat_1	1	1.0
+end
+
+mixture	mix_527
+	material	mat_1	1	1.0
+end
+
+mixture	mix_528
+	material	mat_1	1	1.0
+end
+
+mixture	mix_529
+	material	mat_1	1	1.0
+end
+
+mixture	mix_530
+	material	mat_1	1	1.0
+end
+
+mixture	mix_531
+	material	mat_1	1	1.0
+end
+
+mixture	mix_532
+	material	mat_1	1	1.0
+end
+
+mixture	mix_533
+	material	mat_1	1	1.0
+end
+
+mixture	mix_534
+	material	mat_1	1	1.0
+end
+
+mixture	mix_535
+	material	mat_1	1	1.0
+end
+
+mixture	mix_536
+	material	mat_1	1	1.0
+end
+
+mixture	mix_537
+	material	mat_1	1	1.0
+end
+
+mixture	mix_538
+	material	mat_1	1	1.0
+end
+
+mixture	mix_539
+	material	mat_1	1	1.0
+end
+
+mixture	mix_540
+	material	mat_1	1	1.0
+end
+
+mixture	mix_541
+	material	mat_1	1	1.0
+end
+
+mixture	mix_542
+	material	mat_1	1	1.0
+end
+
+mixture	mix_543
+	material	mat_1	1	1.0
+end
+
+mixture	mix_544
+	material	mat_1	1	1.0
+end
+
+mixture	mix_545
+	material	mat_1	1	1.0
+end
+
+mixture	mix_546
+	material	mat_1	1	1.0
+end
+
+mixture	mix_547
+	material	mat_1	1	1.0
+end
+
+mixture	mix_548
+	material	mat_1	1	1.0
+end
+
+mixture	mix_549
+	material	mat_1	1	1.0
+end
+
+mixture	mix_550
+	material	mat_1	1	1.0
+end
+
+mixture	mix_551
+	material	mat_1	1	1.0
+end
+
+mixture	mix_552
+	material	mat_1	1	1.0
+end
+
+mixture	mix_553
+	material	mat_1	1	1.0
+end
+
+mixture	mix_554
+	material	mat_1	1	1.0
+end
+
+mixture	mix_555
+	material	mat_1	1	1.0
+end
+
+mixture	mix_556
+	material	mat_1	1	1.0
+end
+
+mixture	mix_557
+	material	mat_1	1	1.0
+end
+
+mixture	mix_558
+	material	mat_1	1	1.0
+end
+
+mixture	mix_559
+	material	mat_1	1	1.0
+end
+
+mixture	mix_560
+	material	mat_1	1	1.0
+end
+
+mixture	mix_561
+	material	mat_1	1	1.0
+end
+
+mixture	mix_562
+	material	mat_1	1	1.0
+end
+
+mixture	mix_563
+	material	mat_1	1	1.0
+end
+
+mixture	mix_564
+	material	mat_1	1	1.0
+end
+
+mixture	mix_565
+	material	mat_1	1	1.0
+end
+
+mixture	mix_566
+	material	mat_1	1	1.0
+end
+
+mixture	mix_567
+	material	mat_1	1	1.0
+end
+
+mixture	mix_568
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_569
+	material	mat_1	1	1.0
+end
+
+mixture	mix_570
+	material	mat_1	1	1.0
+end
+
+mixture	mix_571
+	material	mat_1	1	1.0
+end
+
+mixture	mix_572
+	material	mat_1	1	1.0
+end
+
+mixture	mix_573
+	material	mat_1	1	1.0
+end
+
+mixture	mix_574
+	material	mat_1	1	1.0
+end
+
+mixture	mix_575
+	material	mat_1	1	1.0
+end
+
+mixture	mix_576
+	material	mat_1	1	1.0
+end
+
+mixture	mix_577
+	material	mat_1	1	1.0
+end
+
+mixture	mix_578
+	material	mat_1	1	1.0
+end
+
+mixture	mix_579
+	material	mat_1	1	1.0
+end
+
+mixture	mix_580
+	material	mat_1	1	1.0
+end
+
+mixture	mix_581
+	material	mat_1	1	1.0
+end
+
+mixture	mix_582
+	material	mat_1	1	1.0
+end
+
+mixture	mix_583
+	material	mat_1	1	1.0
+end
+
+mixture	mix_584
+	material	mat_1	1	1.0
+end
+
+mixture	mix_585
+	material	mat_1	1	1.0
+end
+
+mixture	mix_586
+	material	mat_1	1	1.0
+end
+
+mixture	mix_587
+	material	mat_1	1	1.0
+end
+
+mixture	mix_588
+	material	mat_1	1	1.0
+end
+
+mixture	mix_589
+	material	mat_1	1	1.0
+end
+
+mixture	mix_590
+	material	mat_1	1	1.0
+end
+
+mixture	mix_591
+	material	mat_1	1	1.0
+end
+
+mixture	mix_592
+	material	mat_1	1	1.0
+end
+
+mixture	mix_593
+	material	mat_1	1	1.0
+end
+
+mixture	mix_594
+	material	mat_1	1	1.0
+end
+
+mixture	mix_595
+	material	mat_1	1	1.0
+end
+
+mixture	mix_596
+	material	mat_1	1	1.0
+end
+
+mixture	mix_597
+	material	mat_1	1	1.0
+end
+
+mixture	mix_598
+	material	mat_1	1	1.0
+end
+
+mixture	mix_599
+	material	mat_1	1	1.0
+end
+
+mixture	mix_600
+	material	mat_1	1	1.0
+end
+
+mixture	mix_601
+	material	mat_1	1	1.0
+end
+
+mixture	mix_602
+	material	mat_1	1	1.0
+end
+
+mixture	mix_603
+	material	mat_1	1	1.0
+end
+
+mixture	mix_604
+	material	mat_1	1	1.0
+end
+
+mixture	mix_605
+	material	mat_1	1	1.0
+end
+
+mixture	mix_606
+	material	mat_1	1	1.0
+end
+
+mixture	mix_607
+	material	mat_1	1	1.0
+end
+
+mixture	mix_608
+	material	mat_1	1	1.0
+end
+
+mixture	mix_609
+	material	mat_1	1	1.0
+end
+
+mixture	mix_610
+	material	mat_1	1	1.0
+end
+
+mixture	mix_611
+	material	mat_1	1	1.0
+end
+
+mixture	mix_612
+	material	mat_1	1	1.0
+end
+
+mixture	mix_613
+	material	mat_1	1	1.0
+end
+
+mixture	mix_614
+	material	mat_1	1	1.0
+end
+
+mixture	mix_615
+	material	mat_1	1	1.0
+end
+
+mixture	mix_616
+	material	mat_1	1	1.0
+end
+
+mixture	mix_617
+	material	mat_1	1	1.0
+end
+
+mixture	mix_618
+	material	mat_1	1	1.0
+end
+
+mixture	mix_619
+	material	mat_1	1	1.0
+end
+
+mixture	mix_620
+	material	mat_1	1	1.0
+end
+
+mixture	mix_621
+	material	mat_1	1	1.0
+end
+
+mixture	mix_622
+	material	mat_1	1	1.0
+end
+
+mixture	mix_623
+	material	mat_1	1	1.0
+end
+
+mixture	mix_624
+	material	mat_1	1	1.0
+end
+
+mixture	mix_625
+	material	mat_1	1	1.0
+end
+
+mixture	mix_626
+	material	mat_1	1	1.0
+end
+
+mixture	mix_627
+	material	mat_1	1	1.0
+end
+
+mixture	mix_628
+	material	mat_1	1	1.0
+end
+
+mixture	mix_629
+	material	mat_1	1	1.0
+end
+
+mixture	mix_630
+	material	mat_1	1	1.0
+end
+
+mixture	mix_631
+	material	mat_1	1	1.0
+end
+
+mixture	mix_632
+	material	mat_1	1	1.0
+end
+
+mixture	mix_633
+	material	mat_1	1	1.0
+end
+
+mixture	mix_634
+	material	mat_1	1	1.0
+end
+
+mixture	mix_635
+	material	mat_1	1	1.0
+end
+
+mixture	mix_636
+	material	mat_1	1	1.0
+end
+
+mixture	mix_637
+	material	mat_1	1	1.0
+end
+
+mixture	mix_638
+	material	mat_1	1	1.0
+end
+
+mixture	mix_639
+	material	mat_1	1	1.0
+end
+
+mixture	mix_640
+	material	mat_1	1	1.0
+end
+
+mixture	mix_641
+	material	mat_1	1	1.0
+end
+
+mixture	mix_642
+	material	mat_1	1	1.0
+end
+
+mixture	mix_643
+	material	mat_1	1	1.0
+end
+
+mixture	mix_644
+	material	mat_1	1	1.0
+end
+
+mixture	mix_645
+	material	mat_1	1	1.0
+end
+
+mixture	mix_646
+	material	mat_1	1	1.0
+end
+
+mixture	mix_647
+	material	mat_1	1	1.0
+end
+
+mixture	mix_648
+	material	mat_1	1	1.0
+end
+
+mixture	mix_649
+	material	mat_1	1	0.999999
+end
+
+mixture	mix_650
+	material	mat_1	1	1.0
+end
+
+mixture	mix_651
+	material	mat_1	1	1.0
+end
+
+mixture	mix_652
+	material	mat_1	1	1.0
+end
+
+mixture	mix_653
+	material	mat_1	1	1.0
+end
+
+mixture	mix_654
+	material	mat_1	1	1.0
+end
+
+mixture	mix_655
+	material	mat_1	1	1.0
+end
+
+mixture	mix_656
+	material	mat_1	1	1.0
+end
+
+mixture	mix_657
+	material	mat_1	1	1.0
+end
+
+mixture	mix_658
+	material	mat_1	1	1.0
+end
+
+mixture	mix_659
+	material	mat_1	1	1.0
+end
+
+mixture	mix_660
+	material	mat_1	1	1.0
+end
+
+mixture	mix_661
+	material	mat_1	1	1.0
+end
+
+mixture	mix_662
+	material	mat_1	1	1.0
+end
+
+mixture	mix_663
+	material	mat_1	1	1.0
+end
+
+mixture	mix_664
+	material	mat_1	1	1.0
+end
+
+mixture	mix_665
+	material	mat_1	1	1.0
+end
+
+mixture	mix_666
+	material	mat_1	1	1.0
+end
+
+mixture	mix_667
+	material	mat_1	1	1.0
+end
+
+mixture	mix_668
+	material	mat_1	1	1.0
+end
+
+mixture	mix_669
+	material	mat_1	1	1.0
+end
+
+mixture	mix_670
+	material	mat_1	1	1.0
+end
+
+mixture	mix_671
+	material	mat_1	1	1.0
+end
+
+mixture	mix_672
+	material	mat_1	1	1.0
+end
+
+mixture	mix_673
+	material	mat_1	1	1.0
+end
+
+mixture	mix_674
+	material	mat_1	1	1.0
+end
+
+mixture	mix_675
+	material	mat_1	1	1.0
+end
+
+mixture	mix_676
+	material	mat_1	1	1.0
+end
+
+mixture	mix_677
+	material	mat_1	1	1.0
+end
+
+mixture	mix_678
+	material	mat_1	1	1.0
+end
+
+mixture	mix_679
+	material	mat_1	1	1.0
+end
+
+mixture	mix_680
+	material	mat_1	1	1.0
+end
+
+mixture	mix_681
+	material	mat_1	1	1.0
+end
+
+mixture	mix_682
+	material	mat_1	1	1.0
+end
+
+mixture	mix_683
+	material	mat_1	1	1.0
+end
+
+mixture	mix_684
+	material	mat_1	1	1.0
+end
+
+mixture	mix_685
+	material	mat_1	1	1.0
+end
+
+mixture	mix_686
+	material	mat_1	1	1.0
+end
+
+mixture	mix_687
+	material	mat_1	1	1.0
+end
+
+mixture	mix_688
+	material	mat_1	1	1.0
+end
+
+mixture	mix_689
+	material	mat_1	1	1.0
+end
+
+mixture	mix_690
+	material	mat_1	1	1.0
+end
+
+mixture	mix_691
+	material	mat_1	1	1.0
+end
+
+mixture	mix_692
+	material	mat_1	1	1.0
+end
+
+mixture	mix_693
+	material	mat_1	1	1.0
+end
+
+mixture	mix_694
+	material	mat_1	1	1.0
+end
+
+mixture	mix_695
+	material	mat_1	1	1.0
+end
+
+mixture	mix_696
+	material	mat_1	1	1.0
+end
+
+mixture	mix_697
+	material	mat_1	1	1.0
+end
+
+mixture	mix_698
+	material	mat_1	1	1.0
+end
+
+mixture	mix_699
+	material	mat_1	1	1.0
+end
+
+mixture	mix_700
+	material	mat_1	1	1.0
+end
+
+mixture	mix_701
+	material	mat_1	1	1.0
+end
+
+mixture	mix_702
+	material	mat_1	1	1.0
+end
+
+mixture	mix_703
+	material	mat_1	1	1.0
+end
+
+mixture	mix_704
+	material	mat_1	1	1.0
+end
+
+mixture	mix_705
+	material	mat_1	1	1.0
+end
+
+mixture	mix_706
+	material	mat_1	1	1.0
+end
+
+mixture	mix_707
+	material	mat_1	1	1.0
+end
+
+mixture	mix_708
+	material	mat_1	1	1.0
+end
+
+mixture	mix_709
+	material	mat_1	1	1.0
+end
+
+mixture	mix_710
+	material	mat_1	1	1.0
+end
+
+mixture	mix_711
+	material	mat_1	1	1.0
+end
+
+mixture	mix_712
+	material	mat_1	1	1.0
+end
+
+mixture	mix_713
+	material	mat_1	1	1.0
+end
+
+mixture	mix_714
+	material	mat_1	1	1.0
+end
+
+mixture	mix_715
+	material	mat_1	1	1.0
+end
+
+mixture	mix_716
+	material	mat_1	1	1.0
+end
+
+mixture	mix_717
+	material	mat_1	1	1.0
+end
+
+mixture	mix_718
+	material	mat_1	1	1.0
+end
+
+mixture	mix_719
+	material	mat_1	1	1.0
+end
+
+mixture	mix_720
+	material	mat_1	1	1.0
+end
+
+mixture	mix_721
+	material	mat_1	1	1.0
+end
+
+mixture	mix_722
+	material	mat_1	1	1.0
+end
+
+mixture	mix_723
+	material	mat_1	1	1.0
+end
+
+mixture	mix_724
+	material	mat_1	1	1.0
+end
+
+mixture	mix_725
+	material	mat_1	1	1.0
+end
+
+mixture	mix_726
+	material	mat_1	1	1.0
+end
+
+mixture	mix_727
+	material	mat_1	1	1.0
+end
+
+mixture	mix_728
+	material	mat_1	1	1.0
+end
+
+mixture	mix_729
+	material	mat_1	1	1.0
+end
+
+material_lib	matlib
+element_lib	elelib
+data_library alaralib fendl2bin
+
+cooling
+	1	s
+	1	m
+	1	h
+	1	d
+	1	y
+end
+
+dump_file	dump.file
+
+output zone
+       units Ci cm3
+#	constituent
+       specific_activity
+       photon_source  fendl2bin  phtn_src 42  1e4  2e4  
+          3e4  4.5e4  6e4  7e4  7.5e4  1e5  1.5e5  2e5  3e5
+          4e5  4.5e5  5.1e5  5.12e5  6e5  7e5  8e5  1e6  1.33e6
+          1.34e6  1.5e6  1.66e6  2e6  2.5e6  3e6  3.5e6  
+          4e6  4.5e6  5e6  5.5e6  6e6  6.5e6  7e6  7.5e6  8e6
+          1e7  1.2e7  1.4e7  2e7  3e7  5e7
+end
+
+flux flux_1 fluxin_9 1.0 0 default
+
+schedule	total
+	.85	y	flux_1	3.9FPYpulsed	0  s
+end
+
+pulsehistory	3.9FPYpulsed
+	5	.15	y
+end
+
+truncation	1e-7
+impurity	5e-6	1e-3
