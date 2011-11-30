@@ -1,2 +1,48 @@
 This repository holds data and scripts for development of 
 the 3D activation workflow.
+
+Instructions to perform 3D Activation and example command line syntax: 
+
+1)	Run mmGridGen on CAD file with desired number of intervals in xyz dimensions. 
+	Adding the --mcnp flag will print out the corresponding fmesh card to be used later on.
+
+		mmGridGen --mcnp simplebox.sat 6 6 6 10
+
+2)	Run meshReader to extract volume fraction information from MOAB mesh.
+
+		meshReader matFracs.h5m
+
+3)	Run make_alara.py on meshReader output to generate alara geometry input 
+	for activation problem. User will be prompted to enter total volume of geometry.
+
+		make_alara.py matFracs_results.txt alara_geom
+
+		Enter the volume: 1000
+
+4)	Copy the contents of alara_geom to ALARA input file that contains the remainder 
+	of input for an ALARA calculation.
+
+5)	 Run MCNP with fmesh card printed by mmGridGen and an emesh card with the same 
+	 neutron energy group structure as is in the data library to be used by ALARA.
+
+		mcnp5 i=simplebox_mcnp
+
+6)	Run FluxParse_MCNP_ALARA.py to parse and normalize neutron fluxes in meshtal 
+	file to appropriate format for ALARA.
+
+		FluxParse_MCNP_ALARA.py meshtal fluxin_6 1e17
+
+7)	Modify ALARA input flux card to be the same as the flux file created in 
+	previous step. Make sure photon source output is specified in ALARA 
+	input. Run ALARA.
+
+		alara < simplebox_alara > alara_out
+
+8)	Modify parse_phtn.py to correspond to correct number of intervals in xyz dimensions. 
+	Run parse_phtn.py to parse photon source file created by ALARA which will create 
+	SDEF card for MCNP photon source transport.
+
+		./parse_phtn.py
+
+9)	Copy contents of phtn_sdef into MCNP input for photon transport. Run MCNP photon 
+	transport problem.
