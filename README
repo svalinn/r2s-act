@@ -38,9 +38,10 @@ Instructions to perform 3D Activation and example command line syntax:
 
 		alara < simplebox_alara > alara_out
 
-8)	Modify parse_phtn.py to correspond to correct number of intervals in xyz dimensions. 
+8)	Modify parse_phtn.py to use the correct phtn_src file, and to correspond to the
+	correct number of intervals in xyz dimensions. 
 	Run parse_phtn.py to parse photon source file created by ALARA which will create 
-	SDEF card for MCNP photon source transport.
+	SDEF card (in file phtn_sdef in the script directory) for MCNP photon source transport.
 
 		./parse_phtn.py
 

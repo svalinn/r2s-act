@@ -20,6 +20,8 @@ class PhtnSrcReader(object):
     """
     
     def __init__(self, myInputFileName):
+        """Init function for class PhtnSrcReader.
+        """
         super(PhtnSrcReader, self).__init__()
 
         self.inputFileName = myInputFileName
@@ -70,86 +72,26 @@ class PhtnSrcReader(object):
                 
             self.headingList.append(lineParts[0])
             
-            #
+            # handling the single string cooling step "shutdown"
             if lineParts[1] == "shutdown":
                 self.coolingStepsList.append([lineParts[1]])
                 self.probList.append(lineParts[2:])
+            # or the two string cooling steps, e.g. "1 d"
             else:
                 self.coolingStepsList.append(lineParts[1:3])
                 self.probList.append(lineParts[3:])
                 
-            line = fr.readline()
+            line = fr.readline() # read next line
         
         # return #what to return?
    
 
-    # DEPRECATED
-    def read_pre_alara_2_9(self):
-        """ reads in lines and stores them in blocks on a per-heading basis
-         e.g. headings are isotope identifiers or TOTAL
-        This method handles the phtn_src format in ALARA prior to version 2.9
-        """
-
-        fr = open(self.inputFileName, 'r')
-
-        line = fr.readline()
-        
-        hcnt = 0;
-        pcnt = 1;
-        
-        self.headingList = []
-        self.probList = []
-        
-        justReadAHeading = False
-        wasBlank = False
-
-        # Read through the file...
-        # Events of interest:
-        #  Blank lines signify either a new isotope, or a new set of probabilities
-        #  Lines specifying isotopes are id'd by alphabetical characters
-        #  Lines with photon source strengths are id'd by number
-        
-        while(line != ''): # != EOF
-            lineParts = line.split()
-
-            if len(lineParts) == 0:
-                line = fr.readline()
-                wasBlank = True
-                continue
-            
-            if justReadAHeading:
-                justReadAHeading = False
-                
-            if wasBlank and lineParts[0][0].isdigit():
-                wasBlank = False
-                self.probList[hcnt - 1].append([])
-                pcnt += 1
-                
-            if lineParts[0][0].isalpha(): # check if first entry of line
-                                            # starts with a letter
-                justReadAHeading = True
-                hcnt += 1
-                pcnt = 1
-                self.headingList.append(lineParts[0]) #~ storing a single string
-                                                      #~ for consistency, use a list?
-                self.probList.append([ [] ]) # empty list to hold lines.
-                wasBlank = False
-                
-            else: # line is a list of numbers...
-                
-                self.probList[hcnt - 1][pcnt - 1].append(lineParts)
-                
-            line = fr.readline()
-        
-        # return #what to return?
-        
-
     def get_isotope(self, isotope="TOTAL"):
-        """ Method searches headingList to find which entry in probList is the
+        """ACTION: Method searches headingList to find which entry in probList is
         the desired TOTAL, and returns the corresponding TOTAL block, which can 
         include multiple cooling steps.
         To get a specific cooling step's total, call isotope_source_strength
-        Method expects that read() has been successfully called.
+        REQUIRES: Method expects that read() has been successfully called.
         """
         
         meshcnt = -1
@@ -165,7 +107,11 @@ class PhtnSrcReader(object):
                 
                 # and save those that match the specified isotope.
                 if set == isotope:
-                    
+                   
+                    # Look for entries with "shutdown" as cooling step. This
+                    #  indicates the beginning of the entries for another mesh
+                    #  cell.  When found, append empty list and increment
+                    #  meshcnt.
                     if self.coolingStepsList[cnt] == ["shutdown"]:
                         self.totalHeadingList.append([])
                         self.totalProbList.append([])
@@ -188,12 +134,12 @@ class PhtnSrcReader(object):
                 
             
     def format_isotope_mcnp(self, coolingstep=0):
-        """Method returns a formatted list of strings that is the block under
+        """RETURNS: Method returns a formatted list of strings that is the block under
         heading TOTAL for some cooling step
-        Method expects that get_isotope() has been successfully called.
+        REQUIRES: Method expects that get_isotope() has been successfully called.
         If self.totalsList does not exist (e.g. get_total has not been called),
         the method quits.
-        If 'coolingstep' is specified, returns the block under TOTAL
+        RECEIVES: If 'coolingstep' is specified, returns the block under TOTAL
         corresponding with the cooling step.
         """
         
@@ -227,30 +173,32 @@ class PhtnSrcReader(object):
 
 
     def isotope_source_strengths(self, coolingstep=0):
-        """Method parses all contents of self.totalProbList and creates and returns a list of
-        the sum of source strengths.  This list can be used to determine the
-        mesh cell strength.
-        Method expects that get_isotope() has been called already.
+        """ACTION: Method parses all contents of self.totalProbList and creates a list of
+        the sum of source strengths in each mesh cell, and a list of each mesh
+        cell's list of source strengths at each energy.
+        REQUIRES: Method expects that get_isotope() has been called already.
         NOTE that volume normalization of resulting list may
         be needed, depending on the mesh.
-        If 'coolingstep' is specified, returns the block under TOTAL
+        RECEIVES: If 'coolingstep' is specified, returns the block under TOTAL
         corresponding with the cooling step.
         """
         
         # Not elegant... gen_sdef_probabilities needs to use the same coolingstep value.
         self.coolingstep = coolingstep
         
+        self.meshprobs = list() # of lists of strings
         self.meshstrengths = list() # of floats
 
         # For each of these, sum the entries in the corresponding source
         # strengths block, and make a list of these sums (self.meshstrengths)
         if len(self.totalHeadingList) and len(self.totalProbList):
 
-            for set in self.totalProbList:
+            for probset in self.totalProbList:
                 #print set[coolingstep]
                 #thistotal = [item for sublist in set[coolingstep] for item in sublist]
                 
-                self.meshstrengths.append(sum(map(float,set[coolingstep])))
+                self.meshprobs.append(probset[coolingstep])
+                self.meshstrengths.append(sum(map(float,probset[coolingstep])))
                     
         else:
             print "headingList or probList was empty. read() was probably not called"
@@ -259,12 +207,12 @@ class PhtnSrcReader(object):
 
 
     def gen_sdef_probabilities(self, meshform, outfile="phtn_sdef"):
-        """Method assumes that read() and isotope_source_strengths() have been
+        """REQUIRES: Method assumes that read() and isotope_source_strengths() have been
         called already.
-        Method creates a sequentially numbered listed of si and sp cards for
+        ACTION: Method creates a sequentially numbered listed of si and sp cards for
         MCNP input, using the energy structure specified (todo) and the photon
         source strength listed for each mesh cell.
-        Method receives a 3D list, meshform, of the form {{zmin,zmax,zintervals},{y...},{x...}}
+        RECEIVES: Method receives a 3D list, meshform, of the form {{xmin,xmax,xintervals},{y...},{z...}}
         """
 
         try:
@@ -280,7 +228,7 @@ class PhtnSrcReader(object):
         
         # Shoddy placeholder for energy bins
         # Note that we replace the {0} with the .format method for each mesh cell.
-        ergbins = "si{0} A  1e-2  2e-2" \
+        self.ergbins = "si{0} 0  1e-2  2e-2" \
           " 3e-2  4.5e-2  6e-2  7e-2  7.5e-2  1e-1  1.5e-1  2e-1  3e-1" \
           " 4e-1  4.5e-1  5.1e-1  5.12e-1  6e-1  7e-1  8e-1  1e0  1.33e0" \
           " 1.34e0  1.5e0  1.66e0  2e0  2.5e0  3e0  3.5e0" \
@@ -366,11 +314,11 @@ class PhtnSrcReader(object):
             normmeshcell = map(str, map(lambda x: x/summeshstrengths, meshcell))
             
             # create the SI card
-            card = ergbins.format(cnt)
+            card = self.ergbins.format(cnt)
             cards.extend(mcnpWrap.wrap(card))
             
             # create the SP card
-            card = ["sp{0}".format(cnt)]
+            card = ["sp{0} 0".format(cnt)]
             card.extend(normmeshcell)
             card = " ".join(card)
             cards.extend(mcnpWrap.wrap(card))
@@ -395,4 +343,136 @@ class PhtnSrcReader(object):
         print "SDEF card has been generated in file '{0}'".format(outfile)
         
         return
+
+
+    def gen_gammas_file(self, meshform, outfile="gammas"):
+        """ACTION: Method generates a file called 'gammas' to be used with a 
+        modified version of MCNP5.
+        REQUIRES: Method assumes that read() and isotope_source_strengths() 
+        have been called already.
+        RECEIVES:
+        3D list, meshform, of the form {{xmin,xmax,xintervals},{y...},{z...}}
+        """
+
+        try:
+            nmesh = len(self.meshstrengths) + 1
+        except:
+            print "ERROR: total_source_strengths needs to be called before" \
+                    "gen_sdef_probabilties"
+            return [0]
+
+        # calculate the mesh spacing in each direction
+        xval = (meshform[0][1]-meshform[0][0])/float(meshform[0][2])#/2
+        yval = (meshform[1][1]-meshform[1][0])/float(meshform[1][2])#/2
+        zval = (meshform[2][1]-meshform[2][0])/float(meshform[2][2])#/2
+
+        fw = open(outfile, 'w')
+        
+        # write first line (intervals for x, y, z)
+        fw.write(" ".join(map(lambda x: str(x[2]), meshform)) + "\n")
+        
+        # create and write x coords line (2nd line)
+        coords = [meshform[0][0]]
+        for cnt in range(1, meshform[0][2]+1):
+            coords.append(meshform[0][0]+cnt*xval)
+        fw.write(" ".join(map(str, coords)) + "\n")
+        
+        # create and write y coords line (3rd line)
+        coords = [meshform[1][0]]
+        for cnt in range(1, meshform[1][2]+1):
+            coords.append(meshform[1][0]+cnt*yval)
+        fw.write(" ".join(map(str, coords)) + "\n")
+        
+        # create and write z coords line (4th line)
+        coords = [meshform[2][0]]
+        for cnt in range(1, meshform[2][2]+1):
+            coords.append(meshform[2][0]+cnt*zval)
+        fw.write(" ".join(map(str, coords)) + "\n")
+
+        # create and write 5th line (list of activated materials... ?????)
+        fw.write(" ".join(map(str, range(1,101))) + "\n")
+
+        # create and write lines for each mesh cell's gamma source strength
+        # BUT first we must create a cummulative list of probabilities.
+        for ergset in self.meshprobs:
+            ergset_f = map(float, ergset)
+            cummulative_ergset = list() # of strings
+            preverg = 0.0
+            for erg in ergset_f:
+                ergsum = erg + preverg
+                cummulative_ergset.append(ergsum)
+                preverg = ergsum
+            cummulative_ergset2 = map(lambda x:
+                    str(x/cummulative_ergset[41]), \
+                    cummulative_ergset)
+            fw.write(" ".join(cummulative_ergset2) + "\n") #~ trailing newline a problem?
+
+        # all lines written, close file.
+        fw.close()
+        
+        return
+
+
+    # DEPRECATED
+    def read_pre_alara_2_9(self):
+        """ DEPRECATED METHOD - Handles the earlier formatting of phtn_src file
+        from ALARA.
+        Method reads in lines and stores them in blocks on a per-heading basis
+         e.g. headings are isotope identifiers or TOTAL
+        This method handles the phtn_src format in ALARA prior to version 2.9
+        """
+
+        fr = open(self.inputFileName, 'r')
+
+        line = fr.readline()
+        
+        hcnt = 0;
+        pcnt = 1;
+        
+        self.headingList = []
+        self.probList = []
+        
+        justReadAHeading = False
+        wasBlank = False
+
+        # Read through the file...
+        # Events of interest:
+        #  Blank lines signify either a new isotope, or a new set of probabilities
+        #  Lines specifying isotopes are id'd by alphabetical characters
+        #  Lines with photon source strengths are id'd by number
+        
+        while(line != ''): # != EOF
+            lineParts = line.split()
+
+            if len(lineParts) == 0:
+                line = fr.readline()
+                wasBlank = True
+                continue
+            
+            if justReadAHeading:
+                justReadAHeading = False
+                
+            if wasBlank and lineParts[0][0].isdigit():
+                wasBlank = False
+                self.probList[hcnt - 1].append([])
+                pcnt += 1
+                
+            if lineParts[0][0].isalpha(): # check if first entry of line
+                                            # starts with a letter
+                justReadAHeading = True
+                hcnt += 1
+                pcnt = 1
+                self.headingList.append(lineParts[0]) #~ storing a single string
+                                                      #~ for consistency, use a list?
+                self.probList.append([ [] ]) # empty list to hold lines.
+                wasBlank = False
+                
+            else: # line is a list of numbers...
+                
+                self.probList[hcnt - 1][pcnt - 1].append(lineParts)
+                
+            line = fr.readline()
+        
+        # return #what to return?
+        
 

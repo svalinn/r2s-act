@@ -1,0 +1,12 @@
+This folder contains modified versions of custom source.F90 files
+----------
+
+From KIT (Germany): (originals are in vendor folder)
+-source_gamma_meshtal1.F90
+-source_gamma_meshtal2.F90
+
+To use one of these in a custom compile of MCNP/DAGMCNP, one can link to the files in the
+Source/src folder like this:
+ln -s *path to this folder*/source_gamma_meshtal2.F90 source.F90
+
+(or you could copy the file to that folder, but it won't get updated when changes happen)
