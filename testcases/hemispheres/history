@@ -1,0 +1,37 @@
+ 1020  vim hemispheres_mcnp.inp
+ 1021  mcnp2cad -G hemispheres_mcnp.inp -o hemispheres.sat
+ 1022  mmGridGen --mcnp hemispheres.sat 8 8 8 100 
+ 1027  /filespace/groups/cnerg/opt/mmGridGen/meshReader/meshReader matFracs.h5m
+ 1030  less matFracs_results.txt
+ 1031  MCNP=/local.hd/cnergg/sjackson/dagmc/trunk/Source/src/mcnp5
+ 1034  $MCNP i=hemispheres_mcnp.inp
+ 1039  less meshtal
+ 1049  ../../scripts/FluxParse_MCNP_ALARA.py --help
+ 1050  ../../scripts/FluxParse_MCNP_ALARA.py meshtal fluxin 5e13 
+ 1054  ../../scripts/make_alara.py -h
+ 1055  ../../scripts/make_alara.py matFracs_results.txt hemispheres_alara.in
+ 1058  less hemispheres_alara.in
+ 1061  vim ../simplebox-1/simplebox_alara
+ 1064  ln -s /filespace/groups/cnerg/opt/alara/data/*.gam 
+ 1069  ln -s /filespace/groups/cnerg/opt/alara/data/FENDL2.lib 
+ 1072  alara --help
+ 1073  alara hemispheres_alara.in -v 5
+ 1082  ln -s /filespace/groups/cnerg/opt/alara/data/ARIES.matlib ./matlib
+ 1085  ln -s /filespace/groups/cnerg/opt/alara/data/elelib_std ./elelib
+ 1088  sed -e s/mat_2/316-SS/g hemispheres_alara.in > hemispheres_alara.in_1
+ 1090  sed -e s/mat_3/water/g hemispheres_alara.in_1 > hemispheres_alara.in
+ 1092  alara hemispheres_alara.in -v 5
+ 1098  cp /filespace/groups/cnerg/opt/alara/data/ARIES.matlib matlib
+ 1099  vim matlib
+ 1102  alara hemispheres_alara.in -v 3 > alara.output
+ 1104  less phtn_src
+ 1106  vim ../../scripts/parse_phtn.py
+ 1110  ../../scripts/parse_phtn.py
+ # Problems occurred after this because of 0-probability distributions in the output
+ # They were resolved in a hackish way to make progress, but the 0-or-negative-energy
+ # bug ultimately prevented a solution from being reached
+ 1111  less phtn_sdef
+ 1121  cp hemispheres_mcnp.inp hemispheres_mcnp_pht.inp
+ 1122  cat phtn_sdef >> hemispheres_mcnp_pht.inp
+ 1123  vim hemispheres_mcnp_pht.inp
+ 1124  $MCNP i=hemispheres_mcnp_pht.inp

@@ -1,0 +1,50 @@
+
+# OLD 316 SS Austenitic Steel. Use 316_SS_New instead
+# Composition:  316-SS 
+# Reference: 1990s ITER Material Design Data Book
+# density: 7.855 g per cm3
+#
+316-SS              7.855    32
+                              b    0.001       5
+                              c    0.018       6
+                              n    0.07        7
+                              o    0.002       8 
+                              al   0.3        13
+                              si   0.46       14
+                              p    0.026      15
+                              s    0.011      16
+                              k    5e-4       19
+                              ti   0.04       22
+                              v    0.004      23
+                              cr   17.1       24
+                              mn   1.7        25
+                              fe   64.6       26
+                              co   0.03       27
+                              ni   13.2       28
+                              cu   0.1        29
+                              as   5e-4       33
+                              zr   0.002      40
+                              nb   0.002      41
+                              mo   2.5        42
+                              ag   2e-4       47
+                              cd   2e-4       48
+                              sn   0.002      50
+                              sb   5e-4       51 
+                              ba   5e-4       56
+                              ta   5e-4       73
+                              w    0.001      74
+                              ir   5e-4       77
+                              tb   5e-4       65
+                              pb   8e-4       82
+                              bi   8e-4       83
+
+
+#Water
+#
+water                 1.00   2
+                              h  11.111        1
+                              o  88.889        8
+
+
+
+
