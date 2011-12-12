@@ -198,7 +198,7 @@ class PhtnSrcReader(object):
                 #thistotal = [item for sublist in set[coolingstep] for item in sublist]
                 
                 self.meshprobs.append(probset[coolingstep])
-                self.meshstrengths.append(sum(map(float,probset[coolingstep])))
+                self.meshstrengths.append(sum([float(prob) for prob in probset[coolingstep]]))
                     
         else:
             print "headingList or probList was empty. read() was probably not called"
@@ -252,13 +252,13 @@ class PhtnSrcReader(object):
         # SI card
         cards.extend(["c si995 - These are the mesh center coords"])
         card = ["si995 L"] # 
-        card.extend(map(str, range(1,nmesh)))
+        card.extend([str(x) for x in range(1,nmesh)])
         card = " ".join(card)
         cards.extend(mcnpWrap.wrap(card))
 
         summeshstrengths = sum(self.meshstrengths)
         strnormmeshstrengths = \
-                map(str, map(lambda x: x/summeshstrengths, self.meshstrengths))
+                [str(x/summeshstrengths) for x in self.meshstrengths]
         
         # SP card
         card = ["sp995 D"] # D for discrete cummulative probabilities
@@ -299,7 +299,7 @@ class PhtnSrcReader(object):
         # create dependent distribution for energy sampling
         cards.extend(["c ds999 - These are the sp/si numbers"])
         card = ["ds999 S"]
-        card.extend(map(str, range(1,nmesh)))
+        card.extend([str(i) for i in range(1,nmesh)])
         card = " ".join(card)
         cards.extend(mcnpWrap.wrap(card))
 
@@ -307,11 +307,20 @@ class PhtnSrcReader(object):
         for fakecnt, meshcells in enumerate(self.totalProbList):
             cnt = fakecnt + 1
             # sum up source strengths in mesh cell
-            meshcell = map(float, meshcells[self.coolingstep])
+            meshcell = (float(item) for item in meshcells[self.coolingstep])
             summeshstrengths = sum(meshcell)
-            
-            # then normalize the source strengths in the mesh cell to total 1 (unnecessary...)
-            normmeshcell = map(str, map(lambda x: x/summeshstrengths, meshcell))
+           
+            # We write fake probabilities if the mesh cell has no photon source
+            #  strength.  This keeps MCNP from objecting.
+            # Otherwiese we normalize and stringify the probability values.
+            #~ Coding to exclude these cards would make this code more convoluted
+            if summeshstrengths == 0:
+                normmeshcell = [str(item + 1) for item in meshcell]
+                cards.append("c  following distribution has zero photon source probability" \
+                        + "\nc  however, non-zero bin probabilities keep MCNP happy.")
+            else:
+                # then normalize the source strengths in the mesh cell to total 1 (unnecessary...)
+                normmeshcell = [str(x/summeshstrengths) for x in meshcell]
             
             # create the SI card
             card = self.ergbins.format(cnt)
@@ -369,43 +378,42 @@ class PhtnSrcReader(object):
         fw = open(outfile, 'w')
         
         # write first line (intervals for x, y, z)
-        fw.write(" ".join(map(lambda x: str(x[2]), meshform)) + "\n")
+        fw.write(" ".join([str(x) for x in meshform]) + "\n")
         
         # create and write x coords line (2nd line)
         coords = [meshform[0][0]]
         for cnt in range(1, meshform[0][2]+1):
             coords.append(meshform[0][0]+cnt*xval)
-        fw.write(" ".join(map(str, coords)) + "\n")
+        fw.write(" ".join([str(x) for x in coords]) + "\n")
         
         # create and write y coords line (3rd line)
         coords = [meshform[1][0]]
         for cnt in range(1, meshform[1][2]+1):
             coords.append(meshform[1][0]+cnt*yval)
-        fw.write(" ".join(map(str, coords)) + "\n")
+        fw.write(" ".join([str(x) for x in coords]) + "\n")
         
         # create and write z coords line (4th line)
         coords = [meshform[2][0]]
         for cnt in range(1, meshform[2][2]+1):
             coords.append(meshform[2][0]+cnt*zval)
-        fw.write(" ".join(map(str, coords)) + "\n")
+        fw.write(" ".join([str(x) for x in coords]) + "\n")
 
         # create and write 5th line (list of activated materials... ?????)
-        fw.write(" ".join(map(str, range(1,101))) + "\n")
+        fw.write(" ".join([str(x) for x in range(1,101)]) + "\n")
 
         # create and write lines for each mesh cell's gamma source strength
         # BUT first we must create a cummulative list of probabilities.
         for ergset in self.meshprobs:
-            ergset_f = map(float, ergset)
+            ergset_f = [float(erg) for erg in ergset]
             cummulative_ergset = list() # of strings
             preverg = 0.0
             for erg in ergset_f:
                 ergsum = erg + preverg
                 cummulative_ergset.append(ergsum)
                 preverg = ergsum
-            cummulative_ergset2 = map(lambda x:
-                    str(x/cummulative_ergset[41]), \
-                    cummulative_ergset)
-            fw.write(" ".join(cummulative_ergset2) + "\n") #~ trailing newline a problem?
+            cummulative_ergset2 = ["{0:<12.5E}".format(x/cummulative_ergset[41]) \
+                    for x in cummulative_ergset]
+            fw.write("".join(cummulative_ergset2) + "\n") #~ trailing newline a problem?
 
         # all lines written, close file.
         fw.close()
