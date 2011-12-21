@@ -9,6 +9,7 @@
 # Written by: Amir Jaber
 
 from itaps import iBase,iMesh
+import re
 import sys
 
 def meshReader( filename ):
@@ -23,13 +24,13 @@ def meshReader( filename ):
     mats=mesh.getTagHandle("MATS")  
     dims=mesh.getTagHandle("GRID_DIMS")
     
-    nmfile.write("Materials "+str(mats[mesh.rootSet]).replace("[","").replace("]","")+"\n")
-    nmfile.write("Dimensions "+str(dims[mesh.rootSet]).replace("[","").replace("]","")+"\n")
+    nmfile.write("Materials "+re.sub("[\[\]\,]","",str(mats[mesh.rootSet]))+"\n")
+    nmfile.write("Dimensions "+re.sub("[\[\]\,]","",str(dims[mesh.rootSet]))+"\n")
     for i in mesh.getEntities(iBase.Type.region) :
         volFracs[j]=fracs[i]
         for i in volFracs.values() :  
             volFracs[j]=list(i)
-        nmfile.write(str(volFracs[j]).replace("[","").replace("]","").replace(r",","")+"\n")
+        nmfile.write(re.sub("[\[\]\,]","",str(volFracs[j]))+"\n")
         j=j+1
     nmfile.close()
     return 
@@ -98,7 +99,7 @@ def make_alara(output_filename, geom_volume):
                      mixdef='\tmaterial\t'+'mat_'+str(matID[j])+'\t'+\
                      str(1)+'\t'+str(float(zonemats[j]))+'\n'
                      alara_input.write(mixdef)
-                     alara_input.write('end\n\n')
+            alara_input.write('end\n\n')
      input.close()
      alara_input.close()
      return
