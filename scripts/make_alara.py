@@ -74,7 +74,7 @@ def Main():
                      mixdef='\tmaterial\t'+'mat_'+str(matID[j])+'\t'+\
                      str(1)+'\t'+str(float(zonemats[j]))+'\n'
                      alara_input.write(mixdef)
-                     alara_input.write('end\n\n')
+            alara_input.write('end\n\n')
      input.close()
      alara_input.close()
      return
