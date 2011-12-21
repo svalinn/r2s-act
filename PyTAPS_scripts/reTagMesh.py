@@ -4,10 +4,8 @@ from itaps import iBase,iMesh
 import re
 import sys
 
-def reTagMesh( filename ):
+def reTagMesh( mesh):
     column=[]; count=0
-    mesh = iMesh.Mesh()
-    mesh.load( filename )
     mats=mesh.getTagHandle("MATS")
     fracs=mesh.getTagHandle("FRACTIONS")
     matID=list(mats[mesh.rootSet])
@@ -25,4 +23,7 @@ def reTagMesh( filename ):
     return 
   
 if __name__=='__main__':
-     reTagMesh(sys.argv[1])	
+     mesh = iMesh.Mesh()
+     mesh.load( sys.argv[1] )
+     reTagMesh(mesh)
+     mesh.save('new_file.h5m')
