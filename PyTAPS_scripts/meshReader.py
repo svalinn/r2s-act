@@ -16,9 +16,7 @@ def meshReader( filename ):
     nmfile = open("matFracs_results", 'w')
     mesh = iMesh.Mesh()
     mesh.load( filename )
-    volFracs = {}
-    cell = []
-    j=0
+
     fracs=mesh.getTagHandle("FRACTIONS")
     errors=mesh.getTagHandle("ERRORS")
     mats=mesh.getTagHandle("MATS")  
@@ -26,12 +24,8 @@ def meshReader( filename ):
     
     nmfile.write("Materials "+re.sub("[\[\]\,]","",str(mats[mesh.rootSet]))+"\n")
     nmfile.write("Dimensions "+re.sub("[\[\]\,]","",str(dims[mesh.rootSet]))+"\n")
-    for i in mesh.getEntities(iBase.Type.region) :
-        volFracs[j]=fracs[i]
-        for i in volFracs.values() :  
-            volFracs[j]=list(i)
-        nmfile.write(re.sub("[\[\]\,]","",str(volFracs[j]))+"\n")
-        j=j+1
+    for i in fracs[mesh.getEntities(iBase.Type.region)] :
+        nmfile.write(re.sub("[\[\]\,]","",str(map(lambda x: round(x ,6), list(i))))+"\n")
     nmfile.close()
     return 
   
