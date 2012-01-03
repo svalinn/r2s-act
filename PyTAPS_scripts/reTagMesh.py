@@ -49,10 +49,10 @@ def TagFluxes( mesh, meshtal ) :
     k=(len(InputLines)-j-m)/j #number of energy groups
     print '\tEnergy bins found:', k
     voxels = mesh.getEntities(iBase.Type.region)
-    column=[]; count=0 ; m=m-1
+    column=[]; count=0 ;
     for groupID in range(1,k+2):
         tag=mesh.createTag("group_"+str(groupID),1,float)
-        for x in range(1,j+1):
+        for x in range(0,j):
             num = InputLines[m+x+j*count]
             column.append(num[42:53])
         count=count+1
