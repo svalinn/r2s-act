@@ -15,7 +15,7 @@
 #Option Parser
 from optparse import OptionParser
 parser = OptionParser()
-parser.add_option('-b', action='store_true', dest='bool', default=False, help="print fluxes in decreasing energy")
+parser.add_option('-b', action='store_true', dest='backwardbool', default=False, help="print fluxes in decreasing energy")
 (opts, args) = parser.parse_args()
 
 def FindFirstLine(InputLines):#Finding # of lines to skip
@@ -28,6 +28,12 @@ def FindFirstLine(InputLines):#Finding # of lines to skip
     print 'Skipping Header:', n, 'lines'
     m=n+1 #first line of values
     return m
+
+def CountDelineation1():
+    x=1
+    while InputLines[m][16:20] == InputLines[m+x][16:20]:
+        x=x+1
+    print "Delinations in first spacial dimension:", x
 
 def MeshPointCount(m):#Counting Number of Meshpoints
     j=1 #initialising # of points
@@ -75,9 +81,11 @@ Input=open(sys.argv[1], "r")#opens MCNP input file (first specified)
 Output=file(sys.argv[2], "w")
 InputLines=Input.readlines() 
 m=FindFirstLine(InputLines)
+print InputLines[m][16:20]
+CountDelineation1()
 j=MeshPointCount(m)
 k=EnergyGroupCount(m,j)
-if opts.bool==False:
+if opts.backwardbool==False:
    PrintLowtoHigh(m,j,k)
 else:
     PrintHightoLow(m,j,k)
