@@ -12,6 +12,8 @@
 # Paul Wilson, University of Wisconsin, Madison
 ######################################################################
 
+import sys
+
 #Option Parser
 from optparse import OptionParser
 parser = OptionParser()
@@ -29,11 +31,20 @@ def FindFirstLine(InputLines):#Finding # of lines to skip
     m=n+1 #first line of values
     return m
 
-def CountDelineation1():
+def CountDelineations(m):
+    #Finding number or Z deliniations
+    z=1
+    while InputLines[m][36:41] != InputLines[m+z][36:41]:
+        z=z+1
+    #Finding number of Y delinations
+    y=1
+    while InputLines[m][26:31] != InputLines[m+z*y][26:31]:
+        y=y+1
+    #Finding number of X deliniations
     x=1
-    while InputLines[m][16:20] == InputLines[m+x][16:20]:
+    while InputLines[m][16:21] != InputLines[m+z*y*x][16:21]:
         x=x+1
-    print "Delinations in first spacial dimension:", x
+    print 'Spacial Deliniations: (',x,',',y,',',z,')'
 
 def MeshPointCount(m):#Counting Number of Meshpoints
     j=1 #initialising # of points
@@ -76,18 +87,17 @@ def CloseFiles(): #Closes input and output files
     Output.close()
 
 #Execute functions
-import sys
-Input=open(sys.argv[1], "r")#opens MCNP input file (first specified)
-Output=file(sys.argv[2], "w")
-InputLines=Input.readlines() 
-m=FindFirstLine(InputLines)
-print InputLines[m][16:20]
-CountDelineation1()
-j=MeshPointCount(m)
-k=EnergyGroupCount(m,j)
-if opts.backwardbool==False:
-   PrintLowtoHigh(m,j,k)
-else:
-    PrintHightoLow(m,j,k)
-CloseFiles()
+if __name__=='__main__':
+    Input=open(sys.argv[1], "r")#opens MCNP input file (first specified)
+    Output=file(sys.argv[2], "w")
+    InputLines=Input.readlines() 
+    m=FindFirstLine(InputLines)
+    CountDelineations(m)
+    j=MeshPointCount(m)
+    k=EnergyGroupCount(m,j)
+    if opts.backwardbool==False:
+        PrintLowtoHigh(m,j,k)
+    else:
+        PrintHightoLow(m,j,k)
+    CloseFiles()
 
