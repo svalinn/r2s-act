@@ -3,10 +3,11 @@
 
 ! - - - - - - NOTES ON MODIFICATIONS - - - - - - -
 ! Edits have been made by Eric Relson with CNERG goals in mind.
-! -Scan 150 materials in multiple spots rather than 150 some places, 100
+! -Scan 100 materials in multiple spots rather than 150 some places, 100
 ! elsewhere
 ! -42 energy groups instead of 24; highlight 24 to see all instances of
 ! changes...
+! -Increase size of 'line' from 150 to 300.
 !
 ! -removed tab characters
 
@@ -32,12 +33,14 @@ subroutine source
         integer,dimension(100) :: active_mat
         save spectrum,ener_phot,i_ints,j_ints,k_ints,n_active_mat, &
              i_bins,j_bins,k_bins,active_mat,tvol,ikffl
-        character*250 :: line
+                         
+                ! IMPORTANT - make sure this is a long enough string.
+        character*300 :: line
 
                                                         
 !        
 !----------------------------------------------------------------------------------------------------
-!	In the first history (ikffl) read 'gammas' file. ikffl under MPI works ?
+!        In the first history (ikffl) read 'gammas' file. ikffl under MPI works ?
 !----------------------------------------------------------------------------------------------------
 !
         ikffl=ikffl+1
@@ -62,10 +65,10 @@ subroutine source
           read(50,*) (j_bins(i),i=1,j_ints+1)
           read(50,*) (k_bins(i),i=1,k_ints+1)
           read(50,'(A)') line
-          read(line,*,end=888) (active_mat(i),i=1,150)
+          read(line,*,end=888) (active_mat(i),i=1,100)
    888    continue
           ! counting number of activated materials specified
-          do i=1,150
+          do i=1,100
             if (active_mat(i)==0) exit
           enddo
           n_active_mat=i-1
@@ -86,9 +89,13 @@ subroutine source
        
 
           ! what is going on here??? reading in mesh values prolly
+                  ! 24ES12.5 means read in 24 #s, each 12 characters long,
+                  !  in exponential form with non-zero leading char,
+                  ! ... presumably includes a single space character.
           i=1
           do
-            read(50,'(24ES12.5)',iostat=stat) (spectrum(i,j),j=1,42) !24)
+                        !read(50,'(24ES12.5)',iostat=stat) (spectrum(i,j),j=1,24) 
+            read(50,'(42ES12.5)',iostat=stat) (spectrum(i,j),j=1,42) !24)
             if (stat /= 0) exit
 !              write(*,'(i4,1x,24ES12.5)') i,(spectrum(i,j),j=1,24)
             i=i+1
@@ -102,7 +109,7 @@ subroutine source
 
 !
 !----------------------------------------------------------------------------------------------------
-!	Sample in the volume of the mesh tally.
+!        Sample in the volume of the mesh tally.
 !       The same number of hits homogeneously in volume.
 !       ~Weight is adjusted, apparently.
 !----------------------------------------------------------------------------------------------------
@@ -127,7 +134,7 @@ subroutine source
 
         i=(kk-1)+(jj-1)*k_ints+(ii-1)*j_ints*k_ints+1
 !        if (spectrum(i,24).eq.0) goto 10
-        if (spectrum(i,48).eq.0) goto 10
+        if (spectrum(i,42).eq.0) goto 10
 
 !        print*,i_bins(1),i_bins(i_ints+1),i_bins(i_ints+1)-i_bins(1)
 !        print*,j_bins(1),j_bins(j_ints+1),j_bins(j_ints+1)-j_bins(1)
@@ -137,7 +144,7 @@ subroutine source
 
 !
 !----------------------------------------------------------------------------------------------------
-!	Use cumulative values in spectrum array for given i to sample the energy of the photon.
+!        Use cumulative values in spectrum array for given i to sample the energy of the photon.
 !----------------------------------------------------------------------------------------------------
 !
 
@@ -151,7 +158,7 @@ subroutine source
 
 !        
 !----------------------------------------------------------------------------------------------------
-!	Determine weight. Intensities (neutron fluence in given meshtal voxel), spectrum (total number 
+!        Determine weight. Intensities (neutron fluence in given meshtal voxel), spectrum (total number 
 !       of produced gammas, if neutron fluence is 1 everywhere), tvol (nonzero cells/all cells  factor).
 !       IPT=2 for photons. JSU=TME=0 works well.
 !----------------------------------------------------------------------------------------------------
@@ -165,7 +172,7 @@ subroutine source
         tme=0
 !        
 !----------------------------------------------------------------------------------------------------
-!	Determine in which cell you are starting. Subroutine is copied from MCNP code (sourcb.F90). 
+!        Determine in which cell you are starting. Subroutine is copied from MCNP code (sourcb.F90). 
 !       ICL and JUNF should be set to 0 for this part of the code to work.
 !----------------------------------------------------------------------------------------------------
 !
@@ -175,7 +182,7 @@ subroutine source
   ! default for cel:  find the cell that contains xyz.
 470 continue
   if( icl==0 ) then
-    if( junf==0 ) then
+    if( junf==0 ) then ! if repeated structures are used...
       do m=1,nlse 
         icl = lse(klse+m)
         call chkcel(icl,2,j)
@@ -184,10 +191,10 @@ subroutine source
       do icl_tmp=1,mxa
         icl = icl_tmp
         call chkcel(icl,2,j)
-        if( j==0 )  go to 540
+        if( j==0 )  goto 540
       end do
       icl = icl_tmp
-    else
+    else ! else, repeated structures are used
       do m=1,nlse 
         icl = lse(klse+m)
         if( jun(icl)/=0 )  cycle 
@@ -201,7 +208,7 @@ subroutine source
         icl = icl_tmp
         if( jun(icl)/=0 )  cycle 
         call chkcel(icl,2,j)
-        if( j==0 )  go to 540
+        if( j==0 )  goto 540
       end do
       icl = icl_tmp
     endif
