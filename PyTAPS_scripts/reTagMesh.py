@@ -16,7 +16,7 @@ def parser():
                       help="Total volume of the geometry, default: 1")
     parser.add_option("-o", "--output",
                       action="store", dest="output", default="mesh.h5m",
-                      help="Mesh output filename (can be .h5m or .vtk), default: mesh.h5m")
+                      help="Mesh output filename (can be .h5m or .vtk), default: mesh.vtk")
     parser.add_option("-f", "--fluxinoutput",
                       action="store", dest="fluxin", default="ALARAflux.in",
                       help="Name of the ALARA flux input file, default: ALARAflux.in")    
@@ -53,7 +53,6 @@ def EnergyGroupCount(m, j):#finding number of energy groups
     return k
 
 def PrintLowtoHigh(m, j, k, Norm):#Printing values to output file
-    #Norm=float(sys.argv[4])
     #Initial normailization factor from command line argument
     for t in range(0, j):
         pointoutput=''
@@ -64,9 +63,8 @@ def PrintLowtoHigh(m, j, k, Norm):#Printing values to output file
         FluxinOutput.write(pointoutput + '\n\n')
     print 'File creation sucessful \n'
 
-def PrintHightoLow(m, j, k):
-    #Norm=float(sys.argv[4])
-    #Initial normailization factor from command line argument
+def PrintHightoLow(m, j, k, Norm):
+   #Initial normailization factor from command line argument
     for t in range(0, j):
         pointoutput=''
         for s in range(k-1,-1,-1):
@@ -211,7 +209,7 @@ if __name__=='__main__':
         MeshtalInput=open(options.meshtal, "r")
         MeshtalInputLines=MeshtalInput.readlines() 
         FluxinOutput=file(options.fluxin, "w")
-        m=FindFirstLine(MeshtalInputLines)
+        m=FindFirstLine(MeshtalInputLine
         j=MeshPointCount(m)
         k=EnergyGroupCount(m,j)
         if options.backwardbool==False:
