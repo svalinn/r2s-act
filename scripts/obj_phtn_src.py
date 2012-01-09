@@ -92,7 +92,7 @@ class PhtnSrcReader(object):
         """ACTION: Method searches headingList to find which entry in probList is
         the desired TOTAL, and returns the corresponding TOTAL block, which can 
         include multiple cooling steps.
-        To get a specific cooling step's total, call isotope_source_strength
+        To get a specific cooling step's total, call isotope_source_strengths
         REQUIRES: Method expects that read() has been successfully called.
         """
         
@@ -128,7 +128,7 @@ class PhtnSrcReader(object):
             print "totalsList or probList was empty. read() was probably not called"
         
         if len(self.totalHeadingList) == 0:
-            print "{0} was not found in photon source." \
+            print "{0} was not found in photon source " \
             "file.".format(isotope)
             
         else:
@@ -214,13 +214,14 @@ class PhtnSrcReader(object):
         ACTION: Method creates a sequentially numbered listed of si and sp cards for
         MCNP input, using the energy structure specified (todo) and the photon
         source strength listed for each mesh cell.
-        RECEIVES: Method receives a 3D list, meshform, of the form {{xmin,xmax,xintervals},{y...},{z...}}
+        RECEIVES: Method receives a 3D list, meshform, of the form 
+        {{xmin,xmax,xintervals},{y...},{z...}}
         """
 
         try:
             nmesh = len(self.meshstrengths) + 1
         except:
-            print "ERROR: total_source_strengths needs to be called before" \
+            print "ERROR: isotope_source_strengths needs to be called before " \
                     "gen_sdef_probabilties"
             return [0]
 
@@ -228,7 +229,7 @@ class PhtnSrcReader(object):
             print "ERROR: Too many mesh cells to create an SDEF card."
             return [0]
         
-        # Shoddy placeholder for energy bins
+        # ~Shoddy placeholder for energy bins
         # Note that we replace the {0} with the .format method for each mesh cell.
         self.ergbins = "si{0} 0  1e-2  2e-2" \
           " 3e-2  4.5e-2  6e-2  7e-2  7.5e-2  1e-1  1.5e-1  2e-1  3e-1" \
@@ -370,7 +371,7 @@ class PhtnSrcReader(object):
         try:
             nmesh = len(self.meshstrengths) + 1
         except:
-            print "ERROR: total_source_strengths needs to be called before" \
+            print "ERROR: isotope_source_strengths needs to be called before " \
                     "gen_sdef_probabilties"
             return [0]
 
@@ -425,7 +426,7 @@ class PhtnSrcReader(object):
         # all lines written, close file.
         fw.close()
         
-        print "The file" + outfile + "was created successfully"
+        print "The file", outfile, "was created successfully"
 
         return
 
@@ -505,12 +506,16 @@ def main():
     usage = "usage: %prog [options] arg"
     parser = OptionParser(usage)
     
+    # Input and output file names
     parser.add_option("-i","--input",action="store",dest="filename", \
             default="", help="photon source strengths are read from file")
+    parser.add_option("-o","--output",action="store",dest="outputfile", \
+            default="", help="file to write source information to.")
 
+    # Options for type of output
     parser.add_option("-m","--mesh",action="store",dest="meshform", \
             default=(0,1,1,0,1,1,0,1,1),help="Needs a 9-valuelist, meshform, of the form " \
-            "{xmin,xmax,xintervals,y...,z...} delimited by spaces.")
+            "-m xmin,xmax,xintervals,y...,z... delimited by commas (no spaces).")
     parser.add_option("-s","--sdef",action="store_true",dest="sdef", \
             default=False, help="Will generate a file with the sdef" \
             "card and the si, sp, and tr cards for MCNP.  Needs mesh "\
@@ -537,16 +542,25 @@ def main():
     print "Cooling steps are:\n", exampleReader.coolingSteps, "\n"
 
     #Turn meshform list received into the 3D list used by other methods
-    meshform3D = [ options.meshform[0::3], \
-                options.meshform[3::6], \
-                options.meshform[6::9] ]
+    options.meshform = options.meshform.split(",")
+    meshform3D = [ [float(x) for x in options.meshform[0:3]], \
+                [float(x) for x in options.meshform[3:6]], \
+                [float(x) for x in options.meshform[6:9]] ]
+
+    print options.meshform[0:3]
+    print meshform3D
 
     if options.sdef:
-        print "sdef!"
+        print "The sdef card will now be generated from a phtn_src file."
+        exampleReader.isotope_source_strengths()
+        if options.outputfile=="": exampleReader.gen_sdef_probabilities(meshform3D)
+        else: exampleReader.gen_sdef_probabilities(meshform3D, options.outputfile)
 
     elif options.gammas:
-        print "gammas!"
-        exampleReader.gen_gammas(meshform3D)
+        print "A 'gammas' file will now be created from a phtn_src file."
+        exampleReader.isotope_source_strengths()
+        if options.outputfile=="": exampleReader.gen_gammas_file(meshform3D)
+        else: exampleReader.gen_gammas_file(meshform3D, options.outputfile)
     
     elif options.h5m:
         print ".h5m to 'gammas' file is not yet implemented."
