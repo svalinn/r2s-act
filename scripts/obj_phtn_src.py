@@ -541,11 +541,13 @@ def main():
     exampleReader.get_isotope()
     print "Cooling steps are:\n", exampleReader.coolingSteps, "\n"
 
-    #Turn meshform list received into the 3D list used by other methods
-    options.meshform = options.meshform.split(",")
-    meshform3D = [ [float(x) for x in options.meshform[0:3]], \
-                [float(x) for x in options.meshform[3:6]], \
-                [float(x) for x in options.meshform[6:9]] ]
+    # Turn meshform list received into the 3D list used by other methods
+    # Also avoiding DeprecationWarnings by mixing floats and ints...
+    meshform3D = options.meshform.split(",")
+    meshform3D[0:9:3] = [float(x) for x in meshform3D[0:9:3] ]
+    meshform3D[1:9:3] = [float(x) for x in meshform3D[1:9:3] ]
+    meshform3D[2:9:3] = [int(x) for x in meshform3D[2:9:3] ]
+    meshform3D = [ meshform3D[0:3], meshform3D[3:6], meshform3D[6:9] ]
 
     print options.meshform[0:3]
     print meshform3D
