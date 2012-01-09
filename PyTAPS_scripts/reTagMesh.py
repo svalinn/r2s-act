@@ -15,7 +15,7 @@ def parser():
                       action="store", dest="volume", default="1",
                       help="Total volume of the geometry, default: 1")
     parser.add_option("-o", "--output",
-                      action="store", dest="output", default="mesh.h5m",
+                      action="store", dest="output", default="mesh.vtk",
                       help="Mesh output filename (can be .h5m or .vtk), default: mesh.vtk")
     parser.add_option("-f", "--fluxinoutput",
                       action="store", dest="fluxin", default="ALARAflux.in",
@@ -113,6 +113,8 @@ def TagFluxes(mesh, meshtal, m, j, k) :
 def CloseFiles(): #Closes meshtal input and flux.in output files
     MeshtalInput.close()
     FluxinOutput.close()
+    return
+
 def meshReader( filename ):
     nmfile = open("matFracs_results", 'w')
     mesh = iMesh.Mesh()
@@ -159,7 +161,7 @@ def make_alara(output_filename, geom_volume):
      numzones=(dimID[0]*dimID[1]*dimID[2])
      elementvolume = float(totalvolume)/numzones
      print 'Volume per mesh element: ', elementvolume
-     
+         
      # Write ALARA geometry card to file
      alara_input.write('geometry rectangular\n\n')
 
@@ -198,29 +200,30 @@ def make_alara(output_filename, geom_volume):
      input.close()
      alara_input.close()
      return
-  
+
 if __name__=='__main__':
-    (options, args)= parser()
-    mesh = iMesh.Mesh()
-    mesh.load(sys.argv[1])
-    TagMats(mesh)    
-    if options.meshtal != None :
-        print 'Parsing meshtal file'
-        MeshtalInput=open(options.meshtal, "r")
-        MeshtalInputLines=MeshtalInput.readlines() 
-        FluxinOutput=file(options.fluxin, "w")
-        m=FindFirstLine(MeshtalInputLine
-        j=MeshPointCount(m)
-        k=EnergyGroupCount(m,j)
-        if options.backwardbool==False:
-            PrintLowtoHigh(m,j,k, options.Norm)
-        else:
-            PrintHightoLow(m,j,k)
-        TagFluxes (mesh, options.meshtal, m, j, k)
-        mesh.save(options.output)
-    CloseFiles()
+    print 'in main'
+    #(options, args)= parser()
+    #mesh = iMesh.Mesh()
+    #mesh.load(sys.argv[1])
+    #TagMats(mesh)    
+    #if options.meshtal != None :
+        #print 'Parsing meshtal file'
+        #MeshtalInput=open(options.meshtal, "r")
+        #MeshtalInputLines=MeshtalInput.readlines() 
+        #FluxinOutput=file(options.fluxin, "w")
+        #m=FindFirstLine(MeshtalInputLine)
+        #j=MeshPointCount(m)
+        #k=EnergyGroupCount(m,j)
+        #if options.backwardbool==False:
+            #PrintLowtoHigh(m,j,k, options.Norm)
+        #else:
+            #PrintHightoLow(m,j,k)
+        #TagFluxes (mesh, options.meshtal, m, j, k)
+        #mesh.save(options.output)
+    #CloseFiles()
     print "generating ALARA input"
-    meshReader(options.output)
-    make_alara(options.alaraname,options.volume)
+    #meshReader(options.output)
+    #make_alara(options.alaraname,options.volume)
     print '\ncomplete'
 	
