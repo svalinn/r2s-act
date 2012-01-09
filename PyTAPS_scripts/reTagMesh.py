@@ -203,27 +203,27 @@ def make_alara(output_filename, geom_volume):
 
 if __name__=='__main__':
     print 'in main'
-    #(options, args)= parser()
-    #mesh = iMesh.Mesh()
-    #mesh.load(sys.argv[1])
-    #TagMats(mesh)    
-    #if options.meshtal != None :
-        #print 'Parsing meshtal file'
-        #MeshtalInput=open(options.meshtal, "r")
-        #MeshtalInputLines=MeshtalInput.readlines() 
-        #FluxinOutput=file(options.fluxin, "w")
-        #m=FindFirstLine(MeshtalInputLine)
-        #j=MeshPointCount(m)
-        #k=EnergyGroupCount(m,j)
-        #if options.backwardbool==False:
-            #PrintLowtoHigh(m,j,k, options.Norm)
-        #else:
-            #PrintHightoLow(m,j,k)
-        #TagFluxes (mesh, options.meshtal, m, j, k)
-        #mesh.save(options.output)
-    #CloseFiles()
+    (options, args)= parser()
+    mesh = iMesh.Mesh()
+    mesh.load(sys.argv[1])
+    TagMats(mesh)    
+    if options.meshtal != None :
+        print 'Parsing meshtal file'
+        MeshtalInput=open(options.meshtal, "r")
+        MeshtalInputLines=MeshtalInput.readlines() 
+        FluxinOutput=file(options.fluxin, "w")
+        m=FindFirstLine(MeshtalInputLines)
+        j=MeshPointCount(m)
+        k=EnergyGroupCount(m,j)
+        if options.backwardbool==False:
+            PrintLowtoHigh(m,j,k, options.Norm)
+        else:
+            PrintHightoLow(m,j,k)
+        TagFluxes (mesh, options.meshtal, m, j, k)
+        mesh.save(options.output)
+    CloseFiles()
     print "generating ALARA input"
-    #meshReader(options.output)
-    #make_alara(options.alaraname,options.volume)
+    meshReader(options.output)
+    make_alara(options.alaraname,options.volume)
     print '\ncomplete'
 	
