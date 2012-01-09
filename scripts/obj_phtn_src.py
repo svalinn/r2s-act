@@ -3,16 +3,18 @@
 ######################################################################
 #obj_phtn_src.py
 ######################################################################
-#This python script defines an object that parses the photon source strength
-# output from ALARA.
+# This python script defines an object that parses the photon source strength
+#  output from ALARA.  
+# The script supports command line calls, but is intended to be
+#  used modularly by other scripts.
 #
 #
 #
-# Created by Eric Relson, relson@wisc.edu, working under Professor 
-# Paul Wilson, University of Wisconsin, Madison
 ######################################################################
 
 import textwrap as tw
+import sys
+from optparse import OptionParser
 
 class PhtnSrcReader(object):
     """A new object of class PhtnSrcReader must be supplied the path of the file
@@ -350,6 +352,8 @@ class PhtnSrcReader(object):
         fw.writelines("\n".join(cards))
         fw.close()
         print "SDEF card has been generated in file '{0}'".format(outfile)
+        print "Remember to update the imp:n to imp:p, as well as updating the \
+                mode card."
         
         return
 
@@ -411,6 +415,9 @@ class PhtnSrcReader(object):
                 ergsum = erg + preverg
                 cummulative_ergset.append(ergsum)
                 preverg = ergsum
+            # The following list comprehension uses a format specifying output
+            #  of 12 characters, with 5 values
+            #  after the decimal point, using scientific notation.
             cummulative_ergset2 = ["{0:<12.5E}".format(x/cummulative_ergset[41]) \
                     for x in cummulative_ergset]
             fw.write("".join(cummulative_ergset2) + "\n") #~ trailing newline a problem?
@@ -418,6 +425,8 @@ class PhtnSrcReader(object):
         # all lines written, close file.
         fw.close()
         
+        print "The file" + outfile + "was created successfully"
+
         return
 
 
@@ -482,5 +491,65 @@ class PhtnSrcReader(object):
             line = fr.readline()
         
         # return #what to return?
+
+    #END DEPRECATED
         
 
+def main():
+    """ACTION: Method defines an option parser and handles command-line
+    usage of this module.
+    REQUIRES: command line arguments to be passed - otherwise prints help
+    information.
+    RECEIVES: N/A
+    """
+    usage = "usage: %prog [options] arg"
+    parser = OptionParser(usage)
+    
+    parser.add_option("-i","--input",action="store",dest="filename", \
+            default="", help="photon source strengths are read from file")
+
+    parser.add_option("-m","--mesh",action="store",dest="meshform", \
+            default=(0,1,1,0,1,1,0,1,1),help="Needs a 9-valuelist, meshform, of the form " \
+            "{xmin,xmax,xintervals,y...,z...} delimited by spaces.")
+    parser.add_option("-s","--sdef",action="store_true",dest="sdef", \
+            default=False, help="Will generate a file with the sdef" \
+            "card and the si, sp, and tr cards for MCNP.  Needs mesh "\
+            "info from -m.")
+    parser.add_option("-g","--gammas",action="store_true",dest="gammas", \
+            default=False,help="Will generate a 'gammas' file directly" \
+            "from a phtn_src file for use by" \
+            "modified versions of MCNP. Needs mesh info from -m.")
+    parser.add_option("-H","--H5M",action="store_true",dest="h5m", \
+            default=False,help="To be implemented...")
+
+    (options, args) = parser.parse_args()
+
+    # Print warning and then exit if no file was specified with -i/--input
+    if options.filename == "":
+        print "Methods in this module need a file name to begin. " \
+                "Use the -i option."
+        return
+
+    exampleReader = PhtnSrcReader(options.filename)
+    exampleReader.read()
+
+    exampleReader.get_isotope()
+    print "Cooling steps are:\n", exampleReader.coolingSteps, "\n"
+
+    #Turn meshform list received into the 3D list used by other methods
+    meshform3D = [ options.meshform[0::3], \
+                options.meshform[3::6], \
+                options.meshform[6::9] ]
+
+    if options.sdef:
+        print "sdef!"
+
+    elif options.gammas:
+        print "gammas!"
+        exampleReader.gen_gammas(meshform3D)
+    
+    elif options.h5m:
+        print ".h5m to 'gammas' file is not yet implemented."
+
+if __name__=='__main__':
+    main()
