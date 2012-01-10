@@ -1,0 +1,20 @@
+Test one:
+Read in a phtn_src file for a 3x3x3 problem.
+Call the SDEF card functionality.
+
+../../scripts/obj_phtn_src.py -i phtn_src -s -m 0,10,3,0,10,3,0,10,3
+
+
+Test two:
+Read in a phtn-src file for a 3x3x3 problem.
+Call the gammas (for source.f90 from KIT) functionality.
+
+../../scripts/obj_phtn_src.py -i phtn_src -g -m 0,10,3,0,10,3,0,10,3
+
+
+Test #?:
+Read in a phtn-src file for a 3x3x3 problem.
+Call the h5m functionality.
+
+../../scripts/obj_phtn_src.py -i phtn_src -H -m 0,10,3,0,10,3,0,10,3
+

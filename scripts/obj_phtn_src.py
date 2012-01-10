@@ -219,11 +219,17 @@ class PhtnSrcReader(object):
         """
 
         try:
-            nmesh = len(self.meshstrengths) + 1
+            nmesh = len(self.meshstrengths)
         except:
             print "ERROR: isotope_source_strengths needs to be called before " \
                     "gen_sdef_probabilties"
             return [0]
+
+        if nmesh != meshform[0][2]*meshform[1][2]*meshform[2][2]:
+            print "WARNING: Number of mesh cells in phtn_src file does not " \
+                    "match the product of the mesh intervals given:"
+            print "     ", nmesh, "!=", \
+                    meshform[0][2],"*",meshform[1][2],"*",meshform[2][2]
 
         if nmesh > 994:
             print "ERROR: Too many mesh cells to create an SDEF card."
@@ -255,7 +261,7 @@ class PhtnSrcReader(object):
         # SI card
         cards.extend(["c si995 - These are the mesh center coords"])
         card = ["si995 L"] # 
-        card.extend([str(x) for x in range(1,nmesh)])
+        card.extend([str(x) for x in range(1,nmesh+1)])
         card = " ".join(card)
         cards.extend(mcnpWrap.wrap(card))
 
@@ -302,7 +308,7 @@ class PhtnSrcReader(object):
         # create dependent distribution for energy sampling
         cards.extend(["c ds999 - These are the sp/si numbers"])
         card = ["ds999 S"]
-        card.extend([str(i) for i in range(1,nmesh)])
+        card.extend([str(i) for i in range(1,nmesh+1)])
         card = " ".join(card)
         cards.extend(mcnpWrap.wrap(card))
 
@@ -369,11 +375,18 @@ class PhtnSrcReader(object):
         """
 
         try:
-            nmesh = len(self.meshstrengths) + 1
+            nmesh = len(self.meshstrengths) # We use this to check for a warning
+                            # and to make sure a required method has been called
         except:
             print "ERROR: isotope_source_strengths needs to be called before " \
                     "gen_sdef_probabilties"
             return [0]
+
+        if nmesh != meshform[0][2]*meshform[1][2]*meshform[2][2]:
+            print "WARNING: Number of mesh cells in phtn_src file does not " \
+                    "match the product of the mesh intervals given:"
+            print "     ", nmesh, "!=", \
+                    meshform[0][2],"*",meshform[1][2],"*",meshform[2][2]
 
         # calculate the mesh spacing in each direction
         xval = (meshform[0][1]-meshform[0][0])/float(meshform[0][2])#/2
@@ -514,7 +527,7 @@ def main():
 
     # Options for type of output
     parser.add_option("-m","--mesh",action="store",dest="meshform", \
-            default=(0,1,1,0,1,1,0,1,1),help="Needs a 9-valuelist, meshform, of the form " \
+            default="0,1,1,0,1,1,0,1,1",help="Needs a 9-valuelist, meshform, of the form " \
             "-m xmin,xmax,xintervals,y...,z... delimited by commas (no spaces).")
     parser.add_option("-s","--sdef",action="store_true",dest="sdef", \
             default=False, help="Will generate a file with the sdef" \
@@ -548,9 +561,6 @@ def main():
     meshform3D[1:9:3] = [float(x) for x in meshform3D[1:9:3] ]
     meshform3D[2:9:3] = [int(x) for x in meshform3D[2:9:3] ]
     meshform3D = [ meshform3D[0:3], meshform3D[3:6], meshform3D[6:9] ]
-
-    print options.meshform[0:3]
-    print meshform3D
 
     if options.sdef:
         print "The sdef card will now be generated from a phtn_src file."
