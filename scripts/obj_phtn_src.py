@@ -15,6 +15,7 @@
 import textwrap as tw
 import sys
 from optparse import OptionParser
+from itaps import iBase,iMesh
 
 class PhtnSrcReader(object):
     """A new object of class PhtnSrcReader must be supplied the path of the file
@@ -96,7 +97,7 @@ class PhtnSrcReader(object):
         REQUIRES: Method expects that read() has been successfully called.
         """
         
-        meshcnt = -1
+        meshcnt = -1 # gets incremented immediately to our starting value of 0
 
         # If the lists with headings and probabilities have contents...
         if len(self.headingList) and len(self.probList):
@@ -185,11 +186,9 @@ class PhtnSrcReader(object):
         corresponding with the cooling step.
         """
         
-        # Not elegant... gen_sdef_probabilities needs to use the same coolingstep value.
-        self.coolingstep = coolingstep
-        
-        self.meshprobs = list() # of lists of strings
-        self.meshstrengths = list() # of floats
+        self.meshprobs = list() # of lists of strings; each string is a source strength
+        self.meshstrengths = list() # of floats; each float is the total source
+                                    #  strength of a voxel at the chosen cooling step
 
         # For each of these, sum the entries in the corresponding source
         # strengths block, and make a list of these sums (self.meshstrengths)
@@ -204,7 +203,7 @@ class PhtnSrcReader(object):
                     
         else:
             print "headingList or probList was empty. read() was probably not called"
-
+        
         return self.meshstrengths
 
 
@@ -313,10 +312,10 @@ class PhtnSrcReader(object):
         cards.extend(mcnpWrap.wrap(card))
 
         # iterate through each mesh cell, outputting the erg distributions
-        for fakecnt, meshcells in enumerate(self.totalProbList):
+        for fakecnt, meshcellstring in enumerate(self.meshprobs): #self.totalProbList):
             cnt = fakecnt + 1
             # sum up source strengths in mesh cell
-            meshcell = (float(item) for item in meshcells[self.coolingstep])
+            meshcell = [float(item) for item in meshcellstring]
             summeshstrengths = sum(meshcell)
            
             # We write fake probabilities if the mesh cell has no photon source
@@ -359,8 +358,8 @@ class PhtnSrcReader(object):
         fw.writelines("\n".join(cards))
         fw.close()
         print "SDEF card has been generated in file '{0}'".format(outfile)
-        print "Remember to update the imp:n to imp:p, as well as updating the \
-                mode card."
+        print "Remember to update the imp:n to imp:p, as well as updating the " \
+                "mode card."
         
         return
 
@@ -443,6 +442,58 @@ class PhtnSrcReader(object):
 
         return
 
+    
+    def gen_phtn_src_h5m_tags(self, inputfile, outfile=""):
+        """ACTION: Method adds tag with photon source strengths from ALARA to a
+        moab mesh.  
+        REQUIRES:
+
+        RECEIVES: The file (a .h5m moab file) containing the mesh of interest.
+        An output file which is fun
+        TODO:
+
+        """
+
+        try:
+            nmesh = len(self.meshstrengths)
+        except:
+            print "ERROR: isotope_source_strengths needs to be called before " \
+                    "gen_phtn_src_h5m_tags"
+            return [0]
+
+        if outfile == "": outfile = inputfile
+
+        mesh = iMesh.Mesh()
+        mesh.load(inputfile)
+
+        num_erg_groups = 42 # must be an integer
+
+        try:
+            mesh.createTag("PHTNSRC",num_erg_groups,"d") # "d" for float values
+
+        except:
+            print "There are already photon source strength tags on the mesh in", \
+                inputfile
+            return #just graceful failure for now
+
+        # We grab the list of mesh entity objects
+        voxels = mesh.getEntities(iBase.Type.region)
+
+        # We need to create the list of photon probabilities for each mesh cell.
+        # Because this list can be quite large, we will do this element-by-element.
+        for grp, prob in enumerate(self.meshprobs):
+            tag = mesh.createTag("phtn_src_group_"+str(grp+1), 1, float)
+
+            for cnt, vox in enumerate(voxels):
+                # we create tag, which is a dictionary, and give the dictionary 
+                tag[vox] = float(prob[cnt])
+
+        mesh.save(outfile)
+
+        print "The file", outfile, "was created successfully"
+
+        return
+
 
     # DEPRECATED
     def read_pre_alara_2_9(self):
@@ -521,29 +572,32 @@ def main():
     
     # Input and output file names
     parser.add_option("-i","--input",action="store",dest="filename", \
-            default="", help="photon source strengths are read from file")
+            default=False, help="photon source strengths are read from FILENAME")
     parser.add_option("-o","--output",action="store",dest="outputfile", \
-            default="", help="file to write source information to.")
+            default="", help="file to write source information to, or" \
+            " file name for saving a modified mesh.")
 
     # Options for type of output
     parser.add_option("-m","--mesh",action="store",dest="meshform", \
-            default="0,1,1,0,1,1,0,1,1",help="Needs a 9-valuelist, meshform, of the form " \
+            default="0,1,1,0,1,1,0,1,1",help="Meshing information.\n" \
+            "Needs a 9-valuelist, meshform, of the form " \
             "-m xmin,xmax,xintervals,y...,z... delimited by commas (no spaces).")
     parser.add_option("-s","--sdef",action="store_true",dest="sdef", \
-            default=False, help="Will generate a file with the sdef" \
-            "card and the si, sp, and tr cards for MCNP.  Needs mesh "\
+            default=False, help="Will generate a file with the sdef, " \
+            "si, sp, and tr cards for MCNP.  Needs mesh "\
             "info from -m.")
     parser.add_option("-g","--gammas",action="store_true",dest="gammas", \
-            default=False,help="Will generate a 'gammas' file directly" \
-            "from a phtn_src file for use by" \
+            default=False,help="Will generate a 'gammas' file directly " \
+            "from a phtn_src file for use by " \
             "modified versions of MCNP. Needs mesh info from -m.")
-    parser.add_option("-H","--H5M",action="store_true",dest="h5m", \
-            default=False,help="To be implemented...")
+    parser.add_option("-H","--H5M",action="store",dest="h5m_filename", \
+            default=False,help="Adds the photon source information to the mesh. " \
+            "Supplied file name is the .h5m mesh.")
 
     (options, args) = parser.parse_args()
 
     # Print warning and then exit if no file was specified with -i/--input
-    if options.filename == "":
+    if options.filename == False:
         print "Methods in this module need a file name to begin. " \
                 "Use the -i option."
         return
@@ -574,8 +628,12 @@ def main():
         if options.outputfile=="": exampleReader.gen_gammas_file(meshform3D)
         else: exampleReader.gen_gammas_file(meshform3D, options.outputfile)
     
-    elif options.h5m:
-        print ".h5m to 'gammas' file is not yet implemented."
+    elif options.h5m_filename:
+        print "A specified h5m mesh will now have tags added containing photon" \
+                " source information from a phtn_src file."
+        exampleReader.isotope_source_strengths()
+        if options.outputfile=="": exampleReader.gen_phtn_src_h5m_tags(options.h5m_filename)
+        else: exampleReader.gen_phtn_src_h5m_tags(options.h5m_filename, options.outputfile)
 
 if __name__=='__main__':
     main()

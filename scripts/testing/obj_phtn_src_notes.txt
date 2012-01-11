@@ -1,20 +1,20 @@
-Test one:
+Tests 1 and 2:
 Read in a phtn_src file for a 3x3x3 problem.
 Call the SDEF card functionality.
 
 ../../scripts/obj_phtn_src.py -i phtn_src -s -m 0,10,3,0,10,3,0,10,3
 
 
-Test two:
+Tests 3 and 4:
 Read in a phtn-src file for a 3x3x3 problem.
 Call the gammas (for source.f90 from KIT) functionality.
 
 ../../scripts/obj_phtn_src.py -i phtn_src -g -m 0,10,3,0,10,3,0,10,3
 
 
-Test #?:
+Test 5:
 Read in a phtn-src file for a 3x3x3 problem.
-Call the h5m functionality.
+Call the functionality to store the photon source strengths in an h5m mesh file for the 3x3x3 problem.
 
-../../scripts/obj_phtn_src.py -i phtn_src -H -m 0,10,3,0,10,3,0,10,3
+../../scripts/obj_phtn_src.py -i phtn_src -H matFracsTest.h5m
 
