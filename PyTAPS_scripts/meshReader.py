@@ -12,7 +12,7 @@ from itaps import iBase,iMesh
 import re
 import sys
 
-def meshReader( filename ):
+def meshReader(filename):
     nmfile = open("matFracs_results", 'w')
     mesh = iMesh.Mesh()
     mesh.load( filename )
