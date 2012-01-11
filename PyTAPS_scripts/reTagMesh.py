@@ -40,19 +40,20 @@ def FindFirstLine(MeshtalInputLines):#Finding # of lines to skip
     m=n+1 #first line of values
     return m
 
-def MeshPointCount(m):#Counting Number of Meshpoints
+def MeshPointCount(MeshtalInputLines, m):#Counting Number of Meshpoints
     j=1 #initialising # of points
     while MeshtalInputLines[j+m-1][:11] == MeshtalInputLines[j+m][:11]:
           j=j+1
     print 'Mesh points found:', j
     return j
 
-def EnergyGroupCount(m, j):#finding number of energy groups
+def EnergyGroupCount(MeshtalInputLines, m, j):#finding number of energy groups
     k=(len(MeshtalInputLines)-j-m)/j #number of energy groups
     print 'Energy bins found:', k
     return k
 
-def PrintLowtoHigh(m, j, k, Norm):#Printing values to output file
+def PrintLowtoHigh(MeshtalInputLines, m, j, k, Norm):#Printing values to output file
+    #Norm=float(sys.argv[4])
     #Initial normailization factor from command line argument
     for t in range(0, j):
         pointoutput=''
@@ -63,8 +64,9 @@ def PrintLowtoHigh(m, j, k, Norm):#Printing values to output file
         FluxinOutput.write(pointoutput + '\n\n')
     print 'File creation sucessful \n'
 
-def PrintHightoLow(m, j, k, Norm):
-   #Initial normailization factor from command line argument
+def PrintHightoLow(MeshtalInputLines, m, j, k):
+    #Norm=float(sys.argv[4])
+    #Initial normailization factor from command line argument
     for t in range(0, j):
         pointoutput=''
         for s in range(k-1,-1,-1):
@@ -113,7 +115,6 @@ def TagFluxes(mesh, meshtal, m, j, k) :
 def CloseFiles(): #Closes meshtal input and flux.in output files
     MeshtalInput.close()
     FluxinOutput.close()
-    return
 
 def meshReader( filename ):
     nmfile = open("matFracs_results", 'w')
@@ -161,7 +162,7 @@ def make_alara(output_filename, geom_volume):
      numzones=(dimID[0]*dimID[1]*dimID[2])
      elementvolume = float(totalvolume)/numzones
      print 'Volume per mesh element: ', elementvolume
-         
+     
      # Write ALARA geometry card to file
      alara_input.write('geometry rectangular\n\n')
 
@@ -200,9 +201,8 @@ def make_alara(output_filename, geom_volume):
      input.close()
      alara_input.close()
      return
-
+  
 if __name__=='__main__':
-    print 'in main'
     (options, args)= parser()
     mesh = iMesh.Mesh()
     mesh.load(sys.argv[1])
@@ -213,17 +213,17 @@ if __name__=='__main__':
         MeshtalInputLines=MeshtalInput.readlines() 
         FluxinOutput=file(options.fluxin, "w")
         m=FindFirstLine(MeshtalInputLines)
-        j=MeshPointCount(m)
-        k=EnergyGroupCount(m,j)
+        j=MeshPointCount(MeshtalInputLines, m)
+        k=EnergyGroupCount(MeshtalInputLines, m,j)
         if options.backwardbool==False:
-            PrintLowtoHigh(m,j,k, options.Norm)
+            PrintLowtoHigh(MeshtalInputLines, m, j, k, options.Norm)
         else:
-            PrintHightoLow(m,j,k)
+            PrintHightoLow(MeshtalInputLines, m, j, k)
         TagFluxes (mesh, options.meshtal, m, j, k)
         mesh.save(options.output)
     CloseFiles()
     print "generating ALARA input"
-    meshReader(options.output)
+    meshReader(sys.argv[1])
     make_alara(options.alaraname,options.volume)
     print '\ncomplete'
 	
