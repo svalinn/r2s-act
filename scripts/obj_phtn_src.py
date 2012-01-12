@@ -451,7 +451,7 @@ class PhtnSrcReader(object):
         RECEIVES: The file (a .h5m moab file) containing the mesh of interest.
         An output file which is fun
         TODO:
-
+        Check to make sure the correct number of energy groups were added as tags.
         """
 
         try:
@@ -468,29 +468,99 @@ class PhtnSrcReader(object):
 
         num_erg_groups = 42 # must be an integer
 
-        try:
-            mesh.createTag("PHTNSRC",num_erg_groups,"d") # "d" for float values
-
-        except:
-            print "There are already photon source strength tags on the mesh in", \
-                inputfile
-            return #just graceful failure for now
-
         # We grab the list of mesh entity objects
         voxels = mesh.getEntities(iBase.Type.region)
 
         # We need to create the list of photon probabilities for each mesh cell.
         # Because this list can be quite large, we will do this element-by-element.
-        for grp, prob in enumerate(self.meshprobs):
-            tag = mesh.createTag("phtn_src_group_"+str(grp+1), 1, float)
+        
+        #for grp, prob in enumerate(self.meshprobs[0]):
+        for grp in range( len(self.meshprobs[0]) ):
+            try:
+                tag = mesh.createTag("phtn_src_group_"+str(grp+1), 1, float)
+            except:
+                print "ERROR: The tag phtn_src_group_" + str(grp+1), "already exists " \
+                        "in the file", inputfile, "\nNow exiting this method."
+                return
 
+            # we give each voxel to the tag dictionary, and assign the tag the value
+            #  
             for cnt, vox in enumerate(voxels):
                 # we create tag, which is a dictionary, and give the dictionary 
-                tag[vox] = float(prob[cnt])
+#                tag[vox] = float(prob[cnt])a
+                tag[vox] = float(self.meshprobs[cnt][grp])
+
 
         mesh.save(outfile)
 
         print "The file", outfile, "was created successfully"
+
+        return
+
+    
+    def gen_gammas_file_from_h5m(self, meshform, inputfile, outfile="gammas"):
+        """ACTION: Method reads tags with photon source strengths from an h5m
+        file and generates the gammas file for the modified KIT source.f90 routine
+        To do this, we generate self.meshprobs and call gen_gammas_file().
+        REQUIRES:
+
+        RECEIVES: The file (a .h5m moab file) containing the mesh of interest.
+        An output file name for the 'gammas' file.
+        TODO:
+        """
+
+        mesh = iMesh.Mesh()
+        mesh.load(inputfile)
+
+        try:
+            group = mesh.getTagHandle("phtn_src_group_1")
+        except:
+            print "ERROR: The file", inputfile, "does not contain tags of the " \
+                    "form 'phtn_src_group_#'"
+            return
+
+        voxels = mesh.getEntities(iBase.Type.region)
+        numvoxels = len(voxels)
+
+        #Need to create: self.meshstrengths, self.meshprobs
+        self.meshprobs = list() # of lists of strings; each string is a source strength
+        self.meshstrengths = list() # of floats; each float is the total source
+                                    #  strength of a voxel at the chosen cooling step
+
+        # For each of these, sum the entries in the corresponding source
+        # strengths block, and make a list of these sums (self.meshstrengths)
+#        if len(self.totalHeadingList) and len(self.totalProbList):
+#
+#            for probset in self.totalProbList:
+#                #print set[coolingstep]
+#                #thistotal = [item for sublist in set[coolingstep] for item in sublist]
+#                
+#                self.meshprobs.append(probset[coolingstep])
+#                self.meshstrengths.append(sum([float(prob) for prob in probset[coolingstep]]))
+
+#        for vox in voxels:
+ #               self.meshprobs.append(list())
+
+        # Fun!:
+        # We create meshprobs with a list comprehension. Voxels are mesh entity pointers(?)
+        # groups is a dictionary, receives the list of pointers, and returns a list of
+        # photon source probabilities.  We use a list comprehension to make this a list of
+        # lists, and assign this to meshprobs.
+        # In the following for loop, each of these lists is appended for each energy group.
+        self.meshprobs = [[x] for x in group[voxels]]
+
+        for i in range(2,1000): #Arbitrary: we look for up to 1000 groups
+            try:
+                group = mesh.getTagHandle("phtn_src_group_"+str(i))
+                for cnt, vox in enumerate(voxels):
+                    self.meshprobs[cnt].append(group[vox])
+            except: break
+        
+#        self.meshstrengths.append(sum([float(prob) for prob in probset[coolingstep]]))
+
+        self.meshstrengths = [sum([float(prob) for prob in x]) for x in self.meshprobs]
+
+        self.gen_gammas_file(meshform, outfile)
 
         return
 
@@ -590,9 +660,12 @@ def main():
             default=False,help="Will generate a 'gammas' file directly " \
             "from a phtn_src file for use by " \
             "modified versions of MCNP. Needs mesh info from -m.")
-    parser.add_option("-H","--H5M",action="store",dest="h5m_filename", \
+    parser.add_option("-H","--H5M",action="store",dest="h5m_write_filename", \
             default=False,help="Adds the photon source information to the mesh. " \
             "Supplied file name is the .h5m mesh.")
+    parser.add_option("-p","--pull",action="store",dest="h5m_read_filename", \
+            default=False,help="Reads photon source information from an h5m mesh " \
+            "and generates a corresponding 'gammas' file.")
 
     (options, args) = parser.parse_args()
 
@@ -628,12 +701,22 @@ def main():
         if options.outputfile=="": exampleReader.gen_gammas_file(meshform3D)
         else: exampleReader.gen_gammas_file(meshform3D, options.outputfile)
     
-    elif options.h5m_filename:
+    elif options.h5m_write_filename:
         print "A specified h5m mesh will now have tags added containing photon" \
                 " source information from a phtn_src file."
         exampleReader.isotope_source_strengths()
-        if options.outputfile=="": exampleReader.gen_phtn_src_h5m_tags(options.h5m_filename)
-        else: exampleReader.gen_phtn_src_h5m_tags(options.h5m_filename, options.outputfile)
+        if options.outputfile=="": exampleReader.gen_phtn_src_h5m_tags(options.h5m_write_filename)
+        else: exampleReader.gen_phtn_src_h5m_tags(options.h5m_write_filename, options.outputfile)
 
+    elif options.h5m_read_filename:
+        print "A specified h5m mesh will now be checked for tags containing photon" \
+                " source information, and a 'gammas' file will be generated."
+        if options.outputfile=="": exampleReader.gen_gammas_file_from_h5m( \
+                meshform3D, options.h5m_read_filename)
+        else: exampleReader.gen_gammas_file_from_h5m( \
+                meshform3D, options.h5m_read_filename, options.outputfile)
+
+
+# Handles module being called as a script.
 if __name__=='__main__':
     main()
