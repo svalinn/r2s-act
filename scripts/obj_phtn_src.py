@@ -395,7 +395,7 @@ class PhtnSrcReader(object):
         fw = open(outfile, 'w')
         
         # write first line (intervals for x, y, z)
-        fw.write(" ".join([str(x) for x in meshform]) + "\n")
+        fw.write(" ".join([str(x[2]) for x in meshform]) + "\n")
         
         # create and write x coords line (2nd line)
         coords = [meshform[0][0]]
@@ -438,7 +438,7 @@ class PhtnSrcReader(object):
         # all lines written, close file.
         fw.close()
         
-        print "The file", outfile, "was created successfully"
+        print "The file '{0}' was created successfully".format(outfile)
 
         return
 
@@ -490,10 +490,9 @@ class PhtnSrcReader(object):
 #                tag[vox] = float(prob[cnt])a
                 tag[vox] = float(self.meshprobs[cnt][grp])
 
-
         mesh.save(outfile)
 
-        print "The file", outfile, "was created successfully"
+        print "The file '{0}' was created successfully".format(outfile)
 
         return
 
