@@ -48,13 +48,11 @@ def MeshPointCount(MeshtalInputLines, m):#Counting Number of Meshpoints
     return j
 
 def EnergyGroupCount(MeshtalInputLines, m, j):#finding number of energy groups
-    k=(len(MeshtalInputLines)-j-m)/j #number of energy groups
+    k=(len(MeshtalInputLines)-j-m)/j #number of energy groups, note, the "-j" is used to neglect flux "Total" rows in
     print 'Energy bins found:', k
     return k
 
 def PrintLowtoHigh(MeshtalInputLines, m, j, k, Norm):#Printing values to output file
-    #Norm=float(sys.argv[4])
-    #Initial normailization factor from command line argument
     for t in range(0, j):
         pointoutput=''
         for s in range(0,k):
@@ -64,9 +62,7 @@ def PrintLowtoHigh(MeshtalInputLines, m, j, k, Norm):#Printing values to output 
         FluxinOutput.write(pointoutput + '\n\n')
     print 'File creation sucessful \n'
 
-def PrintHightoLow(MeshtalInputLines, m, j, k):
-    #Norm=float(sys.argv[4])
-    #Initial normailization factor from command line argument
+def PrintHightoLow(MeshtalInputLines, m, j, k, Norm):
     for t in range(0, j):
         pointoutput=''
         for s in range(k-1,-1,-1):
@@ -154,11 +150,6 @@ def make_alara(output_filename, geom_volume):
      
      # Calculate volume per mesh element assuming equal volume for all elements
      totalvolume = geom_volume
-     try : 
-          float(totalvolume)
-     except :
-          print >>sys.stderr, "Invalid entry for volume."
-          sys.exit(1)
      numzones=(dimID[0]*dimID[1]*dimID[2])
      elementvolume = float(totalvolume)/numzones
      print 'Volume per mesh element: ', elementvolume
@@ -201,13 +192,41 @@ def make_alara(output_filename, geom_volume):
      input.close()
      alara_input.close()
      return
-  
+
+def check_input(norm, vol):
+    try:
+        float(norm)
+    except:
+        print >>sys.stdeer, "Invalid entry for normalization factor"
+        sys.exit(1)
+    try : 
+        float(vol)
+    except :
+        print >>sys.stderr, "Invalid entry for volume."
+        sys.exit(1)
+
+def check_meshpoints(MeshtalInputLines, m, j, k, mesh):
+    voxels = mesh.getEntities(iBase.Type.region)
+    if j !=len(voxels):
+        print >>sys.stderr, 'Number of meshtal points does not match number of mesh points'
+        sys.exit(1)
+
+    #find number of data points in InputLines
+    l=0 #number of datapoints
+    while MeshtalInputLines[m+l][:11] != '   Total   ':
+        l=l+1
+    print l
+    if l != (j*k) :
+        print >>sys.stderr, 'Number of data points does not equal meshpoints*energy groups'
+        sys.exit(1)
+   
 if __name__=='__main__':
     (options, args)= parser()
     mesh = iMesh.Mesh()
     mesh.load(sys.argv[1])
     TagMats(mesh)    
     if options.meshtal != None :
+        check_input(options.Norm, options.volume)
         print 'Parsing meshtal file'
         MeshtalInput=open(options.meshtal, "r")
         MeshtalInputLines=MeshtalInput.readlines() 
@@ -215,10 +234,11 @@ if __name__=='__main__':
         m=FindFirstLine(MeshtalInputLines)
         j=MeshPointCount(MeshtalInputLines, m)
         k=EnergyGroupCount(MeshtalInputLines, m,j)
+        check_meshpoints(MeshtalInputLines, m, j, k, mesh)
         if options.backwardbool==False:
             PrintLowtoHigh(MeshtalInputLines, m, j, k, options.Norm)
         else:
-            PrintHightoLow(MeshtalInputLines, m, j, k)
+            PrintHightoLow(MeshtalInputLines, m, j, k, options.Norm)
         TagFluxes (mesh, options.meshtal, m, j, k)
         mesh.save(options.output)
     CloseFiles()
