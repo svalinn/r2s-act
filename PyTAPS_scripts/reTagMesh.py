@@ -52,7 +52,8 @@ def EnergyGroupCount(MeshtalInputLines, m, j):#finding number of energy groups
     print 'Energy bins found:', k
     return k
 
-def PrintLowtoHigh(MeshtalInputLines, m, j, k, Norm):#Printing values to output file
+def PrintLowtoHigh(MeshtalInputLines, m, j, k, Norm, fluxin):#Printing values to fluxin file
+    FluxinOutput=file(fluxin, "w")
     for t in range(0, j):
         pointoutput=''
         for s in range(0,k):
@@ -62,7 +63,8 @@ def PrintLowtoHigh(MeshtalInputLines, m, j, k, Norm):#Printing values to output 
         FluxinOutput.write(pointoutput + '\n\n')
     print 'File creation sucessful \n'
 
-def PrintHightoLow(MeshtalInputLines, m, j, k, Norm):
+def PrintHightoLow(MeshtalInputLines, m, j, k, Norm, fluxin):#Printing values to fluxin file
+    FluxinOutput=file(fluxin, "w")
     for t in range(0, j):
         pointoutput=''
         for s in range(k-1,-1,-1):
@@ -236,12 +238,12 @@ if __name__=='__main__':
         k=EnergyGroupCount(MeshtalInputLines, m,j)
         check_meshpoints(MeshtalInputLines, m, j, k, mesh)
         if options.backwardbool==False:
-            PrintLowtoHigh(MeshtalInputLines, m, j, k, options.Norm)
+            PrintLowtoHigh(MeshtalInputLines, m, j, k, options.Norm, options.fluxin)
         else:
-            PrintHightoLow(MeshtalInputLines, m, j, k, options.Norm)
+            PrintHightoLow(MeshtalInputLines, m, j, k, options.Norm, options.fluxin)
         TagFluxes (mesh, options.meshtal, m, j, k)
         mesh.save(options.output)
-    CloseFiles()
+        CloseFiles()
     print "generating ALARA input"
     meshReader(sys.argv[1])
     make_alara(options.alaraname,options.volume)
