@@ -14,6 +14,7 @@
 
 import textwrap as tw
 import sys
+import os
 from optparse import OptionParser
 from itaps import iBase,iMesh
 
@@ -23,7 +24,7 @@ class PhtnSrcReader(object):
     """
     
     def __init__(self, myInputFileName):
-        """Init function for class PhtnSrcReader.
+        """Init function for class PhtnSrcReader. Receives a phtn_src type file.
         """
         super(PhtnSrcReader, self).__init__()
 
@@ -32,14 +33,27 @@ class PhtnSrcReader(object):
         # stores a list of notes
         #self.notes = ['Notes for: ' + self.inputFileName]
         
-    
-    def read(self):
-        """ Method opens and reads in lines and stores them in blocks on a 
+    def read_file(self):
+        """Method opens self.inputFileName and passes this object to self.read()"""
+        if os.path.isfile(self.inputFileName):
+            fr = open(self.inputFileName, 'r')
+            read_ok = self.read(fr)
+            fr.close()
+        else:
+            print "The file '{0}' could not be found.".format(self.inputFileName)
+            return 0
+        return read_ok # return 1
+
+
+    def read(self, fr=''):
+        """ Method reads in lines from an IO stream, and stores them in blocks on a 
         per-heading basis, e.g. headings are isotope identifiers or "TOTAL"
+        RECEIVES: fr, an IO stream, e.g. from open('file', 'r')
         """
 
-        fr = open(self.inputFileName, 'r')
-        
+        if fr == '': #default to the file at self.inputFileName
+            return read_file()
+
         self.headingList = list() # contains every line's list of isotope IDs
         self.coolingStepsList = list() # contains every line's list of cooling steps   
         self.probList = list() # contains every line's list of probabilities
@@ -86,7 +100,7 @@ class PhtnSrcReader(object):
                 
             line = fr.readline() # read next line
         
-        # return #what to return?
+        return 1
    
 
     def get_isotope(self, isotope="TOTAL"):
@@ -131,9 +145,12 @@ class PhtnSrcReader(object):
         if len(self.totalHeadingList) == 0:
             print "{0} was not found in photon source " \
             "file.".format(isotope)
+            return 0
             
         else:
             return self.totalHeadingList
+
+        return 1
                 
             
     def format_isotope_mcnp(self, coolingstep=0):
@@ -207,7 +224,7 @@ class PhtnSrcReader(object):
         return self.meshstrengths
 
 
-    def gen_sdef_probabilities(self, meshform, outfile="phtn_sdef"):
+    def gen_sdef_probabilities(self, meshform, outfile="phtn_sdef", ergbins=""):
         """REQUIRES: Method assumes that read() and isotope_source_strengths() have been
         called already.
         ACTION: Method creates a sequentially numbered listed of si and sp cards for
@@ -222,7 +239,7 @@ class PhtnSrcReader(object):
         except:
             print "ERROR: isotope_source_strengths needs to be called before " \
                     "gen_sdef_probabilties"
-            return [0]
+            return 0
 
         if nmesh != meshform[0][2]*meshform[1][2]*meshform[2][2]:
             print "WARNING: Number of mesh cells in phtn_src file does not " \
@@ -232,16 +249,25 @@ class PhtnSrcReader(object):
 
         if nmesh > 994:
             print "ERROR: Too many mesh cells to create an SDEF card."
-            return [0]
+            return 0
         
         # ~Shoddy placeholder for energy bins
-        # Note that we replace the {0} with the .format method for each mesh cell.
-        self.ergbins = "si{0} 0  1e-2  2e-2" \
-          " 3e-2  4.5e-2  6e-2  7e-2  7.5e-2  1e-1  1.5e-1  2e-1  3e-1" \
-          " 4e-1  4.5e-1  5.1e-1  5.12e-1  6e-1  7e-1  8e-1  1e0  1.33e0" \
-          " 1.34e0  1.5e0  1.66e0  2e0  2.5e0  3e0  3.5e0" \
-          " 4e0  4.5e0  5e0  5.5e0  6e0  6.5e0  7e0  7.5e0  8e0" \
-          " 1e1  1.2e1  1.4e1  2e1  3e1  5e1"
+        # Note that we replace the {0} with the .format method for each mesh cell.a
+        if ergbins == "":
+            # we set a default 42 groups
+            print "The energy bins were not specified. A default 42 group set" \
+                    " of bins is being used instead."
+            self.ergbins = "si{0} 0  1e-2  2e-2" \
+              " 3e-2  4.5e-2  6e-2  7e-2  7.5e-2  1e-1  1.5e-1  2e-1  3e-1" \
+              " 4e-1  4.5e-1  5.1e-1  5.12e-1  6e-1  7e-1  8e-1  1e0  1.33e0" \
+              " 1.34e0  1.5e0  1.66e0  2e0  2.5e0  3e0  3.5e0" \
+              " 4e0  4.5e0  5e0  5.5e0  6e0  6.5e0  7e0  7.5e0  8e0" \
+              " 1e1  1.2e1  1.4e1  2e1  3e1  5e1"
+        else:
+            # Not currently implemented
+            self.ergbins = ergbins
+            print "ERROR: ergbins."
+            return 0
         
         # calculate the mesh spacing in each direction
         xval = (meshform[0][1]-meshform[0][0])/float(meshform[0][2])/2
@@ -361,7 +387,7 @@ class PhtnSrcReader(object):
         print "Remember to update the imp:n to imp:p, as well as updating the " \
                 "mode card."
         
-        return
+        return 1
 
 
     def gen_gammas_file(self, meshform, outfile="gammas"):
@@ -379,7 +405,7 @@ class PhtnSrcReader(object):
         except:
             print "ERROR: isotope_source_strengths needs to be called before " \
                     "gen_sdef_probabilties"
-            return [0]
+            return 0
 
         if nmesh != meshform[0][2]*meshform[1][2]*meshform[2][2]:
             print "WARNING: Number of mesh cells in phtn_src file does not " \
@@ -440,7 +466,7 @@ class PhtnSrcReader(object):
         
         print "The file '{0}' was created successfully".format(outfile)
 
-        return
+        return 1
 
     
     def gen_phtn_src_h5m_tags(self, inputfile, outfile=""):
@@ -459,7 +485,7 @@ class PhtnSrcReader(object):
         except:
             print "ERROR: isotope_source_strengths needs to be called before " \
                     "gen_phtn_src_h5m_tags"
-            return [0]
+            return 0
 
         if outfile == "": outfile = inputfile
 
@@ -494,7 +520,7 @@ class PhtnSrcReader(object):
 
         print "The file '{0}' was created successfully".format(outfile)
 
-        return
+        return 1
 
     
     def gen_gammas_file_from_h5m(self, meshform, inputfile, outfile="gammas"):
@@ -516,7 +542,7 @@ class PhtnSrcReader(object):
         except:
             print "ERROR: The file", inputfile, "does not contain tags of the " \
                     "form 'phtn_src_group_#'"
-            return
+            return 0
 
         voxels = mesh.getEntities(iBase.Type.region)
         numvoxels = len(voxels)
@@ -561,7 +587,7 @@ class PhtnSrcReader(object):
 
         self.gen_gammas_file(meshform, outfile)
 
-        return
+        return 1
 
 
     # DEPRECATED
@@ -624,7 +650,7 @@ class PhtnSrcReader(object):
                 
             line = fr.readline()
         
-        # return #what to return?
+        return 1
 
     #END DEPRECATED
         
@@ -672,16 +698,22 @@ def main():
     if options.filename == False:
         print "Methods in this module need a file name to begin. " \
                 "Use the -i option."
-        return
+        return 0
 
     exampleReader = PhtnSrcReader(options.filename)
-    exampleReader.read()
+    exampleReader.read_file()
 
     exampleReader.get_isotope()
     print "Cooling steps are:\n", exampleReader.coolingSteps, "\n"
 
+    # Toss error and then exit if too few mesh values given
+    if len(options.meshform.split(",")) != 9:
+        print "ERROR: The specified mesh parameters, '{0}', should have 9 values." \
+                .format(options.meshform)
+        return 0
+
     # Turn meshform list received into the 3D list used by other methods
-    # Also avoiding DeprecationWarnings by mixing floats and ints...
+    # Also avoiding DeprecationWarnings by mixing floats and ints...    
     meshform3D = options.meshform.split(",")
     meshform3D[0:9:3] = [float(x) for x in meshform3D[0:9:3] ]
     meshform3D[1:9:3] = [float(x) for x in meshform3D[1:9:3] ]
@@ -714,6 +746,8 @@ def main():
                 meshform3D, options.h5m_read_filename)
         else: exampleReader.gen_gammas_file_from_h5m( \
                 meshform3D, options.h5m_read_filename, options.outputfile)
+    
+    return 1
 
 
 # Handles module being called as a script.

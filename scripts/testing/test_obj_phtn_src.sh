@@ -9,7 +9,7 @@ cd $TEST_DIR
 rm test_gammas1 test_gammas2 test_gammas3 test_gammas4 test_sdef1 test_sdef2 matFracsTest.h5m test_mcnp.* -f
 
 echo ------------------------------------
-echo Now TESTING creation of the simplest sdef file.
+echo Now TESTING creation of the simplest SDEF file.
 echo A warning is expected regarding \# mesh cells != mesh intervals\' product.
 echo - - - - - - - - - - - - - - - - - -
 # Note: not using default output - avoids accidental overwrite of phtn_sdef
@@ -17,7 +17,7 @@ $SCRIPT_DIR/obj_phtn_src.py -i phtn_src -s -o test_sdef1
 
 echo
 echo ------------------------------------
-echo Now TESTING creation of the simplest gammas file.
+echo Now TESTING creation of the simplest 'gammas' file.
 echo A warning is expected regarding \# mesh cells != mesh intervals\' product.
 echo - - - - - - - - - - - - - - - - - -
 # Note: not using default output - avoids accidental overwrite of gammas
@@ -25,14 +25,14 @@ $SCRIPT_DIR/obj_phtn_src.py -i phtn_src -s -o test_gammas1
 
 echo
 echo ------------------------------------
-echo Now TESTING creation of a more advanced sdef file.
+echo Now TESTING creation of a more advanced SDEF file.
 echo  No warnings or errors should be given.
 echo - - - - - - - - - - - - - - - - - -
 $SCRIPT_DIR/obj_phtn_src.py -i phtn_src -s -m 0,10,3,0,10,3,0,10,3 -o test_sdef2
 
 echo
 echo --------------------------------------
-echo Now TESTING creation of a more advanced gammas file.
+echo Now TESTING creation of a more advanced 'gammas' file.
 echo  No warnings or errors should be given.
 echo - - - - - - - - - - - - - - - - - -
 $SCRIPT_DIR/obj_phtn_src.py -i phtn_src -g -m 0,10,3,0,10,3,0,10,3 -o test_gammas2
@@ -76,7 +76,7 @@ echo --------------------------------------
 echo "MCNP5 will now be run to test the phtn_src->h5m->gammas->source.f90 workflow for the 3x3x3 case."
 echo  This should succeed and look like a normal MCNP5 run.
 echo - - - - - - - - - - - - - - - - - -
-cp test_gammas4 gammas
+#cp test_gammas4 gammas
 
 $MCNP5_PATH i=simplebox-3_src n=test_mcnp.
 
