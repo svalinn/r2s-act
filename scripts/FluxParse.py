@@ -20,13 +20,13 @@ parser = OptionParser()
 parser.add_option('-b', action='store_true', dest='backwardbool', default=False, help="print fluxes in decreasing energy")
 (opts, args) = parser.parse_args()
 
-def FindFirstLine(InputLines):#Finding # of lines to skip
+def FindFirstLine(MeshtalInputLines):#Finding # of lines to skip
     TableHeading ='   Energy         '
     n=1 #number of lines in mcnp file header
-    HeaderLine=InputLines[0][:64]
+    HeaderLine=MeshtalInputLines[0][:64]
     while HeaderLine != TableHeading:
           n=n+1
-          HeaderLine=InputLines[n][:18]
+          HeaderLine=MeshtalInputLines[n][:18]
     print 'Skipping Header:', n, 'lines'
     m=n+1 #first line of values
     return m
@@ -34,49 +34,47 @@ def FindFirstLine(InputLines):#Finding # of lines to skip
 def CountDelineations(m):
     #Finding number or Z deliniations
     z=1
-    while InputLines[m][36:41] != InputLines[m+z][36:41]:
+    while MeshtalInputLines[m][36:41] != MeshtalInputLines[m+z][36:41]:
         z=z+1
     #Finding number of Y delinations
     y=1
-    while InputLines[m][26:31] != InputLines[m+z*y][26:31]:
+    while MeshtalInputLines[m][26:31] != MeshtalInputLines[m+z*y][26:31]:
         y=y+1
     #Finding number of X deliniations
     x=1
-    while InputLines[m][16:21] != InputLines[m+z*y*x][16:21]:
+    while MeshtalInputLines[m][16:21] != MeshtalInputLines[m+z*y*x][16:21]:
         x=x+1
     print 'Spacial Deliniations: (',x,',',y,',',z,')'
 
 def MeshPointCount(m):#Counting Number of Meshpoints
     j=1 #initialising # of points
-    while InputLines[j+m-1][:11] == InputLines[j+m][:11]:
+    while MeshtalInputLines[j+m-1][:11] == MeshtalInputLines[j+m][:11]:
           j=j+1
     print 'Mesh points found:', j
     return j
 
 def EnergyGroupCount(m, j):#finding number of energy groups
-    k=(len(InputLines)-j-m)/j #number of energy groups
+    k=(len(MeshtalInputLines)-j-m)/j #number of energy groups
     print 'Energy bins found:', k
     return k
 
-def PrintLowtoHigh(m, j, k):#Printing values to output file
-    Norm=float(sys.argv[3])
+def PrintLowtoHigh(m, j, k, Norm):#Printing values to output file
     #Initial normailization factor from command line argument
     for t in range(0, j):
         pointoutput=''
         for s in range(0,k):
-           pointoutput+=str(float(InputLines[m+s*j + t][42:53])*Norm)+' '
+           pointoutput+=str(float(MeshtalInputLines[m+s*j + t][42:53])*Norm)+' '
            if (s+1)%8 == 0 & s != (k-1):
                pointoutput+='\n'
         Output.write(pointoutput + '\n\n')
     print 'File creation sucessful'
 
-def PrintHightoLow(m, j, k):
-    Norm=float(sys.argv[3])
+def PrintHightoLow(m, j, k, Norm):
     #Initial normailization factor from command line argument
     for t in range(0, j):
         pointoutput=''
         for s in range(k-1,-1,-1):
-           pointoutput+=str(float(InputLines[m+s*j + t][42:53])*Norm)+' '
+           pointoutput+=str(float(MeshtalInputLines[m+s*j + t][42:53])*Norm)+' '
            if (s+1)%8 == 0 & s != (k-1):
                pointoutput+='\n'
         Output.write(pointoutput + '\n\n')
@@ -86,17 +84,18 @@ def CloseFiles(): #Closes input and output files
     Input.close()
     Output.close()
 
-def check_meshpoints(MeshtalInputLines, m, j, k, mesh):
-    voxels = mesh.getEntities(iBase.Type.region)
-    if j !=len(voxels):
-        print >>sys.stderr, 'Number of meshtal points does not match number of mesh points'
+def check_input(Norm):
+    try:
+        float(Norm)
+    except:
+        print >>sys.stdeer, "Invalid entry for normalization factor"
         sys.exit(1)
 
-    #find number of data points in InputLines
-    l=0 #number of datapoints
+def check_meshpoints(MeshtalInputLines, m, j, k): #checks to see if the total data points = meshpoints* energy groups
+    l=0
     while MeshtalInputLines[m+l][:11] != '   Total   ':
         l=l+1
-    print l
+    print 'Total data points found:', l
     if l != (j*k) :
         print >>sys.stderr, 'Number of data points does not equal meshpoints*energy groups'
         sys.exit(1)
@@ -105,15 +104,17 @@ def check_meshpoints(MeshtalInputLines, m, j, k, mesh):
 if __name__=='__main__':
     Input=open(sys.argv[1], "r")#opens MCNP input file (first specified)
     Output=file(sys.argv[2], "w")
-    InputLines=Input.readlines() 
-    m=FindFirstLine(InputLines)
+    MeshtalInputLines=Input.readlines() 
+    m=FindFirstLine(MeshtalInputLines)
     CountDelineations(m)
     j=MeshPointCount(m)
     k=EnergyGroupCount(m,j)
-    check_input(options.Norm, options.volume)
+    check_input(sys.argv[3])
+    Norm=float(sys.argv[3])    
+    check_meshpoints(MeshtalInputLines, m, j, k)
     if opts.backwardbool==False:
-        PrintLowtoHigh(m,j,k)
+        PrintLowtoHigh(m,j,k, Norm)
     else:
-        PrintHightoLow(m,j,k)
+        PrintHightoLow(m,j,k, Norm)
     CloseFiles()
 
