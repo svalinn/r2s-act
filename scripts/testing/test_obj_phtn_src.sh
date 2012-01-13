@@ -75,7 +75,12 @@ echo
 echo --------------------------------------
 echo "MCNP5 will now be run to test the phtn_src->h5m->gammas->source.f90 workflow for the 3x3x3 case."
 echo  This should succeed and look like a normal MCNP5 run.
+echo NOTE: MCNP5 must be compiled with the file r2s-act/mcnp_source/source_gamma_meshtal2.F90
 echo - - - - - - - - - - - - - - - - - -
+echo
+read -p "Press [Enter] key to run MCNP5."
+echo
+
 #cp test_gammas4 gammas
 
 $MCNP5_PATH i=simplebox-3_src n=test_mcnp.

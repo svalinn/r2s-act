@@ -5,8 +5,10 @@
 ! Edits have been made by Eric Relson with CNERG goals in mind.
 ! -Scan 100 materials in multiple spots rather than 150 some places, 100
 ! elsewhere
-! -42 energy groups instead of 24; highlight 24 to see all instances of
+! -Formerly: 42 energy groups instead of 24; highlight 24 to see all instances of
 ! changes...
+! -Currently: up to 100 energy groups. Line 6 of the gammas_ener file should
+! list the energy bin boundaries.
 ! -Increase size of 'line' from 150 to 300.
 !
 ! -removed tab characters
@@ -25,14 +27,13 @@ subroutine source
   implicit real(dknd) (a-h,o-z)
         integer stat
 !        real(dknd),dimension(1000000,24) :: spectrum
-        real(dknd),dimension(1000000,42) :: spectrum
-!        real(dknd),dimension(25) :: ener_phot ! 24 + 1 = 25
-        real(dknd),dimension(43) :: ener_phot ! 42 + 1 = 43
-        integer i_ints,j_ints,k_ints,n_active_mat
+        real(dknd),dimension(1000000,100) :: spectrum
+        integer i_ints,j_ints,k_ints,n_active_mat,n_ener_phot
         real,dimension(100):: i_bins,j_bins,k_bins
         integer,dimension(100) :: active_mat
-        save spectrum,ener_phot,i_ints,j_ints,k_ints,n_active_mat, &
-             i_bins,j_bins,k_bins,active_mat,tvol,ikffl
+        real,dimension(100) :: my_ener_phot !up to 100 energy groups (arbitrary)
+        save spectrum,i_ints,j_ints,k_ints,n_active_mat,n_ener_phot, &
+             i_bins,j_bins,k_bins,active_mat,my_ener_phot,tvol,ikffl
                          
                 ! IMPORTANT - make sure this is a long enough string.
         character*300 :: line
@@ -46,32 +47,37 @@ subroutine source
         ikffl=ikffl+1
         if (ikffl.eq.1) then
 
-! bins for photon energy groups.
-!        data ener_phot/0.0,0.01,0.02,0.05,0.1,0.2,0.3,0.4,0.6,0.8,1.0, &
- !            1.22,1.44,1.66,2.0,2.5,3.0,4.0,5.0,6.5,8.0,10.0,12.0,14.0,20.0/
-        data ener_phot/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
-              0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
-              1.66,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0, &
-              10.0,12.0,14.0,20.0,30.0,50.0/
                    
           do i=1,100
             active_mat(i)=0
           enddo
 
+          do i=1,100
+            my_ener_phot(i)=0
+          enddo
+
           close(50)
-          open(unit=50,form='formatted',file='gammas')
+          open(unit=50,form='formatted',file='gammas_ener')
           read(50,*) i_ints,j_ints,k_ints
           read(50,*) (i_bins(i),i=1,i_ints+1)
           read(50,*) (j_bins(i),i=1,j_ints+1)
           read(50,*) (k_bins(i),i=1,k_ints+1)
           read(50,'(A)') line
           read(line,*,end=888) (active_mat(i),i=1,100)
+          read(50,'(A)') line
+          read(line,*,end=888) (my_ener_phot(i),i=1,1000)
    888    continue
           ! counting number of activated materials specified
           do i=1,100
             if (active_mat(i)==0) exit
           enddo
           n_active_mat=i-1
+
+          do i=2,100
+            if (my_ener_phot(i)==0) exit
+          enddo
+          ! -1 for value that is zero, -1 for x values -> x-1 bins defined
+          n_ener_phot = i-1-1
 
 !          print*,i_ints,j_ints,k_ints
 !          print*,(i_bins(i),i=1,i_ints+1)
@@ -82,7 +88,7 @@ subroutine source
 
           ! initiallizing a spectrum array
           do i=1,1000000
-            do j=1,42 ! 24
+            do j=1,n_ener_phot !42 ! 24
               spectrum(i,j)=0.0
             enddo
           enddo
@@ -95,7 +101,7 @@ subroutine source
           i=1
           do
                         !read(50,'(24ES12.5)',iostat=stat) (spectrum(i,j),j=1,24) 
-            read(50,'(42ES12.5)',iostat=stat) (spectrum(i,j),j=1,42) !24)
+            read(50,'(1000ES12.5)',iostat=stat) (spectrum(i,j),j=1,n_ener_phot) !24)
             if (stat /= 0) exit
 !              write(*,'(i4,1x,24ES12.5)') i,(spectrum(i,j),j=1,24)
             i=i+1
@@ -134,7 +140,7 @@ subroutine source
 
         i=(kk-1)+(jj-1)*k_ints+(ii-1)*j_ints*k_ints+1
 !        if (spectrum(i,24).eq.0) goto 10
-        if (spectrum(i,42).eq.0) goto 10
+        if (spectrum(i,n_ener_phot).eq.0) goto 10
 
 !        print*,i_bins(1),i_bins(i_ints+1),i_bins(i_ints+1)-i_bins(1)
 !        print*,j_bins(1),j_bins(j_ints+1),j_bins(j_ints+1)-j_bins(1)
@@ -148,13 +154,13 @@ subroutine source
 !----------------------------------------------------------------------------------------------------
 !
 
-        r4=(1-rang())*spectrum(i,42) !24)
+        r4=(1-rang())*spectrum(i,n_ener_phot) !42) !24)
 
-        do j=1, 42 !24
+        do j=1, n_ener_phot !42 !24
           if (r4.lt.spectrum(i,j)) exit
         enddo
 
-        erg=ener_phot(j)+(1-rang())*(ener_phot(j+1)-ener_phot(j))
+        erg=my_ener_phot(j)+(1-rang())*(my_ener_phot(j+1)-my_ener_phot(j))
 
 !        
 !----------------------------------------------------------------------------------------------------
@@ -164,7 +170,7 @@ subroutine source
 !----------------------------------------------------------------------------------------------------
 !
 
-        wgt=spectrum(i,42) !24)
+        wgt=spectrum(i,n_ener_phot) !42) !24)
 
 
         ipt=2
