@@ -101,7 +101,7 @@ subroutine source
           i=1
           do
                         !read(50,'(24ES12.5)',iostat=stat) (spectrum(i,j),j=1,24) 
-            read(50,'(1000ES12.5)',iostat=stat) (spectrum(i,j),j=1,n_ener_phot) !24)
+            read(50,'(100ES12.5)',iostat=stat) (spectrum(i,j),j=1,n_ener_phot) !24)
             if (stat /= 0) exit
 !              write(*,'(i4,1x,24ES12.5)') i,(spectrum(i,j),j=1,24)
             i=i+1

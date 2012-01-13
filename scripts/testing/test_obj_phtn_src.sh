@@ -81,7 +81,7 @@ echo
 read -p "Press [Enter] key to run MCNP5."
 echo
 
-#cp test_gammas4 gammas
+cp test_gammas4 gammas
 
 $MCNP5_PATH i=simplebox-3_src n=test_mcnp.
 

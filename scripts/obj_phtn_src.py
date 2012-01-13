@@ -390,7 +390,7 @@ class PhtnSrcReader(object):
         return 1
 
 
-    def gen_gammas_file(self, meshform, outfile="gammas"):
+    def gen_gammas_file(self, meshform, outfile="gammas", ergbins=""):
         """ACTION: Method generates a file called 'gammas' to be used with a 
         modified version of MCNP5.
         REQUIRES: Method assumes that read() and isotope_source_strengths() 
@@ -444,22 +444,26 @@ class PhtnSrcReader(object):
         # create and write 5th line (list of activated materials... ?????)
         fw.write(" ".join([str(x) for x in range(1,101)]) + "\n")
 
+        # If storing the energy bins information, write line 6
+        if ergbins != "":
+            fw.write(" ".join([str(x) for x in ergbins]) + "\n")
+
         # create and write lines for each mesh cell's gamma source strength
         # BUT first we must create a cummulative list of probabilities.
-        for ergset in self.meshprobs:
-            ergset_f = [float(erg) for erg in ergset]
-            cummulative_ergset = list() # of strings
-            preverg = 0.0
-            for erg in ergset_f:
-                ergsum = erg + preverg
-                cummulative_ergset.append(ergsum)
-                preverg = ergsum
+        for binset in self.meshprobs:
+            binset_f = [float(erg) for erg in binset]
+            cummulative_binset = list() # of strings
+            prevbin = 0.0
+            for bin in binset_f:
+                binsum = bin + prevbin
+                cummulative_binset.append(binsum)
+                prevbin = binsum
             # The following list comprehension uses a format specifying output
             #  of 12 characters, with 5 values
             #  after the decimal point, using scientific notation.
-            cummulative_ergset2 = ["{0:<12.5E}".format(x/cummulative_ergset[41]) \
-                    for x in cummulative_ergset]
-            fw.write("".join(cummulative_ergset2) + "\n") #~ trailing newline a problem?
+            cummulative_binset2 = ["{0:<12.5E}".format(x/cummulative_binset[41]) \
+                    for x in cummulative_binset]
+            fw.write("".join(cummulative_binset2) + "\n") #~ trailing newline a problem?
 
         # all lines written, close file.
         fw.close()
@@ -527,7 +531,10 @@ class PhtnSrcReader(object):
         """ACTION: Method reads tags with photon source strengths from an h5m
         file and generates the gammas file for the modified KIT source.f90 routine
         To do this, we generate self.meshprobs and call gen_gammas_file().
-        REQUIRES:
+        REQUIRES: the .h5m moab mesh must have photon source strength tags of the
+        form "phtn_src_group_#"
+        Will read photon energy bin boundary values if the root set has the tag 
+        PHOT_ERG (a list of floats)
 
         RECEIVES: The file (a .h5m moab file) containing the mesh of interest.
         An output file name for the 'gammas' file.
@@ -552,20 +559,6 @@ class PhtnSrcReader(object):
         self.meshstrengths = list() # of floats; each float is the total source
                                     #  strength of a voxel at the chosen cooling step
 
-        # For each of these, sum the entries in the corresponding source
-        # strengths block, and make a list of these sums (self.meshstrengths)
-#        if len(self.totalHeadingList) and len(self.totalProbList):
-#
-#            for probset in self.totalProbList:
-#                #print set[coolingstep]
-#                #thistotal = [item for sublist in set[coolingstep] for item in sublist]
-#                
-#                self.meshprobs.append(probset[coolingstep])
-#                self.meshstrengths.append(sum([float(prob) for prob in probset[coolingstep]]))
-
-#        for vox in voxels:
- #               self.meshprobs.append(list())
-
         # Fun!:
         # We create meshprobs with a list comprehension. Voxels are mesh entity pointers(?)
         # groups is a dictionary, receives the list of pointers, and returns a list of
@@ -581,11 +574,19 @@ class PhtnSrcReader(object):
                     self.meshprobs[cnt].append(group[vox])
             except: break
         
-#        self.meshstrengths.append(sum([float(prob) for prob in probset[coolingstep]]))
-
         self.meshstrengths = [sum([float(prob) for prob in x]) for x in self.meshprobs]
 
-        self.gen_gammas_file(meshform, outfile)
+        # We now look for the tags with the energy bin boundary values
+        try:
+            phtn_ergs = mesh.getTagHandle("PHTN_BINS")
+            myergbins = phtn_ergs[mesh.rootSet] #UNTESTED... does this need list() around it?
+            print "NOTE: photon energy bins were found in the .h5m mesh and added to "\
+                    "'{0}'. The modified mcnp5/source.f90 looks for a file caled " \
+                    "'gammas_ener'".format(outfile)
+        except: # if there is no PHTN_BINS tag, then we send an empty string in its place
+            myergbins = ""
+
+        self.gen_gammas_file(meshform, outfile, myergbins)
 
         return 1
 
