@@ -12,6 +12,9 @@ ExpectedFluxinLines=ExpectedFluxin.readlines()
 ExpectedFluxinBack=open('test_files/expected_fluxin_back', 'r')
 ExpectedFluxinBackLines=ExpectedFluxinBack.readlines()
 
+ExpectedALARAin=open('test_files/expected_ALARA.in', 'r')
+ExpectedALARAinLines=ExpectedALARAin.readlines()
+
 
 #####################################
 #Step 1: Testing using typical input 
@@ -46,7 +49,29 @@ def test_PrintHightoLow():
     for x in [1, p, q]:
         assert ActualFluxinBackLines[x] == ExpectedFluxinBackLines[x]
     os.remove('actual_fluxin_back')
-def test
+
+def test_entire_program ():
+    os.system('python reTagMesh.py test_files/test_matFracs.h5m -m test_files/test_meshtal -n 5e13 -v 125')
+    #testing fluxin file
+    ActualFluxin=open('ALARAflux.in', 'r')
+    ActualFluxinLines=ActualFluxin.readlines()
+    assert len(ActualFluxinLines) == len(ExpectedFluxinLines)
+    p=int(len(ActualFluxinLines)/2)
+    q=int(len(ActualFluxinLines)/3)
+    for x in [1, p, q]:
+        assert ActualFluxinLines[x] == ExpectedFluxinLines[x]
+    
+    #testing ALARA.in file
+    ActualALARAin=open('ALARA.in', 'r')
+    ActualALARAinLines=ActualALARAin.readlines()
+    for x in [3, 3108, 3189, 3234]:
+        print x
+        assert ActualALARAinLines[x] == ExpectedALARAinLines[x]
+        
+    #deleting all output files
+    for x in ['ALARAflux.in','ALARA.in','matFracs_results', 'mesh.vtk']:
+        os.remove(x)
+    
 
 
        

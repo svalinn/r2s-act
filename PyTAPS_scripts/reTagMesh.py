@@ -217,7 +217,7 @@ def check_meshpoints(MeshtalInputLines, m, j, k, mesh):
     l=0 #number of datapoints
     while MeshtalInputLines[m+l][:11] != '   Total   ':
         l=l+1
-    print l
+    print 'total data points found:', l
     if l != (j*k) :
         print >>sys.stderr, 'Number of data points does not equal meshpoints*energy groups'
         sys.exit(1)

@@ -1031,2600 +1031,2562 @@ mat_loading
 end
 
 mixture	mix_1
-	material	316-SS	1	0.959973
-	material	water	1	0.0400258
+	material	mat_2	1	0.959973
+	material	mat_3	1	0.040026
 end
 
 mixture	mix_2
-	material	316-SS	1	0.999999
-	material	water	1	0.0
+	material	mat_2	1	0.999999
+	material	mat_3	1	0.0
 end
 
 mixture	mix_3
-	material	316-SS	1	0.999999
-	material	water	1	0.0
+	material	mat_2	1	0.999999
+	material	mat_3	1	0.0
 end
 
 mixture	mix_4
-	material	316-SS	1	0.999999
-	material	water	1	0.0
+	material	mat_2	1	0.999999
+	material	mat_3	1	0.0
 end
 
 mixture	mix_5
-	material	316-SS	1	0.999999
-	material	water	1	0.0
+	material	mat_2	1	0.999999
+	material	mat_3	1	0.0
 end
 
 mixture	mix_6
-	material	316-SS	1	0.999999
-	material	water	1	0.0
+	material	mat_2	1	0.999999
+	material	mat_3	1	0.0
 end
 
 mixture	mix_7
-	material	316-SS	1	0.999999
-	material	water	1	0.0
+	material	mat_2	1	0.999999
+	material	mat_3	1	0.0
 end
 
 mixture	mix_8
-	material	316-SS	1	0.959313
-	material	water	1	0.0406861
+	material	mat_2	1	0.959313
+	material	mat_3	1	0.040686
 end
 
 mixture	mix_9
-	material	316-SS	1	0.999999
-	material	water	1	0.0
+	material	mat_2	1	0.999999
+	material	mat_3	1	0.0
 end
 
 mixture	mix_10
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_11
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_12
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_13
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_14
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_15
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_16
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_17
-	material	316-SS	1	0.999999
-	material	water	1	0.0
+	material	mat_2	1	0.999999
+	material	mat_3	1	0.0
 end
 
 mixture	mix_18
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_19
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_20
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_21
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_22
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_23
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_24
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_25
-	material	316-SS	1	0.999999
-	material	water	1	0.0
+	material	mat_2	1	0.999999
+	material	mat_3	1	0.0
 end
 
 mixture	mix_26
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_27
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_28
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_29
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_30
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_31
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_32
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_33
-	material	316-SS	1	0.999999
-	material	water	1	0.0
+	material	mat_2	1	0.999999
+	material	mat_3	1	0.0
 end
 
 mixture	mix_34
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_35
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_36
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_37
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_38
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_39
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_40
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_41
-	material	316-SS	1	0.999999
-	material	water	1	0.0
+	material	mat_2	1	0.999999
+	material	mat_3	1	0.0
 end
 
 mixture	mix_42
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_43
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_44
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_45
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_46
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_47
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_48
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_49
-	material	316-SS	1	0.999999
-	material	water	1	0.0
+	material	mat_2	1	0.999999
+	material	mat_3	1	0.0
 end
 
 mixture	mix_50
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_51
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_52
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_53
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_54
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_55
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_56
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_57
-	material	316-SS	1	0.958838
-	material	water	1	0.0411614
+	material	mat_2	1	0.958838
+	material	mat_3	1	0.041161
 end
 
 mixture	mix_58
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_59
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_60
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_61
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_62
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_63
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_64
-	material	316-SS	1	0.959437
-	material	water	1	0.0405631
+	material	mat_2	1	0.959437
+	material	mat_3	1	0.040563
 end
 
 mixture	mix_65
-	material	316-SS	1	0.245057
-	material	water	1	0.754943
+	material	mat_2	1	0.245057
+	material	mat_3	1	0.754943
 end
 
 mixture	mix_66
-	material	316-SS	1	0.74281
-	material	water	1	0.25719
+	material	mat_2	1	0.74281
+	material	mat_3	1	0.25719
 end
 
 mixture	mix_67
-	material	316-SS	1	0.961022
-	material	water	1	0.0389775
+	material	mat_2	1	0.961022
+	material	mat_3	1	0.038978
 end
 
 mixture	mix_68
-	material	316-SS	1	0.998052
-	material	water	1	0.0019475
+	material	mat_2	1	0.998052
+	material	mat_3	1	0.001948
 end
 
 mixture	mix_69
-	material	316-SS	1	0.998106
-	material	water	1	0.00189342
+	material	mat_2	1	0.998106
+	material	mat_3	1	0.001893
 end
 
 mixture	mix_70
-	material	316-SS	1	0.961335
-	material	water	1	0.0386648
+	material	mat_2	1	0.961335
+	material	mat_3	1	0.038665
 end
 
 mixture	mix_71
-	material	316-SS	1	0.741729
-	material	water	1	0.258271
+	material	mat_2	1	0.741729
+	material	mat_3	1	0.258271
 end
 
 mixture	mix_72
-	material	316-SS	1	0.246301
-	material	water	1	0.753698
+	material	mat_2	1	0.246301
+	material	mat_3	1	0.753698
 end
 
 mixture	mix_73
-	material	316-SS	1	0.741856
-	material	water	1	0.258143
+	material	mat_2	1	0.741856
+	material	mat_3	1	0.258143
 end
 
 mixture	mix_74
-	material	316-SS	1	0.995825
-	material	water	1	0.00417461
+	material	mat_2	1	0.995825
+	material	mat_3	1	0.004175
 end
 
 mixture	mix_75
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_76
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_77
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_78
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_79
-	material	316-SS	1	0.995695
-	material	water	1	0.00430478
+	material	mat_2	1	0.995695
+	material	mat_3	1	0.004305
 end
 
 mixture	mix_80
-	material	316-SS	1	0.745232
-	material	water	1	0.254768
+	material	mat_2	1	0.745232
+	material	mat_3	1	0.254768
 end
 
 mixture	mix_81
-	material	316-SS	1	0.961599
-	material	water	1	0.0384005
+	material	mat_2	1	0.961599
+	material	mat_3	1	0.0384
 end
 
 mixture	mix_82
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_83
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_84
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_85
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_86
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_87
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_88
-	material	316-SS	1	0.962423
-	material	water	1	0.0375767
+	material	mat_2	1	0.962423
+	material	mat_3	1	0.037577
 end
 
 mixture	mix_89
-	material	316-SS	1	0.998274
-	material	water	1	0.00172595
+	material	mat_2	1	0.998274
+	material	mat_3	1	0.001726
 end
 
 mixture	mix_90
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_91
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_92
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_93
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_94
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_95
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_96
-	material	316-SS	1	0.998118
-	material	water	1	0.00188239
+	material	mat_2	1	0.998118
+	material	mat_3	1	0.001882
 end
 
 mixture	mix_97
-	material	316-SS	1	0.998167
-	material	water	1	0.00183308
+	material	mat_2	1	0.998167
+	material	mat_3	1	0.001833
 end
 
 mixture	mix_98
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_99
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_100
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_101
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_102
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_103
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_104
-	material	316-SS	1	0.998063
-	material	water	1	0.00193738
+	material	mat_2	1	0.998063
+	material	mat_3	1	0.001937
 end
 
 mixture	mix_105
-	material	316-SS	1	0.961853
-	material	water	1	0.0381466
+	material	mat_2	1	0.961853
+	material	mat_3	1	0.038147
 end
 
 mixture	mix_106
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_107
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_108
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_109
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_110
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_111
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_112
-	material	316-SS	1	0.961551
-	material	water	1	0.0384491
+	material	mat_2	1	0.961551
+	material	mat_3	1	0.038449
 end
 
 mixture	mix_113
-	material	316-SS	1	0.742411
-	material	water	1	0.257589
+	material	mat_2	1	0.742411
+	material	mat_3	1	0.257589
 end
 
 mixture	mix_114
-	material	316-SS	1	0.995772
-	material	water	1	0.00422799
+	material	mat_2	1	0.995772
+	material	mat_3	1	0.004228
 end
 
 mixture	mix_115
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_116
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_117
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_118
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_119
-	material	316-SS	1	0.995758
-	material	water	1	0.00424163
+	material	mat_2	1	0.995758
+	material	mat_3	1	0.004242
 end
 
 mixture	mix_120
-	material	316-SS	1	0.745811
-	material	water	1	0.254189
+	material	mat_2	1	0.745811
+	material	mat_3	1	0.254189
 end
 
 mixture	mix_121
-	material	316-SS	1	0.243041
-	material	water	1	0.756959
+	material	mat_2	1	0.243041
+	material	mat_3	1	0.756959
 end
 
 mixture	mix_122
-	material	316-SS	1	0.744764
-	material	water	1	0.255236
+	material	mat_2	1	0.744764
+	material	mat_3	1	0.255236
 end
 
 mixture	mix_123
-	material	316-SS	1	0.960971
-	material	water	1	0.0390291
+	material	mat_2	1	0.960971
+	material	mat_3	1	0.039029
 end
 
 mixture	mix_124
-	material	316-SS	1	0.998262
-	material	water	1	0.00173822
+	material	mat_2	1	0.998262
+	material	mat_3	1	0.001738
 end
 
 mixture	mix_125
-	material	316-SS	1	0.998263
-	material	water	1	0.00173688
+	material	mat_2	1	0.998263
+	material	mat_3	1	0.001737
 end
 
 mixture	mix_126
-	material	316-SS	1	0.961277
-	material	water	1	0.0387233
+	material	mat_2	1	0.961277
+	material	mat_3	1	0.038723
 end
 
 mixture	mix_127
-	material	316-SS	1	0.741585
-	material	water	1	0.258415
+	material	mat_2	1	0.741585
+	material	mat_3	1	0.258415
 end
 
 mixture	mix_128
-	material	316-SS	1	0.246727
-	material	water	1	0.753273
+	material	mat_2	1	0.246727
+	material	mat_3	1	0.753273
 end
 
 mixture	mix_129
-	material	316-SS	1	0.0
-	material	water	1	0.999999
+	material	mat_2	1	0.0
+	material	mat_3	1	0.999999
 end
 
 mixture	mix_130
-	material	316-SS	1	0.0117922
-	material	water	1	0.988207
+	material	mat_2	1	0.011792
+	material	mat_3	1	0.988207
 end
 
 mixture	mix_131
-	material	316-SS	1	0.131415
-	material	water	1	0.868585
+	material	mat_2	1	0.131415
+	material	mat_3	1	0.868585
 end
 
 mixture	mix_132
-	material	316-SS	1	0.260154
-	material	water	1	0.739846
+	material	mat_2	1	0.260154
+	material	mat_3	1	0.739846
 end
 
 mixture	mix_133
-	material	316-SS	1	0.258534
-	material	water	1	0.741466
+	material	mat_2	1	0.258534
+	material	mat_3	1	0.741466
 end
 
 mixture	mix_134
-	material	316-SS	1	0.133048
-	material	water	1	0.866951
+	material	mat_2	1	0.133048
+	material	mat_3	1	0.866951
 end
 
 mixture	mix_135
-	material	316-SS	1	0.0116343
-	material	water	1	0.988365
+	material	mat_2	1	0.011634
+	material	mat_3	1	0.988365
 end
 
 mixture	mix_136
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_137
-	material	316-SS	1	0.0114579
-	material	water	1	0.988542
+	material	mat_2	1	0.011458
+	material	mat_3	1	0.988542
 end
 
 mixture	mix_138
-	material	316-SS	1	0.260585
-	material	water	1	0.739415
+	material	mat_2	1	0.260585
+	material	mat_3	1	0.739415
 end
 
 mixture	mix_139
-	material	316-SS	1	0.568002
-	material	water	1	0.431998
+	material	mat_2	1	0.568002
+	material	mat_3	1	0.431998
 end
 
 mixture	mix_140
-	material	316-SS	1	0.719462
-	material	water	1	0.280538
+	material	mat_2	1	0.719462
+	material	mat_3	1	0.280538
 end
 
 mixture	mix_141
-	material	316-SS	1	0.718394
-	material	water	1	0.281606
+	material	mat_2	1	0.718394
+	material	mat_3	1	0.281606
 end
 
 mixture	mix_142
-	material	316-SS	1	0.568908
-	material	water	1	0.431092
+	material	mat_2	1	0.568908
+	material	mat_3	1	0.431092
 end
 
 mixture	mix_143
-	material	316-SS	1	0.25743
-	material	water	1	0.74257
+	material	mat_2	1	0.25743
+	material	mat_3	1	0.74257
 end
 
 mixture	mix_144
-	material	316-SS	1	0.0114713
-	material	water	1	0.988529
+	material	mat_2	1	0.011471
+	material	mat_3	1	0.988529
 end
 
 mixture	mix_145
-	material	316-SS	1	0.13227
-	material	water	1	0.86773
+	material	mat_2	1	0.13227
+	material	mat_3	1	0.86773
 end
 
 mixture	mix_146
-	material	316-SS	1	0.571826
-	material	water	1	0.428174
+	material	mat_2	1	0.571826
+	material	mat_3	1	0.428174
 end
 
 mixture	mix_147
-	material	316-SS	1	0.865984
-	material	water	1	0.134016
+	material	mat_2	1	0.865984
+	material	mat_3	1	0.134016
 end
 
 mixture	mix_148
-	material	316-SS	1	0.977472
-	material	water	1	0.022528
+	material	mat_2	1	0.977472
+	material	mat_3	1	0.022528
 end
 
 mixture	mix_149
-	material	316-SS	1	0.977259
-	material	water	1	0.0227412
+	material	mat_2	1	0.977259
+	material	mat_3	1	0.022741
 end
 
 mixture	mix_150
-	material	316-SS	1	0.866863
-	material	water	1	0.133137
+	material	mat_2	1	0.866863
+	material	mat_3	1	0.133137
 end
 
 mixture	mix_151
-	material	316-SS	1	0.571153
-	material	water	1	0.428847
+	material	mat_2	1	0.571153
+	material	mat_3	1	0.428847
 end
 
 mixture	mix_152
-	material	316-SS	1	0.132279
-	material	water	1	0.867721
+	material	mat_2	1	0.132279
+	material	mat_3	1	0.867721
 end
 
 mixture	mix_153
-	material	316-SS	1	0.256561
-	material	water	1	0.743438
+	material	mat_2	1	0.256561
+	material	mat_3	1	0.743438
 end
 
 mixture	mix_154
-	material	316-SS	1	0.718343
-	material	water	1	0.281657
+	material	mat_2	1	0.718343
+	material	mat_3	1	0.281657
 end
 
 mixture	mix_155
-	material	316-SS	1	0.976636
-	material	water	1	0.0233642
+	material	mat_2	1	0.976636
+	material	mat_3	1	0.023364
 end
 
 mixture	mix_156
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_157
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_158
-	material	316-SS	1	0.977228
-	material	water	1	0.0227716
+	material	mat_2	1	0.977228
+	material	mat_3	1	0.022772
 end
 
 mixture	mix_159
-	material	316-SS	1	0.719771
-	material	water	1	0.280229
+	material	mat_2	1	0.719771
+	material	mat_3	1	0.280229
 end
 
 mixture	mix_160
-	material	316-SS	1	0.255783
-	material	water	1	0.744217
+	material	mat_2	1	0.255783
+	material	mat_3	1	0.744217
 end
 
 mixture	mix_161
-	material	316-SS	1	0.255786
-	material	water	1	0.744214
+	material	mat_2	1	0.255786
+	material	mat_3	1	0.744214
 end
 
 mixture	mix_162
-	material	316-SS	1	0.716905
-	material	water	1	0.283095
+	material	mat_2	1	0.716905
+	material	mat_3	1	0.283095
 end
 
 mixture	mix_163
-	material	316-SS	1	0.976619
-	material	water	1	0.0233815
+	material	mat_2	1	0.976619
+	material	mat_3	1	0.023381
 end
 
 mixture	mix_164
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_165
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_166
-	material	316-SS	1	0.977364
-	material	water	1	0.0226359
+	material	mat_2	1	0.977364
+	material	mat_3	1	0.022636
 end
 
 mixture	mix_167
-	material	316-SS	1	0.718482
-	material	water	1	0.281518
+	material	mat_2	1	0.718482
+	material	mat_3	1	0.281518
 end
 
 mixture	mix_168
-	material	316-SS	1	0.256097
-	material	water	1	0.743903
+	material	mat_2	1	0.256097
+	material	mat_3	1	0.743903
 end
 
 mixture	mix_169
-	material	316-SS	1	0.132112
-	material	water	1	0.867888
+	material	mat_2	1	0.132112
+	material	mat_3	1	0.867888
 end
 
 mixture	mix_170
-	material	316-SS	1	0.567446
-	material	water	1	0.432554
+	material	mat_2	1	0.567446
+	material	mat_3	1	0.432554
 end
 
 mixture	mix_171
-	material	316-SS	1	0.864228
-	material	water	1	0.135772
+	material	mat_2	1	0.864228
+	material	mat_3	1	0.135772
 end
 
 mixture	mix_172
-	material	316-SS	1	0.977954
-	material	water	1	0.0220464
+	material	mat_2	1	0.977954
+	material	mat_3	1	0.022046
 end
 
 mixture	mix_173
-	material	316-SS	1	0.977503
-	material	water	1	0.0224972
+	material	mat_2	1	0.977503
+	material	mat_3	1	0.022497
 end
 
 mixture	mix_174
-	material	316-SS	1	0.865709
-	material	water	1	0.134291
+	material	mat_2	1	0.865709
+	material	mat_3	1	0.134291
 end
 
 mixture	mix_175
-	material	316-SS	1	0.567668
-	material	water	1	0.432332
+	material	mat_2	1	0.567668
+	material	mat_3	1	0.432332
 end
 
 mixture	mix_176
-	material	316-SS	1	0.130805
-	material	water	1	0.869195
+	material	mat_2	1	0.130805
+	material	mat_3	1	0.869195
 end
 
 mixture	mix_177
-	material	316-SS	1	0.0114379
-	material	water	1	0.988562
+	material	mat_2	1	0.011438
+	material	mat_3	1	0.988562
 end
 
 mixture	mix_178
-	material	316-SS	1	0.261327
-	material	water	1	0.738673
+	material	mat_2	1	0.261327
+	material	mat_3	1	0.738673
 end
 
 mixture	mix_179
-	material	316-SS	1	0.567196
-	material	water	1	0.432804
+	material	mat_2	1	0.567196
+	material	mat_3	1	0.432804
 end
 
 mixture	mix_180
-	material	316-SS	1	0.721969
-	material	water	1	0.278031
+	material	mat_2	1	0.721969
+	material	mat_3	1	0.278031
 end
 
 mixture	mix_181
-	material	316-SS	1	0.719493
-	material	water	1	0.280507
+	material	mat_2	1	0.719493
+	material	mat_3	1	0.280507
 end
 
 mixture	mix_182
-	material	316-SS	1	0.568288
-	material	water	1	0.431712
+	material	mat_2	1	0.568288
+	material	mat_3	1	0.431712
 end
 
 mixture	mix_183
-	material	316-SS	1	0.258869
-	material	water	1	0.741131
+	material	mat_2	1	0.258869
+	material	mat_3	1	0.741131
 end
 
 mixture	mix_184
-	material	316-SS	1	0.011382
-	material	water	1	0.988618
+	material	mat_2	1	0.011382
+	material	mat_3	1	0.988618
 end
 
 mixture	mix_185
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_186
-	material	316-SS	1	0.0116963
-	material	water	1	0.988304
+	material	mat_2	1	0.011696
+	material	mat_3	1	0.988304
 end
 
 mixture	mix_187
-	material	316-SS	1	0.131158
-	material	water	1	0.868842
+	material	mat_2	1	0.131158
+	material	mat_3	1	0.868842
 end
 
 mixture	mix_188
-	material	316-SS	1	0.259324
-	material	water	1	0.740676
+	material	mat_2	1	0.259324
+	material	mat_3	1	0.740676
 end
 
 mixture	mix_189
-	material	316-SS	1	0.258606
-	material	water	1	0.741394
+	material	mat_2	1	0.258606
+	material	mat_3	1	0.741394
 end
 
 mixture	mix_190
-	material	316-SS	1	0.131596
-	material	water	1	0.868404
+	material	mat_2	1	0.131596
+	material	mat_3	1	0.868404
 end
 
 mixture	mix_191
-	material	316-SS	1	0.0112435
-	material	water	1	0.988756
+	material	mat_2	1	0.011244
+	material	mat_3	1	0.988756
 end
 
 mixture	mix_192
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_193
-	material	316-SS	1	0.0
-	material	water	1	0.999999
+	material	mat_2	1	0.0
+	material	mat_3	1	0.999999
 end
 
 mixture	mix_194
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_195
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_196
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_197
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_198
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_199
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_200
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_201
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_202
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_203
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_204
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_205
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_206
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_207
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_208
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_209
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_210
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_211
-	material	316-SS	1	0.00150619
-	material	water	1	0.998494
+	material	mat_2	1	0.001506
+	material	mat_3	1	0.998494
 end
 
 mixture	mix_212
-	material	316-SS	1	0.0334671
-	material	water	1	0.966533
+	material	mat_2	1	0.033467
+	material	mat_3	1	0.966533
 end
 
 mixture	mix_213
-	material	316-SS	1	0.033896
-	material	water	1	0.966104
+	material	mat_2	1	0.033896
+	material	mat_3	1	0.966104
 end
 
 mixture	mix_214
-	material	316-SS	1	0.00143479
-	material	water	1	0.998565
+	material	mat_2	1	0.001435
+	material	mat_3	1	0.998565
 end
 
 mixture	mix_215
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_216
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_217
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_218
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_219
-	material	316-SS	1	0.0344171
-	material	water	1	0.965583
+	material	mat_2	1	0.034417
+	material	mat_3	1	0.965583
 end
 
 mixture	mix_220
-	material	316-SS	1	0.151273
-	material	water	1	0.848727
+	material	mat_2	1	0.151273
+	material	mat_3	1	0.848727
 end
 
 mixture	mix_221
-	material	316-SS	1	0.151437
-	material	water	1	0.848563
+	material	mat_2	1	0.151437
+	material	mat_3	1	0.848563
 end
 
 mixture	mix_222
-	material	316-SS	1	0.0330272
-	material	water	1	0.966973
+	material	mat_2	1	0.033027
+	material	mat_3	1	0.966973
 end
 
 mixture	mix_223
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_224
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_225
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_226
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_227
-	material	316-SS	1	0.0341981
-	material	water	1	0.965802
+	material	mat_2	1	0.034198
+	material	mat_3	1	0.965802
 end
 
 mixture	mix_228
-	material	316-SS	1	0.151878
-	material	water	1	0.848122
+	material	mat_2	1	0.151878
+	material	mat_3	1	0.848122
 end
 
 mixture	mix_229
-	material	316-SS	1	0.152279
-	material	water	1	0.847721
+	material	mat_2	1	0.152279
+	material	mat_3	1	0.847721
 end
 
 mixture	mix_230
-	material	316-SS	1	0.0331834
-	material	water	1	0.966817
+	material	mat_2	1	0.033183
+	material	mat_3	1	0.966817
 end
 
 mixture	mix_231
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_232
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_233
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_234
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_235
-	material	316-SS	1	0.00148285
-	material	water	1	0.998517
+	material	mat_2	1	0.001483
+	material	mat_3	1	0.998517
 end
 
 mixture	mix_236
-	material	316-SS	1	0.0338347
-	material	water	1	0.966165
+	material	mat_2	1	0.033835
+	material	mat_3	1	0.966165
 end
 
 mixture	mix_237
-	material	316-SS	1	0.0336952
-	material	water	1	0.966305
+	material	mat_2	1	0.033695
+	material	mat_3	1	0.966305
 end
 
 mixture	mix_238
-	material	316-SS	1	0.00139602
-	material	water	1	0.998604
+	material	mat_2	1	0.001396
+	material	mat_3	1	0.998604
 end
 
 mixture	mix_239
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_240
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_241
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_242
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_243
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_244
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_245
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_246
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_247
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_248
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_249
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_250
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_251
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_252
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_253
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_254
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_255
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_256
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_257
-	material	316-SS	1	0.0
-	material	water	1	0.999999
+	material	mat_2	1	0.0
+	material	mat_3	1	0.999999
 end
 
 mixture	mix_258
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_259
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_260
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_261
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_262
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_263
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_264
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_265
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_266
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_267
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_268
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_269
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_270
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_271
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_272
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_273
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_274
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_275
-	material	316-SS	1	0.00139394
-	material	water	1	0.998606
+	material	mat_2	1	0.001394
+	material	mat_3	1	0.998606
 end
 
 mixture	mix_276
-	material	316-SS	1	0.0346328
-	material	water	1	0.965367
+	material	mat_2	1	0.034633
+	material	mat_3	1	0.965367
 end
 
 mixture	mix_277
-	material	316-SS	1	0.0344492
-	material	water	1	0.965551
+	material	mat_2	1	0.034449
+	material	mat_3	1	0.965551
 end
 
 mixture	mix_278
-	material	316-SS	1	0.00143142
-	material	water	1	0.998569
+	material	mat_2	1	0.001431
+	material	mat_3	1	0.998569
 end
 
 mixture	mix_279
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_280
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_281
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_282
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_283
-	material	316-SS	1	0.034574
-	material	water	1	0.965426
+	material	mat_2	1	0.034574
+	material	mat_3	1	0.965426
 end
 
 mixture	mix_284
-	material	316-SS	1	0.156443
-	material	water	1	0.843557
+	material	mat_2	1	0.156443
+	material	mat_3	1	0.843557
 end
 
 mixture	mix_285
-	material	316-SS	1	0.153052
-	material	water	1	0.846948
+	material	mat_2	1	0.153052
+	material	mat_3	1	0.846948
 end
 
 mixture	mix_286
-	material	316-SS	1	0.0346032
-	material	water	1	0.965397
+	material	mat_2	1	0.034603
+	material	mat_3	1	0.965397
 end
 
 mixture	mix_287
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_288
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_289
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_290
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_291
-	material	316-SS	1	0.0340334
-	material	water	1	0.965967
+	material	mat_2	1	0.034033
+	material	mat_3	1	0.965967
 end
 
 mixture	mix_292
-	material	316-SS	1	0.155349
-	material	water	1	0.844651
+	material	mat_2	1	0.155349
+	material	mat_3	1	0.844651
 end
 
 mixture	mix_293
-	material	316-SS	1	0.152193
-	material	water	1	0.847807
+	material	mat_2	1	0.152193
+	material	mat_3	1	0.847807
 end
 
 mixture	mix_294
-	material	316-SS	1	0.0344373
-	material	water	1	0.965563
+	material	mat_2	1	0.034437
+	material	mat_3	1	0.965563
 end
 
 mixture	mix_295
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_296
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_297
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_298
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_299
-	material	316-SS	1	0.00144613
-	material	water	1	0.998554
+	material	mat_2	1	0.001446
+	material	mat_3	1	0.998554
 end
 
 mixture	mix_300
-	material	316-SS	1	0.0342033
-	material	water	1	0.965797
+	material	mat_2	1	0.034203
+	material	mat_3	1	0.965797
 end
 
 mixture	mix_301
-	material	316-SS	1	0.0334489
-	material	water	1	0.966551
+	material	mat_2	1	0.033449
+	material	mat_3	1	0.966551
 end
 
 mixture	mix_302
-	material	316-SS	1	0.00146831
-	material	water	1	0.998532
+	material	mat_2	1	0.001468
+	material	mat_3	1	0.998532
 end
 
 mixture	mix_303
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_304
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_305
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_306
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_307
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_308
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_309
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_310
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_311
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_312
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_313
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_314
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_315
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_316
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_317
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_318
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_319
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_320
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_321
-	material	316-SS	1	0.0
-	material	water	1	0.999999
+	material	mat_2	1	0.0
+	material	mat_3	1	0.999999
 end
 
 mixture	mix_322
-	material	316-SS	1	0.0110801
-	material	water	1	0.98892
+	material	mat_2	1	0.01108
+	material	mat_3	1	0.98892
 end
 
 mixture	mix_323
-	material	316-SS	1	0.128906
-	material	water	1	0.871094
+	material	mat_2	1	0.128906
+	material	mat_3	1	0.871094
 end
 
 mixture	mix_324
-	material	316-SS	1	0.259659
-	material	water	1	0.740341
+	material	mat_2	1	0.259659
+	material	mat_3	1	0.740341
 end
 
 mixture	mix_325
-	material	316-SS	1	0.256692
-	material	water	1	0.743308
+	material	mat_2	1	0.256692
+	material	mat_3	1	0.743308
 end
 
 mixture	mix_326
-	material	316-SS	1	0.130864
-	material	water	1	0.869136
+	material	mat_2	1	0.130864
+	material	mat_3	1	0.869136
 end
 
 mixture	mix_327
-	material	316-SS	1	0.0113211
-	material	water	1	0.988679
+	material	mat_2	1	0.011321
+	material	mat_3	1	0.988679
 end
 
 mixture	mix_328
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_329
-	material	316-SS	1	0.0116529
-	material	water	1	0.988347
+	material	mat_2	1	0.011653
+	material	mat_3	1	0.988347
 end
 
 mixture	mix_330
-	material	316-SS	1	0.258507
-	material	water	1	0.741493
+	material	mat_2	1	0.258507
+	material	mat_3	1	0.741493
 end
 
 mixture	mix_331
-	material	316-SS	1	0.568848
-	material	water	1	0.431152
+	material	mat_2	1	0.568848
+	material	mat_3	1	0.431152
 end
 
 mixture	mix_332
-	material	316-SS	1	0.719643
-	material	water	1	0.280357
+	material	mat_2	1	0.719643
+	material	mat_3	1	0.280357
 end
 
 mixture	mix_333
-	material	316-SS	1	0.716623
-	material	water	1	0.283377
+	material	mat_2	1	0.716623
+	material	mat_3	1	0.283377
 end
 
 mixture	mix_334
-	material	316-SS	1	0.567849
-	material	water	1	0.432151
+	material	mat_2	1	0.567849
+	material	mat_3	1	0.432151
 end
 
 mixture	mix_335
-	material	316-SS	1	0.257287
-	material	water	1	0.742713
+	material	mat_2	1	0.257287
+	material	mat_3	1	0.742713
 end
 
 mixture	mix_336
-	material	316-SS	1	0.0118473
-	material	water	1	0.988153
+	material	mat_2	1	0.011847
+	material	mat_3	1	0.988153
 end
 
 mixture	mix_337
-	material	316-SS	1	0.132113
-	material	water	1	0.867887
+	material	mat_2	1	0.132113
+	material	mat_3	1	0.867887
 end
 
 mixture	mix_338
-	material	316-SS	1	0.56472
-	material	water	1	0.43528
+	material	mat_2	1	0.56472
+	material	mat_3	1	0.43528
 end
 
 mixture	mix_339
-	material	316-SS	1	0.865738
-	material	water	1	0.134262
+	material	mat_2	1	0.865738
+	material	mat_3	1	0.134262
 end
 
 mixture	mix_340
-	material	316-SS	1	0.97748
-	material	water	1	0.0225204
+	material	mat_2	1	0.97748
+	material	mat_3	1	0.02252
 end
 
 mixture	mix_341
-	material	316-SS	1	0.976534
-	material	water	1	0.0234664
+	material	mat_2	1	0.976534
+	material	mat_3	1	0.023466
 end
 
 mixture	mix_342
-	material	316-SS	1	0.866398
-	material	water	1	0.133602
+	material	mat_2	1	0.866398
+	material	mat_3	1	0.133602
 end
 
 mixture	mix_343
-	material	316-SS	1	0.564421
-	material	water	1	0.435579
+	material	mat_2	1	0.564421
+	material	mat_3	1	0.435579
 end
 
 mixture	mix_344
-	material	316-SS	1	0.133482
-	material	water	1	0.866518
+	material	mat_2	1	0.133482
+	material	mat_3	1	0.866518
 end
 
 mixture	mix_345
-	material	316-SS	1	0.258598
-	material	water	1	0.741402
+	material	mat_2	1	0.258598
+	material	mat_3	1	0.741402
 end
 
 mixture	mix_346
-	material	316-SS	1	0.717804
-	material	water	1	0.282196
+	material	mat_2	1	0.717804
+	material	mat_3	1	0.282196
 end
 
 mixture	mix_347
-	material	316-SS	1	0.978037
-	material	water	1	0.0219627
+	material	mat_2	1	0.978037
+	material	mat_3	1	0.021963
 end
 
 mixture	mix_348
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_349
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_350
-	material	316-SS	1	0.977476
-	material	water	1	0.0225244
+	material	mat_2	1	0.977476
+	material	mat_3	1	0.022524
 end
 
 mixture	mix_351
-	material	316-SS	1	0.7163
-	material	water	1	0.2837
+	material	mat_2	1	0.7163
+	material	mat_3	1	0.2837
 end
 
 mixture	mix_352
-	material	316-SS	1	0.259535
-	material	water	1	0.740465
+	material	mat_2	1	0.259535
+	material	mat_3	1	0.740465
 end
 
 mixture	mix_353
-	material	316-SS	1	0.256679
-	material	water	1	0.743287
+	material	mat_2	1	0.256679
+	material	mat_3	1	0.743287
 end
 
 mixture	mix_354
-	material	316-SS	1	0.718333
-	material	water	1	0.281634
+	material	mat_2	1	0.718333
+	material	mat_3	1	0.281634
 end
 
 mixture	mix_355
-	material	316-SS	1	0.977778
-	material	water	1	0.0221887
+	material	mat_2	1	0.977778
+	material	mat_3	1	0.022189
 end
 
 mixture	mix_356
-	material	316-SS	1	0.999967
-	material	water	1	0.0
+	material	mat_2	1	0.999967
+	material	mat_3	1	0.0
 end
 
 mixture	mix_357
-	material	316-SS	1	0.999967
-	material	water	1	0.0
+	material	mat_2	1	0.999967
+	material	mat_3	1	0.0
 end
 
 mixture	mix_358
-	material	316-SS	1	0.977367
-	material	water	1	0.0225994
+	material	mat_2	1	0.977367
+	material	mat_3	1	0.022599
 end
 
 mixture	mix_359
-	material	316-SS	1	0.716982
-	material	water	1	0.282985
+	material	mat_2	1	0.716982
+	material	mat_3	1	0.282985
 end
 
 mixture	mix_360
-	material	316-SS	1	0.258704
-	material	water	1	0.741263
+	material	mat_2	1	0.258704
+	material	mat_3	1	0.741263
 end
 
 mixture	mix_361
-	material	316-SS	1	0.132468
-	material	water	1	0.867565
+	material	mat_2	1	0.132468
+	material	mat_3	1	0.867565
 end
 
 mixture	mix_362
-	material	316-SS	1	0.564562
-	material	water	1	0.435472
+	material	mat_2	1	0.564562
+	material	mat_3	1	0.435472
 end
 
 mixture	mix_363
-	material	316-SS	1	0.865888
-	material	water	1	0.134145
+	material	mat_2	1	0.865888
+	material	mat_3	1	0.134145
 end
 
 mixture	mix_364
-	material	316-SS	1	0.977196
-	material	water	1	0.0228378
+	material	mat_2	1	0.977196
+	material	mat_3	1	0.022838
 end
 
 mixture	mix_365
-	material	316-SS	1	0.976011
-	material	water	1	0.0240219
+	material	mat_2	1	0.976011
+	material	mat_3	1	0.024022
 end
 
 mixture	mix_366
-	material	316-SS	1	0.86715
-	material	water	1	0.132883
+	material	mat_2	1	0.86715
+	material	mat_3	1	0.132883
 end
 
 mixture	mix_367
-	material	316-SS	1	0.565162
-	material	water	1	0.434871
+	material	mat_2	1	0.565162
+	material	mat_3	1	0.434871
 end
 
 mixture	mix_368
-	material	316-SS	1	0.132523
-	material	water	1	0.86751
+	material	mat_2	1	0.132523
+	material	mat_3	1	0.86751
 end
 
 mixture	mix_369
-	material	316-SS	1	0.0117306
-	material	water	1	0.988269
+	material	mat_2	1	0.011731
+	material	mat_3	1	0.988269
 end
 
 mixture	mix_370
-	material	316-SS	1	0.258984
-	material	water	1	0.741016
+	material	mat_2	1	0.258984
+	material	mat_3	1	0.741016
 end
 
 mixture	mix_371
-	material	316-SS	1	0.568313
-	material	water	1	0.431687
+	material	mat_2	1	0.568313
+	material	mat_3	1	0.431687
 end
 
 mixture	mix_372
-	material	316-SS	1	0.71964
-	material	water	1	0.28036
+	material	mat_2	1	0.71964
+	material	mat_3	1	0.28036
 end
 
 mixture	mix_373
-	material	316-SS	1	0.715236
-	material	water	1	0.284764
+	material	mat_2	1	0.715236
+	material	mat_3	1	0.284764
 end
 
 mixture	mix_374
-	material	316-SS	1	0.567535
-	material	water	1	0.432465
+	material	mat_2	1	0.567535
+	material	mat_3	1	0.432465
 end
 
 mixture	mix_375
-	material	316-SS	1	0.258492
-	material	water	1	0.741508
+	material	mat_2	1	0.258492
+	material	mat_3	1	0.741508
 end
 
 mixture	mix_376
-	material	316-SS	1	0.0118585
-	material	water	1	0.988142
+	material	mat_2	1	0.011858
+	material	mat_3	1	0.988142
 end
 
 mixture	mix_377
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_378
-	material	316-SS	1	0.0119466
-	material	water	1	0.988053
+	material	mat_2	1	0.011947
+	material	mat_3	1	0.988053
 end
 
 mixture	mix_379
-	material	316-SS	1	0.132135
-	material	water	1	0.867865
+	material	mat_2	1	0.132135
+	material	mat_3	1	0.867865
 end
 
 mixture	mix_380
-	material	316-SS	1	0.260977
-	material	water	1	0.739023
+	material	mat_2	1	0.260977
+	material	mat_3	1	0.739023
 end
 
 mixture	mix_381
-	material	316-SS	1	0.259071
-	material	water	1	0.740929
+	material	mat_2	1	0.259071
+	material	mat_3	1	0.740929
 end
 
 mixture	mix_382
-	material	316-SS	1	0.133002
-	material	water	1	0.866998
+	material	mat_2	1	0.133002
+	material	mat_3	1	0.866998
 end
 
 mixture	mix_383
-	material	316-SS	1	0.0119113
-	material	water	1	0.988089
+	material	mat_2	1	0.011911
+	material	mat_3	1	0.988089
 end
 
 mixture	mix_384
-	material	316-SS	1	0.0
-	material	water	1	1.0
+	material	mat_2	1	0.0
+	material	mat_3	1	1.0
 end
 
 mixture	mix_385
-	material	316-SS	1	0.246014
-	material	water	1	0.753985
+	material	mat_2	1	0.246014
+	material	mat_3	1	0.753985
 end
 
 mixture	mix_386
-	material	316-SS	1	0.745692
-	material	water	1	0.254307
+	material	mat_2	1	0.745692
+	material	mat_3	1	0.254307
 end
 
 mixture	mix_387
-	material	316-SS	1	0.963711
-	material	water	1	0.0362887
+	material	mat_2	1	0.963711
+	material	mat_3	1	0.036289
 end
 
 mixture	mix_388
-	material	316-SS	1	0.998207
-	material	water	1	0.00179254
+	material	mat_2	1	0.998207
+	material	mat_3	1	0.001793
 end
 
 mixture	mix_389
-	material	316-SS	1	0.998231
-	material	water	1	0.00176902
+	material	mat_2	1	0.998231
+	material	mat_3	1	0.001769
 end
 
 mixture	mix_390
-	material	316-SS	1	0.963562
-	material	water	1	0.0364376
+	material	mat_2	1	0.963562
+	material	mat_3	1	0.036438
 end
 
 mixture	mix_391
-	material	316-SS	1	0.745441
-	material	water	1	0.254559
+	material	mat_2	1	0.745441
+	material	mat_3	1	0.254559
 end
 
 mixture	mix_392
-	material	316-SS	1	0.246677
-	material	water	1	0.753322
+	material	mat_2	1	0.246677
+	material	mat_3	1	0.753322
 end
 
 mixture	mix_393
-	material	316-SS	1	0.743137
-	material	water	1	0.256862
+	material	mat_2	1	0.743137
+	material	mat_3	1	0.256862
 end
 
 mixture	mix_394
-	material	316-SS	1	0.995911
-	material	water	1	0.00408905
+	material	mat_2	1	0.995911
+	material	mat_3	1	0.004089
 end
 
 mixture	mix_395
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_396
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_397
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_398
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_399
-	material	316-SS	1	0.995728
-	material	water	1	0.00427205
+	material	mat_2	1	0.995728
+	material	mat_3	1	0.004272
 end
 
 mixture	mix_400
-	material	316-SS	1	0.7453
-	material	water	1	0.2547
+	material	mat_2	1	0.7453
+	material	mat_3	1	0.2547
 end
 
 mixture	mix_401
-	material	316-SS	1	0.960807
-	material	water	1	0.0391923
+	material	mat_2	1	0.960807
+	material	mat_3	1	0.039192
 end
 
 mixture	mix_402
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_403
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_404
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_405
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_406
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_407
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_408
-	material	316-SS	1	0.962017
-	material	water	1	0.0379832
+	material	mat_2	1	0.962017
+	material	mat_3	1	0.037983
 end
 
 mixture	mix_409
-	material	316-SS	1	0.99824
-	material	water	1	0.00175924
+	material	mat_2	1	0.99824
+	material	mat_3	1	0.001759
 end
 
 mixture	mix_410
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_411
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_412
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_413
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_414
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_415
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_416
-	material	316-SS	1	0.998203
-	material	water	1	0.00179679
+	material	mat_2	1	0.998203
+	material	mat_3	1	0.001797
 end
 
 mixture	mix_417
-	material	316-SS	1	0.99818
-	material	water	1	0.00181948
+	material	mat_2	1	0.99818
+	material	mat_3	1	0.001819
 end
 
 mixture	mix_418
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_419
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_420
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_421
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_422
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_423
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_424
-	material	316-SS	1	0.998198
-	material	water	1	0.00180218
+	material	mat_2	1	0.998198
+	material	mat_3	1	0.001802
 end
 
 mixture	mix_425
-	material	316-SS	1	0.960624
-	material	water	1	0.039376
+	material	mat_2	1	0.960624
+	material	mat_3	1	0.039376
 end
 
 mixture	mix_426
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_427
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_428
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_429
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_430
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_431
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_432
-	material	316-SS	1	0.960707
-	material	water	1	0.0392928
+	material	mat_2	1	0.960707
+	material	mat_3	1	0.039293
 end
 
 mixture	mix_433
-	material	316-SS	1	0.742601
-	material	water	1	0.257398
+	material	mat_2	1	0.742601
+	material	mat_3	1	0.257398
 end
 
 mixture	mix_434
-	material	316-SS	1	0.9957
-	material	water	1	0.00429991
+	material	mat_2	1	0.9957
+	material	mat_3	1	0.0043
 end
 
 mixture	mix_435
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_436
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_437
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_438
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_439
-	material	316-SS	1	0.995644
-	material	water	1	0.00435574
+	material	mat_2	1	0.995644
+	material	mat_3	1	0.004356
 end
 
 mixture	mix_440
-	material	316-SS	1	0.744849
-	material	water	1	0.255151
+	material	mat_2	1	0.744849
+	material	mat_3	1	0.255151
 end
 
 mixture	mix_441
-	material	316-SS	1	0.243034
-	material	water	1	0.756966
+	material	mat_2	1	0.243034
+	material	mat_3	1	0.756966
 end
 
 mixture	mix_442
-	material	316-SS	1	0.743216
-	material	water	1	0.256784
+	material	mat_2	1	0.743216
+	material	mat_3	1	0.256784
 end
 
 mixture	mix_443
-	material	316-SS	1	0.962113
-	material	water	1	0.0378871
+	material	mat_2	1	0.962113
+	material	mat_3	1	0.037887
 end
 
 mixture	mix_444
-	material	316-SS	1	0.99829
-	material	water	1	0.00171028
+	material	mat_2	1	0.99829
+	material	mat_3	1	0.00171
 end
 
 mixture	mix_445
-	material	316-SS	1	0.998259
-	material	water	1	0.00174118
+	material	mat_2	1	0.998259
+	material	mat_3	1	0.001741
 end
 
 mixture	mix_446
-	material	316-SS	1	0.961962
-	material	water	1	0.0380375
+	material	mat_2	1	0.961962
+	material	mat_3	1	0.038038
 end
 
 mixture	mix_447
-	material	316-SS	1	0.74094
-	material	water	1	0.25906
+	material	mat_2	1	0.74094
+	material	mat_3	1	0.25906
 end
 
 mixture	mix_448
-	material	316-SS	1	0.246425
-	material	water	1	0.753575
+	material	mat_2	1	0.246425
+	material	mat_3	1	0.753575
 end
 
 mixture	mix_449
-	material	316-SS	1	0.960371
-	material	water	1	0.039595
+	material	mat_2	1	0.960371
+	material	mat_3	1	0.039595
 end
 
 mixture	mix_450
-	material	316-SS	1	0.999966
-	material	water	1	0.0
+	material	mat_2	1	0.999966
+	material	mat_3	1	0.0
 end
 
 mixture	mix_451
-	material	316-SS	1	0.999966
-	material	water	1	0.0
+	material	mat_2	1	0.999966
+	material	mat_3	1	0.0
 end
 
 mixture	mix_452
-	material	316-SS	1	0.999966
-	material	water	1	0.0
+	material	mat_2	1	0.999966
+	material	mat_3	1	0.0
 end
 
 mixture	mix_453
-	material	316-SS	1	0.999966
-	material	water	1	0.0
+	material	mat_2	1	0.999966
+	material	mat_3	1	0.0
 end
 
 mixture	mix_454
-	material	316-SS	1	0.999966
-	material	water	1	0.0
+	material	mat_2	1	0.999966
+	material	mat_3	1	0.0
 end
 
 mixture	mix_455
-	material	316-SS	1	0.999966
-	material	water	1	0.0
+	material	mat_2	1	0.999966
+	material	mat_3	1	0.0
 end
 
 mixture	mix_456
-	material	316-SS	1	0.960128
-	material	water	1	0.0398387
+	material	mat_2	1	0.960128
+	material	mat_3	1	0.039839
 end
 
 mixture	mix_457
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_458
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_459
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_460
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_461
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_462
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_463
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_464
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_465
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_466
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_467
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_468
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_469
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_470
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_471
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_472
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_473
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_474
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_475
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_476
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_477
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_478
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_479
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_480
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_481
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_482
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_483
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_484
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_485
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_486
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_487
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_488
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_489
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_490
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_491
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_492
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_493
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_494
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_495
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_496
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_497
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_498
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_499
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_500
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_501
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_502
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_503
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_504
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_505
-	material	316-SS	1	0.959137
-	material	water	1	0.0408626
+	material	mat_2	1	0.959137
+	material	mat_3	1	0.040863
 end
 
 mixture	mix_506
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_507
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_508
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_509
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_510
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_511
-	material	316-SS	1	1.0
-	material	water	1	0.0
+	material	mat_2	1	1.0
+	material	mat_3	1	0.0
 end
 
 mixture	mix_512
-	material	316-SS	1	0.960284
-	material	water	1	0.0397157
+	material	mat_2	1	0.960284
+	material	mat_3	1	0.039716
 end
 
-material_lib	matlib
-element_lib	elelib
-data_library alaralib FENDL2
-
-cooling
-	1	s
-	1	m
-	1	h
-	1	d
-	1	y
-end
-
-dump_file	dump.file
-
-output zone
-       units Ci cm3
-#	constituent
-       specific_activity
-       photon_source  FENDL2  phtn_src 42  1e4  2e4  
-          3e4  4.5e4  6e4  7e4  7.5e4  1e5  1.5e5  2e5  3e5
-          4e5  4.5e5  5.1e5  5.12e5  6e5  7e5  8e5  1e6  1.33e6
-          1.34e6  1.5e6  1.66e6  2e6  2.5e6  3e6  3.5e6  
-          4e6  4.5e6  5e6  5.5e6  6e6  6.5e6  7e6  7.5e6  8e6
-          1e7  1.2e7  1.4e7  2e7  3e7  5e7
-end
-
-flux flux_1 fluxin 1.0 0 default
-
-schedule	total
-	.85	y	flux_1	3.9FPYpulsed	0  s
-end
-
-pulsehistory	3.9FPYpulsed
-	5	.15	y
-end
-
-truncation	1e-7
-impurity	5e-6	1e-3
