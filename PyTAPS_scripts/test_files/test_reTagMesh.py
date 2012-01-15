@@ -15,6 +15,9 @@ ExpectedFluxinBackLines=ExpectedFluxinBack.readlines()
 ExpectedALARAin=open('test_files/expected_ALARA.in', 'r')
 ExpectedALARAinLines=ExpectedALARAin.readlines()
 
+ExpectedMatFracsResults=open('test_files/expected_matFracs_results', 'r')
+ExpectedMatFracsResultsLines=ExpectedMatFracsResults.readlines()
+
 
 #####################################
 #Step 1: Testing using typical input 
@@ -33,9 +36,7 @@ def test_PrintLowtoHigh():
     ActualFluxin=open('actual_fluxin', 'r')
     ActualFluxinLines=ActualFluxin.readlines()
     assert len(ActualFluxinLines) == len(ExpectedFluxinLines)
-    p=int(len(ActualFluxinLines)/2)
-    q=int(len(ActualFluxinLines)/3)
-    for x in [1, p, q]:
+    for x in [1, 500, 1000, 1500]:
         assert ActualFluxinLines[x] == ExpectedFluxinLines[x]
     os.remove('actual_fluxin')
 
@@ -44,9 +45,7 @@ def test_PrintHightoLow():
     ActualFluxinBack=open('actual_fluxin_back', 'r')
     ActualFluxinBackLines=ActualFluxinBack.readlines()
     assert len(ActualFluxinBackLines) == len(ExpectedFluxinBackLines)
-    p=int(len(ActualFluxinBackLines)/2)
-    q=int(len(ActualFluxinBackLines)/3)
-    for x in [1, p, q]:
+    for x in [1, 500, 1000, 1500]:
         assert ActualFluxinBackLines[x] == ExpectedFluxinBackLines[x]
     os.remove('actual_fluxin_back')
 
@@ -56,17 +55,20 @@ def test_entire_program ():
     ActualFluxin=open('ALARAflux.in', 'r')
     ActualFluxinLines=ActualFluxin.readlines()
     assert len(ActualFluxinLines) == len(ExpectedFluxinLines)
-    p=int(len(ActualFluxinLines)/2)
-    q=int(len(ActualFluxinLines)/3)
-    for x in [1, p, q]:
+    for x in [1, 500, 1000, 1500]:
         assert ActualFluxinLines[x] == ExpectedFluxinLines[x]
     
     #testing ALARA.in file
     ActualALARAin=open('ALARA.in', 'r')
     ActualALARAinLines=ActualALARAin.readlines()
     for x in [3, 3108, 3189, 3234]:
-        print x
         assert ActualALARAinLines[x] == ExpectedALARAinLines[x]
+
+    #testing matFracs_results file
+    ActualMatFracsResults=open('matFracs_results', 'r')
+    ActualMatFracsResultsLines=ActualMatFracsResults.readlines()
+    for x in [9, 124, 188, 513]:
+        assert ActualMatFracsResultsLines[x]==ExpectedMatFracsResultsLines[x]    
         
     #deleting all output files
     for x in ['ALARAflux.in','ALARA.in','matFracs_results', 'mesh.vtk']:
@@ -76,7 +78,7 @@ def test_entire_program ():
 
        
 ######################################
-#Step 1: Testing using atypical input
+#Step 2: Testing using atypical input
 ######################################
 
 #def test_check_meshpoints(MeshtalInputLines, m, j, k, mesh)
