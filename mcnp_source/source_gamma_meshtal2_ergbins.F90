@@ -27,22 +27,21 @@ subroutine source
   implicit real(dknd) (a-h,o-z)
         integer stat
 !        real(dknd),dimension(1000000,24) :: spectrum
-        real(dknd),dimension(1000000,100) :: spectrum
-        integer i_ints,j_ints,k_ints,n_active_mat,n_ener_phot
+        integer i_ints,j_ints,k_ints,n_mesh_cells,n_active_mat,n_ener_phot
         real,dimension(100):: i_bins,j_bins,k_bins
         integer,dimension(100) :: active_mat
         real,dimension(100) :: my_ener_phot !up to 100 energy groups (arbitrary)
+        real(dknd),dimension(:,:), allocatable :: spectrum
         save spectrum,i_ints,j_ints,k_ints,n_active_mat,n_ener_phot, &
-             i_bins,j_bins,k_bins,active_mat,my_ener_phot,tvol,ikffl
-                         
+             i_bins,j_bins,k_bins,active_mat,my_ener_phot,tvol,ikffl                         
                 ! IMPORTANT - make sure this is a long enough string.
-        character*300 :: line
+        character*3000 :: line
 
                                                         
 !        
-!----------------------------------------------------------------------------------------------------
+!---------------------------------------------------------------------------------
 !        In the first history (ikffl) read 'gammas' file. ikffl under MPI works ?
-!----------------------------------------------------------------------------------------------------
+!---------------------------------------------------------------------------------
 !
         ikffl=ikffl+1
         if (ikffl.eq.1) then
@@ -59,6 +58,8 @@ subroutine source
           close(50)
           open(unit=50,form='formatted',file='gammas_ener')
           read(50,*) i_ints,j_ints,k_ints
+          n_mesh_cells = i_ints * j_ints * k_ints
+
           read(50,*) (i_bins(i),i=1,i_ints+1)
           read(50,*) (j_bins(i),i=1,j_ints+1)
           read(50,*) (k_bins(i),i=1,k_ints+1)
@@ -79,15 +80,10 @@ subroutine source
           ! -1 for value that is zero, -1 for x values -> x-1 bins defined
           n_ener_phot = i-1-1
 
-!          print*,i_ints,j_ints,k_ints
-!          print*,(i_bins(i),i=1,i_ints+1)
-!          print*,(j_bins(i),i=1,j_ints+1)
-!          print*,(k_bins(i),i=1,k_ints+1)
-!          print*,(active_mat(i),i=1,n_active_mat)
-!          print*,n_active_mat
-
-          ! initiallizing a spectrum array
-          do i=1,1000000
+          ! set the spectrum array to: # of mesh cells * # energy groups
+          allocate(spectrum(n_mesh_cells,n_ener_phot))
+          ! initiallizing spectrum array
+          do i=1,n_mesh_cells
             do j=1,n_ener_phot !42 ! 24
               spectrum(i,j)=0.0
             enddo
@@ -114,11 +110,11 @@ subroutine source
         endif
 
 !
-!----------------------------------------------------------------------------------------------------
+!---------------------------------------------------------------------------------
 !        Sample in the volume of the mesh tally.
 !       The same number of hits homogeneously in volume.
 !       ~Weight is adjusted, apparently.
-!----------------------------------------------------------------------------------------------------
+!---------------------------------------------------------------------------------
 !
 
 10      xxx=i_bins(1)+rang()*(i_bins(i_ints+1)-i_bins(1))
@@ -142,18 +138,13 @@ subroutine source
 !        if (spectrum(i,24).eq.0) goto 10
         if (spectrum(i,n_ener_phot).eq.0) goto 10
 
-!        print*,i_bins(1),i_bins(i_ints+1),i_bins(i_ints+1)-i_bins(1)
-!        print*,j_bins(1),j_bins(j_ints+1),j_bins(j_ints+1)-j_bins(1)
-!        print*,k_bins(1),k_bins(k_ints+1),k_bins(k_ints+1)-k_bins(1)
-!        print*,ii,jj,kk,i
-
 
 !
-!----------------------------------------------------------------------------------------------------
+!---------------------------------------------------------------------------------
 !        Use cumulative values in spectrum array for given i to sample the energy of the photon.
-!----------------------------------------------------------------------------------------------------
+!---------------------------------------------------------------------------------
 !
-
+        
         r4=(1-rang())*spectrum(i,n_ener_phot) !42) !24)
 
         do j=1, n_ener_phot !42 !24
@@ -163,24 +154,23 @@ subroutine source
         erg=my_ener_phot(j)+(1-rang())*(my_ener_phot(j+1)-my_ener_phot(j))
 
 !        
-!----------------------------------------------------------------------------------------------------
+!---------------------------------------------------------------------------------
 !        Determine weight. Intensities (neutron fluence in given meshtal voxel), spectrum (total number 
 !       of produced gammas, if neutron fluence is 1 everywhere), tvol (nonzero cells/all cells  factor).
 !       IPT=2 for photons. JSU=TME=0 works well.
-!----------------------------------------------------------------------------------------------------
+!---------------------------------------------------------------------------------
 !
 
         wgt=spectrum(i,n_ener_phot) !42) !24)
-
 
         ipt=2
         jsu=0
         tme=0
 !        
-!----------------------------------------------------------------------------------------------------
+!---------------------------------------------------------------------------------
 !        Determine in which cell you are starting. Subroutine is copied from MCNP code (sourcb.F90). 
 !       ICL and JUNF should be set to 0 for this part of the code to work.
-!----------------------------------------------------------------------------------------------------
+!---------------------------------------------------------------------------------
 !
         icl=0
         junf=0
@@ -235,9 +225,9 @@ subroutine source
       & 'the source point is not in the source cell.')
   endif
 !        
-!----------------------------------------------------------------------------------------------------
+!---------------------------------------------------------------------------------
 !       ICL should be set correctly at this point, this means everything is set.
-!----------------------------------------------------------------------------------------------------
+!---------------------------------------------------------------------------------
 !
 543 continue
     do i=1,n_active_mat

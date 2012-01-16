@@ -74,7 +74,7 @@ read -p "Press [Enter] key to run next set of tests..."
 echo
 echo --------------------------------------
 echo "MCNP5 will now be run to test the phtn_src->h5m->gammas->source.f90 workflow for the 3x3x3 case."
-echo  This should succeed and look like a normal MCNP5 run.
+echo  This should succeed and look like a normal MCNP5 run - but with a the comment "Reading gammas file completed!"
 echo NOTE: MCNP5 must be compiled with the file r2s-act/mcnp_source/source_gamma_meshtal2.F90
 echo - - - - - - - - - - - - - - - - - -
 echo
