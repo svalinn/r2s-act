@@ -1,3 +1,8 @@
+#
+# The shell script tests the command line options for calling methods in
+# obj_phtn_src.py, as well as running MCNP after carrying out a test evaluation.# 
+#
+
 # e.g. export SCRIPT_DIR=/filespace/people/r/relson/r2s-act-work/r2s-act/scripts/
 export SCRIPT_DIR=../../scripts/
 # e.g. export TEST_DIR=/filespace/people/r/relson/r2s-act-work/r2s-act/testcases/simplebox-3/

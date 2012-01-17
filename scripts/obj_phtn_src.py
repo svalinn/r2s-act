@@ -37,7 +37,7 @@ class PhtnSrcReader(object):
         """Method opens self.inputFileName and passes this object to self.read()"""
         if os.path.isfile(self.inputFileName):
             fr = open(self.inputFileName, 'r')
-            read_ok = self.read(fr)
+            read_ok = self.read(fr) # stores the 1 or 0 returned from read()
             fr.close()
         else:
             print "The file '{0}' could not be found.".format(self.inputFileName)
@@ -52,7 +52,7 @@ class PhtnSrcReader(object):
         """
 
         if fr == '': #default to the file at self.inputFileName
-            return read_file()
+            return self.read_file()
 
         self.headingList = list() # contains every line's list of isotope IDs
         self.coolingStepsList = list() # contains every line's list of cooling steps   
