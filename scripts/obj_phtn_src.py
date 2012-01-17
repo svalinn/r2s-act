@@ -697,9 +697,8 @@ def main():
 
     # Print warning and then exit if no file was specified with -i/--input
     if options.filename == False:
-        print "Methods in this module need a file name to begin. " \
-                "Use the -i option."
-        return 0
+        parser.error( "Methods in this module need a file name to begin. " \
+                      "Use the -i option." )
 
     exampleReader = PhtnSrcReader(options.filename)
     exampleReader.read_file()

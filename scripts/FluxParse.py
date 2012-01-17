@@ -16,9 +16,6 @@ import sys
 
 #Option Parser
 from optparse import OptionParser
-parser = OptionParser()
-parser.add_option('-b', action='store_true', dest='backwardbool', default=False, help="print fluxes in decreasing energy")
-(opts, args) = parser.parse_args()
 
 def FindFirstLine(MeshtalInputLines):#Finding # of lines to skip
     TableHeading ='   Energy         '
@@ -88,7 +85,7 @@ def check_input(Norm):
     try:
         float(Norm)
     except:
-        print >>sys.stdeer, "Invalid entry for normalization factor"
+        print >>sys.stderr, "Invalid entry for normalization factor"
         sys.exit(1)
 
 def check_meshpoints(MeshtalInputLines, m, j, k): #checks to see if the total data points = meshpoints* energy groups
@@ -102,15 +99,18 @@ def check_meshpoints(MeshtalInputLines, m, j, k): #checks to see if the total da
 
 #Execute functions
 if __name__=='__main__':
-    Input=open(sys.argv[1], "r")#opens MCNP input file (first specified)
-    Output=file(sys.argv[2], "w")
+    parser = OptionParser()
+    parser.add_option('-b', action='store_true', dest='backwardbool', default=False, help="print fluxes in decreasing energy")
+    (opts, args) = parser.parse_args()
+    Input=open(args[0], "r")#opens MCNP input file (first specified)
+    Output=file(args[1], "w")
     MeshtalInputLines=Input.readlines() 
     m=FindFirstLine(MeshtalInputLines)
     CountDelineations(m)
     j=MeshPointCount(m)
     k=EnergyGroupCount(m,j)
-    check_input(sys.argv[3])
-    Norm=float(sys.argv[3])    
+    check_input(args[2])
+    Norm=float(args[2])    
     check_meshpoints(MeshtalInputLines, m, j, k)
     if opts.backwardbool==False:
         PrintLowtoHigh(m,j,k, Norm)

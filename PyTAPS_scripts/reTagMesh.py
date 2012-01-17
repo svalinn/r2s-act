@@ -10,24 +10,23 @@ def parser():
                       action="store", dest="meshtal",
                       help="Path to meshtal input file")
     parser.add_option("-n", "--normalization", dest="Norm", type="float",
-                      default=1, help="Flux normalization factor, default: 1")
+                      default=1, help="Flux normalization factor, default: %default")
     parser.add_option("-v", "--volume",
                       action="store", dest="volume", default="1",
-                      help="Total volume of the geometry, default: 1")
+                      help="Total volume of the geometry, default: %default")
     parser.add_option("-o", "--output",
                       action="store", dest="output", default="mesh.vtk",
-                      help="Mesh output filename (can be .h5m or .vtk), default: mesh.vtk")
+                      help="Mesh output filename (can be .h5m or .vtk), default: %default")
     parser.add_option("-f", "--fluxinoutput",
                       action="store", dest="fluxin", default="ALARAflux.in",
-                      help="Name of the ALARA flux input file, default: ALARAflux.in")    
+                      help="Name of the ALARA flux input file, default: %default")    
     parser.add_option("-a", "--alara",
                       action="store", dest="alaraname", default="ALARA.in",
-                      help="Name of the ALARA input file, default: ALARA.in")
+                      help="Name of the ALARA input file, default: %default")
     parser.add_option('-b', action='store_true', dest='backwardbool', 
                       default=False, help="print fluxes in decreasing energy")    
     
-    (options, args) = parser.parse_args()
-    return (options, args)
+    return parser.parse_args()
 
 def FindFirstLine(MeshtalInputLines):#Finding # of lines to skip
     TableHeading ='   Energy         '
@@ -225,7 +224,7 @@ def check_meshpoints(MeshtalInputLines, m, j, k, mesh):
 if __name__=='__main__':
     (options, args)= parser()
     mesh = iMesh.Mesh()
-    mesh.load(sys.argv[1])
+    mesh.load(args[0])
     TagMats(mesh)    
     if options.meshtal != None :
         check_input(options.Norm, options.volume)
@@ -245,7 +244,7 @@ if __name__=='__main__':
         mesh.save(options.output)
         CloseFiles()
     print "generating ALARA input"
-    meshReader(sys.argv[1])
+    meshReader(sys.args[0])
     make_alara(options.alaraname,options.volume)
     print '\ncomplete'
 	

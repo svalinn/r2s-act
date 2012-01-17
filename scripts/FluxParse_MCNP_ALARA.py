@@ -16,9 +16,6 @@ import sys
 
 #Option Parser
 from optparse import OptionParser
-parser = OptionParser()
-parser.add_option('-b', action='store_true', dest='backwardbool', default=False, help="print fluxes in decreasing energy")
-(opts, args) = parser.parse_args()
 
 def FindFirstLine(InputLines):#Finding # of lines to skip
     TableHeading ='   Energy         '
@@ -58,8 +55,7 @@ def EnergyGroupCount(m, j):#finding number of energy groups
     print 'Energy bins found:', k
     return k
 
-def PrintLowtoHigh(m, j, k):#Printing values to output file
-    Norm=float(sys.argv[3])
+def PrintLowtoHigh(m, j, k, Norm):#Printing values to output file
     #Initial normailization factor from command line argument
     for t in range(0, j):
         pointoutput=''
@@ -70,8 +66,7 @@ def PrintLowtoHigh(m, j, k):#Printing values to output file
         Output.write(pointoutput + '\n\n')
     print 'File creation sucessful'
 
-def PrintHightoLow(m, j, k):
-    Norm=float(sys.argv[3])
+def PrintHightoLow(m, j, k, Norm):
     #Initial normailization factor from command line argument
     for t in range(0, j):
         pointoutput=''
@@ -88,16 +83,19 @@ def CloseFiles(): #Closes input and output files
 
 #Execute functions
 if __name__=='__main__':
-    Input=open(sys.argv[1], "r")#opens MCNP input file (first specified)
-    Output=file(sys.argv[2], "w")
+    parser = OptionParser()
+    parser.add_option('-b', action='store_true', dest='backwardbool', default=False, help="print fluxes in decreasing energy")
+    (opts, args) = parser.parse_args()
+    Input=open(args[0], "r")#opens MCNP input file (first specified)
+    Output=file(args[1], "w")
     InputLines=Input.readlines() 
     m=FindFirstLine(InputLines)
     CountDelineations(m)
     j=MeshPointCount(m)
     k=EnergyGroupCount(m,j)
     if opts.backwardbool==False:
-        PrintLowtoHigh(m,j,k)
+        PrintLowtoHigh(m,j,k,float(args[2])
     else:
-        PrintHightoLow(m,j,k)
+        PrintHightoLow(m,j,k,float(args[2])
     CloseFiles()
 
