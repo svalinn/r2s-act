@@ -24,7 +24,7 @@ class PhtnSrcReader(object):
     """
     
     def __init__(self, myInputFileName):
-        """Init function for class PhtnSrcReader. Receives a phtn_src type file.
+        """Init function for class PhtnSrcReader. Receives a phtn_src file.
         """
         super(PhtnSrcReader, self).__init__()
 
@@ -48,7 +48,7 @@ class PhtnSrcReader(object):
     def read(self, fr=''):
         """ Method reads in lines from an IO stream, and stores them in blocks on a 
         per-heading basis, e.g. headings are isotope identifiers or "TOTAL"
-        RECEIVES: fr, an IO stream, e.g. from open('file', 'r')
+        RECEIVES: fr, an IO stream, e.g. from open('file', 'r'), fr is NOT a filename
         """
 
         if fr == '': #default to the file at self.inputFileName
@@ -105,17 +105,18 @@ class PhtnSrcReader(object):
 
     def get_isotope(self, isotope="TOTAL"):
         """ACTION: Method searches headingList to find which entry in probList is
-        the desired TOTAL, and returns the corresponding TOTAL block, which can 
-        include multiple cooling steps.
+        the desired TOTAL or isotope, and returns the corresponding TOTAL block,
+        which can include multiple cooling steps.
         To get a specific cooling step's total, call isotope_source_strengths
         REQUIRES: Method expects that read() has been successfully called.
+        RETURNS: If the isotope is sucessfully found, returns self.totalHeadingList
         """
         
         meshcnt = -1 # gets incremented immediately to our starting value of 0
 
         # If the lists with headings and probabilities have contents...
         if len(self.headingList) and len(self.probList):
-            self.totalHeadingList = list()
+            self.totalHeadingList = list() #
             self.totalProbList = list()
             self.totalCoolingStepsList = list()
             
@@ -152,45 +153,6 @@ class PhtnSrcReader(object):
 
         return 1
                 
-            
-    def format_isotope_mcnp(self, coolingstep=0):
-        """RETURNS: Method returns a formatted list of strings that is the block under
-        heading TOTAL for some cooling step
-        REQUIRES: Method expects that get_isotope() has been successfully called.
-        If self.totalsList does not exist (e.g. get_total has not been called),
-        the method quits.
-        RECEIVES: If 'coolingstep' is specified, returns the block under TOTAL
-        corresponding with the cooling step.
-        """
-        
-        # if not len(self.totalsList):
-            # print "object's variable 'totalsList' has not been set." \
-            # " format_total_mcnp will now return ['0']"
-            # return ['0']
-
-        # try:
-            # self.totalsList[coolingstep]
-        # except:
-            # print 'Cooling step', coolingstep, 'not found. Using last cooling step instead.'
-            # coolingstep = len(self.totalsList) - 1
-
-        grandTotal = [item for sublist in self.totalsList[coolingstep] for
-                item in sublist]
-        grandTotal = " ".join(grandTotal)
-
-        # wrap is set up so that lines indent 5 spaces and wrap at 80 chars
-        #  First line indents extra to make room for SI card.
-        #  Resulting 'grandTotal' should copy/paste nicely into MCNP input deck.
-        mcnpWrap = tw.TextWrapper()
-        mcnpWrap.initial_indent = 7*' '
-        mcnpWrap.subsequent_indent = 5*' '
-        mcnpWrap.wdith = 80
-        mcnpWrap.break_on_hyphens = False
-
-        grandTotal = mcnpWrap.wrap(grandTotal)
-
-        return grandTotal
-
 
     def isotope_source_strengths(self, coolingstep=0):
         """ACTION: Method parses all contents of self.totalProbList and creates a list of
@@ -210,7 +172,7 @@ class PhtnSrcReader(object):
         # For each of these, sum the entries in the corresponding source
         # strengths block, and make a list of these sums (self.meshstrengths)
         if len(self.totalHeadingList) and len(self.totalProbList):
-
+            
             for probset in self.totalProbList:
                 #print set[coolingstep]
                 #thistotal = [item for sublist in set[coolingstep] for item in sublist]
@@ -220,6 +182,7 @@ class PhtnSrcReader(object):
                     
         else:
             print "headingList or probList was empty. read() was probably not called"
+            return 0
         
         return self.meshstrengths
 
@@ -592,6 +555,47 @@ class PhtnSrcReader(object):
 
 
     # DEPRECATED
+    def format_isotope_mcnp(self, coolingstep=0):
+        """NOTE: Intended for taking phtn_src file for a single mesh (1x1x1) and 
+        formatting its contents for use as probabilities in an sdef card.
+        RETURNS: Method returns a formatted list of strings that is the block under
+        heading TOTAL for some cooling step
+        REQUIRES: Method expects that get_isotope() has been successfully called.
+        If self.totalsList does not exist (e.g. get_total has not been called),
+        the method quits.
+        RECEIVES: If 'coolingstep' is specified, returns the block under TOTAL
+        corresponding with the cooling step.
+        """
+        
+        # if not len(self.totalsList):
+            # print "object's variable 'totalsList' has not been set." \
+            # " format_total_mcnp will now return ['0']"
+            # return ['0']
+
+        # try:
+            # self.totalsList[coolingstep]
+        # except:
+            # print 'Cooling step', coolingstep, 'not found. Using last cooling step instead.'
+            # coolingstep = len(self.totalsList) - 1
+
+        grandTotal = [item for sublist in self.totalsList[coolingstep] for
+                item in sublist]
+        grandTotal = " ".join(grandTotal)
+
+        # wrap is set up so that lines indent 5 spaces and wrap at 80 chars
+        #  First line indents extra to make room for SI card.
+        #  Resulting 'grandTotal' should copy/paste nicely into MCNP input deck.
+        mcnpWrap = tw.TextWrapper()
+        mcnpWrap.initial_indent = 7*' '
+        mcnpWrap.subsequent_indent = 5*' '
+        mcnpWrap.wdith = 80
+        mcnpWrap.break_on_hyphens = False
+
+        grandTotal = mcnpWrap.wrap(grandTotal)
+
+        return grandTotal
+
+
     def read_pre_alara_2_9(self):
         """ DEPRECATED METHOD - Handles the earlier formatting of phtn_src file
         from ALARA.
@@ -677,7 +681,8 @@ def main():
     parser.add_option("-m","--mesh",action="store",dest="meshform", \
             default="0,1,1,0,1,1,0,1,1",help="Meshing information.\n" \
             "Needs a 9-valuelist, meshform, of the form " \
-            "-m xmin,xmax,xintervals,y...,z... delimited by commas (no spaces).")
+            "-m xmin,xmax,xintervals,y...,z... delimited by commas (no spaces)." \
+            "Default: %default")
     parser.add_option("-s","--sdef",action="store_true",dest="sdef", \
             default=False, help="Will generate a file with the sdef, " \
             "si, sp, and tr cards for MCNP.  Needs mesh "\

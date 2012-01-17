@@ -1,4 +1,4 @@
-#import imp
+
 from nose import with_setup
 import magic_import as mi
 
