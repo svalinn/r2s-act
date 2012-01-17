@@ -198,7 +198,7 @@ def check_input(norm, vol):
     try:
         float(norm)
     except:
-        print >>sys.stdeer, "Invalid entry for normalization factor"
+        print >>sys.stderr, "Invalid entry for normalization factor"
         sys.exit(1)
     try : 
         float(vol)
