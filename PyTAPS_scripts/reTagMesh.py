@@ -244,7 +244,7 @@ if __name__=='__main__':
         mesh.save(options.output)
         CloseFiles()
     print "generating ALARA input"
-    meshReader(sys.args[0])
+    meshReader(args[0])
     make_alara(options.alaraname,options.volume)
     print '\ncomplete'
 	
