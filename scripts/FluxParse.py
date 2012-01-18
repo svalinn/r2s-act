@@ -28,27 +28,36 @@ def FindFirstLine(MeshtalInputLines):#Finding # of lines to skip
     m=n+1 #first line of values
     return m
 
-def CountDelineations(m):
-    #Finding number or Z deliniations
-    z=1
-    while MeshtalInputLines[m][36:41] != MeshtalInputLines[m+z][36:41]:
-        z=z+1
-    #Finding number of Y delinations
-    y=1
-    while MeshtalInputLines[m][26:31] != MeshtalInputLines[m+z*y][26:31]:
-        y=y+1
-    #Finding number of X deliniations
-    x=1
-    while MeshtalInputLines[m][16:21] != MeshtalInputLines[m+z*y*x][16:21]:
-        x=x+1
-    print 'Spacial Deliniations: (',x,',',y,',',z,')'
-
 def MeshPointCount(m):#Counting Number of Meshpoints
     j=1 #initialising # of points
     while MeshtalInputLines[j+m-1][:11] == MeshtalInputLines[j+m][:11]:
           j=j+1
     print 'Mesh points found:', j
     return j
+
+def DataPointCount(MeshtalInputLines, m):
+    l=0
+    while MeshtalInputLines[m+l][:11] != '   Total   ':
+        l=l+1
+    print 'Total data points found:', l
+    return l
+
+def CountDelineations(MeshtalInputLines, m):
+    #Finding number or Z deliniations
+    z=1
+    while MeshtalInputLines[m][34:41] != MeshtalInputLines[m+z][34:41]:
+        z=z+1
+        #Finding number of Y delinations
+    y=1
+    while MeshtalInputLines[m][24:31] != MeshtalInputLines[m+z*y][24:31]:
+        y=y+1
+    #Finding number of X deliniations
+    x=1
+    while MeshtalInputLines[m][14:21] != MeshtalInputLines[m+z*y*x][14:21]:
+        x=x+1
+    print 'Spacial Deliniations: (',x,',',y,',',z,')'
+    return(x, y, z)
+   
 
 def EnergyGroupCount(m, j):#finding number of energy groups
     k=(len(MeshtalInputLines)-j-m)/j #number of energy groups
@@ -88,14 +97,13 @@ def check_input(Norm):
         print >>sys.stderr, "Invalid entry for normalization factor"
         sys.exit(1)
 
-def check_meshpoints(MeshtalInputLines, m, j, k): #checks to see if the total data points = meshpoints* energy groups
-    l=0
-    while MeshtalInputLines[m+l][:11] != '   Total   ':
-        l=l+1
-    print 'Total data points found:', l
-    if l != (j*k) :
-        print >>sys.stderr, 'Number of data points does not equal meshpoints*energy groups'
-        sys.exit(1)
+def check_meshpoints(j, k, l, x, y, z): #checks to see if the total data points = meshpoints* energy groups
+       if l != (j*k) :
+           print >>sys.stderr, 'Number of data points does not equal meshpoints*energy groups'
+           sys.exit(1)
+       if x*y*z != j :
+           print >>sys.stderr, 'Number of mesh points does not equal x*y*z'
+           sys.exit(1)
 
 #Execute functions
 if __name__=='__main__':
@@ -106,12 +114,13 @@ if __name__=='__main__':
     Output=file(args[1], "w")
     MeshtalInputLines=Input.readlines() 
     m=FindFirstLine(MeshtalInputLines)
-    CountDelineations(m)
+    l=DataPointCount(MeshtalInputLines, m)
+    x,y,z =CountDelineations(MeshtalInputLines, m)
     j=MeshPointCount(m)
     k=EnergyGroupCount(m,j)
     check_input(args[2])
     Norm=float(args[2])    
-    check_meshpoints(MeshtalInputLines, m, j, k)
+    check_meshpoints(j, k, l, x, y, z)
     if opts.backwardbool==False:
         PrintLowtoHigh(m,j,k, Norm)
     else:
