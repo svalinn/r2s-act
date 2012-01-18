@@ -258,7 +258,7 @@ class PhtnSrcReader(object):
                 [str(x/summeshstrengths) for x in self.meshstrengths]
         
         # SP card
-        card = ["sp995 D"] # D for discrete cummulative probabilities
+        card = ["sp995 D"] # D for discrete cumulative probabilities
         card.extend(strnormmeshstrengths)
         card = " ".join(card)
         cards.extend(mcnpWrap.wrap(card))
@@ -271,7 +271,7 @@ class PhtnSrcReader(object):
         card = " ".join(card)
         cards.extend(mcnpWrap.wrap(card))
         # SP card
-        cards.append("sp996 D 0 1") # D for discrete cummulative probabilities
+        cards.append("sp996 D 0 1") # D for discrete cumulative probabilities
         
         # create distribution for Y sampling
         # SI card
@@ -281,7 +281,7 @@ class PhtnSrcReader(object):
         card = " ".join(card)
         cards.extend(mcnpWrap.wrap(card))
         # SP card
-        cards.append("sp997 D 0 1") # D for discrete cummulative probabilities
+        cards.append("sp997 D 0 1") # D for discrete cumulative probabilities
         
         # create distribution for Z sampling
         # SI card
@@ -291,7 +291,7 @@ class PhtnSrcReader(object):
         card = " ".join(card)
         cards.extend(mcnpWrap.wrap(card))
         # SP card
-        cards.append("sp998 D 0 1") # D for discrete cummulative probabilities
+        cards.append("sp998 D 0 1") # D for discrete cumulative probabilities
 
         # create dependent distribution for energy sampling
         cards.extend(["c ds999 - These are the sp/si numbers"])
@@ -412,21 +412,26 @@ class PhtnSrcReader(object):
             fw.write(" ".join([str(x) for x in ergbins]) + "\n")
 
         # create and write lines for each mesh cell's gamma source strength
-        # BUT first we must create a cummulative list of probabilities.
+        # BUT first we must create a cumulative list of probabilities.
         for binset in self.meshprobs:
             binset_f = [float(erg) for erg in binset]
-            cummulative_binset = list() # of strings
+            cumulative_binset = list() # of strings
             prevbin = 0.0
             for bin in binset_f:
                 binsum = bin + prevbin
-                cummulative_binset.append(binsum)
+                cumulative_binset.append(binsum)
                 prevbin = binsum
+
+            if cumulative_binset[len(cumulative_binset)-1] == 0:
+                norm = 1
+            else:
+                norm = cumulative_binset[len(cumulative_binset)-1]
+
             # The following list comprehension uses a format specifying output
             #  of 12 characters, with 5 values
             #  after the decimal point, using scientific notation.
-            cummulative_binset2 = ["{0:<12.5E}".format(x/cummulative_binset[41]) \
-                    for x in cummulative_binset]
-            fw.write("".join(cummulative_binset2) + "\n") #~ trailing newline a problem?
+            cumulative_binset2 = ["{0:<12.5E}".format(x/norm) for x in cumulative_binset]
+            fw.write("".join(cumulative_binset2) + "\n") #~ trailing newline a problem?
 
         # all lines written, close file.
         fw.close()
@@ -672,7 +677,9 @@ def main():
     
     # Input and output file names
     parser.add_option("-i","--input",action="store",dest="filename", \
-            default=False, help="photon source strengths are read from FILENAME")
+            default=False, help="The photon source strengths are read from" \
+            "FILENAME. This option is required to supplement most other " \
+            "options.")
     parser.add_option("-o","--output",action="store",dest="outputfile", \
             default="", help="file to write source information to, or" \
             " file name for saving a modified mesh.")
@@ -684,32 +691,41 @@ def main():
             "-m xmin,xmax,xintervals,y...,z... delimited by commas (no spaces)." \
             "Default: %default")
     parser.add_option("-s","--sdef",action="store_true",dest="sdef", \
-            default=False, help="Will generate a file with the sdef, " \
-            "si, sp, and tr cards for MCNP.  Needs mesh "\
-            "info from -m.")
+            default=False, help="Will generate a file with the SDEF, " \
+            "SI, SP, and TR cards for MCNP. Mesh information from the -m " \
+            "option is required.")
     parser.add_option("-g","--gammas",action="store_true",dest="gammas", \
             default=False,help="Will generate a 'gammas' file directly " \
             "from a phtn_src file for use by " \
             "modified versions of MCNP. Needs mesh info from -m.")
     parser.add_option("-H","--H5M",action="store",dest="h5m_write_filename", \
-            default=False,help="Adds the photon source information to the mesh. " \
-            "Supplied file name is the .h5m mesh.")
+            default=False,help="Adds the photon source information to an " \
+            "existing .h5m mesh. " \
+            "You must specify the file name/location for the .h5m mesh.")
     parser.add_option("-p","--pull",action="store",dest="h5m_read_filename", \
-            default=False,help="Reads photon source information from an h5m mesh " \
-            "and generates a corresponding 'gammas' file.")
+            default=False,help="Reads photon source information from a .h5m mesh " \
+            "and generates a corresponding 'gammas' file. You must specify the " \
+            ".h5m mesh file's name/location. Mesh information from the -m " \
+            "option is required.")
 
     (options, args) = parser.parse_args()
 
-    # Print warning and then exit if no file was specified with -i/--input
-    if options.filename == False:
-        parser.error( "Methods in this module need a file name to begin. " \
-                      "Use the -i option." )
+    # create an object and read it in if options specify getting info from phtn_src
+    if not options.h5m_read_filename:
+        # Print warning and then exit if no file was specified with -i/--input
+        if options.filename == False:
+            parser.error( "Methods in this module need a file name to begin. " \
+                          "Use the -i option." )
 
-    exampleReader = PhtnSrcReader(options.filename)
-    exampleReader.read_file()
+        exampleReader = PhtnSrcReader(options.filename)
+        exampleReader.read_file()
 
-    exampleReader.get_isotope()
-    print "Cooling steps are:\n", exampleReader.coolingSteps, "\n"
+        exampleReader.get_isotope()
+        print "Cooling steps are:\n", exampleReader.coolingSteps, "\n"
+    
+    else:
+        # We need a dummy object in order to call needed methods later.
+        exampleReader = PhtnSrcReader('fake.file')
 
     # Toss error and then exit if too few mesh values given
     if len(options.meshform.split(",")) != 9:
@@ -738,18 +754,22 @@ def main():
         else: exampleReader.gen_gammas_file(meshform3D, options.outputfile)
     
     elif options.h5m_write_filename:
-        print "A specified h5m mesh will now have tags added containing photon" \
+        print "The specified h5m mesh will now have tags added containing photon" \
                 " source information from a phtn_src file."
         exampleReader.isotope_source_strengths()
-        if options.outputfile=="": exampleReader.gen_phtn_src_h5m_tags(options.h5m_write_filename)
-        else: exampleReader.gen_phtn_src_h5m_tags(options.h5m_write_filename, options.outputfile)
+        if options.outputfile=="": 
+            exampleReader.gen_phtn_src_h5m_tags(options.h5m_write_filename)
+        else: exampleReader.gen_phtn_src_h5m_tags( \
+                options.h5m_write_filename, options.outputfile)
 
     elif options.h5m_read_filename:
-        print "A specified h5m mesh will now be checked for tags containing photon" \
+        print "The specified h5m mesh will now be checked for tags containing photon" \
                 " source information, and a 'gammas' file will be generated."
-        if options.outputfile=="": exampleReader.gen_gammas_file_from_h5m( \
+        if options.outputfile=="": 
+            exampleReader.gen_gammas_file_from_h5m( \
                 meshform3D, options.h5m_read_filename)
-        else: exampleReader.gen_gammas_file_from_h5m( \
+        else: 
+            exampleReader.gen_gammas_file_from_h5m( \
                 meshform3D, options.h5m_read_filename, options.outputfile)
     
     return 1

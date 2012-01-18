@@ -18,3 +18,8 @@ Call the functionality to store the photon source strengths in an h5m mesh file 
 
 ../../scripts/obj_phtn_src.py -i phtn_src -H matFracsTest.h5m
 
+
+
+NEEDED:
+Test negative dimensions
+Test zero mesh probability -> divide by zero (probably use hemispheres case)
