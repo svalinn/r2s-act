@@ -100,7 +100,7 @@ def TagFluxes(mesh, meshtal, m, j, k) :
     voxels = mesh.getEntities(iBase.Type.region)
     column=[]; count=0 ;
     for n_groupID in range(1,k+2):
-        tag=mesh.createTag("group_"+str(n_groupID),1,float)
+        tag=mesh.createTag("n_group_"+str(n_groupID),1,float)
         for x in range(0,j):
             num = MeshtalInputLines[m+x+j*count]
             column.append(num[42:53])
