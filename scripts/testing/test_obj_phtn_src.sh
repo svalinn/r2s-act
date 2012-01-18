@@ -72,6 +72,14 @@ $SCRIPT_DIR/obj_phtn_src.py -i phtn_src -H matFracsTest.h5m
 echo
 let CNT=CNT+1
 echo $CNT------------------------------------
+echo Now trying to add the information to the same mesh again, but with retagging enabled.
+echo  No warnings or errors should be given.
+echo - - - - - - - - - - - - - - - - - -
+$SCRIPT_DIR/obj_phtn_src.py -i phtn_src -H matFracsTest.h5m -r
+
+echo
+let CNT=CNT+1
+echo $CNT------------------------------------
 echo Now trying to read the photon source information back from a mesh missing this information.
 echo  This should fail, with an error noting the missing information.
 echo - - - - - - - - - - - - - - - - - -

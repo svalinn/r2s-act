@@ -441,9 +441,11 @@ class PhtnSrcReader(object):
         return 1
 
     
-    def gen_phtn_src_h5m_tags(self, inputfile, outfile=""):
+    def gen_phtn_src_h5m_tags(self, inputfile, outfile="", retag=False):
         """ACTION: Method adds tag with photon source strengths from ALARA to a
-        moab mesh.  
+        moab mesh. 
+        If there are photon energy group tags with numbers higher than those
+        added and retagging is enabled, these tags are removed.
         REQUIRES:
 
         RECEIVES: The file (a .h5m moab file) containing the mesh of interest.
@@ -461,6 +463,7 @@ class PhtnSrcReader(object):
 
         if outfile == "": outfile = inputfile
 
+        # pyTaps stuff starts here
         mesh = iMesh.Mesh()
         mesh.load(inputfile)
 
@@ -477,16 +480,33 @@ class PhtnSrcReader(object):
             try:
                 tag = mesh.createTag("phtn_src_group_"+str(grp+1), 1, float)
             except:
-                print "ERROR: The tag phtn_src_group_" + str(grp+1), "already exists " \
-                        "in the file", inputfile, "\nNow exiting this method."
-                return
+                if retag:
+                    tag = mesh.getTagHandle("phtn_src_group_"+str(grp+1))
+                else:
+                    print "ERROR: The tag phtn_src_group_" + str(grp+1), "already exists " \
+                            "in the file", inputfile, "\nNow exiting this method."
+                    return 0
 
             # we give each voxel to the tag dictionary, and assign the tag the value
-            #  
+            # stored in self.meshprobs 
             for cnt, vox in enumerate(voxels):
                 # we create tag, which is a dictionary, and give the dictionary 
-#                tag[vox] = float(prob[cnt])a
                 tag[vox] = float(self.meshprobs[cnt][grp])
+
+        #~ some caution needed with making sure 'grp' remains as is at end of
+        #~  above for loop
+        grp += 1
+
+        #
+        if retag:
+            while grp:
+                try:
+                    tag = mesh.getTagHandle("phtn_src_group_"+str(grp+1))
+                    mesh.destroyTag(tag,force=True)
+                    grp += 1
+                except:
+                    grp = 0
+
 
         mesh.save(outfile)
 
@@ -572,17 +592,6 @@ class PhtnSrcReader(object):
         corresponding with the cooling step.
         """
         
-        # if not len(self.totalsList):
-            # print "object's variable 'totalsList' has not been set." \
-            # " format_total_mcnp will now return ['0']"
-            # return ['0']
-
-        # try:
-            # self.totalsList[coolingstep]
-        # except:
-            # print 'Cooling step', coolingstep, 'not found. Using last cooling step instead.'
-            # coolingstep = len(self.totalsList) - 1
-
         grandTotal = [item for sublist in self.totalsList[coolingstep] for
                 item in sublist]
         grandTotal = " ".join(grandTotal)
@@ -708,6 +717,11 @@ def main():
             ".h5m mesh file's name/location. Mesh information from the -m " \
             "option is required.")
 
+    # Other options
+    parser.add_option("-r","--retag",action="store_true",dest="retag", \
+            default=False,help="Option enables retagging of .h5m meshes, e.g. " \
+            "with the -H option. Default: %default")
+
     (options, args) = parser.parse_args()
 
     # create an object and read it in if options specify getting info from phtn_src
@@ -758,9 +772,10 @@ def main():
                 " source information from a phtn_src file."
         exampleReader.isotope_source_strengths()
         if options.outputfile=="": 
-            exampleReader.gen_phtn_src_h5m_tags(options.h5m_write_filename)
+            exampleReader.gen_phtn_src_h5m_tags(options.h5m_write_filename, \
+                    retag=options.retag)
         else: exampleReader.gen_phtn_src_h5m_tags( \
-                options.h5m_write_filename, options.outputfile)
+                options.h5m_write_filename, options.outputfile, retag=options.retag)
 
     elif options.h5m_read_filename:
         print "The specified h5m mesh will now be checked for tags containing photon" \
