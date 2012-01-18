@@ -1,0 +1,91 @@
+This file documents the methods provided to go from the phtn_src file produced by ALARA to a running MCNP with the corresponding photon source. All features discussed in this document are implemented in obj_phtn_src.py.
+
+ALARA's output provides information on a per mesh cell basis, discretized by energy, and for various cooling steps.  Output is given for all activated isotopes in the problem, both invdividually or as a total.
+
+On the MCNP side, a typical MCNP input deck is used, with a source definition overlaid.  User-defined tallies (e.g. mesh tallies or surface tallies) can quantify the photon flux or dosage, etc.
+
+
+Code methods:
+The following approaches can be used; they are listed here and elaborated below. There are two ways to sue the functionality - running the module with options at the command line, or module/method calls within python.
+1) phtn_src file is converted to a text file with SDEF, SI, SP and TR cards to create an MCNP source.
+2) phtn_src file is converted to a 'gammas' file, which is read by a custom source.F90 code in a specially compiled MCNP executable
+3) (USE THIS METHOD) phtn_src file information is stored on a MOAB mesh (.h5m format). The .h5m file's contents are in turn used to gnerate a 'gammas' file, which is read by the same custom routine in MCNP.
+
+These methods share some code, and all code for this is located in the r2s-act repository in the scripts/obj_phtn_src.py file.
+
+
+Walkthroughs (command line)
+
+Method 1)
+The following command creates the file phtn_sdef containing the SDEF and related cards for MCNP from the phtn_src file.
+SCRIPT_DIR/obj_phtn_src.py -i phtn_src -s -m 0,10,3,0,10,3,0,10,3 -o phtn_sdef
+
+The options used are:
+-i input file name; phtn_src is this file name
+-s follow the SDEF workflow
+-m mesh info in the form xmin,xmax,xintervals,y,y,y,z,z,z; The example is a cube 10 cm on a side, with 3 intervals in each dimension (27 same-sized cubes form the mesh)
+-o output file name; phtn_sdef is this example file name.
+
+The contents of the generated phtn_sdef file are already formatted to work for MCNP5. Copy and paste this content into an MCNP input file and then:
+-use card 'mode p'
+-set all cell importances for photons, imp:p=#
+-define desired tallies for the photon transport
+-run your MCNP input file.
+
+Method 2)
+The following command creates the file gammas from the phtn_src file.
+SCRIPT_DIR/obj_phtn_src.py -i phtn_src -g -m 0,10,3,0,10,3,0,10,3 -o gammas
+
+The options used are:
+-i input file name; phtn_src is this file name
+-g follow the 'gammas' workflow
+-m mesh info in the form xmin,xmax,xintervals,y,y,y,z,z,z; The example is a cube 10 cm on a side, with 3 intervals in each dimension (27 same-sized cubes form the mesh)
+-o output file name; gammas is this example file name
+
+We then run a custom built MCNP in the directory where the gammas file is located, e.g.:
+mcnp5 i=inp
+
+inp is a typical MCNP input deck with a few requirements:
+-no source information (e.g. no sdef card, or similar)
+-the nps card IS still needed
+-use card 'mode p'
+-all cell importances are for photons, imp:p=#
+-must be run in the directory containing the 'gammas' file.
+
+Method 3)
+Method 3 is similar to the 2nd method, but also stores the photon source information in a MOAB mesh (.h5m file or .vtk file).  Two calls are made at the command line:
+SCRIPT_DIR/obj_phtn_src.py -i phtn_src -H example.h5m
+SCRIPT_DIR/obj_phtn_src.py -p matFracsTest.h5m -o test_gammas4 -m 0,10,3,0,10,3,0,10,3 
+
+The options used in the first call are:
+-i input file name; phtn_src is this file name
+-H write to specified moab mesh; example.h5m is this specified mesh file
+-r retag mesh; OPTIONAL parameter will tell script to replace existing tag values on the mesh.
+
+The options used in the second call are:
+-p pull info from specified moab mesh; example.h5m is this specified mesh file 
+-o output file name; gammas is this example file name
+-m mesh info in the form xmin,xmax,xintervals,y,y,y,z,z,z; The example is a cube 10 cm on a side, with 3 intervals in each dimension (27 same-sized cubes form the mesh)
+
+Note that the first call will fail if the tags already exist on the mesh.
+
+We then run a custom built MCNP in the directory where the gammas file is located, e.g.:
+mcnp5 i=inp
+
+inp is a typical MCNP input deck with a few requirements:
+-no source information (e.g. no sdef card, or similar)
+-the nps card IS still needed
+-use card 'mode p'
+-all cell importances are for photons, imp:p=#
+-must be run in the directory containing the 'gammas' file.
+
+
+Walkthroughs (directly using module/methods)
+
+Method 1)
+
+
+
+
+
+To recompile MCNP5 or DAG-MCNP to use the custom source.F90 code, see the file /mcnp_source/README

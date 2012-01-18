@@ -9,9 +9,9 @@ Adapted from KIT
 c) source_gamma_meshtal2_ergbins.F90
 
 More information about each file:
-a) Not used
-b) Original was modified from 24 energy groups to 42 groups and to use dynamic array allocation for the phtn source information.
-c) Modifications to read in another line from the 'gammas' file. This additional line contains the energy bin values, starting from 0.0, and increasing to maximum energy of interest.
+a) Not used (uses RDUM and IDUm cards in MCNP; have not tried to get this working)
+b) Original was modified from 24 energy groups to 42 groups and to use dynamic array allocation for the phtn source information. The file it loos for is called 'gammas'
+c) Modifications to read in another line from the 'gammas_ener' file (note different name). This additional line contains the energy bin values, starting from 0.0, and increasing to maximum energy of interest.
 
 ------
 To use one of these in a custom compile of MCNP/DAGMCNP, one can link to the files in the
