@@ -10,15 +10,30 @@ c) source_gamma_meshtal2_ergbins.F90
 
 More information about each file:
 a) Not used
-b) Original was modified from 24 energy groups to 42 groups
-c) Modifications to read in another line from the gammas file. This additional line contains the energy bin values, starting from 0.0, and increasing to maximum energy of interest.
+b) Original was modified from 24 energy groups to 42 groups and to use dynamic array allocation for the phtn source information.
+c) Modifications to read in another line from the 'gammas' file. This additional line contains the energy bin values, starting from 0.0, and increasing to maximum energy of interest.
 
 ------
 To use one of these in a custom compile of MCNP/DAGMCNP, one can link to the files in the
 Source/src folder like this:
 ln -s *path to this folder*/source_gamma_meshtal2.F90 source.F90
 
-(or you could copy the file to that folder, but it won't get updated when changes happen)
+(or you could copy the file to that folder, but it won't get updated when changes happen in the repository)
 
+To *compile* MCNP/DAGMCNP:
+
+We call the build scripts from within the /5.1.51/trunk/Source folder.
+Since we are using some custom code, the .o files are in the way... use realclean (But this also gives an error so we build twice...); do the following two commands:
+1:
+>> ../scripts/build_dagmc realclean
+<< error messages...
+2:
+>> ../scripts/build_dagmc
+<< Success!
+
+You can now call the mcnp5 executable in Source/src.
+
+You can make it easy to call my using an alias command in your .bashrc file, e.g.
+alias mcnp5p='$HOME/DAG-MCNP/5.1.51/trunk/Source/src/mcnp5'
 ----
 

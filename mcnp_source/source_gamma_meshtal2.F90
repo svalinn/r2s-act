@@ -25,7 +25,8 @@ subroutine source
   implicit real(dknd) (a-h,o-z)
         integer stat
 !        real(dknd),dimension(1000000,24) :: spectrum
-        real(dknd),dimension(1000000,42) :: spectrum
+!        real(dknd),dimension(1000000,42) :: spectrum
+        real(dknd),dimension(:,:),allocatable :: spectrum
 !        real(dknd),dimension(25) :: ener_phot ! 24 + 1 = 25
         real(dknd),dimension(43) :: ener_phot ! 42 + 1 = 43
         integer i_ints,j_ints,k_ints,n_active_mat
@@ -73,15 +74,10 @@ subroutine source
           enddo
           n_active_mat=i-1
 
-!          print*,i_ints,j_ints,k_ints
-!          print*,(i_bins(i),i=1,i_ints+1)
-!          print*,(j_bins(i),i=1,j_ints+1)
-!          print*,(k_bins(i),i=1,k_ints+1)
-!          print*,(active_mat(i),i=1,n_active_mat)
-!          print*,n_active_mat
-
+          ! set the spectrum array to: # of mesh cells * 42 energy groups
+          allocate(spectrum(i_ints * j_ints * k_ints, 42))
           ! initiallizing a spectrum array
-          do i=1,1000000
+          do i=1,i_ints * j_ints * k_ints
             do j=1,42 ! 24
               spectrum(i,j)=0.0
             enddo
