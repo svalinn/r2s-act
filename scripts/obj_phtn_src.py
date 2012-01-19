@@ -33,6 +33,7 @@ class PhtnSrcReader(object):
         # stores a list of notes
         #self.notes = ['Notes for: ' + self.inputFileName]
         
+
     def read_file(self):
         """Method opens self.inputFileName and passes this object to self.read()"""
         if os.path.isfile(self.inputFileName):
@@ -100,8 +101,9 @@ class PhtnSrcReader(object):
                 
             line = fr.readline() # read next line
         
+        print "The file '{0}' has been read successfully.".format(self.inputFileName)
         return 1
-   
+
 
     def get_isotope(self, isotope="TOTAL"):
         """ACTION: Method searches headingList to find which entry in probList is
@@ -475,7 +477,7 @@ class PhtnSrcReader(object):
         # We need to create the list of photon probabilities for each mesh cell.
         # Because this list can be quite large, we will do this element-by-element.
         
-        #for grp, prob in enumerate(self.meshprobs[0]):
+        # for grp, prob in enumerate(self.meshprobs[0]):
         for grp in range( len(self.meshprobs[0]) ):
             try:
                 tag = mesh.createTag("phtn_src_group_"+str(grp+1), 1, float)
@@ -497,7 +499,7 @@ class PhtnSrcReader(object):
         #~  above for loop
         grp += 1
 
-        #
+        # We get of tags corresponding with higher energy groups here.
         if retag:
             while grp:
                 try:
