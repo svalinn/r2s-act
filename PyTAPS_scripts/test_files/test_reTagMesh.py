@@ -18,6 +18,10 @@ ExpectedALARAinLines=ExpectedALARAin.readlines()
 ExpectedMatFracsResults=open('test_files/expected_matFracs_results', 'r')
 ExpectedMatFracsResultsLines=ExpectedMatFracsResults.readlines()
 
+ExpectedMesh=iMesh.Mesh()
+ExpectedMesh.load('test_files/expected_mesh.vtk')
+ExpectedFracs=ExpectedMesh.getTagHandle("FRACTIONS")
+
 
 #####################################
 #Step 1: Testing using typical input 
@@ -68,7 +72,15 @@ def test_entire_program ():
     ActualMatFracsResults=open('matFracs_results', 'r')
     ActualMatFracsResultsLines=ActualMatFracsResults.readlines()
     for x in [9, 124, 188, 513]:
-        assert ActualMatFracsResultsLines[x]==ExpectedMatFracsResultsLines[x]    
+        assert ActualMatFracsResultsLines[x]==ExpectedMatFracsResultsLines[x]
+
+    #testing mesh.vtk file
+    ActualMesh=iMesh.Mesh()
+    ActualMesh.load('mesh.vtk')
+    AcutalFracs=ActualMesh.getTagHandle("FRACTIONS")
+    for x in [70, 150, 300, 350, 400]:
+        for y in [1, 2]:
+            assert ExpectedFracs[ExpectedMesh.getEntities(iBase.Type.region)][x][y] == AcutalFracs[ActualMesh.getEntities(iBase.Type.region)][x][y]    
         
     #deleting all output files
     for x in ['ALARAflux.in','ALARA.in','matFracs_results', 'mesh.vtk']:
