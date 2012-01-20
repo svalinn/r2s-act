@@ -1,19 +1,15 @@
-
 from nose import with_setup
-import magic_import as mi
+import obj_phtn_src
 
 #
-# The method sin obj_phtn_src.py are written to return 1 or 0.
+# The methods in obj_phtn_src.py are written to return 1 or 0.
 #  0 corresponds with errors, and 1 is returned otherwise...
-# We use assert method() to do the testing.
+# We use 'assert method()' to do the testing.
 #
-
-# trickery for importing module from parent folder
-obj_phtn_src = mi.__import__("obj_phtn_src", ["../"])
 
 idea = 1 # placeholder that becomes a PhtnSrcReader object.
 
-def test_phtnsrc_read(myfile="../../testcases/simplebox-3/phtn_src"):
+def test_phtnsrc_read(myfile="../testcases/simplebox-3/phtn_src"):
     """ """
     global idea # .. so that next line creates a global object.
     idea = obj_phtn_src.PhtnSrcReader(myfile)
