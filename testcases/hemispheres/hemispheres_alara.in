@@ -3592,7 +3592,7 @@ end
 
 material_lib	matlib
 element_lib	elelib
-data_library alaralib fendl2.0bin
+data_library alaralib FENDL2
 
 cooling
 	1	s
@@ -3608,7 +3608,7 @@ output zone
        units Ci cm3
 #	constituent
        specific_activity
-       photon_source  fendl2.0bin  phtn_src 42  1e4  2e4  
+       photon_source  FENDL2  phtn_src 42  1e4  2e4  
           3e4  4.5e4  6e4  7e4  7.5e4  1e5  1.5e5  2e5  3e5
           4e5  4.5e5  5.1e5  5.12e5  6e5  7e5  8e5  1e6  1.33e6
           1.34e6  1.5e6  1.66e6  2e6  2.5e6  3e6  3.5e6  

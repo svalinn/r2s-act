@@ -5,8 +5,8 @@ ALARA's output provides information on a per mesh cell basis, discretized by ene
 On the MCNP side, a typical MCNP input deck is used, with a source definition overlaid.  User-defined tallies (e.g. mesh tallies or surface tallies) can quantify the photon flux or dosage, etc.
 
 
-Code methods:
-The following approaches can be used; they are listed here and elaborated below. There are two ways to sue the functionality - running the module with options at the command line, or module/method calls within python.
+Code methods:  ****Method 3 is the current method****
+The following approaches can be used; they are listed here and elaborated below. There are two ways to sue the functionality - running the module with options at the command line, or module/method calls within python.  ****Method 3 is the current method****
 1) phtn_src file is converted to a text file with SDEF, SI, SP and TR cards to create an MCNP source.
 2) phtn_src file is converted to a 'gammas' file, which is read by a custom source.F90 code in a specially compiled MCNP executable
 3) (USE THIS METHOD) phtn_src file information is stored on a MOAB mesh (.h5m format). The .h5m file's contents are in turn used to gnerate a 'gammas' file, which is read by the same custom routine in MCNP.
@@ -54,12 +54,14 @@ inp is a typical MCNP input deck with a few requirements:
 
 Method 3)
 Method 3 is similar to the 2nd method, but also stores the photon source information in a MOAB mesh (.h5m file or .vtk file).  Two calls are made at the command line:
-SCRIPT_DIR/obj_phtn_src.py -i phtn_src -H example.h5m
-SCRIPT_DIR/obj_phtn_src.py -p matFracsTest.h5m -o test_gammas4 -m 0,10,3,0,10,3,0,10,3 
+SCRIPT_DIR/PhtnSrcToH5M.py -p phtn_src -m example.h5m
+SCRIPT_DIR/obj_phtn_src.py -p example.h5m -o test_gammas4 -m 0,10,3,0,10,3,0,10,3 
 
 The options used in the first call are:
--i input file name; phtn_src is this file name
--H write to specified moab mesh; example.h5m is this specified mesh file
+-p input file name; phtn_src is this file name
+-m write to specified moab mesh; example.h5m is this specified mesh file
+-i isotope name or TOTAL; default is TOTAL. You can inspect the phtn_src file for other isotopes used.
+-c cooling step number or name; default is 0, which is 'shutdown'. You can inspect the phtn_src file for other isotopes used
 -r retag mesh; OPTIONAL parameter will tell script to replace existing tag values on the mesh.
 
 The options used in the second call are:
@@ -67,7 +69,7 @@ The options used in the second call are:
 -o output file name; gammas is this example file name
 -m mesh info in the form xmin,xmax,xintervals,y,y,y,z,z,z; The example is a cube 10 cm on a side, with 3 intervals in each dimension (27 same-sized cubes form the mesh)
 
-Note that the first call will fail if the tags already exist on the mesh.
+Note that the first call will fail if the tags already exist on the mesh unless you include the -r option.
 
 We then run a custom built MCNP in the directory where the gammas file is located, e.g.:
 mcnp5 i=inp
@@ -84,7 +86,10 @@ Walkthroughs (directly using module/methods)
 
 Method 1)
 
+Method 2)
 
+Method 3)
+For now, see the method and option parser definitions in PhtnSrcToH5M.py and obj_phtn_src.py.  The test_ versions of these files may also be instructive as examples.
 
 
 
