@@ -16,7 +16,7 @@ def find_first_line(meshtal):
         line=linecache.getline(meshtal, n)
     m=n+1
     print 'Skipping Header:', n, 'lines'  
-    return m
+    return m #first line of data
 
 def meshtal_to_array(meshtal, m):
     n=m
