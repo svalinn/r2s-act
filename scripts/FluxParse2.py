@@ -7,6 +7,28 @@ from optparse import OptionParser
 import sys
 
 #use for lines in filename
+def find_meshtal_type(meshtal):
+    neutron_index=-1
+    photon_index =-1
+    count=0
+    meshtal_type=''
+    while neutron_index == -1 and photon_index == -1 :
+        line=linecache.getline(meshtal, count)
+        neutron_index=line.find('neutron')
+        photon_index=line.find('photon')
+        count=count+1
+        if count > 100 :
+            print >>sys.stderr, 'Type of meshtal not detected in first 100 lines'
+            sys.exit(1)
+    if neutron_index != -1 :
+        print 'This is a neutron meshtal file.'
+        meshtal_type = 'n'
+    if photon_index != -1 :
+        print 'This is a photon meshtal file.'
+        meshtal_type = 'p'
+    
+    return meshtal_type
+
 def find_first_line(meshtal):
     table_heading ='   Energy         '
     n=1
@@ -23,8 +45,20 @@ def meshtal_to_array(meshtal, m):
     line=linecache.getline(meshtal, n)
     array = []
     while line[:11] != '   Total   ' :
-        array.append([float(line[2:11]),float(line[14:21]),float(line[24:31]),
-                                        float(line[34:41]),float(line[42:53])])
+        column_count=0
+        char_count=0
+        column_data=[0]*5
+        while column_count < 5 :
+            if line[char_count] == ' ':
+                char_count = char_count +1
+            else :
+                min_char =char_count
+                while line[char_count] != ' ':
+                    char_count=char_count +1
+                max_char=char_count
+                column_data[column_count]=float(line[min_char:max_char])
+                column_count = column_count+1
+        array.append(column_data)        
         n=n+1
         line=linecache.getline(meshtal, n)
     return array
@@ -91,7 +125,7 @@ def print_fluxin(array, j, k, norm, output_file, backwardbool):
            if (s+1)%8 == 0 & s != (k-1):
                pointoutput+='\n'
         output.write(pointoutput + '\n\n')
-    print output_file, 'created sucessfully'
+    print 'ALARA flux input file,', output_file , ', created sucessfully'
      
 if __name__=='__main__':
     print 'Parsing meshtal file'
@@ -99,6 +133,7 @@ if __name__=='__main__':
     parser.add_option('-b', action='store_true', dest='backwardbool', default=False, help="Print fluxes in decreasing energy")
     parser.add_option('-o', dest='output_file', default='ALARAflux.in', help="Name of output file")
     (opts, args) = parser.parse_args()
+    meshtal_type=find_meshtal_type(args[0])
     m=find_first_line(args[0])
     array=meshtal_to_array(args[0],m)
     j=count_mesh_points(array)
