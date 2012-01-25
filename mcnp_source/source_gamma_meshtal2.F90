@@ -7,7 +7,7 @@
 ! elsewhere
 ! -42 energy groups instead of 24; highlight 24 to see all instances of
 ! changes...
-! -Increase size of 'line' from 150 to 300.
+! -Increase size of 'line' from 150 to 3000.
 !
 ! -removed tab characters
 
@@ -36,7 +36,7 @@ subroutine source
              i_bins,j_bins,k_bins,active_mat,tvol,ikffl
                          
                 ! IMPORTANT - make sure this is a long enough string.
-        character*300 :: line
+        character*3000 :: line
 
                                                         
 !        
@@ -163,7 +163,7 @@ subroutine source
         wgt=spectrum(i,42) !24)
 
 
-        ipt=2
+        ipt=2 ! 2 == Photon particle type
         jsu=0
         tme=0
 !        
@@ -178,7 +178,7 @@ subroutine source
   ! default for cel:  find the cell that contains xyz.
 470 continue
   if( icl==0 ) then
-    if( junf==0 ) then ! if repeated structures are used...
+    if( junf==0 ) then ! if repeated structures are NOT used...
       do m=1,nlse 
         icl = lse(klse+m)
         call chkcel(icl,2,j)
@@ -231,7 +231,10 @@ subroutine source
 !
 543 continue
     do i=1,n_active_mat
-      if (nmt(mat(icl)).eq.active_mat(i)) return
+!      if (i.eq.1) write(*,*) nmt(mat(icl)),mat(icl),icl,mat(3),mat(5),mat(8)
+      if (nmt(mat(icl)).eq.active_mat(i)) then
+         return
+      endif
     enddo
 !    write (*,'(i5,3es10.3,i5)') ikffl,xxx,yyy,zzz,nmt(mat(icl))
     goto 10

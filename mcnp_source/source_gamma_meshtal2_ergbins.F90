@@ -9,7 +9,7 @@
 ! changes...
 ! -Currently: up to 100 energy groups. Line 6 of the gammas_ener file should
 ! list the energy bin boundaries.
-! -Increase size of 'line' from 150 to 300.
+! -Increase size of 'line' from 150 to 3000.
 !
 ! -removed tab characters
 
