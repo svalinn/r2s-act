@@ -413,6 +413,14 @@ class PhtnSrcReader(object):
         if ergbins != "":
             fw.write(" ".join([str(x) for x in ergbins]) + "\n")
 
+        # We calcualte the normalization factor as the average 
+        # This applies ONLY for uniform voxel size meshing.
+        numactivatedcells = 0
+        for val in self.meshstrengths:
+            if val > 0:
+                numactivatedcells += 1
+        norm = sum(self.meshstrengths) / numactivatedcells
+
         # create and write lines for each mesh cell's gamma source strength
         # BUT first we must create a cumulative list of probabilities.
         for binset in self.meshprobs:
@@ -423,11 +431,6 @@ class PhtnSrcReader(object):
                 binsum = bin + prevbin
                 cumulative_binset.append(binsum)
                 prevbin = binsum
-
-            if cumulative_binset[len(cumulative_binset)-1] == 0:
-                norm = 1
-            else:
-                norm = cumulative_binset[len(cumulative_binset)-1]
 
             # The following list comprehension uses a format specifying output
             #  of 12 characters, with 5 values
@@ -557,13 +560,14 @@ class PhtnSrcReader(object):
         # In the following for loop, each of these lists is appended for each energy group.
         self.meshprobs = [[x] for x in group[voxels]]
 
-        for i in range(2,1000): #Arbitrary: we look for up to 1000 groups
+        for i in range(2,1000): #~ Arbitrary: we look for up to 1000 groups
             try:
                 group = mesh.getTagHandle("phtn_src_group_"+str(i))
                 for cnt, vox in enumerate(voxels):
                     self.meshprobs[cnt].append(group[vox])
-            except: break
+            except iBase.TagNotFoundError: break
         
+        # Make list of total photons/cm3/s for each mesh cell
         self.meshstrengths = [sum([float(prob) for prob in x]) for x in self.meshprobs]
 
         # We now look for the tags with the energy bin boundary values
