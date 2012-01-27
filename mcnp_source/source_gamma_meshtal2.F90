@@ -144,7 +144,7 @@ subroutine source
 !----------------------------------------------------------------------------------------------------
 !
 
-        r4=(1-rang())*spectrum(i,42) !24)
+        r4=(1-rang()) * spectrum(i,42) !24)
 
         do j=1, 42 !24
           if (r4.lt.spectrum(i,j)) exit
@@ -232,9 +232,9 @@ subroutine source
 543 continue
     do i=1,n_active_mat
 !      if (i.eq.1) write(*,*) nmt(mat(icl)),mat(icl),icl,mat(3),mat(5),mat(8)
-      if (nmt(mat(icl)).eq.active_mat(i)) then
+      ! if (nmt(mat(icl)).eq.active_mat(i)) then
          return
-      endif
+      ! endif
     enddo
 !    write (*,'(i5,3es10.3,i5)') ikffl,xxx,yyy,zzz,nmt(mat(icl))
     goto 10
