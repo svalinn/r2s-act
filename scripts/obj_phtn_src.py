@@ -359,9 +359,13 @@ class PhtnSrcReader(object):
         """ACTION: Method generates a file called 'gammas' to be used with a 
         modified version of MCNP5.
         REQUIRES: Method assumes that read() and isotope_source_strengths() 
-        have been called already.
+        have been called already, OR that self.meshstrengths and self.meshprobs
+        have been otherwise created properly.
         RECEIVES:
         3D list, meshform, of the form {{xmin,xmax,xintervals},{y...},{z...}}
+        Optional: 'outfile' allows for an alternate file name instead of gammas
+        Optional: 'ergbins' can specify different energy bins, rather than a
+           default set of 42 bins. (This adds an additional line in gammas.)
         """
 
         try:
@@ -413,19 +417,23 @@ class PhtnSrcReader(object):
         if ergbins != "":
             fw.write(" ".join([str(x) for x in ergbins]) + "\n")
 
-        # We calcualte the normalization factor as the average 
+        # We calcualte the normalization factor as the average total source
+        #  strength in each mesh cell divided by the number of mesh cells
+        #  with non-zero source strength.
         # This applies ONLY for uniform voxel size meshing.
         numactivatedcells = 0
         for val in self.meshstrengths:
             if val > 0:
                 numactivatedcells += 1
+        print "The number of activated voxels and total number of voxels is {0}/{1}" \
+                .format(numactivatedcells, nmesh)
         norm = sum(self.meshstrengths) / numactivatedcells
 
-        # create and write lines for each mesh cell's gamma source strength
-        # BUT first we must create a cumulative list of probabilities.
+        # Create and write lines for each mesh cell's gamma source strength,
+        #  but first we must create a cumulative list of probabilities.
         for binset in self.meshprobs:
             binset_f = [float(erg) for erg in binset]
-            cumulative_binset = list() # of strings
+            cumulative_binset = list() # of floats
             prevbin = 0.0
             for bin in binset_f:
                 binsum = bin + prevbin
@@ -436,7 +444,7 @@ class PhtnSrcReader(object):
             #  of 12 characters, with 5 values
             #  after the decimal point, using scientific notation.
             cumulative_binset2 = ["{0:<12.5E}".format(x/norm) for x in cumulative_binset]
-            fw.write("".join(cumulative_binset2) + "\n") #~ trailing newline a problem?
+            fw.write("".join(cumulative_binset2) + "\n")
 
         # all lines written, close file.
         fw.close()
@@ -448,7 +456,7 @@ class PhtnSrcReader(object):
     
     def gen_phtn_src_h5m_tags(self, inputfile, outfile="", retag=False):
         """ACTION: Method adds tag with photon source strengths from ALARA to a
-        moab mesh. 
+        moab mesh.
         If there are photon energy group tags with numbers higher than those
         added and retagging is enabled, these tags are removed.
         REQUIRES:
