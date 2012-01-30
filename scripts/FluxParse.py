@@ -184,7 +184,7 @@ def tag_fluxes_preexisting(array, j, k, mestal_type, mesh_input, mesh_output):
             spacer=''
             if group_ID<100:
                 spacer='0'
-            if group_ID<10:
+            elif group_ID<10:
                 spacer='00'
             tag_flux=mesh.createTag(meshtal_type+'_group_'+spacer+str(group_ID),1,float)
             tag_error=mesh.createTag(meshtal_type+'_group_'+spacer+str(group_ID)+'_error',1,float)
@@ -202,6 +202,8 @@ def tag_fluxes_preexisting(array, j, k, mestal_type, mesh_input, mesh_output):
         column_error=[]
     mesh.save(mesh_output)
     print 'User supplied mesh successfully tagged'
+
+
  
 if __name__=='__main__':
     parser = OptionParser()
