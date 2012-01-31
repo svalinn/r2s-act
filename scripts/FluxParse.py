@@ -182,9 +182,9 @@ def tag_fluxes_preexisting(array, j, k, mestal_type, mesh_input, mesh_output):
     for group_ID in range(1,k+1):#need to add one for total fluxes
         if group_ID != k:
             spacer=''
-            if group_ID<100:
+            if group_ID<100 and group_ID >= 10:
                 spacer='0'
-            elif group_ID<10:
+            if group_ID<10:
                 spacer='00'
             tag_flux=mesh.createTag(meshtal_type+'_group_'+spacer+str(group_ID),1,float)
             tag_error=mesh.createTag(meshtal_type+'_group_'+spacer+str(group_ID)+'_error',1,float)
