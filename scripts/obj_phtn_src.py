@@ -19,8 +19,12 @@ from optparse import OptionParser
 from itaps import iBase,iMesh
 
 class PhtnSrcReader(object):
-    """A new object of class PhtnSrcReader must be supplied the path of the file
-     of interest.
+    """USE: Object of class stores photon source strength information that is
+    read in from the phtn_src file from ALARA.  Class methods can:
+        read in phtn_src, tag h5m mesh with this data, create SDEF cards from
+        this data, create gammas file from this data or from h5m tags ...
+    REQUIRES: A new object of class PhtnSrcReader must be supplied the path of 
+    the file of interest.
     """
     
     def __init__(self, myInputFileName):
@@ -491,13 +495,15 @@ class PhtnSrcReader(object):
         # for grp, prob in enumerate(self.meshprobs[0]):
         for grp in range( len(self.meshprobs[0]) ):
             try:
-                tag = mesh.createTag("phtn_src_group_"+str(grp+1), 1, float)
+                tag = mesh.createTag( \
+                        "phtn_src_group_"+"{0:03d}".format(str(grp+1)), 1, float)
             except:
                 if retag:
                     tag = mesh.getTagHandle("phtn_src_group_"+str(grp+1))
                 else:
-                    print "ERROR: The tag phtn_src_group_" + str(grp+1), "already exists " \
-                            "in the file", inputfile, "\nNow exiting this method."
+                    print "ERROR: The tag phtn_src_group_" + str(grp+1), \
+                            "already exists in the file", inputfile, \
+                            "\nNow exiting this method."
                     return 0
 
             # we give each voxel to the tag dictionary, and assign the tag the value
