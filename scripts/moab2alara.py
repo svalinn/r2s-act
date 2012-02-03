@@ -33,36 +33,40 @@ def moab2alara(mesh, filename):
 
 # Write ALARA volume card to file
     filename.write('volume\n')
-    for i in range(1,len(voxels)) :
+    for i in range(len(voxels)) :
          zonename='\t'+str(elementvolume)+'\t'+'zone_'+str(i)+'\n'
          filename.write(zonename)
     filename.write('end\n\n')
 
 # Write ALARA mat_loading card to file
     filename.write('mat_loading\n')
-    for i in range(1,len(voxels)) :
+    for i in range(len(voxels)) :
          zonemats=list(fracs[voxels][i])
-         if float(zonemats[0])==1.0:
+         if zonemats[0] == 1.0:
              matname='\t'+'zone_'+str(i)+'\t'+'void'+'\n'
              filename.write(matname)  
-         else:
+         else :
              matname='\t'+'zone_'+str(i)+'\t'+'mix_'+str(i)+'\n'
              filename.write(matname)
     filename.write('end\n\n')
      
 # Write ALARA mixture definitions to file
     nummats=len(matID)
-    for i in range(1,len(voxels)) :
-        if float(zonemats[0])==1.0 :
-            continue
-        else :
+    for i in range(len(voxels)) :
+        zonemats=list(fracs[voxels][i])
+        if zonemats[0] != 1.0 :  
             mixname='mixture'+'\t'+'mix_'+str(i)+'\n'
             filename.write(mixname)
-            for j in range(1,nummats):
-                     mixdef='\tmaterial\t'+'mat_'+str(matID[j])+'\t'+\
-                     str(1)+'\t'+str(float(zonemats[j]))+'\n'
-                     filename.write(mixdef)
+            for j in range(nummats):
+                   if zonemats[j] != 0 :
+                       mixdef='\tmaterial\t'+'mat_'+str(matID[j])+'\t'+\
+                       str(1)+'\t'+str(float(zonemats[j]))+'\n'
+                       filename.write(mixdef)
+                   else :
+                       continue
             filename.write('end\n\n')
+        else :
+            continue
     filename.close()
 
     return
