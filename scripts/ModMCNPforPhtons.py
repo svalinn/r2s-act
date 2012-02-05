@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import re
+from optparse import OptionParser
+
 
 class ModMCNPforPhotons(object):
     """
@@ -39,8 +41,7 @@ class ModMCNPforPhotons(object):
         
         fr.close
 
-        print self.inputFileName, 'has been read. use get()', \
-                'to access list of sections.'
+        print "'{0}' has been read.\n".format(self.inputFileName)
 
         return 1
 
@@ -70,12 +71,22 @@ class ModMCNPforPhotons(object):
 
     def change_block_1(self):
         """ACTION: Method changes the importance cards to affect protons
+        RETURNS: N/A
         """
+
+        cntimp = 0
         
-        for line in self.block1:
+        for cnt, line in enumerate(self.block1Lines):
             # check for the case where both imp:n and imp:p are being used
             if "imp:p" not in line:
                 line = line.replace("imp:n", "imp:p")
+                cntimp += 1
+
+            self.block1Lines[cnt] = line
+
+        print "Block 1 has been updated:\n" \
+                "-{0} imp:n were changed to imp:p\n" \
+                "".format(cntimp)
 
         return 1
 
@@ -84,6 +95,8 @@ class ModMCNPforPhotons(object):
         """Block 2 of MCNP input doesn't depend on particle type
         Thus nothing is done.
         """
+
+        # print "Block 2 has been updated:\n"
 
         pass
 
@@ -94,12 +107,17 @@ class ModMCNPforPhotons(object):
         -comments out any source-definition cards
         """
         
+        cntsrc = 0
+        notemode = ""
+        noteimp = ""
+        notephys = ""
+
         commentout = False # We toggle this to determine whether or not to
                             # comment out continued lines
 
-        sourcecards = ["sdef","si","sp","sb","sc","ds,","tr","kcode","ksrc"]
+        sourcecards = ["sdef","si","sp","sb","sc","ds","tr","kcode","ksrc"]
 
-        for line in self.block3:
+        for cnt, line in enumerate(self.block3Lines):
 
             # If line is indented 5+ spaces and the previous non-indented 
             #  line was commented out, comment out out this line too.
@@ -112,28 +130,50 @@ class ModMCNPforPhotons(object):
             linesplit_orig = line.split()
             linesplit = line.lower().split()
 
+            # remove numbers from first string part, and try to match with
+            #  the basic source cards.
             if re.sub("\d+","",linesplit[0]) in sourcecards:
                 line = "c " + line
+                cntsrc += 1
+                commentout = True
+
+            elif "phys:n" == linesplit[0]:
+                line = "c " + line
+                notephys = "-phys:n was commented out \n"
                 commentout = True
 
             elif "mode" == linesplit[0]:
                 line = "mode p\n"
+                notemode = "-mode card replaced with 'mode p' \n"
+
             elif "imp:n" == linesplit[0]:
                 line = "imp:p " + ' '.join(linesplit_orig[1:]) + '\n'
+                noteimp = "-imp:n card converted to imp:p \n"
 
+            self.block3Lines[cnt] = line
+
+        print "Block 3 has been updated: \n" \
+                "-{0} source cards commented out\n" \
+                "{1}{2}{3}\n" \
+                "Note that tallies were not modified." \
+                "\n".format(cntsrc, notemode, notephys, noteimp)
         return 1
 
 
     def write_deck(self, outputFileName=""):
-        """
+        """ACTION: Method writes the contents of self.block#Lines to a new file.
+            File name is determined automatically if not supplied.
+        REQUIRES: read() has been called for the class object so that blockLines
+            and title are not empty.
+        RETURNS: N/A
         """
 
         if outputFileName == "":
             inputFileNameParts = self.inputFileName.split(".")
             x = len(inputFileNameParts) - 1
             if x == 0: x = 1
-            outputFileName = ".".join(self.inputFileNameParts[:x]) + "_p" + \
-                    ("." + "".join(self.inputFileNameParts[x:])).rstrip(".")
+            outputFileName = ".".join(inputFileNameParts[:x]) + "_p" + \
+                    ("." + "".join(inputFileNameParts[x:])).rstrip(".")
 
         fw = open(outputFileName, "w")
 
@@ -147,6 +187,48 @@ class ModMCNPforPhotons(object):
 
         fw.close()
 
+        print "Modified input deck has been written to '{0}'".format(outputFileName)
+
         return 1
 
+
+def main():
+    """ACTION: Method defines an option parser and handles command-line
+    usage of this module.
+    REQUIRES: command line arguments to be passed - otherwise prints help
+    information.
+    RECEIVES: N/A
+    """
+
+    usage = "usage: %prog [options] arg"
+    parser = OptionParser(usage)
+    
+    # Input and output file names
+    parser.add_option("-i","--input",action="store",dest="filename", \
+            default=False, help="The MCNP input file to read from") 
+    parser.add_option("-o","--output",action="store",dest="outputfile", \
+            default="", help="Filename to write modified MCNP input to." \
+            " Default is to append input filename with '_p'.")
+
+    (options, args) = parser.parse_args()
+
+    if options.filename != False:
+        x = ModMCNPforPhotons(options.filename)
+
+        x.read()
+        x.change_block_1()
+        x.change_block_2()
+        x.change_block_3()
+        x.write_deck(options.outputfile)
+    
+    else:
+        print "An input file must be specified to use this script.\n" \
+                "Use the -i option or see the -h option for more information."
+
+    return 1
+
+
+# Handles module being called as a script.
+if __name__=='__main__':
+    main()
 
