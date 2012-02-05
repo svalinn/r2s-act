@@ -6,6 +6,7 @@
 
 from itaps import iBase,iMesh
 from optparse import OptionParser
+from numpy import ones
 
 def parser():
     parser = OptionParser(usage="usage: %prog <in> [options]")
@@ -41,43 +42,58 @@ def moab2alara(mesh, filename, numround):
      
   # Write ALARA mixture definitions to file
     nummats=len(matID)
+    list1 = list(ones(len(voxels)))
     for i in range(len(voxels)) :
         zonemats=list(fracs[voxels][i])
         if round(zonemats[0],1) != 1.0 :
             for k in range(len(voxels)) :
-                zonemats_i=map(lambda x: round(x ,1), list(fracs[voxels][i]))
-                zonemats_k=map(lambda x: round(x ,1), list(fracs[voxels][k]))
-                if zonemats_i == zonemats_k :
-                    mixname='mixture'+'\t'+'mix_'+str(k)+'\n'
-                    break
-                else :
-                    mixname='mixture'+'\t'+'mix_'+str(i)+'\n'
-                    continue
+                zonemats_i=map(lambda x: round(x ,6), list(fracs[voxels][i]))
+                zonemats_k=map(lambda x: round(x ,6), list(fracs[voxels][k]))
+                
+                if (zonemats_i == zonemats_k):
+                    if (list1[k] == 1) :
+                        mixname='mixture'+'\t'+'mix_'+str(k)+'\n'
+                        filename.write(mixname)
+                        list1[k] = 2;
+                        for j in range(1,nummats): # start from [1] because [0] is void fraction
+                           if zonemats[j] != 0 :
+                                mixdef='\tmaterial\t'+'mat_'+str(matID[j])+'\t'+\
+                                str(1)+'\t'+str(round(zonemats[j],int(numround)))+'\n'
+                                filename.write(mixdef)
+                           else :
 
-            filename.write(mixname)
-            
-            for j in range(1,nummats): # start from [1] because [0] is void fraction
-               if zonemats[j] != 0 :
-                   mixdef='\tmaterial\t'+'mat_'+str(matID[j])+'\t'+\
-                   str(1)+'\t'+str(round(zonemats[j],int(numround)))+'\n'
-                   filename.write(mixdef)
-               else :
-                   continue
-            filename.write('end\n\n')
+                               continue
+                        filename.write('end\n\n')
+                        break;
+                    
+
+                    break;
+  
 
         else :
             continue
 
   # Write ALARA mat_loading card to file
     filename.write('mat_loading\n')
+    list1 = list(ones(len(voxels)))
     for i in range(len(voxels)) :
          zonemats=list(fracs[voxels][i])
          if round(zonemats[0],1) == 1.0:
              matname='\t'+'zone_'+str(i)+'\t'+'void'+'\n'
              filename.write(matname)  
          else :
-             matname='\t'+'zone_'+str(i)+'\t'+'mix_'+str(i)+'\n'
-             filename.write(matname)
+             filename.write('\t'+'zone_'+str(i))
+             for k in range(len(voxels)) :
+                zonemats_i=map(lambda x: round(x ,6), list(fracs[voxels][i]))
+                zonemats_k=map(lambda x: round(x ,6), list(fracs[voxels][k]))
+                
+                if (zonemats_i == zonemats_k):
+                    mixname='\t'+'mix_'+str(k)+'\n'
+                    filename.write(mixname)
+                    break;
+                                
+                    
+
     filename.write('end\n\n')   
 
     filename.close()
