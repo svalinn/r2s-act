@@ -42,18 +42,20 @@ def moab2alara(mesh, filename, numround):
      
   # Write ALARA mixture definitions to file
     nummats=len(matID)
+    count=0
     list1 = list(ones(len(voxels)))
     for i in range(len(voxels)) :
         zonemats=list(fracs[voxels][i])
         if round(zonemats[0],1) != 1.0 :
             for k in range(len(voxels)) :
-                zonemats_i=map(lambda x: round(x ,6), list(fracs[voxels][i]))
-                zonemats_k=map(lambda x: round(x ,6), list(fracs[voxels][k]))
+                zonemats_i=map(lambda x: round(x ,int(numround)), list(fracs[voxels][i]))
+                zonemats_k=map(lambda x: round(x ,int(numround)), list(fracs[voxels][k]))
                 
                 if (zonemats_i == zonemats_k):
                     if (list1[k] == 1) :
                         mixname='mixture'+'\t'+'mix_'+str(k)+'\n'
                         filename.write(mixname)
+                        count = count + 1
                         list1[k] = 2;
                         for j in range(1,nummats): # start from [1] because [0] is void fraction
                            if zonemats[j] != 0 :
@@ -65,13 +67,12 @@ def moab2alara(mesh, filename, numround):
                                continue
                         filename.write('end\n\n')
                         break;
-                    
 
                     break;
-  
 
         else :
             continue
+    print str(count)+' mixtures defined'
 
   # Write ALARA mat_loading card to file
     filename.write('mat_loading\n')
@@ -84,18 +85,15 @@ def moab2alara(mesh, filename, numround):
          else :
              filename.write('\t'+'zone_'+str(i))
              for k in range(len(voxels)) :
-                zonemats_i=map(lambda x: round(x ,6), list(fracs[voxels][i]))
-                zonemats_k=map(lambda x: round(x ,6), list(fracs[voxels][k]))
+                zonemats_i=map(lambda x: round(x ,int(numround)), list(fracs[voxels][i]))
+                zonemats_k=map(lambda x: round(x ,int(numround)), list(fracs[voxels][k]))
                 
                 if (zonemats_i == zonemats_k):
                     mixname='\t'+'mix_'+str(k)+'\n'
                     filename.write(mixname)
                     break;
-                                
-                    
-
+                                   
     filename.write('end\n\n')   
-
     filename.close()
 
     return
