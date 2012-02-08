@@ -13,7 +13,6 @@
 ######################################################################
 
 import textwrap as tw
-import sys
 import os
 from optparse import OptionParser
 from itaps import iBase,iMesh
@@ -369,7 +368,8 @@ class PhtnSrcReader(object):
         3D list, meshform, of the form {{xmin,xmax,xintervals},{y...},{z...}}
         Optional: 'outfile' allows for an alternate file name instead of gammas
         Optional: 'ergbins' can specify different energy bins, rather than a
-           default set of 42 bins. (This adds an additional line in gammas.)
+           default set of 42 bins. (This adds an additional line in gammas
+           and requires a different source.F90.)
         """
 
         try:
@@ -396,19 +396,19 @@ class PhtnSrcReader(object):
         # write first line (intervals for x, y, z)
         fw.write(" ".join([str(x[2]) for x in meshform]) + "\n")
         
-        # create and write x coords line (2nd line)
+        # create and write x mesh edges line (2nd line)
         coords = [meshform[0][0]]
         for cnt in range(1, meshform[0][2]+1):
             coords.append(meshform[0][0]+cnt*xval)
         fw.write(" ".join([str(x) for x in coords]) + "\n")
         
-        # create and write y coords line (3rd line)
+        # create and write y mesh edges line (3rd line)
         coords = [meshform[1][0]]
         for cnt in range(1, meshform[1][2]+1):
             coords.append(meshform[1][0]+cnt*yval)
         fw.write(" ".join([str(x) for x in coords]) + "\n")
         
-        # create and write z coords line (4th line)
+        # create and write z mesh edges line (4th line)
         coords = [meshform[2][0]]
         for cnt in range(1, meshform[2][2]+1):
             coords.append(meshform[2][0]+cnt*zval)
@@ -428,10 +428,21 @@ class PhtnSrcReader(object):
         numactivatedcells = 0
         for val in self.meshstrengths:
             if val > 0:
-                numactivatedcells += 1
-        print "The number of activated voxels and total number of voxels is {0}/{1}" \
-                .format(numactivatedcells, nmesh)
+                numactivatedcells += 1 
+                # volsourcetot += volcell
+        print "The number of activated voxels and total number of voxels is " \
+                "{0}/{1}".format(numactivatedcells, nmesh)
         norm = sum(self.meshstrengths) / numactivatedcells
+
+        #~ Future normalizations:
+        # With just void fractions included, so void rejection is doable:
+        # norm = sum(self.meshstrengths) / sum([1-x for x in self.voidfracs])
+
+        # With varying voxel size, but no void fraction info
+        # norm = sum(self.meshstrengths_volweighted
+
+        # With both varying voxel size and void fraction info
+
 
         # Create and write lines for each mesh cell's gamma source strength,
         #  but first we must create a cumulative list of probabilities.
@@ -454,6 +465,32 @@ class PhtnSrcReader(object):
         fw.close()
         
         print "The file '{0}' was created successfully".format(outfile)
+
+        return 1
+
+
+    def calc_volumes_list(self, meshplanes):
+        """ACTION: Method creates a 1D list of voxel volumes
+        RECEIVES: meshplanes: a 2D list of mesh intervals, e.g.
+                    [[x0,x1,x2,...],[y0,y1,y2,...],[z0,z1,z2,...]]
+
+        NOTE: Voxel ordering follows meshtal file convention which is
+         -for x for y iterate z
+         -for x iterate y
+         -iterate x
+        """
+        
+        oldz = meshplanes[2][0]
+        oldy = meshplanes[1][0]
+        oldx = meshplanes[0][0]
+
+        for cntx, x in enumerate(meshplanes[0][1:]):
+            for cnty, y in enumerate(meshplanes[1][1:]):
+                for cntz, z in enumerate(meshplanes[2][1:]):
+                    # Calc volume here
+                    oldz = z
+                oldy = y
+            oldx = x
 
         return 1
 
@@ -496,12 +533,12 @@ class PhtnSrcReader(object):
         for grp in range( len(self.meshprobs[0]) ):
             try:
                 tag = mesh.createTag( \
-                        "phtn_src_group_"+"{0:03d}".format(str(grp+1)), 1, float)
+                        "phtn_src_group_{0:03d}".format(grp+1), 1, float)
             except:
                 if retag:
-                    tag = mesh.getTagHandle("phtn_src_group_"+str(grp+1))
+                    tag = mesh.getTagHandle("phtn_src_group_{0:03d}".format(grp+1))
                 else:
-                    print "ERROR: The tag phtn_src_group_" + str(grp+1), \
+                    print "ERROR: The tag phtn_src_group_{0:03d}".format(grp+1), \
                             "already exists in the file", inputfile, \
                             "\nNow exiting this method."
                     return 0
@@ -520,7 +557,7 @@ class PhtnSrcReader(object):
         if retag:
             while grp:
                 try:
-                    tag = mesh.getTagHandle("phtn_src_group_"+str(grp+1))
+                    tag = mesh.getTagHandle("phtn_src_group_{0:03d}".format(grp+1))
                     mesh.destroyTag(tag,force=True)
                     grp += 1
                 except:
@@ -552,7 +589,7 @@ class PhtnSrcReader(object):
         mesh.load(inputfile)
 
         try:
-            group = mesh.getTagHandle("phtn_src_group_1")
+            group = mesh.getTagHandle("phtn_src_group_001")
         except:
             print "ERROR: The file", inputfile, "does not contain tags of the " \
                     "form 'phtn_src_group_#'"
@@ -576,7 +613,7 @@ class PhtnSrcReader(object):
 
         for i in range(2,1000): #~ Arbitrary: we look for up to 1000 groups
             try:
-                group = mesh.getTagHandle("phtn_src_group_"+str(i))
+                group = mesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
                 for cnt, vox in enumerate(voxels):
                     self.meshprobs[cnt].append(group[vox])
             except iBase.TagNotFoundError: break
@@ -595,6 +632,35 @@ class PhtnSrcReader(object):
             myergbins = ""
 
         self.gen_gammas_file(meshform, outfile, myergbins)
+
+        return 1
+
+    # Method will probably not be used/developed; volumes will instead be
+    #  recalculated rather than read from tags.
+    def voxel_volumes_from_h5m(self, inputfile):
+        """ACTION: Method reads tags with voxel volumes from an h5m
+        file and stores the information in 
+        To do this, we generate self.meshprobs and call gen_gammas_file().
+        REQUIRES: the .h5m moab mesh must have 
+
+        RECEIVES: The file (a .h5m moab file) containing the mesh of interest.
+        TODO:
+        """
+
+        #~ NOTE: The below code is a placeholder from 'gen_gammas_from_h5m_file()'
+
+        mesh = iMesh.Mesh()
+        mesh.load(inputfile)
+
+        try:
+            group = mesh.getTagHandle("VOLUMES")
+        except:
+            print "ERROR: "
+                    
+            return 0
+
+        voxels = mesh.getEntities(iBase.Type.region)
+        numvoxels = len(voxels)
 
         return 1
 
