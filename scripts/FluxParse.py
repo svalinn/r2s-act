@@ -11,7 +11,7 @@ import math
 def find_meshtal_type(meshtal):
     neutron_index=-1
     photon_index =-1
-    count=0
+    count=1
     meshtal_type=''
     while neutron_index == -1 and photon_index == -1 :
         line=linecache.getline(meshtal, count)
@@ -181,13 +181,8 @@ def tag_fluxes_preexisting(array, j, k, mestal_type, mesh_input, mesh_output):
     count=0
     for group_ID in range(1,k+1):#need to add one for total fluxes
         if group_ID != k:
-            spacer=''
-            if group_ID<100 and group_ID >= 10:
-                spacer='0'
-            if group_ID<10:
-                spacer='00'
-            tag_flux=mesh.createTag(meshtal_type+'_group_'+spacer+str(group_ID),1,float)
-            tag_error=mesh.createTag(meshtal_type+'_group_'+spacer+str(group_ID)+'_error',1,float)
+            tag_flux=mesh.createTag('{0}_group_{1:03d}'.format(meshtal_type, group_ID),1,float)
+            tag_error=mesh.createTag('{0}_group_{1:03d}_error'.format(meshtal_type, group_ID),1,float)
         if group_ID ==k:
             tag_flux=mesh.createTag(meshtal_type+'_group_total',1,float)
             tag_error=mesh.createTag(meshtal_type+'_group_total_error',1,float)
@@ -203,16 +198,74 @@ def tag_fluxes_preexisting(array, j, k, mestal_type, mesh_input, mesh_output):
     mesh.save(mesh_output)
     print 'User supplied mesh successfully tagged'
 
+def get_mesh_boundaries(meshtal):
+    boundary_index=-1
+    count=1
+    while boundary_index == -1 :
+        line=linecache.getline(meshtal, count)
+        boundary_index=line.find('Tally bin')
+        count=count+1
+        if count > 100 :
+            print >>sys.stderr, 'Tally bin boundaries not found in first 100 lines'
+            sys.exit(1)
 
+    boundaries_array=[]
+    for x in range (0,3):
+        column_data=[]
+        line=linecache.getline(meshtal, count+x)
+        char_count=0
+        column_count=0
+        while line[char_count] != '' and char_count < len(line)-1:
+            if line[char_count] == ' ':
+                char_count = char_count +1
+            else :
+                min_char = char_count
+                while line[char_count] != ' ' and char_count<len(line)-1:
+                    char_count=char_count +1
+                max_char=char_count
+                if column_count > 1:
+                    column_data.append(float(line[min_char:max_char]))
+                column_count += 1    
+        boundaries_array.append(column_data)        
+    return boundaries_array
+
+def create_mesh(a, mesh_name):#a is the name of the boundaries_array
+    mesh=iMesh.Mesh()
+    vertex_list=[]
+    x_div=len(a[0])
+    y_div=len(a[1])
+    z_div=len(a[2])
+    verts=[0]*len(a[0])*len(a[1])*len(a[2])
+    count=0;
+    for x in range(0, x_div):
+        for y in range(0, y_div):
+            for z in range(0, z_div):
+                verts[count]= mesh.createVtx([ a[0][x], a[1][y], a[2][z] ])
+                count += 1 
+    for x in range(0, x_div-1):
+        for y in range(0,y_div-1):
+            for z in range(0, z_div-1):
+                 vert_set = [verts[z + y*z_div + x*z_div*y_div],\
+                             verts[z + y*z_div + (x+1)*z_div*y_div],\
+                             verts[z + y*z_div + (x+1)*z_div*y_div + z_div],\
+                             verts[z + y*z_div + x*z_div*y_div + z_div],\
+                             verts[z + y*z_div + x*z_div*y_div +1 ],\
+                             verts[z + y*z_div + (x+1)*z_div*y_div + 1 ],\
+                             verts[z + y*z_div + (x+1)*z_div*y_div + z_div +1],\
+                             verts[z + y*z_div + x*z_div*y_div + z_div + 1]]
+                 cube, status = mesh.createEnt(iMesh.Topology.hexahedron, vert_set)
+    mesh.save(mesh_name)                            
  
 if __name__=='__main__':
+
     parser = OptionParser()
     parser.add_option('-b', action='store_true', dest='backward_bool', default=False, help='Print to ALARA fluxin in fluxes in decreasing energy')
     parser.add_option('-o', dest='fluxin_name', default='ALARAflux.in', help='Name of ALARA fluxin output file')
-    parser.add_option('-m',  dest='mesh_input', default= 'none', help = 'Tag meshes onto user preexisting mesh, supply file name')
+    parser.add_option('-m',  dest='mesh_input', default= 'False', help = 'Tag meshes onto user preexisting mesh, supply file name')
     parser.add_option('-p', dest='mesh_output', default='mesh.vtk', help = 'Name of mesh output file')
-    parser.add_option('-s', action='store_true', dest='supress_mesh', default=False, help='Supress creation of mesh file, only fluxin file is created')
+    parser.add_option('-s', action='store_true', dest='supress_mesh', default='False', help='Supress creation of mesh file, only fluxin file is created')
     (opts, args) = parser.parse_args()
+
     meshtal_type=find_meshtal_type(args[0])
     m=find_first_line(args[0])
     array, totals_bool=meshtal_to_array(args[0],m)    
@@ -225,9 +278,14 @@ if __name__=='__main__':
     check_meshtal_data(l, j, k, x, y, z)
     norm=float(args[1])
     print_fluxin(array, j, k, norm, opts.fluxin_name, opts.backward_bool)
-    
-    #if opts.mesh_input = 'none' and opts.supress_mesh == 'False'
-    if opts.mesh_input != 'none':
+
+    #mesh tagging/creation
+   
+    if opts.mesh_input == 'False' and opts.supress_mesh == 'False' :
+        boundaries_array = get_mesh_boundaries(args[0])
+        create_mesh(boundaries_array, opts.mesh_output)
+        tag_fluxes_preexisting(array, j, k, meshtal_type, opts.mesh_output, opts.mesh_output)
+    if opts.mesh_input != 'False':
         tag_fluxes_preexisting(array, j, k, meshtal_type, opts.mesh_input, opts.mesh_output)
 
 
