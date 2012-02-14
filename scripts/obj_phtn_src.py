@@ -439,10 +439,10 @@ class PhtnSrcReader(object):
         # norm = sum(self.meshstrengths) / sum([1-x for x in self.voidfracs])
 
         # With varying voxel size, but no void fraction info
-        # norm = sum(self.meshstrengths_volweighted
+        # norm = sum(self.meshstrengths_vol_weighted
 
         # With both varying voxel size and void fraction info
-
+        # norm = sum(self.meshstrengths_vol_weighted
 
         # Create and write lines for each mesh cell's gamma source strength,
         #  but first we must create a cumulative list of probabilities.
@@ -484,15 +484,37 @@ class PhtnSrcReader(object):
         oldy = meshplanes[1][0]
         oldx = meshplanes[0][0]
 
+        nxdiv = len(meshplanes[0]) - 1
+        nydiv = len(meshplanes[1]) - 1
+        nzdiv = len(meshplanes[2]) - 1
+
+        # create 1D list
+        self.vol = [0] * (nxdiv * nydiv * nzdiv)
+
         for cntx, x in enumerate(meshplanes[0][1:]):
+            oldy = meshplanes[1][0]
             for cnty, y in enumerate(meshplanes[1][1:]):
+                oldz = meshplanes[2][0]
                 for cntz, z in enumerate(meshplanes[2][1:]):
                     # Calc volume here
+                    self.vol[nydiv*nzdiv*cntx + nzdiv*cnty + cntz] = \
+                            (x - oldx) * \
+                            (y - oldy) * \
+                            (z - oldz)
+                    print x-oldx, y-oldy, z-oldz
                     oldz = z
                 oldy = y
             oldx = x
 
         return 1
+
+
+    def weight_mesh_strengths_by_vol(self):
+        """
+        """
+
+#        self.meshstrengths_vol_weighted[]
+        pass
 
     
     def gen_phtn_src_h5m_tags(self, inputfile, outfile="", retag=False):

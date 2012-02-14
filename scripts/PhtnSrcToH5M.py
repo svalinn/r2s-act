@@ -118,7 +118,7 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, retag=False
         while grp:
             try:
                 tag = mesh.getTagHandle( \
-                        "phtn_src_group_"+"{0:03d}".format(str(grp+1)))
+                        "phtn_src_group_"+"{0:03d}".format(grp+1))
                 mesh.destroyTag(tag,force=True)
                 grp += 1
             except iBase.TagNotFoundError:
