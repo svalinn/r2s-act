@@ -16,6 +16,8 @@ import textwrap as tw
 import os
 from optparse import OptionParser
 from itaps import iBase,iMesh
+import alias
+
 
 class PhtnSrcReader(object):
     """USE: Object of class stores photon source strength information that is
@@ -370,6 +372,7 @@ class PhtnSrcReader(object):
         Optional: 'ergbins' can specify different energy bins, rather than a
            default set of 42 bins. (This adds an additional line in gammas
            and requires a different source.F90.)
+        RETURNS: 1 if successful, 0 if an error occurred.
         """
 
         try:
@@ -386,6 +389,154 @@ class PhtnSrcReader(object):
             print "     ", nmesh, "!=", \
                     meshform[0][2],"*",meshform[1][2],"*",meshform[2][2]
 
+        # We call the function that opens our gammas file and writes the header
+        fw = self._gen_gammas_header(meshform, outfile, ergbins)
+
+        # We calcualte the normalization factor as the average total source
+        #  strength in each mesh cell divided by the number of mesh cells
+        #  with non-zero source strength.
+        # This applies ONLY for uniform voxel size meshing.
+        numactivatedcells = 0
+        for val in self.meshstrengths:
+            if val > 0:
+                numactivatedcells += 1 
+                # volsourcetot += volcell
+        print "The number of activated voxels and total number of voxels is " \
+                "{0}/{1}".format(numactivatedcells, nmesh)
+        norm = sum(self.meshstrengths) / numactivatedcells
+
+        #~ Future normalizations:
+        # With just void fractions included, so void rejection is doable:
+        # norm = sum(self.meshstrengths) / sum([1-x for x in self.voidfracs])
+
+        # With varying voxel size, but no void fraction info
+        # norm = sum(self.meshstrengths_vol_weighted
+
+        # With both varying voxel size and void fraction info
+        # norm = sum(self.meshstrengths_vol_weighted
+
+        # Create and write lines for each mesh cell's gamma source strength,
+        #  but first we must create a cumulative list of normalized probabilities.
+        for binset in self.meshprobs:
+            binset_f = [float(prob) for prob in binset]
+            cumulative_binset = list() # of floats
+            prevbin = 0.0
+            for bin in binset_f:
+                # Normalize value of current bin, and add it to previous bin,
+                #  since the previous bin is now the sum of all previous bins.
+                binsum = bin/norm + prevbin
+                cumulative_binset.append(binsum)
+                prevbin = binsum
+
+            # The following list comprehension uses a format specifying output
+            #  of 12 characters, with 5 values
+            #  after the decimal point, using scientific notation.
+            cumulative_binset2 = ["{0:<12.5E}".format(x) for x in cumulative_binset]
+            fw.write("".join(cumulative_binset2) + "\n")
+
+        # all lines written, close file.
+        fw.close()
+        
+        print "The file '{0}' was created successfully".format(outfile)
+
+        return 1
+
+
+    def gen_gammas_file_aliasing(self, meshform, outfile="gammas", ergbins=""):
+        """ACTION: Method creates the file gammas with the photon energy bins
+        for each voxel stored as alias tables.
+        Header information is the same as that in gen_gammas_file().
+
+        Each voxel's line corresponds with an alias table of the form:
+        [total source strength, p1, g1a, g1b, p2, g2a, g2b ... pN, gNa, gNb]
+        Where each p#, g#a, g#b are the info for one bin in the alias table.
+
+        REQUIRES: Method assumes that read() and isotope_source_strengths() 
+        have been called already, OR that self.meshstrengths and self.meshprobs
+        have been otherwise created properly.
+        RECEIVES:
+        3D list, meshform, of the form {{xmin,xmax,xintervals},{y...},{z...}}
+        Optional: 'outfile' allows for an alternate file name instead of gammas
+        Optional: 'ergbins' can specify different energy bins, rather than a
+           default set of 42 bins. (This adds an additional line in gammas
+           and requires a different source.F90.)
+        RETURNS: 1 if successful, 0 if an error occurred.
+        """
+
+        try:
+            nmesh = len(self.meshstrengths) # We use this to check for a warning
+                            # and to make sure a required method has been called
+        except:
+            print "ERROR: isotope_source_strengths needs to be called before " \
+                    "gen_sdef_probabilties"
+            return 0
+
+        if nmesh != meshform[0][2]*meshform[1][2]*meshform[2][2]:
+            print "WARNING: Number of mesh cells in phtn_src file does not " \
+                    "match the product of the mesh intervals given:"
+            print "     ", nmesh, "!=", \
+                    meshform[0][2],"*",meshform[1][2],"*",meshform[2][2]
+
+        fw = self._gen_gammas_header(meshform, outfile, ergbins)
+
+        # We call the function that opens our gammas file and writes the header
+        fw = self._gen_gammas_header(meshform, outfile, ergbins)
+
+        # We calcualte the normalization factor as the average total source
+        #  strength in each mesh cell divided by the number of mesh cells
+        #  with non-zero source strength.
+        # This applies ONLY for uniform voxel size meshing.
+        numactivatedcells = 0
+        for val in self.meshstrengths:
+            if val > 0:
+                numactivatedcells += 1 
+                # volsourcetot += volcell
+        print "The number of activated voxels and total number of voxels is " \
+                "{0}/{1}".format(numactivatedcells, nmesh)
+        norm = sum(self.meshstrengths) / numactivatedcells
+
+        for binset in self.meshprobs:
+
+            # We create the list to send to alias.gen_alias_table()
+            ergproblist = list()
+            sourcetotal = sum([float(prob) for prob in binset]) # binset)
+
+            # Special case of a zero source strength voxel...
+            # In this case, we write the correct number of zeros to the gammas
+            #  file so that the source.F90 code doesn't run out of values to read
+            if sourcetotal == 0:
+                fw.write(" ".join([0]*(len(binset)*3+1)) + "\n")
+                continue
+
+            for cnt, p in enumerate(binset):
+                ergproblist.append([float(p)/sourcetotal, cnt+1])
+    
+            aliastable = alias.gen_alias_table(ergproblist)
+
+            # We compactly format the alias table as a bunch of strings.
+            # The following list comprehension uses a format specifying output
+            #  of 12 characters, with 5 values after the decimal point and 
+            #  scientific notation for the probability values, and integer 
+            #  format for the energy group numbers
+            aliasstrings = ["{0:<12.5E} {1} {2}".format(x[0][0],x[0][1],x[1][1]) \
+                    for x in aliastable]
+
+            fw.write(str(sourcetotal/norm) + " " + " ".join(aliasstrings) + "\n")
+
+        # all lines written, close file.
+        fw.close()
+        
+        print "The file '{0}' was created successfully".format(outfile)
+
+        return 1
+
+
+    def _gen_gammas_header(self, meshform, outfile, ergbins):
+        """ACTION: Method writes the header lines for gammas file, and method
+        is used by both gen_gammas_file() and gen_gammas_file_aliasing().
+        RETURNS: A file writing object, fw.
+        """
+        
         # calculate the mesh spacing in each direction
         xval = (meshform[0][1]-meshform[0][0])/float(meshform[0][2])#/2
         yval = (meshform[1][1]-meshform[1][0])/float(meshform[1][2])#/2
@@ -421,52 +572,7 @@ class PhtnSrcReader(object):
         if ergbins != "":
             fw.write(" ".join([str(x) for x in ergbins]) + "\n")
 
-        # We calcualte the normalization factor as the average total source
-        #  strength in each mesh cell divided by the number of mesh cells
-        #  with non-zero source strength.
-        # This applies ONLY for uniform voxel size meshing.
-        numactivatedcells = 0
-        for val in self.meshstrengths:
-            if val > 0:
-                numactivatedcells += 1 
-                # volsourcetot += volcell
-        print "The number of activated voxels and total number of voxels is " \
-                "{0}/{1}".format(numactivatedcells, nmesh)
-        norm = sum(self.meshstrengths) / numactivatedcells
-
-        #~ Future normalizations:
-        # With just void fractions included, so void rejection is doable:
-        # norm = sum(self.meshstrengths) / sum([1-x for x in self.voidfracs])
-
-        # With varying voxel size, but no void fraction info
-        # norm = sum(self.meshstrengths_vol_weighted
-
-        # With both varying voxel size and void fraction info
-        # norm = sum(self.meshstrengths_vol_weighted
-
-        # Create and write lines for each mesh cell's gamma source strength,
-        #  but first we must create a cumulative list of probabilities.
-        for binset in self.meshprobs:
-            binset_f = [float(erg) for erg in binset]
-            cumulative_binset = list() # of floats
-            prevbin = 0.0
-            for bin in binset_f:
-                binsum = bin + prevbin
-                cumulative_binset.append(binsum)
-                prevbin = binsum
-
-            # The following list comprehension uses a format specifying output
-            #  of 12 characters, with 5 values
-            #  after the decimal point, using scientific notation.
-            cumulative_binset2 = ["{0:<12.5E}".format(x/norm) for x in cumulative_binset]
-            fw.write("".join(cumulative_binset2) + "\n")
-
-        # all lines written, close file.
-        fw.close()
-        
-        print "The file '{0}' was created successfully".format(outfile)
-
-        return 1
+        return fw
 
 
     def calc_volumes_list(self, meshplanes):
@@ -501,7 +607,6 @@ class PhtnSrcReader(object):
                             (x - oldx) * \
                             (y - oldy) * \
                             (z - oldz)
-                    print x-oldx, y-oldy, z-oldz
                     oldz = z
                 oldy = y
             oldx = x

@@ -15,7 +15,7 @@ nps 1e6
 m2 26000 88.8 24000 9  74000 2 25055 0.5 14000 0.25 6000 0.1
 m3 1001 2 8016 1
 mode p
-fmesh4: geom=xyz origin=-5 -5 -5
+fmesh4:p geom=xyz origin=-5 -5 -5
          imesh=10 iints=8
          jmesh=10 jints=8
          kmesh=10 kints=8

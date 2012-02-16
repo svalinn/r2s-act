@@ -48,8 +48,6 @@ subroutine source
         if (ikffl.eq.1) then
 
 ! bins for photon energy groups.
-!        data ener_phot/0.0,0.01,0.02,0.05,0.1,0.2,0.3,0.4,0.6,0.8,1.0, &
- !            1.22,1.44,1.66,2.0,2.5,3.0,4.0,5.0,6.5,8.0,10.0,12.0,14.0,20.0/
         data ener_phot/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
               0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
               1.66,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0, &
@@ -60,7 +58,7 @@ subroutine source
           enddo
 
           close(50)
-          open(unit=50,form='formatted',file='gammas')
+          open(unit=50,form='formatted',file='gammas_alias')
           read(50,*) i_ints,j_ints,k_ints
           read(50,*) (i_bins(i),i=1,i_ints+1)
           read(50,*) (j_bins(i),i=1,j_ints+1)
@@ -75,10 +73,10 @@ subroutine source
           n_active_mat=i-1
 
           ! set the spectrum array to: # of mesh cells * 42 energy groups
-          allocate(spectrum(i_ints * j_ints * k_ints, 42))
+          allocate(spectrum(i_ints * j_ints * k_ints, 1+3*42))
           ! initiallizing a spectrum array
           do i=1,i_ints * j_ints * k_ints
-            do j=1,42 ! 24
+            do j=1,1+3*42 ! 24
               spectrum(i,j)=0.0
             enddo
           enddo
@@ -90,8 +88,7 @@ subroutine source
                   ! ... presumably includes a single space character.
           i=1
           do
-                        !read(50,'(24ES12.5)',iostat=stat) (spectrum(i,j),j=1,24) 
-            read(50,*,iostat=stat) (spectrum(i,j),j=1,42) !24)
+            read(50,*,iostat=stat) (spectrum(i,j),j=1,1+3*42) !24)
             if (stat /= 0) exit
 !              write(*,'(i4,1x,24ES12.5)') i,(spectrum(i,j),j=1,24)
             i=i+1
@@ -99,7 +96,7 @@ subroutine source
 
           close(50)
 
-          write(*,*) 'Reading gammas file completed!'
+          write(*,*) 'Reading gammas_alias file completed!'
 
         endif
 
@@ -129,26 +126,28 @@ subroutine source
 !   adr=z+y*k_ints+x*j_ints*k_ints+i_mat*i_ints*j_ints*k_ints;
 
         i=(kk-1)+(jj-1)*k_ints+(ii-1)*j_ints*k_ints+1
-!        if (spectrum(i,24).eq.0) goto 10
-        if (spectrum(i,42).eq.0) goto 10
 
-!        print*,i_bins(1),i_bins(i_ints+1),i_bins(i_ints+1)-i_bins(1)
-!        print*,j_bins(1),j_bins(j_ints+1),j_bins(j_ints+1)-j_bins(1)
-!        print*,k_bins(1),k_bins(k_ints+1),k_bins(k_ints+1)-k_bins(1)
-!        print*,ii,jj,kk,i
-
+        if (spectrum(i,1).eq.0) goto 10
 
 !
 !----------------------------------------------------------------------------------------------------
 !        Use cumulative values in spectrum array for given i to sample the energy of the photon.
 !----------------------------------------------------------------------------------------------------
 !
+                
+        r4 = INT(rang() * 42) * 3 ! choose alias table indice
 
-        r4=(1-rang()) * spectrum(i,42) !24)
+        r5 = rang() ! second rand chooses first or second bin in alias table bin
 
-        do j=1, 42 !24
-          if (r4.lt.spectrum(i,j)) exit
-        enddo
+        ! three values are associated with the alias bin:
+        ! -probability of the first secondary bin
+        ! -energy bin # of the first secondary bin
+        ! -energy bin # of the second secondary bin
+        if ( r5.le.spectrum(i, 1 + r4     + 1) ) then
+          j = INT( spectrum(i, 1 + r4 + 1 + 1) )
+        else
+          j = INT( spectrum(i, 1 + r4 + 2 + 1) )
+        endif
 
         erg=ener_phot(j)+(1-rang())*(ener_phot(j+1)-ener_phot(j))
 
@@ -160,8 +159,7 @@ subroutine source
 !----------------------------------------------------------------------------------------------------
 !
 
-        wgt=spectrum(i,42) !24)
-
+        wgt=spectrum(i,1)  !42) !24)
 
         ipt=2 ! 2 == Photon particle type
         jsu=0

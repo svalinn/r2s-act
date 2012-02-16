@@ -95,9 +95,10 @@ subroutine source
                   !  in exponential form with non-zero leading char,
                   ! ... presumably includes a single space character.
           i=1
+!          voxformat = '(' // n_mesh_cells_str //
           do
                         !read(50,'(24ES12.5)',iostat=stat) (spectrum(i,j),j=1,24) 
-            read(50,'(100ES12.5)',iostat=stat) (spectrum(i,j),j=1,n_ener_phot) !24)
+            read(50,*,iostat=stat) (spectrum(i,j),j=1,n_ener_phot) !24)
             if (stat /= 0) exit
 !              write(*,'(i4,1x,24ES12.5)') i,(spectrum(i,j),j=1,24)
             i=i+1
@@ -105,7 +106,7 @@ subroutine source
 
           close(50)
 
-          write(*,*) 'Reading gammas file completed!'
+          write(*,*) 'Reading gammas_ener file completed!'
 
         endif
 

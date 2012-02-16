@@ -7,15 +7,17 @@ b) source_gamma_meshtal2.F90
 
 Adapted from KIT
 c) source_gamma_meshtal2_ergbins.F90
+d) source_gamma_meshtal2_alias.F90
 
 Custom-compiled dag-mcnp/mcnp5 executable
-d) mcnp5p
+e) mcnp5p
 
 More information about each file:
 a) Not used (uses RDUM and IDUm cards in MCNP; have not tried to get this working)
 b) Original was modified from 24 energy groups to 42 groups and to use dynamic array allocation for the phtn source information. The file it looks for is called 'gammas'
 c) Modifications to read in another line from the 'gammas_ener' file (note different name). This additional line contains the energy bin values, starting from 0.0, and increasing to maximum energy of interest.
-d) You must be in the svn-dagmc group to access the modified executable.  The executable is currently compiled with file b) above.
+d) Modifications to read a different format gammas file so that an alias table is used to chose the photon energy.  This is an experiment to see if this provides better/worse execution speed.
+e) You must be in the svn-dagmc group to access the modified executable.  The executable is currently compiled with file b) above.
 
 ------
 One should be able to use the mcnp5p link for running problems.
