@@ -8,11 +8,13 @@ import random
 #  actual value of interst (e.g. energy group?)
 # In the alias table, all bins have the same probability: 1/n
 
-def gen_alias_table(aa):
-    """ACTION: Method generates an alias table from the received list aa.
+def gen_alias_table(bins):
+    """Generates and returns an alias table of the supplied discrete bins.
+    
+    ACTION: Method generates an alias table from the received list bins.
     NOTE: Algorithm used is that described in Prof. Paul Wilson's NE506 lecture
     on random sampling techniques.
-    RECEIVES: aa, a list of the form
+    RECEIVES: bins, a list of the form
     [[p1,v1],[p2,v2].... [pN,vN]]
     Where p1 is the probability of value v1 being chosen. p values must be
     already normalized.
@@ -21,50 +23,50 @@ def gen_alias_table(aa):
 
     pairs = list() # This is our Alias Table
 
-    n = len(aa)
-    n_inv = 1.0/len(aa) # self explanatory; saves time.
+    n = len(bins)
+    n_inv = 1.0/len(bins) # self explanatory; saves time.
 
     # Counting variables
     cnt = 0 # keeps track of the current alias table bin that we are working with
-    remainingbins = len(aa)
+    remainingbins = len(bins)
 
-    aa.sort() # initial sort; sorts by probability (first value of each bin)
+    bins.sort() # initial sort; sorts by probability (first value of each bin)
 
     # n_inv = round(n_inv,5) #~had no effect?
 
     # Alias table generating loop
     while remainingbins > 0:
-        #aa.sort() #~ This can be optimized to sort the right end of the array
+        #bins.sort() #~ This can be optimized to sort the right end of the array
                     #~ until no more sorting is needed.  Needs custom function
                 #~ OR we can simply find where the last bin needs to be moved to.
-        aa = _sort_for_alias_table_gen(aa) # update aa so it is fully sorted.
+        bins = _sort_for_alias_table_gen(bins) # update bins so it is fully sorted.
 
         # If lowest probability bin is less than n_inv...
-        if aa[0][0] < n_inv:
+        if bins[0][0] < n_inv:
             # Add the bin to a new bin in alias table
-            pairs.append([aa[0]]) # append the first item in aa
+            pairs.append([bins[0]]) # append the first item in bins
 
             # Then add the largest bin as the second part of the alias table
             #  and then reduce the largest probability bin by: x - n_inv
             #  where x is the probability of the bin added above.
-            pairs[cnt].append([round(n_inv - aa[0][0],5), aa[remainingbins-1][1]])
-            aa[remainingbins-1][0] -= (n_inv - aa[0][0])
-            aa[remainingbins-1][0] = round(aa[remainingbins-1][0],5)
+            pairs[cnt].append([round(n_inv - bins[0][0],5), bins[remainingbins-1][1]])
+            bins[remainingbins-1][0] -= (n_inv - bins[0][0])
+            bins[remainingbins-1][0] = round(bins[remainingbins-1][0],5)
 
-            aa = aa[1:]
+            bins = bins[1:]
             
-        elif aa[0][1] > n_inv:
-            pairs.append([[ n_inv,aa[0][1] ]])
+        elif bins[0][1] > n_inv:
+            pairs.append([[ n_inv,bins[0][1] ]])
             # above: we append [[1/n, bin #]] to alias table
-            # then we reduce aa[0] by 1/n, and continue on
-            aa[0][0] -= n_inv
-            aa = aa[1:]
+            # then we reduce bins[0] by 1/n, and continue on
+            bins[0][0] -= n_inv
+            bins = bins[1:]
 
             pairs[cnt].append([0,0])
             
         else: #~ least probable
-            pairs.append([aa[0]])
-            aa = aa[1:]
+            pairs.append([bins[0]])
+            bins = bins[1:]
             pairs[cnt].append([0,0])
 
         # we set the alias bin's two secondary bin probabilities to toal 1
@@ -80,7 +82,9 @@ def gen_alias_table(aa):
 # Then we sample using the alias table
 
 def sample_alias_table(n, pairs):
-    """ACTION: Method receives the number of samples to take, n,
+    """Returns a list of values sampled from an alias table.
+
+    ACTION: Method receives the number of samples to take, n,
     and then generates these using the alias table stored in
     pairs.  The list of samples is store in v, and is returned.
     RECEIVES: n, number of samples to take, and pairs, the alias table.
@@ -102,7 +106,9 @@ def sample_alias_table(n, pairs):
 
 
 def _sort_for_alias_table_gen(bins):
-    """ACTION: Method determines where to move the last item in bins to,
+    """Alias table sorting method that sorts only the last value in a list.
+    
+    ACTION: Method determines where to move the last item in bins to,
     so that bins is presumably sorted properly by the first value in each
     bin.
     NOTE: This is an internal method that should not need to be call externally.
