@@ -5,7 +5,10 @@ from optparse import OptionParser
 
 
 class ModMCNPforPhotons(object):
-    """
+    """Class is used to convert a neutron problem in MCNP to a photon problem
+
+    An MCNP input file is read in, and stored in 4 parts: title card, block 1,
+     block 2, and block 3.
     """
 
     def __init__(self, myInputFileName):
@@ -17,7 +20,9 @@ class ModMCNPforPhotons(object):
 
 
     def read(self):
-        """ We clean the input file of a bunch of useless blank lines
+        """Read an MCNP input file and store its parts in the object.
+
+        We clean the input file of a bunch of useless blank lines
         and lines filled with asterisks...
         Saved lines are written to file tempFileName
         Blocks 1 and 2 are used to create a surface parser object
@@ -47,7 +52,9 @@ class ModMCNPforPhotons(object):
 
 
     def mcnp_block_parser(self, fr, blockLines):
-        """Method receives a file reader ('fr'), and reads lines
+        """Read lines from input file until an entire block has been read.
+        
+        Method receives a file reader ('fr'), and reads lines
          until a blank line is encountered (or end of file)
         Blank lines are tossed, and any comment lines beginning
          with c are tossed
@@ -70,7 +77,9 @@ class ModMCNPforPhotons(object):
 
 
     def change_block_1(self):
-        """ACTION: Method changes the importance cards to affect protons
+        """Modify contents of self.block1Lines for a photon problem.
+        
+        ACTION: Method changes the importance cards to affect protons
         RETURNS: N/A
         """
 
@@ -92,7 +101,9 @@ class ModMCNPforPhotons(object):
 
 
     def change_block_2(self):
-        """Block 2 of MCNP input doesn't depend on particle type
+        """Modify contents of self.block2Lines for a photon problem (N/A).
+        
+        Block 2 of MCNP input doesn't depend on particle type
         Thus nothing is done.
         """
 
@@ -102,7 +113,9 @@ class ModMCNPforPhotons(object):
 
     
     def change_block_3(self):
-        """ACTION: Method 
+        """Modify contents of self.block3Lines for a photon problem.
+        
+        ACTION: Method 
         -changes the mode card from 'mode n' to 'mode p'
         -comments out any source-definition cards
         """
@@ -161,7 +174,9 @@ class ModMCNPforPhotons(object):
 
 
     def write_deck(self, outputFileName=""):
-        """ACTION: Method writes the contents of self.block#Lines to a new file.
+        """Createa new MCNP input file from the object's contents.
+        
+        ACTION: Method writes the contents of self.block#Lines to a new file.
             File name is determined automatically if not supplied.
         REQUIRES: read() has been called for the class object so that blockLines
             and title are not empty.

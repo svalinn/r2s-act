@@ -5,7 +5,9 @@ from itaps import iBase,iMesh
 
 
 def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, retag=False):
-    """ACTION: Method reads in a phtn_src file line by line, looking for
+    """Read in a phtn_src file and tag the contents to a moab mesh.
+    
+    ACTION: Method reads in a phtn_src file line by line, looking for
     a specific isotope at a specific cooling step
     RECEIVES: input file (ALARA phtn_src style), mesh file to write to,
     isotope identifier, cooling step number (0'th is 'shutdown')

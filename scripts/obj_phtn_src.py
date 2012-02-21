@@ -20,7 +20,9 @@ import alias
 
 
 class PhtnSrcReader(object):
-    """USE: Object of class stores photon source strength information that is
+    """Store data from a phtn_src file and recreate this information in other formats.
+    
+    USE: Object of class stores photon source strength information that is
     read in from the phtn_src file from ALARA.  Class methods can:
         read in phtn_src, tag h5m mesh with this data, create SDEF cards from
         this data, create gammas file from this data or from h5m tags ...
@@ -29,7 +31,9 @@ class PhtnSrcReader(object):
     """
     
     def __init__(self, myInputFileName):
-        """Init function for class PhtnSrcReader. Receives a phtn_src file.
+        """Init function for class PhtnSrcReader.
+        
+        Receives a phtn_src file.
         """
         super(PhtnSrcReader, self).__init__()
 
@@ -52,7 +56,9 @@ class PhtnSrcReader(object):
 
 
     def read(self, fr=''):
-        """ Method reads in lines from an IO stream, and stores them in blocks on a 
+        """Read lines from a phtn_src file and store information.
+        
+        Method reads in lines from an IO stream, and stores them in blocks on a 
         per-heading basis, e.g. headings are isotope identifiers or "TOTAL"
         RECEIVES: fr, an IO stream, e.g. from open('file', 'r'), fr is NOT a filename
         """
@@ -111,7 +117,9 @@ class PhtnSrcReader(object):
 
 
     def get_isotope(self, isotope="TOTAL"):
-        """ACTION: Method searches headingList to find which entry in probList is
+        """Get the information for a specific isotope for all cooling steps and voxels.
+        
+        ACTION: Method searches headingList to find which entry in probList is
         the desired TOTAL or isotope, and returns the corresponding TOTAL block,
         which can include multiple cooling steps.
         To get a specific cooling step's total, call isotope_source_strengths
@@ -123,7 +131,7 @@ class PhtnSrcReader(object):
 
         # If the lists with headings and probabilities have contents...
         if len(self.headingList) and len(self.probList):
-            self.totalHeadingList = list() #
+            self.totalHeadingList = list() # List of lists values for a given isotope
             self.totalProbList = list()
             self.totalCoolingStepsList = list()
             
@@ -162,7 +170,9 @@ class PhtnSrcReader(object):
                 
 
     def isotope_source_strengths(self, coolingstep=0):
-        """ACTION: Method parses all contents of self.totalProbList and creates a list of
+        """Generate a list of bin source strenghts for a specific isotope and cooling step.
+        
+        ACTION: Method parses all contents of self.totalProbList and creates a list of
         the sum of source strengths in each mesh cell, and a list of each mesh
         cell's list of source strengths at each energy.
         REQUIRES: Method expects that get_isotope() has been called already.
@@ -195,7 +205,9 @@ class PhtnSrcReader(object):
 
 
     def gen_sdef_probabilities(self, meshform, outfile="phtn_sdef", ergbins=""):
-        """REQUIRES: Method assumes that read() and isotope_source_strengths() have been
+        """Generate MCNP photon source cards and write them to a file.
+        
+        REQUIRES: Method assumes that read() and isotope_source_strengths() have been
         called already.
         ACTION: Method creates a sequentially numbered listed of si and sp cards for
         MCNP input, using the energy structure specified (todo) and the photon
@@ -361,7 +373,9 @@ class PhtnSrcReader(object):
 
 
     def gen_gammas_file(self, meshform, outfile="gammas", ergbins=""):
-        """ACTION: Method generates a file called 'gammas' to be used with a 
+        """Generate the 'gammas' file for source.F90 routine directly from phtn_src file
+        
+        ACTION: Method generates a file called 'gammas' to be used with a 
         modified version of MCNP5.
         REQUIRES: Method assumes that read() and isotope_source_strengths() 
         have been called already, OR that self.meshstrengths and self.meshprobs
@@ -442,9 +456,11 @@ class PhtnSrcReader(object):
         return 1
 
 
-    def gen_gammas_file_aliasing(self, meshform, outfile="gammas", ergbins=""):
-        """ACTION: Method creates the file gammas with the photon energy bins
-        for each voxel stored as alias tables.
+    def gen_gammas_file_aliasing(self, meshform, outfile="gammas_alias", ergbins=""):
+        """Generate the gammas_alias file for alias table version of source.F90
+        
+        ACTION: Method creates the file gammas with the photon energy bins
+        for each voxel stored as alias tables. Reads directly from phtn_src file.
         Header information is the same as that in gen_gammas_file().
 
         Each voxel's line corresponds with an alias table of the form:
@@ -476,8 +492,6 @@ class PhtnSrcReader(object):
                     "match the product of the mesh intervals given:"
             print "     ", nmesh, "!=", \
                     meshform[0][2],"*",meshform[1][2],"*",meshform[2][2]
-
-        fw = self._gen_gammas_header(meshform, outfile, ergbins)
 
         # We call the function that opens our gammas file and writes the header
         fw = self._gen_gammas_header(meshform, outfile, ergbins)
@@ -532,7 +546,9 @@ class PhtnSrcReader(object):
 
 
     def _gen_gammas_header(self, meshform, outfile, ergbins):
-        """ACTION: Method writes the header lines for gammas file, and method
+        """Open a stream to write the header information for a gammas file
+        
+        ACTION: Method writes the header lines for gammas file, and method
         is used by both gen_gammas_file() and gen_gammas_file_aliasing().
         RETURNS: A file writing object, fw.
         """
@@ -576,7 +592,9 @@ class PhtnSrcReader(object):
 
 
     def calc_volumes_list(self, meshplanes):
-        """ACTION: Method creates a 1D list of voxel volumes
+        """Create list of voxel volumes for a cartesian mesh
+        
+        ACTION: Method creates a 1D list of voxel volumes
         RECEIVES: meshplanes: a 2D list of mesh intervals, e.g.
                     [[x0,x1,x2,...],[y0,y1,y2,...],[z0,z1,z2,...]]
 
@@ -623,7 +641,9 @@ class PhtnSrcReader(object):
 
     
     def gen_phtn_src_h5m_tags(self, inputfile, outfile="", retag=False):
-        """ACTION: Method adds tag with photon source strengths from ALARA to a
+        """Tag an h5m mesh with the phtn_src information (deprecated)
+        
+        ACTION: Method adds tag with photon source strengths from ALARA to a
         moab mesh.
         If there are photon energy group tags with numbers higher than those
         added and retagging is enabled, these tags are removed.
@@ -699,7 +719,9 @@ class PhtnSrcReader(object):
 
     
     def gen_gammas_file_from_h5m(self, meshform, inputfile, outfile="gammas"):
-        """ACTION: Method reads tags with photon source strengths from an h5m
+        """Generate gammas file using information from tags on a moab mesh.
+        
+        ACTION: Method reads tags with photon source strengths from an h5m
         file and generates the gammas file for the modified KIT source.f90 routine
         To do this, we generate self.meshprobs and call gen_gammas_file().
         REQUIRES: the .h5m moab mesh must have photon source strength tags of the
@@ -765,7 +787,9 @@ class PhtnSrcReader(object):
     # Method will probably not be used/developed; volumes will instead be
     #  recalculated rather than read from tags.
     def voxel_volumes_from_h5m(self, inputfile):
-        """ACTION: Method reads tags with voxel volumes from an h5m
+        """Read volumes of voxels from tags in a moab mesh.
+        
+        ACTION: Method reads tags with voxel volumes from an h5m
         file and stores the information in 
         To do this, we generate self.meshprobs and call gen_gammas_file().
         REQUIRES: the .h5m moab mesh must have 
@@ -794,7 +818,9 @@ class PhtnSrcReader(object):
 
     # DEPRECATED
     def format_isotope_mcnp(self, coolingstep=0):
-        """NOTE: Intended for taking phtn_src file for a single mesh (1x1x1) and 
+        """DEPRECATED METHOD
+        
+        NOTE: Intended for taking phtn_src file for a single mesh (1x1x1) and 
         formatting its contents for use as probabilities in an sdef card.
         RETURNS: Method returns a formatted list of strings that is the block under
         heading TOTAL for some cooling step
@@ -824,7 +850,9 @@ class PhtnSrcReader(object):
 
 
     def read_pre_alara_2_9(self):
-        """ DEPRECATED METHOD - Handles the earlier formatting of phtn_src file
+        """ DEPRECATED METHOD
+        
+        Handles the earlier formatting of phtn_src file
         from ALARA.
         Method reads in lines and stores them in blocks on a per-heading basis
          e.g. headings are isotope identifiers or TOTAL
