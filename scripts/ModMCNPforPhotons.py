@@ -11,12 +11,13 @@ class ModMCNPforPhotons(object):
      block 2, and block 3.
     """
 
-    def __init__(self, myInputFileName):
+    def __init__(self, myInputFileName, dagmc=True):
         """Init function for class ModMCNPforPhotons. Receives an MCNP input file.
         """
         super(ModMCNPforPhotons, self).__init__()
 
         self.inputFileName = myInputFileName
+        self.dagmc = dagmc
 
 
     def read(self):
@@ -40,8 +41,9 @@ class ModMCNPforPhotons(object):
 
         # The mcnp input file is read into it's three blocks
         # comment lines (beginning with 'c' are not included)
-        self.mcnp_block_parser(fr, self.block1Lines)
-        self.mcnp_block_parser(fr, self.block2Lines)
+        if not self.dagmc:
+            self.mcnp_block_parser(fr, self.block1Lines)
+            self.mcnp_block_parser(fr, self.block2Lines)
         self.mcnp_block_parser(fr, self.block3Lines)
         
         fr.close
@@ -168,7 +170,8 @@ class ModMCNPforPhotons(object):
         print "Block 3 has been updated: \n" \
                 "-{0} source cards commented out\n" \
                 "{1}{2}{3}\n" \
-                "Note that tallies were not modified." \
+                "Note that tallies were not modified. Remember that neutron" \
+                " tallies\nshould probably be changed." \
                 "\n".format(cntsrc, notemode, notephys, noteimp)
         return 1
 
@@ -194,10 +197,11 @@ class ModMCNPforPhotons(object):
 
         # Start writing to file - title card first
         fw.write(self.title)
-        for line in self.block1Lines: fw.write(line) #block 1
-        fw.write('\n') #blank line dividing blocks 1 and 2
-        for line in self.block2Lines: fw.write(line) #block 2
-        fw.write('\n') #blank line dividing blocks 2 and 3
+        if not self.dagmc:
+            for line in self.block1Lines: fw.write(line) #block 1
+            fw.write('\n') #blank line dividing blocks 1 and 2
+            for line in self.block2Lines: fw.write(line) #block 2
+            fw.write('\n') #blank line dividing blocks 2 and 3
         for line in self.block3Lines: fw.write(line) #block 3
 
         fw.close()
@@ -215,30 +219,34 @@ def main():
     RECEIVES: N/A
     """
 
-    usage = "usage: %prog [options] arg"
+    usage = "Usage: %prog INPUTFILE [options]\n\n" \
+            "INPUTFILE is the MCNP or DAG-MCNP input deck that is to be " \
+            "modified. \nUse the -d option for DAG-MCNP files."
     parser = OptionParser(usage)
     
-    # Input and output file names
-    parser.add_option("-i","--input",action="store",dest="filename", \
-            default=False, help="The MCNP input file to read from") 
+    # Output file name, and toggle for DAG-MCNP problems
     parser.add_option("-o","--output",action="store",dest="outputfile", \
             default="", help="Filename to write modified MCNP input to." \
             " Default is to append input filename with '_p'.")
+    parser.add_option("-d","--dagmc",action="store_true",dest="dagmc", \
+            default=False, help="Add flag to parse file like a DAG-MCNP file " \
+            "(which has only title card and block 3 cards). Default: %default")
 
     (options, args) = parser.parse_args()
-
-    if options.filename != False:
-        x = ModMCNPforPhotons(options.filename)
+    
+    if len(args):
+        x = ModMCNPforPhotons(args[0], options.dagmc)
 
         x.read()
-        x.change_block_1()
-        x.change_block_2()
+        if not x.dagmc:
+            x.change_block_1()
+            x.change_block_2()
         x.change_block_3()
         x.write_deck(options.outputfile)
     
     else:
-        print "An input file must be specified to use this script.\n" \
-                "Use the -i option or see the -h option for more information."
+        print "An input file must be specified as the first argument to use " \
+                "this script.\nSee the -h option for more information."
 
     return 1
 
