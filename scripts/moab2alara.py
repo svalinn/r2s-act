@@ -47,8 +47,8 @@ def moab2alara(mesh, filename, numround):
     for i in range(len(voxels)) :
         zonemats=list(fracs[voxels][i])
         if round(zonemats[0],1) != 1.0 :
+            zonemats_i=map(lambda x: round(x ,int(numround)), list(fracs[voxels][i]))
             for k in range(len(voxels)) :
-                zonemats_i=map(lambda x: round(x ,int(numround)), list(fracs[voxels][i]))
                 zonemats_k=map(lambda x: round(x ,int(numround)), list(fracs[voxels][k]))
                 
                 if (zonemats_i == zonemats_k):
@@ -76,7 +76,7 @@ def moab2alara(mesh, filename, numround):
 
   # Write ALARA mat_loading card to file
     filename.write('mat_loading\n')
-    list1 = list(ones(len(voxels)))
+#    list1 = list(ones(len(voxels)))
     for i in range(len(voxels)) :
          zonemats=list(fracs[voxels][i])
          if round(zonemats[0],1) == 1.0:
@@ -84,8 +84,8 @@ def moab2alara(mesh, filename, numround):
              filename.write(matname)  
          else :
              filename.write('\t'+'zone_'+str(i))
+             zonemats_i=map(lambda x: round(x ,int(numround)), list(fracs[voxels][i]))
              for k in range(len(voxels)) :
-                zonemats_i=map(lambda x: round(x ,int(numround)), list(fracs[voxels][i]))
                 zonemats_k=map(lambda x: round(x ,int(numround)), list(fracs[voxels][k]))
                 
                 if (zonemats_i == zonemats_k):
