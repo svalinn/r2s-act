@@ -52,7 +52,7 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, retag=False
 #            return 0
 
         coolingstep = lineparts[1].strip(' ')
-        print firstisotope, lineparts[:1]
+        #print firstisotope, lineparts[:1]
         print "The cooling step being read is '{0}'".format(coolingstep)
 
     except ValueError:
@@ -80,16 +80,17 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, retag=False
     for grp in range(len(lineparts) - 2 ): # group tags = parts in the line - 2
         try:
             # If tags are new to file... create tag
-            tagList.append(mesh.createTag("phtn_src_group_"+str(grp+1), 1, float))
+            tagList.append(mesh.createTag("phtn_src_group_{0:03d}".format(grp+1), 1, float))
         except iBase.TagAlreadyExistsError:
             # Else if the tags already exist...
             if retag:
                 # Get existing tag; We will overwrite tag values that already exist
-                tagList.append(mesh.getTagHandle("phtn_src_group_"+str(grp+1)))
+                tagList.append(mesh.getTagHandle("phtn_src_group_{0:03d}".format(grp+1)))
             else:
                 # Or print error if retagging was not specified.
-                print "ERROR: The tag phtn_src_group_" + str(grp+1), "already exists " \
-                        "in the file", inputfile, "\nUse -r option to overwrite tags."
+                print "ERROR: The tag phtn_src_group_{0:03d} already exists " \
+                        "in the file {1}\nUse -r option to overwrite tags." \
+                        "".format(grp+1, inputfile)
                 return 0
 
     voxelcnt = 0
