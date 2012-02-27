@@ -1,5 +1,5 @@
+import itertools
 from collections import namedtuple
-from contextlib import contextmanager
 
 from itaps import iBase, iMesh, iMeshExtensions
 
@@ -115,3 +115,39 @@ class ScdMesh:
         """Return the (i,j,k)'th hexahedron in the mesh"""
         n = ScdMesh._dimConvert(self.dims, (i, j, k))
         return ScdMesh._stepIter(self.hexit, n)
+
+    def iterateHex(self, order='xyz', **kw):
+
+        # a valid order has the letters 'x', 'y', and 'z'
+        # in any order without duplicates
+        if not (len(order) <= 3 and
+                len(set(order)) == len(order) and
+                all([a in 'xyz' for a in order])):
+            raise ScdMeshError('Invalid iteration order: ' + str(order))
+
+        # special case: xyz order is the standard pytaps iteration order,
+        # so we can save time by simply returning a pytaps iterator
+        # FIXME: can't use this unless kw are emptyh
+        #if order == 'xyz':
+        #    self.scdset.iterate(iBase.Type.region, iMesh.Topology.hexahedron)
+        #    return
+
+        indices = []
+        for L in order:
+            idx = 'xyz'.find(L)
+            indices.append(kw.get(L, range(self.dims[idx], self.dims[idx+3])))
+            if isinstance( indices[-1], int ):
+                indices[-1] = [indices[-1]]
+
+        print indices
+        indices[0], indices[2] = indices[2], indices[0]
+
+        items = itertools.product(*(indices))
+
+        ordmap = [order.find(L) for L in 'xyz']
+
+        for i in items:
+            i = list(i)
+            i[0], i[2] = i[2], i[0]
+            item = [i[x] for x in ordmap]
+            yield self.getHex(*item)
