@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-#This is the second version of FluxParse, which uses an array of numbers 
-#instead of using a readlines()
-
 import linecache
 from optparse import OptionParser
 import sys
@@ -19,7 +16,8 @@ def find_meshtal_type(meshtal):
         photon_index=line.find('photon')
         count=count+1
         if count > 100 :
-            print >>sys.stderr, 'Type of meshtal not detected in first 100 lines'
+            print >>sys.stderr, 'Type of meshtal not detected in \
+                                                  first 100 lines'
             sys.exit(1)
     if neutron_index != -1 :
         print 'Parsing neutron meshtal file.'
@@ -94,10 +92,12 @@ def calc_totals(array, j):
         abs_err_sqr_sum=0.0
         for a in range(0, k):
             flux_sum=flux_sum + array[mesh_point_index+j*a][4]
-            abs_err_sqr_sum=abs_err_sqr_sum+(array[mesh_point_index+j*a][4]*array[mesh_point_index+j*a][5])**2
+            abs_err_sqr_sum=abs_err_sqr_sum+(array[mesh_point_index+j*a][4]\
+                                          *array[mesh_point_index+j*a][5])**2
         totals[4]=flux_sum
         if flux_sum !=0:
-            totals[5]=math.sqrt(abs_err_sqr_sum)/flux_sum #calculating relative error=absolute/value
+            #calculating relative error=absolute/value
+            totals[5]=math.sqrt(abs_err_sqr_sum)/flux_sum 
         else:
             totals[5]=0.0
         totals_array.append(totals)
@@ -115,7 +115,8 @@ def count_energy_bins(array,j):
         if abs(array[n][0]/array[n+1][0] -1)> 0.00001 :
             k=k+1
     print '\tEnergy bins found:', k, '+ Total'
-    k=k+1 #need add 1 to account because the function does not detect (and count) the total group
+    k=k+1 #need add 1 to account because the function does not 
+          #detect (and count) the total group
     return k #total energy bins, include the total energy bin
 
 def count_data_points(array):
@@ -141,7 +142,8 @@ def count_delinations(array) :
 
 def check_meshtal_data(l, j, k, x, y, z) :
     if l != (j*k) :
-        print >>sys.stderr, 'Number of data points does not equal meshpoints*energy groups'
+        print >>sys.stderr, 'Number of data points does not equal \
+                                           meshpoints*energy groups'
         sys.exit(1)
     if x*y*z != j :
         print >>sys.stderr, 'Number of mesh points does not equal x*y*z'
@@ -181,8 +183,10 @@ def tag_fluxes_preexisting(array, j, k, mestal_type, mesh_input, mesh_output):
     count=0
     for group_ID in range(1,k+1):#need to add one for total fluxes
         if group_ID != k:
-            tag_flux=mesh.createTag('{0}_group_{1:03d}'.format(meshtal_type, group_ID),1,float)
-            tag_error=mesh.createTag('{0}_group_{1:03d}_error'.format(meshtal_type, group_ID),1,float)
+            tag_flux=mesh.createTag\
+            ('{0}_group_{1:03d}'.format(meshtal_type, group_ID),1,float)
+            tag_error=mesh.createTag\
+            ('{0}_group_{1:03d}_error'.format(meshtal_type, group_ID),1,float)
         if group_ID ==k:
             tag_flux=mesh.createTag(meshtal_type+'_group_total',1,float)
             tag_error=mesh.createTag(meshtal_type+'_group_total_error',1,float)
@@ -206,7 +210,8 @@ def get_mesh_boundaries(meshtal):
         boundary_index=line.find('Tally bin')
         count=count+1
         if count > 100 :
-            print >>sys.stderr, 'Tally bin boundaries not found in first 100 lines'
+            print >>sys.stderr,\
+            'Tally bin boundaries not found in first 100 lines'
             sys.exit(1)
 
     boundaries_array=[]
@@ -231,47 +236,70 @@ def get_mesh_boundaries(meshtal):
 
 def create_mesh(a, mesh_name):#a is the name of the boundaries_array
     mesh=iMesh.Mesh()
+
+    #creating a list of vertices from array of mesh boundaries
+    #with z values changing fastest, then x,then y
+
     vertex_list=[]
     x_div=len(a[0])
     y_div=len(a[1])
     z_div=len(a[2])
     verts=[0]*len(a[0])*len(a[1])*len(a[2])
     count=0;
+
     for x in range(0, x_div):
         for y in range(0, y_div):
             for z in range(0, z_div):
                 verts[count]= mesh.createVtx([ a[0][x], a[1][y], a[2][z] ])
-                count += 1 
+                count += 1
+
+    #grouping together vertices in cannonical order to create cubes
+ 
     for x in range(0, x_div-1):
         for y in range(0,y_div-1):
             for z in range(0, z_div-1):
-                 vert_set = [verts[z + y*z_div + x*z_div*y_div],\
-                             verts[z + y*z_div + (x+1)*z_div*y_div],\
-                             verts[z + y*z_div + (x+1)*z_div*y_div + z_div],\
-                             verts[z + y*z_div + x*z_div*y_div + z_div],\
-                             verts[z + y*z_div + x*z_div*y_div +1 ],\
-                             verts[z + y*z_div + (x+1)*z_div*y_div + 1 ],\
-                             verts[z + y*z_div + (x+1)*z_div*y_div + z_div +1],\
-                             verts[z + y*z_div + x*z_div*y_div + z_div + 1]]
-                 cube, status = mesh.createEnt(iMesh.Topology.hexahedron, vert_set)
+                vert_set = [verts[z + y*z_div + x*z_div*y_div],\
+                            verts[z + y*z_div + (x+1)*z_div*y_div],\
+                            verts[z + y*z_div + (x+1)*z_div*y_div + z_div],\
+                            verts[z + y*z_div + x*z_div*y_div + z_div],\
+                            verts[z + y*z_div + x*z_div*y_div +1 ],\
+                            verts[z + y*z_div + (x+1)*z_div*y_div + 1 ],\
+                            verts[z + y*z_div + (x+1)*z_div*y_div + z_div +1],\
+                            verts[z + y*z_div + x*z_div*y_div + z_div + 1]]
+                cube, status = mesh.createEnt(iMesh.Topology.hexahedron, vert_set)
     mesh.save(mesh_name)                            
  
 if __name__=='__main__':
 
     parser = OptionParser()
-    parser.add_option('-b', action='store_true', dest='backward_bool', default=False, help='Print to ALARA fluxin in fluxes in decreasing energy')
-    parser.add_option('-o', dest='fluxin_name', default='ALARAflux.in', help='Name of ALARA fluxin output file')
-    parser.add_option('-m',  dest='mesh_input', default= 'False', help = 'Tag meshes onto user preexisting mesh, supply file name')
-    parser.add_option('-p', dest='mesh_output', default='mesh.vtk', help = 'Name of mesh output file')
-    parser.add_option('-s', action='store_true', dest='supress_mesh', default='False', help='Supress creation of mesh file, only fluxin file is created')
+
+    parser.add_option('-b', action='store_true', dest='backward_bool',\
+        default=False, help='Print to ALARA fluxin in fluxes in \
+        decreasing energy')\
+
+    parser.add_option('-o', dest='fluxin_name', default='ALARAflux.in',\
+        help='Name of ALARA fluxin output file')
+
+    parser.add_option('-m',  dest='mesh_input', default= 'False',\
+        help = 'Tag meshes onto user preexisting mesh, supply file name')
+
+    parser.add_option('-p', dest='mesh_output', default='mesh.vtk',\
+        help = 'Name of mesh output file')
+
+    parser.add_option('-s', action='store_true', dest='supress_mesh',\
+        default='False', help='Supress creation of mesh file, only fluxin\
+        file is created')
+
     (opts, args) = parser.parse_args()
 
     meshtal_type=find_meshtal_type(args[0])
     m=find_first_line(args[0])
     array, totals_bool=meshtal_to_array(args[0],m)    
     j=count_mesh_points(array)
+
     if totals_bool== False :
-        array=calc_totals(array, j)    
+        array=calc_totals(array, j)
+    
     k=count_energy_bins(array,j)
     l=count_data_points(array)
     x,y,z=count_delinations(array)
