@@ -7,6 +7,7 @@
 from itaps import iBase,iMesh
 from optparse import OptionParser
 from numpy import ones
+import operator
 
 def parser():
     parser = OptionParser(usage="usage: %prog <in> [options]")
@@ -44,54 +45,52 @@ def moab2alara(mesh, filename, numround):
     nummats=len(matID)
     count=0
     list1 = list(ones(len(voxels)))
-    for i in range(len(voxels)) :
-        zonemats=list(fracs[voxels][i])
+
+    def create_mixture_tuple( v ):
+        return tuple( [ round(x, int(numround)) for x in fracs[v]] )
+
+    # unique_mixtures maps mixture tuples (see below) to lists of hex handles
+    # that participate in those mixtures.  However, the first item in each list
+    # is a unique id for that mixture.  Thus:
+    # unique_mixture[ (mixture_tuple) ] = [ ID, handle, handle, ... ]
+    unique_mixtures = dict()
+    for v in voxels :
+        
+        zonemats=list(fracs[v])
+        # if material 1 (void) is not 1.0
         if round(zonemats[0],1) != 1.0 :
-            zonemats_i=map(lambda x: round(x ,int(numround)), list(fracs[voxels][i]))
-            for k in range(len(voxels)) :
-                zonemats_k=map(lambda x: round(x ,int(numround)), list(fracs[voxels][k]))
-                
-                if (zonemats_i == zonemats_k):
-                    if (list1[k] == 1) :
-                        mixname='mixture'+'\t'+'mix_'+str(k)+'\n'
-                        filename.write(mixname)
-                        count = count + 1
-                        list1[k] = 2;
-                        for j in range(1,nummats): # start from [1] because [0] is void fraction
-                           if zonemats[j] != 0 :
-                                mixdef='\tmaterial\t'+'mat_'+str(matID[j])+'\t'+\
-                                str(1)+'\t'+str(round(zonemats[j],int(numround)))+'\n'
-                                filename.write(mixdef)
-                           else :
+            zonemats_i = create_mixture_tuple( v )
+            if zonemats_i not in unique_mixtures:
+                unique_mixtures[zonemats_i] = [len(unique_mixtures),v] 
+            else:
+                unique_mixtures[zonemats_i].append(v)
 
-                               continue
-                        filename.write('end\n\n')
-                        break;
+    for mixture, voxel_members in sorted( unique_mixtures.iteritems(), 
+                                   key = operator.itemgetter(1,0) ):
+        # voxels[0] is a unique mixture ID
+        filename.write('mixture\tmix_{0}\n'.format(voxel_members[0])) 
+        for idx, m in enumerate(mixture[1:]):
+            if m == 0: continue
+            mixdef = ('\tmaterial\t'+'mat_'+str(matID[idx+1])+'\t'+
+                       str(1)+'\t'+str(round(m,int(numround)))+'\n')
+            filename.write(mixdef) 
+        filename.write('end\n\n')
 
-                    break;
-
-        else :
-            continue
-    print str(count)+' mixtures defined'
+    count = len(unique_mixtures)
+    print count, 'mixtures defined'
 
   # Write ALARA mat_loading card to file
     filename.write('mat_loading\n')
-#    list1 = list(ones(len(voxels)))
-    for i in range(len(voxels)) :
-         zonemats=list(fracs[voxels][i])
-         if round(zonemats[0],1) == 1.0:
-             matname='\t'+'zone_'+str(i)+'\t'+'void'+'\n'
-             filename.write(matname)  
-         else :
-             filename.write('\t'+'zone_'+str(i))
-             zonemats_i=map(lambda x: round(x ,int(numround)), list(fracs[voxels][i]))
-             for k in range(len(voxels)) :
-                zonemats_k=map(lambda x: round(x ,int(numround)), list(fracs[voxels][k]))
-                
-                if (zonemats_i == zonemats_k):
-                    mixname='\t'+'mix_'+str(k)+'\n'
-                    filename.write(mixname)
-                    break;
+    for idx, v in enumerate(voxels):
+        zonemats=list(fracs[v])
+        # if material 1 (void) is 1.0
+        if round(zonemats[0],1) == 1.0 :
+            filename.write('\tzone_{0}\tvoid\n'.format( idx ))
+        else:
+            zonemats_i =  create_mixture_tuple( v )
+            mat_voxel_list = unique_mixtures[ zonemats_i ]
+            mat_id = mat_voxel_list[0]
+            filename.write('\tzone_{0}\tmix_{1}\n'.format(idx,mat_id))
                                    
     filename.write('end\n\n')   
     filename.close()
