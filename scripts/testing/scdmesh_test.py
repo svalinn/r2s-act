@@ -74,40 +74,43 @@ class ScdMeshIterateTest(unittest.TestCase):
 
     def test_bad_iterates(self):
 
-        self.assertRaises( ScdMeshError,  self.sm.iterateHex('abc').next )
-        self.assertRaises( TypeError,  self.sm.iterateHex(12).next )
-        self.assertRaises( ScdMeshError,  self.sm.iterateHex('xxyz').next )
-        self.assertRaises( ScdMeshError,  self.sm.iterateHex('yyx').next )
-
+        self.assertRaises( ScdMeshError,  self.sm.iterateHex, 'abc' )
+        self.assertRaises( TypeError,  self.sm.iterateHex, 12 )
+        self.assertRaises( ScdMeshError,  self.sm.iterateHex, 'xxyz' )
+        self.assertRaises( ScdMeshError,  self.sm.iterateHex, 'yyx' )
+        self.assertRaises( ScdMeshError,  self.sm.iterateHex, 'xyz',z=[0,1,2] )
 
     def test_iterate_3d(self):
         
-        izip = itertools.izip
+        # use izip_longest in the lockstep iterations below; this will catch any
+        # situations where one iterator turns out to be longer than expected.
+        izip = itertools.izip_longest
+
         it = self.sm.scdset.iterate( iBase.Type.region, 
                                      iMesh.Topology.hexahedron )
 
-        print "testing xyz"
+        print "testing zyx"
 
-        # Test the xyz order, which is default; it should be equivalent
+        # Test the zyx order, which is default; it should be equivalent
         # to the standard imesh iterator
         for it_x, sm_x in izip( it, self.sm.iterateHex() ):
             self.assertEqual( it_x, sm_x )
 
-        print "testing zyx"
+        print "testing xyz"
 
         all_indices_zyx = itertools.product( self.I, self.J, self.K )
-        # Test the zyx order, the default from original mmGridGen
+        # Test the xyz order, the default from original mmGridGen
         for ijk_index, sm_x in izip( all_indices_zyx, 
-                                     self.sm.iterateHex('zyx') ):
+                                     self.sm.iterateHex('xyz') ):
             self.assertEqual( self.sm.getHex(*ijk_index), sm_x )
 
         def tuple_sort( collection, indices ):
             # sorting function for order test
             def t( tup ):
                 # sort this 3-tuple according to the order of x, y, and z in indices
-                return ( tup['xyz'.find(indices[2])]*100 +
+                return ( tup['xyz'.find(indices[0])]*100 +
                          tup['xyz'.find(indices[1])]*10 +
-                         tup['xyz'.find(indices[0])] )
+                         tup['xyz'.find(indices[2])] )
             return sorted( collection, key = t )
 
         def test_order( order, *args,  **kw ):
@@ -122,12 +125,50 @@ class ScdMeshIterateTest(unittest.TestCase):
         test_order( 'xzy', self.I, self.J, self.K )
         test_order( 'zxy', self.I, self.J, self.K )
 
+        # Specify z=[1] to iterator
         test_order( 'xyz', self.I, self.J, [1], z=[1] )
+        # Specify y=2 to iterator
         test_order( 'zyx', self.I, [2], self.K, y=2 )
+        # specify x and y both to iterator
         test_order( 'yzx', [1,2,3],self.J[:-1], self.K, y=self.J[:-1], x=[1,2,3] )
 
     def test_iterate_2d(self):
-        pass
+        def test_order( iter1, iter2 ):
+            for i1, i2 in itertools.izip_longest( iter1, iter2 ):
+                self.assertEqual( i1, i2 )
+
+        test_order( self.sm.iterateHex('yx'), self.sm.iterateHex('zyx', z=[0] ) )
+        test_order( self.sm.iterateHex('yx',z=1), self.sm.iterateHex('zyx',z=[1]) )
+        test_order( self.sm.iterateHex('yx',z=1), self.sm.iterateHex('yzx',z=[1]) )
+        test_order( self.sm.iterateHex('zy',x=[3]), self.sm.iterateHex('zxy',x=3) )
+
+        # Cannot iterate over multiple z's without specifing z order
+        self.assertRaises( ScdMeshError, self.sm.iterateHex, 'yx', z=[0,1] )
 
     def test_iterate_1d(self):
-        pass
+        
+        def test_equal( ijk_list, miter ):
+            for ijk, i in itertools.izip_longest( ijk_list, miter ):
+                self.assertEqual( self.sm.getHex(*ijk), i )
+
+        test_equal( [[0,0,0],[0,0,1]], 
+                    self.sm.iterateHex('z') )
+
+        test_equal( [[0,1,1],[0,2,1]],
+                    self.sm.iterateHex('y', y=[1,2], z=1) )
+
+        test_equal( [[2,0,0],[2,1,0],[2,2,0]],
+                    self.sm.iterateHex('y', x=2) ) 
+        test_equal( [[0,0,0],[1,0,0],[2,0,0]], 
+            self.sm.iterateHex('x', x=[0,1,2]) )
+
+    def test_large_iterator(self):
+        return 
+        print "building large mesh"
+        big = ScdMesh(iMesh.Mesh(), range(1,100), range(101,200), range(201,300))
+        print "iterating (1)"
+        for i in big.iterateHex():
+            pass
+        print "iterating (2)"
+        for i in big.iterateHex( 'yzx' ):
+            pass

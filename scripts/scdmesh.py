@@ -116,7 +116,47 @@ class ScdMesh:
         n = ScdMesh._dimConvert(self.dims, (i, j, k))
         return ScdMesh._stepIter(self.hexit, n)
 
-    def iterateHex(self, order='xyz', **kw):
+    def iterateHex(self, order='zyx', **kw):
+        """Get an iterator over the hexahedra of the mesh
+
+        The order argument specifies the iteration order.  It must be a string
+        of 1-3 letters from the set (x,y,z).  The rightmost letter is the axis
+        along which the iteration will advance the most quickly.  Thus 'zyx' --
+        x coordinates changing fastest, z coordinates changing least fast-- is
+        the default, and is identical to the order that would be given by the
+        scdset.iterate() function.
+
+        When a dimension is absent from the order, iteration will proceed over
+        only the column in the mesh that has the lowest corresonding (i/j/k)
+        coordinate.  Thus, with order 'xy,' iteration proceeds over the i/j
+        plane of the structured mesh with the smallest k coordinate.
+
+        Specific slices can be specified with keyword arguments:
+
+        Keyword args:
+          x: specify one or more i-coordinates to iterate over.
+          y: specify one or more j-coordinates to iterate over.
+          z: specify one or more k-coordinates to iterate over.
+
+        Examples:
+          iterateHex(): equivalent to iMesh iterator over hexes in mesh
+          iterateHex( 'xyz' ): iterate over entire mesh, with k-coordinates
+                               changing fastest, i-coordinates least fast.
+          iterateHex( 'yz', x=3 ): Iterate over the j-k plane of the mesh
+                                   whose i-coordinate is 3, with k values
+                                   changing fastest.
+          iterateHex( 'z' ): Iterate over k-coordinates, with i=dims.imin
+                             and j=dims.jmin
+          iterateHex( 'yxz', y=(3,4) ): Iterate over all hexes with
+                                        j-coordinate = 3 or 4.  k-coordinate
+                                        values change fastest, j-values least
+                                        fast.
+
+        Performance:
+          This function is currently very slow for large meshes, except when
+          order=zyx and  no kwargs are specified.  Improving performance
+          is an active area of development.
+        """
 
         # a valid order has the letters 'x', 'y', and 'z'
         # in any order without duplicates
@@ -125,29 +165,47 @@ class ScdMesh:
                 all([a in 'xyz' for a in order])):
             raise ScdMeshError('Invalid iteration order: ' + str(order))
 
-        # special case: xyz order is the standard pytaps iteration order,
+        # special case: zyx order is the standard pytaps iteration order,
         # so we can save time by simply returning a pytaps iterator
-        # FIXME: can't use this unless kw are emptyh
-        #if order == 'xyz':
-        #    self.scdset.iterate(iBase.Type.region, iMesh.Topology.hexahedron)
-        #    return
+        # if no kwargs were specified
+        if order == 'zyx' and not kw:
+            return self.scdset.iterate(iBase.Type.region, iMesh.Topology.hexahedron)
+
+        # process kw
+        spec = {}
+        for idx, d in enumerate('xyz'):
+            if d in kw:
+                spec[d] = kw[d]
+                if isinstance(spec[d], int):
+                    spec[d] = [spec[d]]
+                if not all(x in range(self.dims[idx], self.dims[idx+3])
+                           for x in spec[d]):
+                    raise ScdMeshError('Invalid iterator kwarg: ' + str(spec[d]))
+                if d not in order and len(spec[d]) > 1:
+                    raise ScdMeshError('Cannot iterate over' + str(spec[d]) +
+                                       'without a proper iteration order')
+            if d not in order:
+                order = d+order
+                spec[d] = spec.get(d, [self.dims[idx]])
 
         indices = []
         for L in order:
             idx = 'xyz'.find(L)
-            indices.append(kw.get(L, range(self.dims[idx], self.dims[idx+3])))
-            if isinstance( indices[-1], int ):
-                indices[-1] = [indices[-1]]
-
-        print indices
-        indices[0], indices[2] = indices[2], indices[0]
+            indices.append(spec.get(L, xrange(self.dims[idx], self.dims[idx+3])))
 
         items = itertools.product(*(indices))
-
         ordmap = [order.find(L) for L in 'xyz']
 
-        for i in items:
-            i = list(i)
-            i[0], i[2] = i[2], i[0]
-            item = [i[x] for x in ordmap]
-            yield self.getHex(*item)
+        def it(items, ordmap):
+            dy = (self.dims[3]-self.dims[0])
+            dz = (self.dims[4]-self.dims[1]) * dy
+            it = self.hexit
+            for i in items:
+                #n = sum( d*x for d,x in zip( (dz,dy,1), [i[f] for f in ordmap] ) )
+                n = dz*i[ordmap[2]] + dy*i[ordmap[1]] + i[ordmap[0]]
+                it.step(n)
+                r = it.next()[0]
+                it.reset()
+                yield r
+
+        return it(items, ordmap)
