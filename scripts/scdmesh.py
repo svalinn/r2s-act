@@ -1,5 +1,5 @@
 import itertools
-from collections import namedtuple
+from collections import namedtuple, Iterable
 
 from itaps import iBase, iMesh, iMeshExtensions
 
@@ -79,42 +79,15 @@ class ScdMesh:
         m = ScdMesh(mesh, None, None, None, _scdset=eset)
         return m
 
-    @staticmethod
-    def _dimConvert(dims, ijk):
-        """Helper method fo getVtx and getHex
-
-        For tuple (i,j,k), return the number N in the appropriate iterator.
-        """
-        dim0 = [0] * 3
-        for i in xrange(0, 3):
-            if (dims[i] > ijk[i] or dims[i + 3] <= ijk[i]):
-                raise ScdMeshError(str(ijk) + ' is out of bounds')
-            dim0[i] = ijk[i] - dims[i]
-        i0, j0, k0 = dim0
-        n = (((dims[4] - dims[1]) * (dims[3] - dims[0]) * k0) +
-             ((dims[3] - dims[0]) * j0) +
-             i0)
-        return n
-
-    @staticmethod
-    def _stepIter(it, n):
-        """Helper method for getVtx and getHex
-
-        Return the nth item in the iterator"""
-        it.step(n)
-        r = it.next()[0]
-        it.reset()
-        return r
-
     def getVtx(self, i, j, k):
         """Return the (i,j,k)'th vertex in the mesh"""
-        n = ScdMesh._dimConvert(self.vdims, (i, j, k))
-        return ScdMesh._stepIter(self.vtxit, n)
+        n = _dimConvert(self.vdims, (i, j, k))
+        return _stepIter(self.vtxit, n)
 
     def getHex(self, i, j, k):
         """Return the (i,j,k)'th hexahedron in the mesh"""
-        n = ScdMesh._dimConvert(self.dims, (i, j, k))
-        return ScdMesh._stepIter(self.hexit, n)
+        n = _dimConvert(self.dims, (i, j, k))
+        return _stepIter(self.hexit, n)
 
     def iterateHex(self, order='zyx', **kw):
         """Get an iterator over the hexahedra of the mesh
@@ -151,61 +124,107 @@ class ScdMesh:
                                         j-coordinate = 3 or 4.  k-coordinate
                                         values change fastest, j-values least
                                         fast.
-
-        Performance:
-          This function is currently very slow for large meshes, except when
-          order=zyx and  no kwargs are specified.  Improving performance
-          is an active area of development.
         """
-
-        # a valid order has the letters 'x', 'y', and 'z'
-        # in any order without duplicates
-        if not (len(order) <= 3 and
-                len(set(order)) == len(order) and
-                all([a in 'xyz' for a in order])):
-            raise ScdMeshError('Invalid iteration order: ' + str(order))
 
         # special case: zyx order is the standard pytaps iteration order,
         # so we can save time by simply returning a pytaps iterator
         # if no kwargs were specified
         if order == 'zyx' and not kw:
-            return self.scdset.iterate(iBase.Type.region, iMesh.Topology.hexahedron)
+            return self.scdset.iterate(iBase.Type.region,
+                                       iMesh.Topology.hexahedron)
 
-        # process kw
-        spec = {}
-        for idx, d in enumerate('xyz'):
-            if d in kw:
-                spec[d] = kw[d]
-                if isinstance(spec[d], int):
-                    spec[d] = [spec[d]]
-                if not all(x in range(self.dims[idx], self.dims[idx+3])
-                           for x in spec[d]):
-                    raise ScdMeshError('Invalid iterator kwarg: ' + str(spec[d]))
-                if d not in order and len(spec[d]) > 1:
-                    raise ScdMeshError('Cannot iterate over' + str(spec[d]) +
-                                       'without a proper iteration order')
-            if d not in order:
-                order = d+order
-                spec[d] = spec.get(d, [self.dims[idx]])
+        indices, ordmap = _scdIterSetup(self.dims, order, **kw)
+        return _scdIter(indices, ordmap, self.dims, self.hexit)
 
-        indices = []
-        for L in order:
-            idx = 'xyz'.find(L)
-            indices.append(spec.get(L, xrange(self.dims[idx], self.dims[idx+3])))
+    def iterateVtx(self, order='zyx', **kw):
+        """Get an iterator over the vertices of the mesh
 
-        items = itertools.product(*(indices))
-        ordmap = [order.find(L) for L in 'xyz']
+        See iterateHex() for an explanation of the order argument and the
+        available keyword arguments.
+        """
 
-        def it(items, ordmap):
-            dy = (self.dims[3]-self.dims[0])
-            dz = (self.dims[4]-self.dims[1]) * dy
-            it = self.hexit
-            for i in items:
-                #n = sum( d*x for d,x in zip( (dz,dy,1), [i[f] for f in ordmap] ) )
-                n = dz*i[ordmap[2]] + dy*i[ordmap[1]] + i[ordmap[0]]
-                it.step(n)
-                r = it.next()[0]
-                it.reset()
-                yield r
+        #special case: zyx order without kw is equivalent to pytaps iterator
+        if order == 'zyx' and not kw:
+            return self.scdset.iterate(iBase.Type.vertex, iMesh.Topology.point)
 
-        return it(items, ordmap)
+        indices, ordmap = _scdIterSetup(self.vdims, order, **kw)
+        return _scdIter(indices, ordmap, self.vdims, self.vtxit)
+
+
+def _dimConvert(dims, ijk):
+    """Helper method fo getVtx and getHex
+
+    For tuple (i,j,k), return the number N in the appropriate iterator.
+    """
+    dim0 = [0] * 3
+    for i in xrange(0, 3):
+        if (dims[i] > ijk[i] or dims[i + 3] <= ijk[i]):
+            raise ScdMeshError(str(ijk) + ' is out of bounds')
+        dim0[i] = ijk[i] - dims[i]
+    i0, j0, k0 = dim0
+    n = (((dims[4] - dims[1]) * (dims[3] - dims[0]) * k0) +
+         ((dims[3] - dims[0]) * j0) +
+         i0)
+    return n
+
+
+def _stepIter(it, n):
+    """Helper method for getVtx and getHex
+
+    Return the nth item in the iterator"""
+    it.step(n)
+    r = it.next()[0]
+    it.reset()
+    return r
+
+
+def _scdIterSetup(dims, order, **kw):
+    """Setup helper function for ScdMesh iterator functions
+
+    Given dims and the arguments to the iterator function, return
+    a list of three lists, each being a set of desired coordinates,
+    with fastest-changing coordinate in the last column),
+    and the ordmap used by _scdIter to reorder each coodinate to (i,j,k)
+    """
+    # a valid order has the letters 'x', 'y', and 'z'
+    # in any order without duplicates
+    if not (len(order) <= 3 and
+            len(set(order)) == len(order) and
+            all([a in 'xyz' for a in order])):
+        raise ScdMeshError('Invalid iteration order: ' + str(order))
+
+    # process kw
+    spec = {}
+    for idx, d in enumerate('xyz'):
+        if d in kw:
+            spec[d] = kw[d]
+            if not isinstance(spec[d], Iterable ):
+                spec[d] = [spec[d]]
+            if not all(x in range(dims[idx], dims[idx + 3])
+                       for x in spec[d]):
+                raise ScdMeshError('Invalid iterator kwarg: ' + str(spec[d]))
+            if d not in order and len(spec[d]) > 1:
+                raise ScdMeshError('Cannot iterate over' + str(spec[d]) +
+                                   'without a proper iteration order')
+        if d not in order:
+            order = d + order
+            spec[d] = spec.get(d, [dims[idx]])
+
+    indices = []
+    for L in order:
+        idx = 'xyz'.find(L)
+        indices.append(spec.get(L, xrange(dims[idx], dims[idx + 3])))
+
+    ordmap = ['zyx'.find(L) for L in order]
+    return indices, ordmap
+
+
+def _scdIter(indices, ordmap, dims, it):
+    """Iterate over the indices lists, yielding _stepIter(it) for each"""
+    d = [0, 0, 1]
+    d[1] = (dims[3] - dims[0])
+    d[0] = (dims[4] - dims[1]) * d[1]
+    offsets = ([a * d[ordmap[x]] for a in indices[x]]
+               for x in range(3))
+    for ioff, joff, koff in itertools.product(*offsets):
+        yield _stepIter(it, (ioff + joff + koff))

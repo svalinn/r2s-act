@@ -162,8 +162,36 @@ class ScdMeshIterateTest(unittest.TestCase):
         test_equal( [[0,0,0],[1,0,0],[2,0,0]], 
             self.sm.iterateHex('x', x=[0,1,2]) )
 
+    def test_vtx_iterator(self):
+        
+        #use vanilla izip as we'll test using non-equal-length iterators
+        izip = itertools.izip
+
+        sm = self.sm
+        it = sm.scdset.iterate(iBase.Type.vertex, iMesh.Topology.point)
+        
+        for (it_x, sm_x) in izip( it, sm.iterateVtx('zyx') ):
+            self.assertEqual(it_x,sm_x)
+
+        it.reset()
+
+        for (it_x, sm_x) in izip( it, sm.iterateVtx('yx',z=sm.dims[2])):
+            self.assertEqual(it_x,sm_x)
+
+        it.reset()
+
+        for (it_x, sm_x) in izip( it, sm.iterateVtx('x')):
+            self.assertEqual(it_x,sm_x)
+
+    
+class ScdPerf(unittest.TestCase):
+
+    # Give this class the perf attribute; this slow test may be selected
+    # using nosetests -a '!perf'
+    perf = True
+
     def test_large_iterator(self):
-        return 
+
         print "building large mesh"
         big = ScdMesh(iMesh.Mesh(), range(1,100), range(101,200), range(201,300))
         print "iterating (1)"
