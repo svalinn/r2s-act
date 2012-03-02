@@ -32,7 +32,7 @@ class ScdMesh:
             self.scdset = kw['_scdset']
         else:
             extents = [0, 0, 0]
-            extents.extend([len(x) for x in [x_points, y_points, z_points]])
+            extents.extend([len(x)-1 for x in [x_points, y_points, z_points]])
             self.scdset = mesh.createStructuredMesh(
                     extents, i=x_points, j=y_points, k=z_points,
                     create_set=True)
@@ -150,6 +150,19 @@ class ScdMesh:
         indices, ordmap = _scdIterSetup(self.vdims, order, **kw)
         return _scdIter(indices, ordmap, self.vdims, self.vtxit)
 
+    def getDivisions(self, dim):
+        """Get the mesh divisions on a given dimension
+
+        Given a dimension 'x', 'y', or 'z', return a list of the mesh vertices
+        along that dimension
+        """
+        if len(dim) == 1 and dim in 'xyz':
+            idx = 'xyz'.find(dim)
+            return [self.mesh.getVtxCoords(i)[idx]
+                    for i in self.iterateVtx(dim)]
+        else:
+            raise ScdMeshError('Invalid dimension: '+str(dim))
+
 
 def _dimConvert(dims, ijk):
     """Helper method fo getVtx and getHex
@@ -198,7 +211,7 @@ def _scdIterSetup(dims, order, **kw):
     for idx, d in enumerate('xyz'):
         if d in kw:
             spec[d] = kw[d]
-            if not isinstance(spec[d], Iterable ):
+            if not isinstance(spec[d], Iterable):
                 spec[d] = [spec[d]]
             if not all(x in range(dims[idx], dims[idx + 3])
                        for x in spec[d]):

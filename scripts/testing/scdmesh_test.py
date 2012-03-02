@@ -15,7 +15,7 @@ class ScdMeshTest(unittest.TestCase):
 
     def test_create(self):
         sm = ScdMesh( self.mesh, range(1,5), range(1,4), range(1,3) )
-        self.assertEqual( sm.dims, (0,0,0,4,3,2) )
+        self.assertEqual( sm.dims, (0,0,0,3,2,1) )
 
     def test_create_by_set(self):
         a =  self.mesh.createStructuredMesh( [0,0,0,1,1,1], 
@@ -31,7 +31,7 @@ class ScdMeshTest(unittest.TestCase):
 
     def test_get_hex(self):
         # mesh with valid i values 0-4, j values 0-3, k values 0-2
-        sm = ScdMesh( self.mesh, range(11,15), range(21,24), range(31,33) )
+        sm = ScdMesh( self.mesh, range(11,16), range(21,25), range(31,34) )
         def check( e ):
             self.assertTrue( isinstance(e, iBase.Entity) )
         check(sm.getHex(0, 0, 0))
@@ -59,14 +59,24 @@ class ScdMeshTest(unittest.TestCase):
                     vcoord = self.mesh.getVtxCoords( vtx )
                     self.assertTrue( all( vcoord == [x,y,z]) )
 
+    def test_get_divs(self):
+        x = [1, 2.5, 4, 6.9]
+        y = [-12, -10, -.5]
+        z = [100, 200]
+
+        sm = ScdMesh( self.mesh, x, y, z )
+
+        self.assertEqual( sm.getDivisions('x'), x )
+        self.assertEqual( sm.getDivisions('y'), y )
+        self.assertEqual( sm.getDivisions('z'), z )
 
 class ScdMeshIterateTest(unittest.TestCase):
 
     def setUp(self):
         self.mesh = iMesh.Mesh()
-        self.sm = ScdMesh( self.mesh, range(10,14), # i = 0,1,2,3
-                                      range(21,24), # j = 0,1,2
-                                      range(31,33)) # k = 0,1
+        self.sm = ScdMesh( self.mesh, range(10,15), # i = 0,1,2,3
+                                      range(21,25), # j = 0,1,2
+                                      range(31,34)) # k = 0,1
 
         self.I = range(0,4)
         self.J = range(0,3)
@@ -169,17 +179,21 @@ class ScdMeshIterateTest(unittest.TestCase):
 
         sm = self.sm
         it = sm.scdset.iterate(iBase.Type.vertex, iMesh.Topology.point)
-        
-        for (it_x, sm_x) in izip( it, sm.iterateVtx('zyx') ):
+
+        # test the default order
+        for (it_x, sm_x) in itertools.izip_longest( it, sm.iterateVtx('zyx') ):
+            self.assertEqual(it_x,sm_x)
+
+        # Do the same again, but use an arbitrary kwarg to iterateVtx to prevent optimization from kicking in
+        it.reset()
+        for (it_x, sm_x) in itertools.izip_longest( it, sm.iterateVtx('zyx', no_opt=True) ):
             self.assertEqual(it_x,sm_x)
 
         it.reset()
-
         for (it_x, sm_x) in izip( it, sm.iterateVtx('yx',z=sm.dims[2])):
             self.assertEqual(it_x,sm_x)
 
         it.reset()
-
         for (it_x, sm_x) in izip( it, sm.iterateVtx('x')):
             self.assertEqual(it_x,sm_x)
 
