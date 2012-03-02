@@ -56,14 +56,16 @@ class ScdMesh:
         """
         retlist = []
         mesh.rootSet.load(filename)
-        bdtag = mesh.getTagHandle('BOX_DIMS')
         for eset in mesh.rootSet.getEntSets():
             try:
+                bdtag = mesh.getTagHandle('BOX_DIMS')
                 bdtag[eset]
                 retlist.append(ScdMesh(mesh, None, None, None,
                                        _scdset=eset, bdtag=bdtag))
             except iBase.TagNotFoundError:
                 pass
+        if not retlist:
+            raise ScdMeshError('Found no structured meshes in file '+filename)
         if len(retlist) == 1:
             return retlist[0]
         else:
