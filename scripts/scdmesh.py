@@ -43,9 +43,9 @@ class ScdMesh:
         # Our access iterators must have size=2 for now, until iMesh non-array
         # iterators receive support for the stepIter function
         self.hexit = self.scdset.iterate(iBase.Type.region,
-                                         iMesh.Topology.hexahedron, size=2)
+                                         iMesh.Topology.hexahedron)
         self.vtxit = self.scdset.iterate(iBase.Type.vertex,
-                                         iMesh.Topology.point, size=2)
+                                         iMesh.Topology.point)
 
     @classmethod
     def fromFile(cls, mesh, filename):
@@ -188,7 +188,7 @@ def _stepIter(it, n):
 
     Return the nth item in the iterator"""
     it.step(n)
-    r = it.next()[0]
+    r = it.next()
     it.reset()
     return r
 
