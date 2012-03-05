@@ -268,7 +268,7 @@ class PhtnSrcReader(object):
         # SI card
         cards.extend(["c si995 - These are the mesh center coords"])
         card = ["si995 L"] # 
-        card.extend([str(x) for x in range(1,nmesh+1)])
+        card.extend( [ str(x) for x in xrange(1,nmesh+1) ] )
         card = " ".join(card)
         cards.extend(mcnpWrap.wrap(card))
 
@@ -315,7 +315,7 @@ class PhtnSrcReader(object):
         # create dependent distribution for energy sampling
         cards.extend(["c ds999 - These are the sp/si numbers"])
         card = ["ds999 S"]
-        card.extend([str(i) for i in range(1,nmesh+1)])
+        card.extend( [ str(i) for i in xrange(1,nmesh+1) ] )
         card = " ".join(card)
         cards.extend(mcnpWrap.wrap(card))
 
@@ -350,9 +350,9 @@ class PhtnSrcReader(object):
             
         # create transform (TR) cards, 1 for each mesh cell.
         cnt = 0
-        for x in range(meshform[0][2]):
-            for y in range(meshform[1][2]):
-                for z in range(meshform[2][2]):
+        for x in xrange(meshform[0][2]):
+            for y in xrange(meshform[1][2]):
+                for z in xrange(meshform[2][2]):
                     cnt += 1
                     cards.append(" ".join( \
                             ["tr"+str(cnt), \
@@ -586,7 +586,7 @@ class PhtnSrcReader(object):
 
         # We now go through all photon energy groups and add the individual bins
         #  to get the total source strength in each voxel
-        for i in range(2,1000): #~ Arbitrary: we look for up to 1000 groups
+        for i in xrange(2,1000): #~ Arbitrary: we look for up to 1000 groups
             try:
                 group = mesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
                 for cnt, vox in enumerate(voxels):
@@ -627,7 +627,7 @@ class PhtnSrcReader(object):
         for voxel in voxels:
             writestring = ""
             binval = 0.0
-            for i in range(1, numergbins + 1):
+            for i in xrange(1, numergbins + 1):
                 binval += float(mesh.getTagHandle( \
                         "phtn_src_group_{0:03d}".format(i))[voxel])
                 writestring += "{0:<12.5E}".format(binval/norm)
@@ -658,24 +658,24 @@ class PhtnSrcReader(object):
         
         # create and write x mesh edges line (2nd line)
         coords = [meshform[0][0]]
-        for cnt in range(1, meshform[0][2]+1):
+        for cnt in xrange(1, meshform[0][2]+1):
             coords.append(meshform[0][0]+cnt*xval)
         fw.write(" ".join([str(x) for x in coords]) + "\n")
         
         # create and write y mesh edges line (3rd line)
         coords = [meshform[1][0]]
-        for cnt in range(1, meshform[1][2]+1):
+        for cnt in xrange(1, meshform[1][2]+1):
             coords.append(meshform[1][0]+cnt*yval)
         fw.write(" ".join([str(x) for x in coords]) + "\n")
         
         # create and write z mesh edges line (4th line)
         coords = [meshform[2][0]]
-        for cnt in range(1, meshform[2][2]+1):
+        for cnt in xrange(1, meshform[2][2]+1):
             coords.append(meshform[2][0]+cnt*zval)
         fw.write(" ".join([str(x) for x in coords]) + "\n")
 
         # create and write 5th line (list of activated materials... ?????)
-        fw.write(" ".join([str(x) for x in range(1,101)]) + "\n")
+        fw.write(" ".join([str(x) for x in xrange(1,101)]) + "\n")
 
         # If storing the energy bins information, write line 6
         if ergbins != "":
@@ -770,7 +770,7 @@ class PhtnSrcReader(object):
         # Because this list can be quite large, we will do this element-by-element.
         
         # for grp, prob in enumerate(self.meshprobs[0]):
-        for grp in range( len(self.meshprobs[0]) ):
+        for grp in xrange( len(self.meshprobs[0]) ):
             try:
                 tag = mesh.createTag( \
                         "phtn_src_group_{0:03d}".format(grp+1), 1, float)

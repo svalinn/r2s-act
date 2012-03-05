@@ -94,7 +94,7 @@ def sample_alias_table(n, pairs):
     npairs = len(pairs)
     
     v = list()
-    for cnt in range(n):
+    for cnt in xrange(n):
         pair = pairs[ int(random.random() * npairs) ]
         if len(pair) == 1:
             v.append(pair[0][1])

@@ -77,7 +77,7 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, retag=False
 
     # We create a list of tag objects to use while parsing phtn_src
     tagList = []
-    for grp in range(len(lineparts) - 2 ): # group tags = parts in the line - 2
+    for grp in xrange(len(lineparts) - 2 ): # group tags = parts in the line - 2
         try:
             # If tags are new to file... create tag
             tagList.append(mesh.createTag("phtn_src_group_{0:03d}".format(grp+1), 1, float))
