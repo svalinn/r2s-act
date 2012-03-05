@@ -1,41 +1,41 @@
 #Setup
 import linecache
 import os
+import unittest
+import itertools
+
 import FluxParse
 
-def test_fluxin():
-    ExpectedFluxin=open('testing/expected_fluxin', 'r')
-    ExpectedFluxinLines=ExpectedFluxin.readlines()
-    os.system('./FluxParse.py testing/test_meshtal 5e13 -o actual_fluxin')
-    ActualFluxin=open('actual_fluxin', 'r')
-    ActualFluxinLines=ActualFluxin.readlines()
-    assert len(ActualFluxinLines) == len(ExpectedFluxinLines)
-    for x in [1, 500, 1000, 1500]:
-        assert ActualFluxinLines[x] == ExpectedFluxinLines[x]
-    os.remove('actual_fluxin')
-    os.remove('mesh.vtk')
+izip = itertools.izip_longest
 
-def test_backwards_fluxes():  
-    ExpectedFluxinBack=open('testing/expected_fluxin_back', 'r')
-    ExpectedFluxinBackLines=ExpectedFluxinBack.readlines()
-    os.system('./FluxParse.py testing/test_meshtal 5e13 -o actual_fluxin_back -b')
-    ActualFluxinBack=open('actual_fluxin_back', 'r')
-    ActualFluxinBackLines=ActualFluxinBack.readlines()
-    assert len(ActualFluxinBackLines) == len(ExpectedFluxinBackLines)
-    for x in [1, 500, 1000, 1500]:
-        assert ActualFluxinBackLines[x] == ExpectedFluxinBackLines[x]
-    os.remove('actual_fluxin_back')   
-    os.remove('mesh.vtk')
+class FluxParseTest( unittest.TestCase ):
 
-def test_vtk():
-    expected_mesh='testing/expected_mesh.vtk'
-    os.system('./FluxParse.py testing/test_meshtal 5e13')
-    actual_mesh='mesh.vtk'
-    for x in [5557,57794 ,67132, 85836, 104061, 150079, 182191]:
-         assert linecache.getline(expected_mesh, x)==\
-                linecache.getline(actual_mesh, x)
-    os.remove('ALARAflux.in')
-    os.remove('mesh.vtk')
+    def test_fluxin(self):
+        ExpectedFluxin=open('testing/expected_fluxin', 'r')
+        FluxParse.main('testing/test_meshtal 5e13 -o actual_fluxin -p mesh.vtk'.split())
+        ActualFluxin=open('actual_fluxin', 'r')
+        for lineno, (i1,i2) in enumerate( izip(ActualFluxin, ExpectedFluxin), 
+                                          start=1 ):
+            self.assertEqual( i1, i2, 'Unequal line number {0}'.format(lineno) )
+        os.remove('actual_fluxin')
+        os.remove('mesh.vtk')
 
-    
-    
+    def test_backwards_fluxes(self):  
+        ExpectedFluxinBack=open('testing/expected_fluxin_back', 'r')
+        FluxParse.main( 'testing/test_meshtal 5e13 -o actual_fluxin_back -b -p mesh.vtk'.split() )
+        ActualFluxinBack=open('actual_fluxin_back', 'r')
+        for lineno, (i1,i2) in enumerate( izip(ActualFluxinBack, ExpectedFluxinBack),
+                                          start=1 ):
+            self.assertEqual( i1, i2, 'Unequal line number {0}'.format(lineno) )
+        os.remove('actual_fluxin_back')   
+        os.remove('mesh.vtk')
+
+    def test_vtk(self):
+        expected_mesh=open('testing/expected_mesh.vtk', 'r')
+        FluxParse.main('testing/test_meshtal 5e13 -p mesh.vtk'.split())
+        actual_mesh=open('mesh.vtk', 'r')
+        for lineno, (i1,i2) in enumerate( izip(actual_mesh, expected_mesh),
+                                          start=1 ):
+            self.assertEqual( i1, i2, 'Unequal line number {0}'.format(lineno) )
+        os.remove('ALARAflux.in')
+        os.remove('mesh.vtk')

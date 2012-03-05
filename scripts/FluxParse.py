@@ -170,7 +170,7 @@ def print_fluxin(array, j, k, norm, output_file, backwardbool):
         output.write(pointoutput + '\n\n')
     print 'ALARA flux input file,', output_file , ', created sucessfully'
 
-def tag_fluxes_preexisting(array, j, k, mestal_type, mesh_input, mesh_output):
+def tag_fluxes_preexisting(array, j, k, meshtal_type, mesh_input, mesh_output):
     if meshtal_type == 'n':
         print 'Tagging user supplied mesh with neutron fluxes'
     if meshtal_type == 'p':
@@ -268,8 +268,8 @@ def create_mesh(a, mesh_name):#a is the name of the boundaries_array
                             verts[z + y*z_div + x*z_div*y_div + z_div + 1]]
                 cube, status = mesh.createEnt(iMesh.Topology.hexahedron, vert_set)
     mesh.save(mesh_name)                            
- 
-if __name__=='__main__':
+
+def main( arguments = None ):
 
     parser = OptionParser()
 
@@ -278,19 +278,19 @@ if __name__=='__main__':
         decreasing energy')\
 
     parser.add_option('-o', dest='fluxin_name', default='ALARAflux.in',\
-        help='Name of ALARA fluxin output file')
+        help='Name of ALARA fluxin output file, default=%default')
 
     parser.add_option('-m',  dest='mesh_input', default= 'False',\
         help = 'Tag meshes onto user preexisting mesh, supply file name')
 
-    parser.add_option('-p', dest='mesh_output', default='mesh.vtk',\
-        help = 'Name of mesh output file')
+    parser.add_option('-p', dest='mesh_output', default='fluxparse_out.h5m',\
+        help = 'Name of mesh output file, default=%default')
 
     parser.add_option('-s', action='store_true', dest='supress_mesh',\
         default='False', help='Supress creation of mesh file, only fluxin\
         file is created')
 
-    (opts, args) = parser.parse_args()
+    (opts, args) = parser.parse_args( arguments )
 
     meshtal_type=find_meshtal_type(args[0])
     m=find_first_line(args[0])
@@ -316,4 +316,5 @@ if __name__=='__main__':
     if opts.mesh_input != 'False':
         tag_fluxes_preexisting(array, j, k, meshtal_type, opts.mesh_input, opts.mesh_output)
 
-
+if __name__ == '__main__':
+    main()
