@@ -252,6 +252,10 @@ class ScdConvertTest(unittest.TestCase):
                                self.mesh.iterate( iBase.Type.region, iMesh.Topology.hexahedron ),
                                sm.iterateHex( 'xyz' )):
                 self.assertTrue( all( t1[e1] == t2[e2] ) )
+        for tname in ["GRID_DIMS","MATS"]: # tags on root set
+            t1 = self.mesh.getTagHandle(tname)
+            t2 = sm.mesh.getTagHandle(tname)
+            self.assertTrue( all(t1[self.mesh.rootSet] == t2[sm.scdset]) )
 
     def test_error(self):
         sm = ScdMesh( iMesh.Mesh(), *([range(5)]*3) )

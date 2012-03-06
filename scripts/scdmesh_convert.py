@@ -27,7 +27,8 @@ def convert_mesh( mesh1, meshset1, mesh2, **kw ):
     a ScdMesh containing them.  Data are copied into the iMesh.Mesh instance mesh2,
     which may be equal to mesh1.
 
-    All tags set on the hexahedra of the input mesh will be duplicated in the output mesh.
+    All tags set on the hexahedra of the input mesh will be duplicated in the output mesh,
+    and all tags on meshset1 will be added to the scdset of the new ScdMesh
 
     Keyword args:
         order: The underlying order of the hexahedra in the input mesh.  This is a string
@@ -64,6 +65,22 @@ def convert_mesh( mesh1, meshset1, mesh2, **kw ):
                                              iMesh.Topology.hexahedron ),
                             sm.iterateHex( kw.get('order','xyz') )):
             t2[e2] = t1[e1]
+
+    settags1 = mesh1.getAllTags( meshset1 )
+    for t in settags1:
+        if mesh1 is not mesh2:
+            # different iMesh instances; create a new tag in mesh2
+            tt = mesh2.createTag(t.name, t.sizeValues, t.type)
+            tt[sm.scdset] = t[meshset1]
+        elif meshset1 == mesh1.rootSet:
+            # mesh1 and mesh2 are the same, but the given set is the root set 
+            # of mesh1, meaning the tag cannot be set on the scdset.  Do nothing,
+            # since the tag remains global.
+            pass
+        else:
+            # mesh1 and mesh2 are the same, and this tag can be validly set on
+            # entity sets, so set it on sm.scdset
+            t[sm.scdset] = t[meshset1]
 
     return sm
 
