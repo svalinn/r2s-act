@@ -19,7 +19,7 @@ import alias
 from scdmesh import ScdMesh, ScdMeshError
 
 
-def gen_gammas_file_from_h5m(inputfile, outfile="gammas"):
+def gen_gammas_file_from_h5m(inputfile, outfile="gammas", do_alias=False):
     """Generate gammas file using information from tags on a MOAB mesh.
     
     ACTION: Method reads tags with photon source strengths from an h5m
@@ -107,16 +107,53 @@ def gen_gammas_file_from_h5m(inputfile, outfile="gammas"):
     except: # if there is no PHTN_BINS tag, then we send an empty string in its place
         myergbins = ""
 
+    # The header of the gammas file is created in outfile, and the file writing
+    #  stream is returned to fw
     fw = _gen_gammas_header(sm, outfile, myergbins)
 
-    for voxel in voxels:
-        writestring = ""
-        binval = 0.0
-        for i in xrange(1, numergbins + 1):
-            binval += float(mesh.getTagHandle( \
-                    "phtn_src_group_{0:03d}".format(i))[voxel])
-            writestring += "{0:<12.5E}".format(binval/norm)
-        fw.write(writestring + "\n")
+    if do_alias:
+        for voxel in voxels:
+            sourcetotal = 0
+            ergproblist = list()
+            # We go through each energy group for the voxel and:
+            # -sum up the total source strength (sourcetotal)
+            # -make a list of bin source strengths and group #s (ergproblist)
+            for i in xrange(1, numergbins + 1):
+                sourcetotal += float(mesh.getTagHandle( \
+                        "phtn_src_group_{0:03d}".format(i))[voxel])
+                ergproblist.append([float(mesh.getTagHandle( \
+                        "phtn_src_group_{0:03d}".format(i))[voxel]), i])
+
+            # Special case if there is no source strength
+            if sourcetotal == 0:
+                fw.write(" ".join(["0"]*(numergbins*3+1)) + "\n")
+                continue
+
+            # Reduce the source strengths to fractional probabilities
+            ergproblist = [ [x[0]/sourcetotal,x[1]] for x in ergproblist ]
+
+            # And generate the alias table
+            aliastable = alias.gen_alias_table(ergproblist)
+
+            # We compactly format the alias table as a bunch of strings.
+            # The following list comprehension uses a format specifying output
+            #  of 12 characters, with 5 values after the decimal point and 
+            #  scientific notation for the probability values, and integer 
+            #  format for the energy group numbers
+            aliasstrings = ["{0:<12.5E} {1} {2}".format(x[0][0],x[0][1],x[1][1]) \
+                    for x in aliastable]
+
+            fw.write(str(sourcetotal/norm) + " " + " ".join(aliasstrings) + "\n")
+
+    else:
+        for voxel in voxels:
+            writestring = ""
+            binval = 0.0
+            for i in xrange(1, numergbins + 1):
+                binval += float(mesh.getTagHandle( \
+                        "phtn_src_group_{0:03d}".format(i))[voxel])
+                writestring += "{0:<12.5E}".format(binval/norm)
+            fw.write(writestring + "\n")
     
     fw.close()
 
@@ -157,95 +194,6 @@ def _gen_gammas_header(scd, outfile, ergbins):
         fw.write(" ".join([str(x) for x in ergbins]) + "\n")
 
     return fw
-
-
-#def gen_gammas_file_aliasing(meshform, outfile="gammas_alias", ergbins=""):
-#    """Generate the gammas_alias file for alias table version of source.F90
-#    
-#    ACTION: Method creates the file gammas with the photon energy bins
-#    for each voxel stored as alias tables. Reads directly from phtn_src file.
-#    Header information is the same as that in gen_gammas_file().
-#
-#    Each voxel's line corresponds with an alias table of the form:
-#    [total source strength, p1, g1a, g1b, p2, g2a, g2b ... pN, gNa, gNb]
-#    Where each p#, g#a, g#b are the info for one bin in the alias table.
-#
-#    REQUIRES: Method assumes that read() and isotope_source_strengths() 
-#    have been called already, OR that self.meshstrengths and self.meshprobs
-#    have been otherwise created properly.
-#    RECEIVES:
-#    3D list, meshform, of the form {{xmin,xmax,xintervals},{y...},{z...}}
-#    Optional: 'outfile' allows for an alternate file name instead of gammas
-#    Optional: 'ergbins' can specify different energy bins, rather than a
-#       default set of 42 bins. (This adds an additional line in gammas
-#       and requires a different source.F90.)
-#    RETURNS: 1 if successful, 0 if an error occurred.
-#    """
-#
-#    try:
-#        nmesh = len(self.meshstrengths) # We use this to check for a warning
-#                        # and to make sure a required method has been called
-#    except:
-#        print "ERROR: isotope_source_strengths needs to be called before " \
-#                "gen_sdef_probabilties"
-#        return 0
-#
-#    if nmesh != meshform[0][2]*meshform[1][2]*meshform[2][2]:
-#        print "WARNING: Number of mesh cells in phtn_src file does not " \
-#                "match the product of the mesh intervals given:"
-#        print "     ", nmesh, "!=", \
-#                meshform[0][2],"*",meshform[1][2],"*",meshform[2][2]
-#
-#    # We call the function that opens our gammas file and writes the header
-#    fw = self._gen_gammas_header(meshform, outfile, ergbins)
-#
-#    # We calcualte the normalization factor as the average total source
-#    #  strength in each mesh cell divided by the number of mesh cells
-#    #  with non-zero source strength.
-#    # This applies ONLY for uniform voxel size meshing.
-#    numactivatedcells = 0
-#    for val in self.meshstrengths:
-#        if val > 0:
-#            numactivatedcells += 1 
-#            # volsourcetot += volcell
-#    print "The number of activated voxels and total number of voxels is " \
-#            "{0}/{1}".format(numactivatedcells, nmesh)
-#    norm = sum(self.meshstrengths) / numactivatedcells
-#
-#    for binset in self.meshprobs:
-#
-#        # We create the list to send to alias.gen_alias_table()
-#        ergproblist = list()
-#        sourcetotal = sum([float(prob) for prob in binset]) # binset)
-#
-#        # Special case of a zero source strength voxel...
-#        # In this case, we write the correct number of zeros to the gammas
-#        #  file so that the source.F90 code doesn't run out of values to read
-#        if sourcetotal == 0:
-#            fw.write(" ".join([0]*(len(binset)*3+1)) + "\n")
-#            continue
-#
-#        for cnt, p in enumerate(binset):
-#            ergproblist.append([float(p)/sourcetotal, cnt+1])
-#
-#        aliastable = alias.gen_alias_table(ergproblist)
-#
-#        # We compactly format the alias table as a bunch of strings.
-#        # The following list comprehension uses a format specifying output
-#        #  of 12 characters, with 5 values after the decimal point and 
-#        #  scientific notation for the probability values, and integer 
-#        #  format for the energy group numbers
-#        aliasstrings = ["{0:<12.5E} {1} {2}".format(x[0][0],x[0][1],x[1][1]) \
-#                for x in aliastable]
-#
-#        fw.write(str(sourcetotal/norm) + " " + " ".join(aliasstrings) + "\n")
-#
-#    # all lines written, close file.
-#    fw.close()
-#    
-#    print "The file '{0}' was created successfully".format(outfile)
-#
-#    return 1
 
 
 def calc_volumes_list(scd):
@@ -289,7 +237,7 @@ def calc_volumes_list(scd):
                 oldz = z
             oldy = y
         oldx = x
-    print vols
+    
     return vols
 
 
@@ -308,12 +256,27 @@ def main():
     parser.add_option("-o","--output",action="store",dest="output", \
             default="gammas",help="Option specifies the name of the 'gammas'" \
             "file. Default: %default")
-
+    # Other options
+    parser.add_option("-a","--alias",action="store_true",dest="alias", \
+            default=False,help="Generate the gammas file with an alias table " \
+            "of energy bins for each voxel. Default: %default \n\r" \
+            "Default file name changes to 'gammas_alias' " \
+            "\n\n" \
+            "Creates the file gammas with the photon energy bins for each \
+            voxel stored as alias tables. Reads directly from phtn_src file.\n\n \
+            Each voxel's line corresponds with an alias table of the form: \
+            [total source strength, p1, g1a, g1b, p2, g2a, g2b ... pN, gNa, gNb] \
+            Where each p#, g#a, g#b are the info for one bin in the alias table." 
+           )
+   
     (options, args) = parser.parse_args()
 
-    print options.output
-    print args
-    gen_gammas_file_from_h5m( args[0], options.output )
+    if options.alias and options.output == 'gammas':
+        options.output = 'gammas_alias'
+        print "NOTE: Generated file will use name 'gammas_alias' instead " \
+            "of 'gammas'."
+
+    gen_gammas_file_from_h5m( args[0], options.output, options.alias)
 
     return 1
 
