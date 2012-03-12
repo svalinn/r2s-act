@@ -29,6 +29,13 @@ class ScdMeshTest(unittest.TestCase):
         sm = ScdMesh.fromFile(self.mesh, filename)
         self.assertEqual( sm.dims, (1, 11, -5, 5, 14, -3) )
 
+        # This mesh is interesting because the i/j/k space is not numbered from zero
+        # Check that divisions are correct
+
+        self.assertEqual( sm.getDivisions('x'), range(1,6) )
+        self.assertEqual( sm.getDivisions('y'), [1.0, 5.0, 10.0, 15.0] )
+        self.assertEqual( sm.getDivisions('z'), [-10.0, 2.0, 12.0] )
+
         # loading a test file without structured mesh metadata should raise an error
         filename2 = os.path.join(os.path.dirname(__file__), 'test_matFracs.h5m')
         self.assertRaises( ScdMeshError, ScdMesh.fromFile, iMesh.Mesh(), filename2 )
