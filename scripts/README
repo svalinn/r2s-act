@@ -1,15 +1,43 @@
 Scripts:
 
-FluxParse_MCNP_ALARA.py - a script to parse raw MCNP mesh tally files to ALARA flux-in format
+alias.py: Module providing alias sampling method, used by gen_gammas.
 
-make_alara.py:
- 
-obj_phtn_src.py:
+FluxParse.py: A script to parse raw MCNP mesh tally files to ALARA flux-in format.
+              This is the first step of the workflow.
+
+gen_gammas.py: Takes photon source data on a mesh (as produced by PhtnSrcToH5M.py),
+               normalizes source information, and generates the 'gammas' file for 
+               our custom source.F90 routine.
+
+mmgrid.py: Python replacement for mmGridGen; uses Monte Carlo techniques to estimate
+           material fractions, given a structured mesh and a CAD geometry.
+
+moab2alara.py: Converts mmgrid output to ALARA geometry and materials definitions.
+
+ModMCNPforPhotons.py: Modifies MCNP neutron problem definition, creating the corresponding
+                      photon problem to use with custom source.F90.
+
+PhtnSrcToH5M.py: Turn ALARA photon source output and converts it to MOAB representation.
+
+reTagMesh.py: Script to prepare visuzliations of volume fractions produced by
+              mmgrid.
+
+scdmesh.py: Module for representation of structured rectilinear hex meshes
+            through PyTAPS; uses the PyTAPS structured mesh extension functions.
+
+scdmesh_convert.py: Utility script to convert old-stype hex meshes into scdmeshes.
+
+==================================================
+
+alt_photon_src: files related to older approach to doing photon source definitions,
+using a very elaborate sdef card instead of a custom source routine.
+
+alt_photon_src/obj_phtn_src.py:
 Script defines a class for handling the phtn_src file output from ALARA 2.9+.  
 Methods parse the file into three equal-length lists: headers (isotope identifiers), cooling steps,
 and source strengths in each mesh cell.  
 Currently supports up to 994 mesh elements with the gen_sdef_probabilities method.
 May eventually convert phtn_src to a format that can be input into MCNP with a source.F90 routine.
 
-parse_phtn.py:
+alt_photon_src/parse_phtn.py
 Script demos the use of obj_phtn_src.py
