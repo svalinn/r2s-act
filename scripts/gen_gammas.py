@@ -50,7 +50,7 @@ def gen_gammas_file_from_h5m(inputfile, outfile="gammas", do_alias=False):
     voxels = mesh.getEntities(iBase.Type.region)
     numvoxels = len(voxels)
 
-    #Need to create: meshstrengths, self.meshprobs
+    # Need to create: meshstrengths
     meshprobs = list() # of lists of strings; each string is a source strength
     meshstrengths = list() # of floats; each float is the total source
                                 #  strength of a voxel at the chosen cooling step
@@ -271,7 +271,9 @@ def main():
    
     (options, args) = parser.parse_args()
 
+    # Check for combination of default filename, and alias mode
     if options.alias and options.output == 'gammas':
+        # Use a different default file name and print a message about this
         options.output = 'gammas_alias'
         print "NOTE: Generated file will use name 'gammas_alias' instead " \
             "of 'gammas'."

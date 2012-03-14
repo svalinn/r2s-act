@@ -1,4 +1,5 @@
 from nose import with_setup
+import unittest
 import obj_phtn_src
 
 #
@@ -54,5 +55,12 @@ def test_calc_volumes_list_2():
     """
     my_obj.calc_volumes_list([[-2,-1.0,0,1.0],[-2,-1,0,1],[0.0,1.0,2.0,3.0]])
     assert my_obj.vol == [1] * (3*3*3)
+
+#class test_obj(unittest.TestCase):
+#    def setUp(self)
+#        pass
+#
+#    def test_read_phtn_tag(self):
+#        self.assertEqual(1,self.obj.gen_gammas([[],[],[]], "gammastest"))
 
 
