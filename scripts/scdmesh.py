@@ -40,8 +40,7 @@ class ScdMesh:
         self.dims = ScdMesh.extents_tuple(*bdtag[self.scdset])
         vdims_incr = list(self.dims[0:3]) + [x + 1 for x in self.dims[3:6]]
         self.vdims = ScdMesh.extents_tuple(*vdims_incr)
-        # Our access iterators must have size=2 for now, until iMesh non-array
-        # iterators receive support for the stepIter function
+        # access iterators for hexes and vertices; used by getHex()/getVtx()
         self.hexit = self.scdset.iterate(iBase.Type.region,
                                          iMesh.Topology.hexahedron)
         self.vtxit = self.scdset.iterate(iBase.Type.vertex,
@@ -239,8 +238,8 @@ def _scdIter(indices, ordmap, dims, it):
     d = [0, 0, 1]
     d[1] = (dims[3] - dims[0])
     d[0] = (dims[4] - dims[1]) * d[1]
-    mins = [dims[2],dims[1],dims[0]]
-    offsets = ([(a-mins[ordmap[x]]) * d[ordmap[x]] 
+    mins = [dims[2], dims[1], dims[0]]
+    offsets = ([(a - mins[ordmap[x]]) * d[ordmap[x]]
                 for a in indices[x]]
                 for x in range(3))
     for ioff, joff, koff in itertools.product(*offsets):
