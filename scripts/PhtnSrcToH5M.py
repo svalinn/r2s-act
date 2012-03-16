@@ -19,52 +19,54 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, retag=False
 
     # First, we determine the coolingstep string to look for
     # ... if given a number, we take the nth line
-
     try:
         coolingstep = int(coolingstep)
 
-        if coolingstep < 0: raise ValueError
+        if coolingstep < 0: 
+            raise Exception("ERROR: A negative integer was given for the " \
+                    "cooling step")
 
         # With a numerical value for coolingstep, we read the first few
         #  lines in from the phtn_src file to get the cooling step string.
         i = 0
         while i <= coolingstep:
             line = fr.readline()
+            
+            # Record first isotope to avoid counting through multiple isotopes
             if i == 0: firstisotope = line.split('\t')[0]
-            i += 1
+            
             if line == '':
                 raise Exception("Problem reading file contents.")
+
             # If coolingstep is a larger number than the number of cooling steps
-            #  (assessed by counting coolingsteps for first isotope in first voxel)
+            #  (assessed by counting coolingsteps for first isotope in 
+            #   first voxel)
             if firstisotope != line.split('\t')[0]:
-                print "ERROR: File '{0}' does not contain {1} coolingsteps." \
-                      .format(inputfile, i)
+                raise Exception("ERROR: File '{0}' does not contain {1} " \
+                        "coolingsteps.".format(inputfile, coolingstep) )
                 return 0
+            
+            i += 1
 
         # The phtn_src file is formated with columns separated by tabs
         #  and some extraneous spaces adjacent to the tabs.  We split lines
         #  by the tabs, and remove these extraneous spaces.
         lineparts = line.split('\t')
 
-#        if lineparts[0] != firstisotope:
-#            print "ERROR: File '{0}' does not contain {1} coolingsteps." \
-#                    .format(inputfile, i)
-#            return 0
-
         coolingstep = lineparts[1].strip(' ')
-        #print firstisotope, lineparts[:1]
+        
         print "The cooling step being read is '{0}'".format(coolingstep)
-
+    
     except ValueError:
-        # the specified cooling step is a string...
+        # The specified cooling step is a string...
         # should catch this exception, and continue on - coolingstep is
         # presumed to be a valid string
-        pass
         line = fr.readline()
-        lineparts = line.split('\t')
+        lineparts=line.split('\t')
     
     except Exception as e:
-        # File reading problem?
+        # File reading problem, e.g. malformed phtn_src file
+        # We lack an actual example of this happening...
         print e
         return 0
 
@@ -80,12 +82,15 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, retag=False
     for grp in xrange(len(lineparts) - 2 ): # group tags = parts in the line - 2
         try:
             # If tags are new to file... create tag
-            tagList.append(mesh.createTag("phtn_src_group_{0:03d}".format(grp+1), 1, float))
+            tagList.append(mesh.createTag( \
+                    "phtn_src_group_{0:03d}".format(grp+1), 1, float))
         except iBase.TagAlreadyExistsError:
             # Else if the tags already exist...
             if retag:
-                # Get existing tag; We will overwrite tag values that already exist
-                tagList.append(mesh.getTagHandle("phtn_src_group_{0:03d}".format(grp+1)))
+                # Get existing tag
+                # We will overwrite tag values that already exist
+                tagList.append(mesh.getTagHandle( \
+                        "phtn_src_group_{0:03d}".format(grp+1)))
             else:
                 # Or print error if retagging was not specified.
                 print "ERROR: The tag phtn_src_group_{0:03d} already exists " \
@@ -122,12 +127,17 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, retag=False
             try:
                 tag = mesh.getTagHandle( \
                         "phtn_src_group_"+"{0:03d}".format(grp+1))
+                # Normally an exception is thrown by above line
                 mesh.destroyTag(tag,force=True)
                 grp += 1
             except iBase.TagNotFoundError:
                 grp = 0 # breaks the while loop
 
     mesh.save(meshfile)
+
+    print "The MOAB file '{0}' is now tagged with the photon source strengths" \
+            " for isotope '{1}' at cooling step '{2}'".format(meshfile, \
+            isotope, coolingstep)
 
     return 1
 
