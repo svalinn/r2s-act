@@ -36,6 +36,8 @@ class FluxParseTest( unittest.TestCase ):
         actual_mesh=open('mesh.vtk', 'r')
         for lineno, (i1,i2) in enumerate( izip(actual_mesh, expected_mesh),
                                           start=1 ):
-            self.assertEqual( i1, i2, 'Unequal line number {0}'.format(lineno) )
+            # second line of vtk file is MOAB version tag, which may vary harmlessly over time
+            if lineno != 2:
+                self.assertEqual( i1, i2, 'Unequal line number {0}'.format(lineno) )
         os.remove('ALARAflux.in')
         os.remove('mesh.vtk')
