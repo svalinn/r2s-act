@@ -47,7 +47,7 @@ class mmGridTest( unittest.TestCase ):
         pydagmc.dagmc.load( path )
 
     def test_matset(self):
-
+        """Test the prepare_materials and get_mata_id functions"""
         matdict = mmgrid.prepare_materials()
         self.assertEqual( matdict, 
                          {(0, 0.0): (0, 'matVOID'),

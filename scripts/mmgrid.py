@@ -21,6 +21,11 @@ _quiet = False
 
 
 def _msg(msg, newline=True):
+    """Print to stdout if the module's _quiet flag is not set.
+
+    Optionally skip printing a newline, allowing in-place update 
+    of a running status line
+    """
     if not _quiet:
         sys.stdout.write(msg)
         if newline:
@@ -72,7 +77,8 @@ def _random_square( n ):
     return points_inside
 
 
-def pairwise( l ):
+def pairwise(l):
+    """Generator: given a sequence x, yield (x[0],x[1]), (x[1],x[2]), ..."""
     it = iter(l)
     x0 = it.next()
     for x1 in it:
@@ -81,8 +87,10 @@ def pairwise( l ):
 
 
 class mmGrid:
+    """Object representing a macromaterial grid"""
 
     def __init__( self, scdmesh ):
+        """Create a grid based on a given structured mesh"""
         self.scdmesh = scdmesh
         self.materials = prepare_materials()
 
@@ -98,6 +106,12 @@ class mmGrid:
 
     @classmethod
     def from_dag_geom( cls, ndiv=10 ):
+        """Create a grid based on the geometry currently loaded in DagMC
+
+        Creates an equally spaced grid with ndiv divisions per side, set
+        within the full DagMC geometry.  This constructor requires that
+        DagMC has geometry loaded with a rectangular graveyard volume
+        """
         low_corner, high_corner = dagutil.find_graveyard_inner_box()
         divisions = [0]*3
         for i in range(3):
@@ -105,6 +119,12 @@ class mmGrid:
         return cls( scdmesh.ScdMesh( iMesh.Mesh(), *divisions) )
 
     def _rayframe(self, dim):
+        """Generator: yield squares on the side of the mesh perpendicular to dim
+        
+        Returns ijk, the structured mesh coordinate of the hex along which
+        the square lies, and (a0,a1,b0,b1), the coordinates of the corners of 
+        the squares
+        """
         sm = self.scdmesh
 
         plane = 'xyz'.replace(dim,'')
@@ -126,6 +146,17 @@ class mmGrid:
             ijk[a_idx] += 1
 
     def _grid_fragments(self, divs, div, startloc, length):
+        """Generator: yield line segments along a ray
+
+        The divs parameter is the divisions of the grid along a ray.  Div is
+        the division index after which the ray starts, and startloc is the
+        starting position.  Length is the length of the ray from startloc.
+
+        Yields a 3-tuple (L, ratio, keepgoing)
+            L: The length of the ray segment in the next grid element
+            ratio: the ratio of L to length of the grid element.
+            keepgoing: true if unassigned length remains after this iteration.
+        """
         L = length
         loc = startloc
         for x0, x1 in pairwise(divs[div:]):
@@ -141,6 +172,14 @@ class mmGrid:
                 break
 
     def _alloc_one_ray(self, start_ijk, dim, xyz, uvw, divs):
+        """Fire a single ray and store the sampled data to the grid
+        
+        start_ijk: structured mesh coordinates of the hex from which ray begins
+        dim: 0, 1, or 2 depending on whether whether ray is x, y, or z-directed.
+        xyz: start position of ray
+        uvw: direction of ray
+        divs: The structured grid divisions along this dimension.
+        """
         first_vol = self.first_vol
         if not first_vol or not dagmc.point_in_volume(first_vol,xyz,uvw):
             first_vol = dagmc.find_volume(xyz,uvw)
@@ -178,6 +217,10 @@ class mmGrid:
             voxel['errs'] += sample**2
 
     def generate(self, N):
+        """Sample the DagMC geometry and store the results on this grid.
+
+        N is the number of samples to take per voxel per dimsion
+        """
         count = 1
         rays = _linspace_square(N)
 
