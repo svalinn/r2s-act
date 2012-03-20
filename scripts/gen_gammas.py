@@ -11,8 +11,6 @@
 #
 ######################################################################
 
-import textwrap as tw
-import os
 from optparse import OptionParser
 from itaps import iBase,iMesh
 import alias
@@ -23,15 +21,16 @@ def gen_gammas_file_from_h5m(inputfile, outfile="gammas", do_alias=False):
     """Generate gammas file using information from tags on a MOAB mesh.
     
     ACTION: Method reads tags with photon source strengths from an h5m
-    file and generates the gammas file for the modified KIT source.f90 routine
-    To do this, we generate meshprobs and call gen_gammas_file().
+    file and generates the gammas file for the modified KIT source.f90 routine.
+    To do this, we generate meshstrengths and call gen_gammas_file().
     REQUIRES: the .h5m moab mesh must have photon source strength tags of the
     form "phtn_src_group_###"
     Will read photon energy bin boundary values if the root set has the tag 
-    PHOT_ERG (a list of floats)
+    PHTN_ERG (a list of floats)
 
     RECEIVES: The file (a moab mesh file) containing the mesh of interest.
-    An output file name for the 'gammas' file.
+    Optional: An output file name for the 'gammas' file; do_alias=True will
+    generate the gammas_alias file with alias tables.
     TODO:
     """
 
@@ -48,12 +47,6 @@ def gen_gammas_file_from_h5m(inputfile, outfile="gammas", do_alias=False):
         return 0
 
     voxels = mesh.getEntities(iBase.Type.region)
-    numvoxels = len(voxels)
-
-    # Need to create: meshstrengths
-    meshprobs = list() # of lists of strings; each string is a source strength
-    meshstrengths = list() # of floats; each float is the total source
-                                #  strength of a voxel at the chosen cooling step
 
     # Initialize list to first erg bin source strength value for each voxel
     meshstrengths = [float(x) for x in grouptag[voxels]]
@@ -99,7 +92,7 @@ def gen_gammas_file_from_h5m(inputfile, outfile="gammas", do_alias=False):
 
     # We now look for the tags with the energy bin boundary values
     try:
-        phtn_ergs = mesh.getTagHandle("PHTN_BINS")
+        phtn_ergs = mesh.getTagHandle("PHTN_ERG")
         myergbins = phtn_ergs[mesh.rootSet] #UNTESTED... does this need list() around it?
         print "NOTE: photon energy bins were found in the .h5m mesh and added to " \
                 "'{0}'. The modified mcnp5/source.f90 looks for a file caled " \
