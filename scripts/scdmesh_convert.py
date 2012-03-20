@@ -13,7 +13,7 @@ def extract_dimensions( mesh, meshset ):
     
     Return a list of three sets: the unique values of the x, y, and z, coordinates
     of the vertices in the given set."""
-    dimsets = [set()]*3
+    dimsets = [set(), set(), set()]
     for vtx in meshset.iterate( iBase.Type.vertex, iMesh.Topology.point ):
         xyz = mesh.getVtxCoords( vtx )
         for idx, val in enumerate(xyz):
