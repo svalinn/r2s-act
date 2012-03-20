@@ -24,7 +24,7 @@ def create_elelib(inp, outp):
              for iso_index in range (1,num_isos+1):
                  iso_line=line_to_list.convert(linecache.getline(inp,line_index+iso_index), (1,2), ('str','str'), (' ','\t'))
                  output.write(line_list[0]+':'+iso_line[0]+' '+line_list[1]+' '+\
-                     line_list[2]+' '+line_list[3]+' '+ '1\n\t\t\t'+iso_line[0]+' '+iso_line[1]+'\n')
+                     line_list[2]+' '+line_list[3]+' '+ '1\n\t\t\t'+iso_line[0]+'\t100'+'\n')
         line_index=line_index+1
         line=linecache.getline(inp, line_index)
 def main( arguments = None ):
