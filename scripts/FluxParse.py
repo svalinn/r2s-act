@@ -170,7 +170,7 @@ def print_fluxin(array, j, k, norm, output_file, backwardbool):
         output.write(pointoutput + '\n\n')
     print 'ALARA flux input file,', output_file , ', created sucessfully'
 
-def tag_fluxes_preexisting(array, j, k, meshtal_type, mesh_input, mesh_output):
+def tag_fluxes_preexisting(array, j, k, norm, meshtal_type, mesh_input, mesh_output):
     if meshtal_type == 'n':
         print 'Tagging user supplied mesh with neutron fluxes'
     if meshtal_type == 'p':
@@ -192,7 +192,7 @@ def tag_fluxes_preexisting(array, j, k, meshtal_type, mesh_input, mesh_output):
             tag_error=mesh.createTag(meshtal_type+'_group_total_error',1,float)
         for x in range(0,j):
             array_index=x+j*count            
-            column_flux.append(array[array_index][4])
+            column_flux.append(array[array_index][4]*norm)
             column_error.append(array[array_index][5])
         count=count+1
         tag_flux[voxels]=column_flux
@@ -312,9 +312,9 @@ def main( arguments = None ):
     if opts.mesh_input == 'False' and opts.supress_mesh == 'False' :
         boundaries_array = get_mesh_boundaries(args[0])
         create_mesh(boundaries_array, opts.mesh_output)
-        tag_fluxes_preexisting(array, j, k, meshtal_type, opts.mesh_output, opts.mesh_output)
+        tag_fluxes_preexisting(array, j, k, norm, meshtal_type, opts.mesh_output, opts.mesh_output)
     if opts.mesh_input != 'False':
-        tag_fluxes_preexisting(array, j, k, meshtal_type, opts.mesh_input, opts.mesh_output)
+        tag_fluxes_preexisting(array, j, k, norm, meshtal_type, opts.mesh_input, opts.mesh_output)
 
 if __name__ == '__main__':
     main()
