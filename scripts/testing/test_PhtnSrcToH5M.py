@@ -1,4 +1,3 @@
-from nose import with_setup
 import PhtnSrcToH5M
 import os
 import unittest
@@ -20,9 +19,12 @@ class TestPhtnTagging(unittest.TestCase):
         os.system("rm " + meshfile)
         os.system("cp " + meshfile_orig + " " + meshfile)
 
+    def tearDown(self):
+        os.system("rm " + meshfile)
+
     def test_tagging(self):
-        """Tag a mesh; tagging again should fail; then tagging again should succeed
-        when we add the retag=True option"""
+        """Tag a mesh; tagging again should fail; then tagging again should
+        succeed when we add the retag=True option"""
     #def test_simple_pass(self):
         self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile), 1)
 
@@ -31,7 +33,8 @@ class TestPhtnTagging(unittest.TestCase):
         self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile), 0)
 
     #def test_simple_retag_pass():
-        """We try again to tag the same mesh, but with the retag parameter = True
+        """We try again to tag the same mesh, but with the retag 
+        parameter = True
         Should succeed fine."""
         self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, retag=True), 1)
 
@@ -41,6 +44,10 @@ class TestPhtn(unittest.TestCase):
     def setUp(self):
         os.system("rm " + meshfile)
         os.system("cp " + meshfile_orig + " " + meshfile)
+
+    def tearDown(self):
+        pass
+        #os.system("rm " + meshfile)
 
     def test_unobtanium(self):
         """Supplied isotope doesn't exist in file."""
@@ -66,9 +73,6 @@ class TestPhtn(unittest.TestCase):
         """We send an invalid string value for the cooling step.  String is not in 
         file and should return 0"""
         self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, coolingstep="never"), 0)
-
-
-os.system("rm " + meshfile)
 
 
 if __name__ == "__main__":

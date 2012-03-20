@@ -8,10 +8,12 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, retag=False
     """Read in a phtn_src file and tag the contents to a moab mesh.
     
     ACTION: Method reads in a phtn_src file line by line, looking for
-    a specific isotope at a specific cooling step
+     a specific isotope at a specific cooling step.
+    Method tags the MOAB mesh at meshfile with the phtn source information,
+     and then saves the mesh.
     RECEIVES: input file (ALARA phtn_src style), mesh file to write to,
-    isotope identifier, cooling step number (0'th is 'shutdown')
-    OR cooling step name, whether to retag existing tags in mesh
+     isotope identifier, cooling step number (0'th is 'shutdown')
+     OR cooling step name, whether to retag existing tags in mesh
     """
     
     fr = open(inputfile, 'r')

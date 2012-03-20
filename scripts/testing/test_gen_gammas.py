@@ -6,11 +6,10 @@ from itaps import iMesh, iBase
 import os.path
 
 # These directories are relative to scripts directory.
-inputfile = "../testcases/simplebox-3/phtn_src"
-meshfile_orig  = "../testcases/simplebox-3/matFracs.h5m"
-meshfile  = "../testcases/simplebox-3/matFracs3.h5m"
-
-
+inputfile = "../testcases/simplebox-3/phtn_src" #revision controlled
+meshfile_orig = "testing/matFracsSCD3x3x3.h5m"
+meshfile = "matFracsSCD3x3x3_tagged.h5m"
+outfile = "gammas_test"
 
 
 class TestCalcVolumes(unittest.TestCase):
@@ -34,14 +33,16 @@ class TestCalcVolumes(unittest.TestCase):
 class TestGenGammasFile(unittest.TestCase):
 
     def setUp(self):
+        os.system("rm " + meshfile)
+        os.system("cp " + meshfile_orig + " " + meshfile)
+        PhtnSrcToH5M.read_to_h5m(inputfile, meshfile)
 
-#    #@with_setup(test_phtnsrc_read)
-#    def test_calc_volumes_list_2():
-#        """
-#        Checks that calc_volumes_list works for 3x3x3 mesh with equal voxel sizing.
-#        Also includes some negative mesh intervals, with mixed integers/floats.
-#        """
-#        gen_gammas.calc_volumes_list([[-2,-1.0,0,1.0],[-2,-1,0,1],[0.0,1.0,2.0,3.0]])
-#        assert my_obj.vol == [1] * (3*3*3)
+    def tearDown(self):
+        #os.system("rm " + meshfile) # seems to disappear on its own?
+        os.system("rm " + outfile)
     
-    
+    def test_gen_gammas(self):
+        """Tests a run-through of the method with 3x3x3 non-void geometry."""
+        self.assertEqual(gen_gammas.gen_gammas_file_from_h5m( \
+                meshfile, outfile), 1)
+
