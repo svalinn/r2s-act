@@ -33,12 +33,12 @@ class TestCalcVolumes(unittest.TestCase):
 class TestGenGammasFile(unittest.TestCase):
 
     def setUp(self):
-        os.system("rm " + meshfile)
+        #os.system("rm " + meshfile)
         os.system("cp " + meshfile_orig + " " + meshfile)
         PhtnSrcToH5M.read_to_h5m(inputfile, meshfile)
 
     def tearDown(self):
-        #os.system("rm " + meshfile) # seems to disappear on its own?
+        os.system("rm " + meshfile)
         os.system("rm " + outfile)
     
     def test_gen_gammas(self):

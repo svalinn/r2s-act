@@ -13,41 +13,23 @@ inputfile = "../testcases/simplebox-3/phtn_src"
 meshfile_orig  = "../testcases/simplebox-3/matFracs.h5m"
 meshfile  = "../testcases/simplebox-3/matFracs3.h5m"
 
-class TestPhtnTagging(unittest.TestCase):
-
-    def setUp(self):
-        os.system("rm " + meshfile)
-        os.system("cp " + meshfile_orig + " " + meshfile)
-
-    def tearDown(self):
-        os.system("rm " + meshfile)
-
-    def test_tagging(self):
-        """Tag a mesh; tagging again should fail; then tagging again should
-        succeed when we add the retag=True option"""
-    #def test_simple_pass(self):
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile), 1)
-
-    #def test_simple_retag_fail(self):
-        """We try again to tag the same mesh. An error should be returned"""
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile), 0)
-
-    #def test_simple_retag_pass():
-        """We try again to tag the same mesh, but with the retag 
-        parameter = True
-        Should succeed fine."""
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, retag=True), 1)
-
 
 class TestPhtn(unittest.TestCase):
 
     def setUp(self):
-        os.system("rm " + meshfile)
         os.system("cp " + meshfile_orig + " " + meshfile)
 
     def tearDown(self):
         pass
-        #os.system("rm " + meshfile)
+        os.system("rm " + meshfile)
+
+    def test_simple(self):
+        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile), 1)
+
+    def test_simple_with_totals(self):
+        """Tag a mesh; tagging again should fail; then tagging again should
+        succeed when we add the retag=True option"""
+        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, totals=True), 1)
 
     def test_unobtanium(self):
         """Supplied isotope doesn't exist in file."""
@@ -73,6 +55,59 @@ class TestPhtn(unittest.TestCase):
         """We send an invalid string value for the cooling step.  String is not in 
         file and should return 0"""
         self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, coolingstep="never"), 0)
+
+
+class TestPhtnRetagging(unittest.TestCase):
+    """Test methods in this class test what happens when phtn_src tags already
+    exist. Retagging is enabled with the 'retag' option.  This also applies to
+    the phtn_src_total tag via the 'totals' option.
+    """
+
+    def setUp(self):
+        os.system("cp " + meshfile_orig + " " + meshfile)
+        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile), 1)
+
+    def tearDown(self):
+        os.system("rm " + meshfile)
+
+    def test_retag_fail(self):
+        """We try again to tag the same mesh. An error should be returned"""
+        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile), 0)
+
+    def test_retag_totals_fail(self):
+        """We try again to tag the same mesh. An error should be returned.
+        This test should be redundant as totals should not be reached before 
+        the method fails."""
+        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, totals=True), 0)
+
+    def test_retag_ok(self):
+        """We try to tag the same mesh, but with the retag 
+        parameter = True
+        Should succeed fine."""
+        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, retag=True), 1)
+
+    def test_retag_totals_fail(self):
+        """We try to tag the same mesh, and also include totals; 
+        Should have no problems. should not be reached before """
+        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, retag=True, totals=True), 1)
+
+
+class TestPhtnTotalsRetagging(unittest.TestCase):
+    """We tag a tagless mesh, including totals. Then check retagging behavior.
+    """
+
+    def setUp(self):
+        os.system("cp " + meshfile_orig + " " + meshfile)
+        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, totals=True), 1)
+
+    def tearDown(self):
+        os.system("rm " + meshfile)
+
+    def test_retag_and_totals_ok(self):
+        """We enable retagging and also make sure that the totals get retagged.
+        """
+        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, retag=True, totals=True), 1)
+
 
 
 if __name__ == "__main__":

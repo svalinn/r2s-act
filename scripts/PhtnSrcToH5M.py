@@ -4,7 +4,8 @@ from optparse import OptionParser
 from itaps import iBase,iMesh
 
 
-def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, retag=False):
+def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, \
+        retag=False, totals=False):
     """Read in a phtn_src file and tag the contents to a moab mesh.
     
     ACTION: Method reads in a phtn_src file line by line, looking for
@@ -42,7 +43,7 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, retag=False
 
             # If coolingstep is a larger number than the number of cooling steps
             #  (assessed by counting coolingsteps for first isotope in 
-            #   first voxel)
+            #   first voxel, AKA whether isotope name has changed)
             if firstisotope != line.split('\t')[0]:
                 raise Exception("ERROR: File '{0}' does not contain {1} " \
                         "coolingsteps.".format(inputfile, coolingstep) )
@@ -79,9 +80,10 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, retag=False
     # We grab the list of mesh entity objects
     voxels = mesh.getEntities(iBase.Type.region)
 
-    # We create a list of tag objects to use while parsing phtn_src
+    # We create a list of tag objects ('tagList') to use while parsing phtn_src
     tagList = []
-    for grp in xrange(len(lineparts) - 2 ): # group tags = parts in the line - 2
+    numergbins = len(lineparts) - 2
+    for grp in xrange(numergbins): # group tags = parts in the line - 2
         try:
             # If tags are new to file... create tag
             tagList.append(mesh.createTag( \
@@ -135,11 +137,67 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, retag=False
             except iBase.TagNotFoundError:
                 grp = 0 # breaks the while loop
 
+    if totals:
+        if not tag_phtn_src_totals(mesh, numergbins, retag):
+            print "ERROR: failed to tagged the total photon source strengths."
+            return 0
+
     mesh.save(meshfile)
 
     print "The MOAB file '{0}' is now tagged with the photon source strengths" \
             " for isotope '{1}' at cooling step '{2}'".format(meshfile, \
             isotope, coolingstep)
+
+    return 1
+
+
+def tag_phtn_src_totals(mesh, numergbins=-1, retag=False):
+    """Method tags the total photon source strength for each voxel.
+
+    ACTION: Method calculate the total photon source strength, and 
+    if retagging is enabled or the tag does not exist, tags the mesh.
+    RECEIVES: mesh, an iMesh.Mesh object
+    OPTIONAL: numergbins, number of energy group tags to read; retag,
+    whether to overwrite an existing 'phtn_src_total' tag.
+    """
+
+    voxels = mesh.getEntities(iBase.Type.region)
+
+    # Check if 'phtn_src_total' tag already exists
+    try:
+        # If tags are new to file... create tag
+        totalPhtnSrcTag = mesh.createTag( \
+                "phtn_src_total", 1, float)
+    except iBase.TagAlreadyExistsError:
+        if not retag:
+            print "ERROR: phtn_src_total tag already exists. Use the -r "\
+                    "option to enable retagging."
+            return 0
+
+        else:
+            totalPhtnSrcTag = mesh.getTagHandle("phtn_src_total")
+ 
+    # If not supplied, se try/except to find number of energy bins
+    if not numergbins:
+        for i in xrange(1,1000): #~ Arbitrary: we look for up to 1000 groups
+            try:
+                mesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
+            except iBase.TagNotFoundError: 
+                numergbins = i - 1
+                break
+
+    # We go voxel by voxel, calculating total photon source, and then adding
+    #  these tags.
+    for vox in voxels:
+        totstrength = 0.0
+
+        #get total for the voxel
+        for i in xrange(1,numergbins + 1):
+            grouptag = mesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
+            totstrength += float(grouptag[vox])
+
+        # Add the total as a tag
+        totalPhtnSrcTag[vox] = float(totstrength)
 
     return 1
 
@@ -164,14 +222,18 @@ def main():
             " file name for saving a modified mesh.")
     # Other options
     parser.add_option("-i","--isotope",action="store",dest="isotope", \
-            default="TOTAL", help="The isotope string identifier or TOTAL. "\
+            default="TOTAL", help="The isotope string identifier or 'TOTAL'. "\
             "Default: %default")
     parser.add_option("-c","--coolingstep",action="store",dest="coolingstep", \
             default=0, help="The cooling step number or string identifier. " \
             "(0 is first cooling step)  Default: %default")
     parser.add_option("-r","--retag",action="store_true",dest="retag", \
-            default=False,help="Option enables retagging of .h5m meshes, e.g. " \
-            "with the -H option. Default: %default")
+            default=False,help="Option enables retagging of .h5m meshes. " \
+            "Default: %default")
+    parser.add_option("-t","--totals",action="store_true",dest="totals", \
+            default=False,help="Option enables adding the total photon " \
+            "source strength for all energy groups as a tag for each voxel. " \
+            "Default: %default")
 
     (options, args) = parser.parse_args()
 
