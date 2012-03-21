@@ -81,7 +81,7 @@ class mmGridTest( unittest.TestCase ):
         self.assertEqual( grid.grid[0,0,0]['errs'].shape, (3,) )
 
     def test_create_from_geom(self):
-        grid = mmgrid.mmGrid.from_dag_geom(8)
+        grid = mmgrid.mmGrid.fromDagGeom(8)
         sm = grid.scdmesh
         self.assertEqual( sm.dims, (0,0,0,7,7,7) )
         extents = (-22.8, 22.8)
@@ -95,15 +95,15 @@ class mmGridTest( unittest.TestCase ):
         grid_side = [-5,-3.75,-2.5,-1.25,0,1.25,2.5,3.75,5]
         sm = ScdMesh( iMesh.Mesh(), *([grid_side]*3) )
         grid = mmgrid.mmGrid( sm )
-        grid.generate(2)
+        grid.generate(2, True)
 
         for ijk, x in numpy.ndenumerate(grid.grid):
             self.assertAlmostEqual( 
                     sum(x['mats']), 1.0, 
                     msg='Normality at ijk={0}:\n'
                         '    sum({1}) = {2} != 1.0'.format(ijk, x['mats'], sum(x['mats'])))
-        grid.tag()
-        grid.writeFile( 'check.vtk' )
+
+        grid.createTags()
 
 
     def test_unequal_grid_size(self):
@@ -111,7 +111,7 @@ class mmGridTest( unittest.TestCase ):
         grid_side = [-3,0,.1,.2,3]
         sm = ScdMesh( iMesh.Mesh(), *([grid_side]*3) )
         grid = mmgrid.mmGrid( sm )
-        grid.generate(5)
+        grid.generate(5)#, True)
 
         for ijk, x in numpy.ndenumerate(grid.grid):
             self.assertAlmostEqual( 

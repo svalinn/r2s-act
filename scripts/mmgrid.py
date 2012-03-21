@@ -105,7 +105,7 @@ class mmGrid:
         self.first_vol = None
 
     @classmethod
-    def from_dag_geom( cls, ndiv=10 ):
+    def fromDagGeom( cls, ndiv=10 ):
         """Create a grid based on the geometry currently loaded in DagMC
 
         Creates an equally spaced grid with ndiv divisions per side, set
@@ -117,6 +117,16 @@ class mmGrid:
         for i in range(3):
             divisions[i] = np.linspace(low_corner[i],high_corner[i],ndiv,endpoint=True)
         return cls( scdmesh.ScdMesh( iMesh.Mesh(), *divisions) )
+
+    def _rayframe_count(self, dim):
+
+        sm = self.scdmesh
+
+        plane = 'xyz'.replace(dim,'')
+        adivs = sm.getDivisions( plane[0] )
+        bdivs = sm.getDivisions( plane[1] )
+
+        return (len(adivs)-1)*(len(bdivs)-1)
 
     def _rayframe(self, dim):
         """Generator: yield squares on the side of the mesh perpendicular to dim
@@ -138,7 +148,6 @@ class mmGrid:
         ijk = list(sm.dims[0:3])
 
         for a0, a1 in pairwise( adivs ):
-            print b_idx, ijk, sm.dims
             ijk[b_idx] = sm.dims[b_idx]
             for b0, b1 in pairwise( bdivs ):
                 yield ijk, (a0, a1, b0, b1)
@@ -216,13 +225,18 @@ class mmGrid:
             voxel['mats'] += sample
             voxel['errs'] += sample**2
 
-    def generate(self, N):
+    def generate(self, N, use_grid=False ):
         """Sample the DagMC geometry and store the results on this grid.
 
         N is the number of samples to take per voxel per dimsion
         """
         count = 1
-        rays = _linspace_square(N)
+        if use_grid:
+            rays = _linspace_square(N)
+        else:
+            rays = _random_square(N**2)
+
+        total_ray_count = sum([self._rayframe_count(dim) for dim in 'xyz']) * (N**2)
 
         # iterate over ray-firing directions
         for idx, dim in enumerate('xyz'):
@@ -237,44 +251,35 @@ class mmGrid:
 
             # iterate over all the scdmesh squares on the plane normal to uvw
             for ijk, square in self._rayframe(dim):
-                _msg('\rGenerating: {0}'.format(count), False)
+                _msg('\rFiring rays: {0}%'.format((100*count)/total_ray_count), False)
                 # For each ray that starts in this square, take a sample
                 for xyz in (make_xyz(a,b) for a,b in rays(*square)):
                     self._alloc_one_ray( ijk, idx, xyz, uvw, divs )
                     count += 1
+        _msg('\rFiring rays: 100%')
 
-        total_scores = N*N*3
+        total_scores_per_vox = N*N*3
         max_err = 0
-        _msg("\nnormalizing...")
+        _msg("Normalizing...")
         for vox in self.grid.flat:
             # Note: vox['mats'] = ... does not work as expected, but
             #       vox['mats'] /= ... does the right thing.
             # To get the correct assignment behavior, use an extra [:], as below
-            vox['mats'] /= total_scores
-            errs = vox['errs'] / total_scores
-            sigma = np.sqrt( (errs - (vox['mats']**2)) / total_scores )
+            vox['mats'] /= total_scores_per_vox
+            errs = vox['errs'] / total_scores_per_vox
+            sigma = np.sqrt( (errs - (vox['mats']**2)) / total_scores_per_vox )
             vox['errs'][:] = sigma
             max_err = max(max_err, max(vox['errs']))
         _msg("Maximum error: {0}".format(max_err))
 
-    def tag(self):
-        mesh = self.scdmesh.mesh
-        fractag = mesh.createTag( 'FRACTIONS', len(self.materials), np.float64 )
-        errstag = mesh.createTag( 'ERRORS', len(self.materials), np.float64 )
-        for ijk,(mat,err) in np.ndenumerate(self.grid):
-            # TODO: This incorrectly assumes ijk is zero-based
-            hx = self.scdmesh.getHex(*ijk)
-            fractag[ hx ] = mat
-            errstag[ hx ] = err
-
-    def tag_for_visualization(self):
+    def createTags(self):
         mesh = self.scdmesh.mesh
         for idx, ((mat, rho), (matnum,matname)) in enumerate(self.materials.iteritems()):
             mattag = mesh.createTag( matname, 1, np.float64 )
             errtag = mesh.createTag( matname+'_err', 1, np.float64 )
             for ijk, (mat,err) in np.ndenumerate(self.grid):
-                # TODO: assumes ijk is zero-based
-                hx = self.scdmesh.getHex(*ijk)
+                offset_ijk = [x+y for x,y in zip(ijk,self.scdmesh.dims[0:3])]
+                hx = self.scdmesh.getHex(*offset_ijk)
                 mattag[hx] = mat[matnum]
                 errtag[hx] = err[matnum]
 
@@ -286,13 +291,23 @@ class mmGrid:
 def main( arguments=None ):
     global _quiet
     op = optparse.OptionParser()
-    op.add_option( '-n', '--numrays', help='Number of rays per voxel, default=%default',
+    op.set_usage('%prog [options] geometry_file [structured_mesh_file]')
+    op.set_description('Compute a macromaterial grid in the tradition of mmGridGen.  '
+                       'The first required argument should be a DagMC-loadable geometry.  '
+                       'The optional second argument must be a file with a single '
+                       'structured mesh.  In the absence of the second argument, '
+                       'mmgrid will attempt to infer the shape of the DagMC geometry '
+                       'and create a structured grid to match it, with NDVIS divisions '
+                       'on each side.')
+    op.add_option( '-n',  help='Set N. N^2 rays fired per row.  Default N=%default',
                    dest='numrays', default=20, type=int )
+    op.add_option( '-g', '--grid', help='Use grid of rays instead of randomly selected starting points',
+                    dest='usegrid', default=False, action='store_true' )
     op.add_option( '-o', '--output', help='Output file name, default=%default',
                    dest='output_filename', default='mmgrid_output.h5m' )
     op.add_option( '-q', '--quiet', help='Suppress non-error output from mmgrid',
                    dest='quiet', default=False, action='store_true' )
-    op.add_option( '--divs', help='Number of mesh divisions to use when inferring mesh size, default=%default',
+    op.add_option( '-d','--divs', help='Number of mesh divisions to use when inferring mesh size, default=%default',
                    dest='ndivs', default=10 )
     opts, args = op.parse_args( arguments )
     if len(args) != 1 and len(args) != 2:
@@ -303,13 +318,13 @@ def main( arguments=None ):
     dagmc.load( args[0] )
     sm = None
     if len(args) == 2:
-        sm = scdmesh.ScdMesh.from_file(args[1])
+        sm = scdmesh.ScdMesh.fromFile(iMesh.Mesh(),args[1])
         grid = mmGrid( sm )
     else:
         grid = mmGrid.from_dag_geom(opts.ndivs)
 
-    grid.generate(opts.numrays)
-    grid.tag_for_visualization()
+    grid.generate(opts.numrays, opts.usegrid)
+    grid.createTags()
     grid.writeFile( opts.output_filename )
 
 
