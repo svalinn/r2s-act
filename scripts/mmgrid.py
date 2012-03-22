@@ -321,7 +321,7 @@ def main( arguments=None ):
         sm = scdmesh.ScdMesh.fromFile(iMesh.Mesh(),args[1])
         grid = mmGrid( sm )
     else:
-        grid = mmGrid.from_dag_geom(opts.ndivs)
+        grid = mmGrid.fromDagGeom(opts.ndivs)
 
     grid.generate(opts.numrays, opts.usegrid)
     grid.createTags()
