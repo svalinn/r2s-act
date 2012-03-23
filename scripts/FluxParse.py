@@ -271,7 +271,7 @@ def create_mesh(a, mesh_name):#a is the name of the boundaries_array
 
 def main( arguments = None ):
 
-    parser = OptionParser()
+    parser = OptionParser(usage='FluxParse.py <meshtal_file> <normalization_factor> [options]')
 
     parser.add_option('-b', action='store_true', dest='backward_bool',\
         default=False, help='Print to ALARA fluxin in fluxes in \
