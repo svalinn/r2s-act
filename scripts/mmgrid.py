@@ -180,7 +180,7 @@ class mmGrid:
                 loc = L
                 break
 
-    def _alloc_one_ray(self, start_ijk, dim, xyz, uvw, divs):
+    def _alloc_one_ray(self, start_ijk, dim, xyz, uvw, divs, samples):
         """Fire a single ray and store the sampled data to the grid
         
         start_ijk: structured mesh coordinates of the hex from which ray begins
@@ -196,30 +196,25 @@ class mmGrid:
         vol = first_vol
         loc = divs[0]
         div = 0
-        ijk = list(start_ijk)
-        samples = np.zeros((len(divs)-1,(len(self.materials))), dtype=np.float64)
-
         for nxtvol, raydist, _ in dagmc.ray_iterator( vol, xyz, uvw ):
             mat_idx = get_mat_id( self.materials, vol )
+            vol = nxtvol
             for meshdist, meshrat, newloc in self._grid_fragments( divs, div, loc, raydist ):
-                # allocate meshdist to mesh at this location
-                # with material for volume 'vol'
-                #print ijk, "gets vol", vol, "mat", mat_idx, "length", meshdist, "({0})".format(meshrat), "at", div
+                # The ray fills this voxel for a normalized distance of
+                # meshrat = (meshdist / length_of_voxel)
                 samples[div,mat_idx] += meshrat
-
                 loc += meshdist
                 if(newloc):
                     div += 1
-                    ijk[dim] = div
-            vol = nxtvol
 
+        # Save the first detected volume to speed future queries
         self.first_vol = first_vol
 
         # prepare an indexing object for self.grid to access the appropriate mesh row.
         # It is important to use a slice object rather than a general sequence
         # because a general sequence will trigger numpy's advanced iteration,
         # which returns copies of data instead of views.
-        idx_ijk = ijk
+        idx_ijk = start_ijk
         idx_ijk[dim] = slice(self.scdmesh.dims[dim], self.scdmesh.dims[dim+3])
         for sample, voxel in itertools.izip_longest( samples, self.grid[idx_ijk]):
             voxel['mats'] += sample
@@ -243,6 +238,8 @@ class mmGrid:
             uvw = np.array([0,0,0],dtype=np.float64)
             uvw[idx] = 1.0
             divs = self.scdmesh.getDivisions(dim)
+            samples = np.zeros((len(divs)-1,(len(self.materials))), dtype=np.float64)
+
 
             def make_xyz(a,b):
                     xyz = [a,b]
@@ -254,8 +251,9 @@ class mmGrid:
                 _msg('\rFiring rays: {0}%'.format((100*count)/total_ray_count), False)
                 # For each ray that starts in this square, take a sample
                 for xyz in (make_xyz(a,b) for a,b in rays(*square)):
-                    self._alloc_one_ray( ijk, idx, xyz, uvw, divs )
+                    self._alloc_one_ray( ijk, idx, xyz, uvw, divs, samples )
                     count += 1
+                    samples[:,:] = 0
         _msg('\rFiring rays: 100%')
 
         total_scores_per_vox = N*N*3
