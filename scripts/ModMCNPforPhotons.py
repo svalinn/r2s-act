@@ -137,7 +137,7 @@ class ModMCNPforPhotons(object):
             # If line is indented 5+ spaces and the previous non-indented 
             #  line was commented out, comment out out this line too.
             if line[:5] == '     ' and commentout:
-                line = "c" + line
+                self.block3Lines[cnt] = "c" + line
                 continue
             else:
                 commentout = False
@@ -150,12 +150,10 @@ class ModMCNPforPhotons(object):
             if re.sub("\d+","",linesplit[0]) in sourcecards:
                 line = "c " + line
                 cntsrc += 1
-                commentout = True
 
             elif "phys:n" == linesplit[0]:
                 line = "c " + line
                 notephys = "-phys:n was commented out \n"
-                commentout = True
 
             elif "mode" == linesplit[0]:
                 line = "mode p\n"
@@ -164,7 +162,11 @@ class ModMCNPforPhotons(object):
             elif "imp:n" == linesplit[0]:
                 line = "imp:p " + ' '.join(linesplit_orig[1:]) + '\n'
                 noteimp = "-imp:n card converted to imp:p \n"
+            
+            else:
+                continue
 
+            commentout = True
             self.block3Lines[cnt] = line
 
         print "Block 3 has been updated: \n" \
