@@ -239,7 +239,7 @@ def main():
 
     read_to_h5m( \
                 options.phtnsrcfile, options.meshfile, options.isotope, \
-                options.coolingstep, options.retag)
+                options.coolingstep, options.retag, options.totals)
 
     return 1
 
