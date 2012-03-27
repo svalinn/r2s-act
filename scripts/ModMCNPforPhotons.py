@@ -82,7 +82,7 @@ class ModMCNPforPhotons(object):
         """Modify contents of self.block1Lines for a photon problem.
         
         ACTION: Method changes the importance cards to affect protons
-        RETURNS: N/A
+        RETURNS: '1' when run successfully
         """
 
         cntimp = 0
@@ -119,7 +119,10 @@ class ModMCNPforPhotons(object):
         
         ACTION: Method 
         -changes the mode card from 'mode n' to 'mode p'
-        -comments out any source-definition cards
+        -remove phys:n
+        -change inp:n to inp:p
+        -comments out any source-definition cards.  These cards are:
+         sdef, si, sp, sb, sc, ds, kcode, ksrc
         """
         
         cntsrc = 0
@@ -130,7 +133,7 @@ class ModMCNPforPhotons(object):
         commentout = False # We toggle this to determine whether or not to
                             # comment out continued lines
 
-        sourcecards = ["sdef","si","sp","sb","sc","ds","tr","kcode","ksrc"]
+        sourcecards = ["sdef","si","sp","sb","sc","ds","kcode","ksrc"]
 
         for cnt, line in enumerate(self.block3Lines):
 
@@ -159,6 +162,7 @@ class ModMCNPforPhotons(object):
                 line = "mode p\n"
                 notemode = "-mode card replaced with 'mode p' \n"
 
+            # keep same cell importances, but set them for photons
             elif "imp:n" == linesplit[0]:
                 line = "imp:p " + ' '.join(linesplit_orig[1:]) + '\n'
                 noteimp = "-imp:n card converted to imp:p \n"
