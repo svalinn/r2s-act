@@ -10,7 +10,10 @@ from numpy import ones
 import operator
 
 def parser():
-    parser = OptionParser(usage="usage: %prog <in> [options]")
+    parser = OptionParser(usage="usage: %prog <in> -v VOLUME [options]")
+    parser.add_option("-v", "--volume",
+                      action="store", dest="volume",
+                      help="Total volume of mesh geometry")
     parser.add_option("-r", "--round",
                       action="store", dest="round", default="6",
                       help="Number of decimal places to round volume fractions, default: %default")
@@ -19,7 +22,7 @@ def parser():
                       help="Name of generated ALARA input file, default: %default")
     return parser.parse_args()
 
-def moab2alara(mesh, filename, numround):
+def moab2alara(mesh, filename, numround, total_volume):
   # Write ALARA geometry card to file
     filename.write('geometry rectangular\n\n')
     
@@ -32,7 +35,7 @@ def moab2alara(mesh, filename, numround):
   # To be redone later to allow for coarse/fine meshes
     dimID = list(dims[mesh.rootSet])
     numzones=(dimID[0]*dimID[1]*dimID[2])
-    elementvolume = float(1)/numzones 
+    elementvolume = float(total_volume)/numzones 
 
   # Write ALARA volume card to file
     filename.write('volume\n')
@@ -103,7 +106,7 @@ def main() :
     mesh = iMesh.Mesh()
     print "Read "+args[0]
     mesh.load(args[0])
-    moab2alara(mesh, alara_input, options.round)  
+    moab2alara(mesh, alara_input, options.round, options.volume)  
     print "Wrote "+options.output
     return
 
