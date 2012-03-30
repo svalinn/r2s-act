@@ -55,6 +55,21 @@ class ScdMeshTest(unittest.TestCase):
         self.assertRaises(ScdMeshError, sm.getHex, 0, 3, 0)
         self.assertRaises(ScdMeshError, sm.getHex, 0, 0, 2)
 
+    def test_hex_volume(self):
+
+        sm = ScdMesh( self.mesh, [0,1,3], [-3,-2,0], [12,13,15] )
+        self.assertEqual( sm.getHexVolume(0,0,0), 1 )
+        self.assertEqual( sm.getHexVolume(1,0,0), 2 )
+        self.assertEqual( sm.getHexVolume(0,1,0), 2 )
+        self.assertEqual( sm.getHexVolume(1,1,0), 4 )
+        self.assertEqual( sm.getHexVolume(1,1,1), 8 )
+
+        ijk_all = itertools.product(*([[0,1]]*3))
+
+        for V, ijk in itertools.izip_longest(sm.iterateHexVolumes(), ijk_all):
+            self.assertEqual( V, sm.getHexVolume(*ijk) )
+
+
     def test_get_vtx(self):
         # mesh with valid i values 0-4, j values 0-3, k values 0-2
         x_range = numpy.array(range(10,15),dtype=numpy.float64)

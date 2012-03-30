@@ -90,6 +90,17 @@ class ScdMesh:
         n = _dimConvert(self.dims, (i, j, k))
         return _stepIter(self.hexit, n)
 
+    def getHexVolume(self, i, j, k):
+        """Return the volume of the (i,j,k)'th hexahedron in the mesh"""
+        v = list(self.iterateVtx(x=[i, i + 1],
+                                 y=[j, j + 1],
+                                 z=[k, k + 1]))
+        coord = self.mesh.getVtxCoords(v)
+        dx = coord[1][0] - coord[0][0]
+        dy = coord[2][1] - coord[0][1]
+        dz = coord[4][2] - coord[0][2]
+        return dx * dy * dz
+
     def iterateHex(self, order='zyx', **kw):
         """Get an iterator over the hexahedra of the mesh
 
@@ -150,6 +161,21 @@ class ScdMesh:
 
         indices, ordmap = _scdIterSetup(self.vdims, order, **kw)
         return _scdIter(indices, ordmap, self.vdims, self.vtxit)
+
+    def iterateHexVolumes(self, order='zyx', **kw):
+        """Get an iterator over the volumes of the mesh hexahedra
+
+        See iterateHex() for an explanation of the order argument and the
+        available keyword arguments.
+        """
+
+        indices, ordmap = _scdIterSetup(self.dims, order, **kw)
+        # Use an inefficient but simple approach: call getHexVolume()
+        # on each required i,j,k pair.  
+        # A better implementation would only make one call to getVtxCoords.
+        for A in itertools.product(*indices):
+            ijk = [A[ordmap[x]] for x in range(3)]
+            yield self.getHexVolume(*ijk)
 
     def getDivisions(self, dim):
         """Get the mesh divisions on a given dimension
