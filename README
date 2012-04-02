@@ -14,18 +14,25 @@ Instructions to perform 3D Activation and example command line syntax:
 	A MOAB mesh will be created with the default name fluxparse_out.h5m. This mesh will contain 
 	the neutron group-wise flux data. Additionally, an ALARA fluxin file will be created. 
 
-	       FluxParse.py meshtal 1
+		FluxParse.py meshtal 1
 
-2.b)   If fluxparse_out.h5m is not a structure mesh then it must be converted 
+2.b)   If fluxparse_out.h5m is not a structured mesh, then it must be converted 
 	using scdmesh_convert.py. A file with the name converted_scdmesh.h5m will be created.
 
 		scdmesh_convert.py fluxparse_out.h5m
+
+2.c)   If you are planning to use a specific photon energy group structure that is not the 
+	default 42 group structure, create a file, e.g. ergs, that lists the energy group 
+	boundaries, one per line, lowest energy first. The tag_erg_bins.py script is then 
+	used to place these tags on the mesh.
+
+		tag_erg_bins.py ergs converted_scdmesh.h5m
 
 3)     Run mmgrid.py to obtain volume fractions of the spatial mesh elements represented
        in the converted_scdmesh.h5m. A mesh file named mmgrid_output.h5m will be created with 
        volume fractions data tagged on the mesh.
 
-       	mmgrid.py hemispheres.sat converted_scdmesh.h5m
+		mmgrid.py hemispheres.sat converted_scdmesh.h5m
 
 4)     Run moab2alara.py to extract geometry and materials information from MOAB mesh
        and create ALARA geometry input file, alara_geom. 
@@ -43,6 +50,7 @@ Instructions to perform 3D Activation and example command line syntax:
 7)	Run PhtnSrcToH5M.py to extract photon source data from text file and store it
 	on the MOAB mesh. The input is a mesh file and the photon source file. The user
 	can specify different cooling times and isotopes for which to tag the mesh.
+        The defaults are the total source strengh (all isotopes) at shutdown.
 
 		PhtnSrcToH5M.py -m mmgrid_output.h5m -p phtn_src
 
@@ -52,12 +60,15 @@ Instructions to perform 3D Activation and example command line syntax:
 		gen_gammas.py mmgrid_output.h5m
 
 9) 	Modify forward neutron DAGMCNP input to be suited for photon transport problem using 
-	ModMCNPforPhotons.py.
+	ModMCNPforPhotons.py.  Tallies will need to be changed by hand.  If the input file
+        is a DAGMCNP input, include the -d flag; otherwise this can be omitted.
 
-		ModMCNPforPhotons.py inp
+		ModMCNPforPhotons.py inp -d
 
 10) 	Run forward photon transport problem with custom DAGMCNP compiled with unique source.F90 
-	to obtain source sampling information from gammas file. 
+	to obtain source sampling information from gammas file. A version of this custom
+        executable is linked at /r2s/mcnp_source/mcnp5p. (You will need to specify this path
+	in place of mcnp5p, below.)
 
-		dagmcnp5_p i=inp g=hemispheres.sat
+		mcnp5p i=inp g=hemispheres.sat
 
