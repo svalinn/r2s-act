@@ -169,11 +169,14 @@ class ScdMesh:
         available keyword arguments.
         """
 
-        indices, ordmap = _scdIterSetup(self.dims, order, **kw)
+        indices, _ = _scdIterSetup(self.dims, order, **kw)
         # Use an inefficient but simple approach: call getHexVolume()
         # on each required i,j,k pair.  
         # A better implementation would only make one call to getVtxCoords.
         for A in itertools.product(*indices):
+            # the ordmap returned from _scdIterSetup maps to kji/zyx ordering,
+            # but we want ijk/xyz ordering, so create the ordmap differently.
+            ordmap = [order.find(L) for L in 'xyz']
             ijk = [A[ordmap[x]] for x in range(3)]
             yield self.getHexVolume(*ijk)
 
@@ -242,7 +245,7 @@ def _scdIterSetup(dims, order, **kw):
                 spec[d] = [spec[d]]
             if not all(x in range(dims[idx], dims[idx + 3])
                        for x in spec[d]):
-                raise ScdMeshError('Invalid iterator kwarg: ' + str(spec[d]))
+                raise ScdMeshError('Invalid iterator kwarg: {0}={1}'.format(d,spec[d]))
             if d not in order and len(spec[d]) > 1:
                 raise ScdMeshError('Cannot iterate over' + str(spec[d]) +
                                    'without a proper iteration order')
