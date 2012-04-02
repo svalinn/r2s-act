@@ -3,47 +3,61 @@ the 3D activation workflow.
 
 Instructions to perform 3D Activation and example command line syntax: 
 
-1)	Run mmGridGen on CAD file with desired number of intervals in xyz dimensions. 
-	Adding the --mcnp flag will print out the corresponding fmesh card to be used later on.
+1)	Perform DAGMCNP forward neutron transport calculation. DAGMCNP input 
+       should contain fmesh card with appropriate phase-space bins required for
+       activation calculation.
 
-		mmGridGen --mcnp simplebox.sat 6 6 6 10
+		dagmcnp5 i=inp g=hemispheres.sat
 
-2)	Run meshReader to extract volume fraction information from MOAB mesh.
+2.a)   Run FluxParse.py on meshtal file. A flux normalization is needed. If the normalization 
+	has been included in the input with the use of an FM card, then this should just be 1.
+	A MOAB mesh will be created with the default name fluxparse_out.h5m. This mesh will contain 
+	the neutron group-wise flux data. Additionally, an ALARA fluxin file will be created. 
 
-		meshReader matFracs.h5m
+	       FluxParse.py meshtal 1
 
-3)	Run make_alara.py on meshReader output to generate alara geometry input 
-	for activation problem. User will be prompted to enter total volume of geometry.
+2.b)   If fluxparse_out.h5m is not a structure mesh then it must be converted 
+	using scdmesh_convert.py. A file with the name converted_scdmesh.h5m will be created.
 
-		make_alara.py matFracs_results.txt alara_geom
+		scdmesh_convert.py fluxparse_out.h5m
 
-		Enter the volume: 1000
+3)     Run mmgrid.py to obtain volume fractions of the spatial mesh elements represented
+       in the converted_scdmesh.h5m. A mesh file named mmgrid_output.h5m will be created with 
+       volume fractions data tagged on the mesh.
 
-4)	Copy the contents of alara_geom to ALARA input file that contains the remainder 
-	of input for an ALARA calculation.
+       	mmgrid.py hemispheres.sat converted_scdmesh.h5m
 
-5)	 Run MCNP with fmesh card printed by mmGridGen and an emesh card with the same 
-	 neutron energy group structure as is in the data library to be used by ALARA.
+4)     Run moab2alara.py to extract geometry and materials information from MOAB mesh
+       and create ALARA geometry input file, alara_geom. 
 
-		mcnp5 i=simplebox_mcnp
+		moab2alara.py mmgrid_output.h5m
 
-6)	Run FluxParse_MCNP_ALARA.py to parse and normalize neutron fluxes in meshtal 
-	file to appropriate format for ALARA.
+5)     Add flux schedule and photon source output definitions to alara_geom to create a 
+       complete ALARA input file. An ALARA material library will need to be created to 
+       define the materials used in transport for the activation calculation. 
 
-		FluxParse_MCNP_ALARA.py meshtal fluxin_6 1e17
+6)     Perform activation calculation. ALARA will produce photon source file.
 
-7)	Modify ALARA input flux card to be the same as the flux file created in 
-	previous step. Make sure photon source output is specified in ALARA 
-	input. Run ALARA.
+		alara < alara_input > alara_output
 
-		alara < simplebox_alara > alara_out
+7)	Run PhtnSrcToH5M.py to extract photon source data from text file and store it
+	on the MOAB mesh. The input is a mesh file and the photon source file. The user
+	can specify different cooling times and isotopes for which to tag the mesh.
 
-8)	Modify parse_phtn.py to use the correct phtn_src file, and to correspond to the
-	correct number of intervals in xyz dimensions. 
-	Run parse_phtn.py to parse photon source file created by ALARA which will create 
-	SDEF card (in file phtn_sdef in the script directory) for MCNP photon source transport.
+		PhtnSrcToH5M.py -m mmgrid_output.h5m -p phtn_src
 
-		./parse_phtn.py
+8)	Run gen_gammas.py to created gammas file needed for forward photon transport in
+	DAGMCNP.
 
-9)	Copy contents of phtn_sdef into MCNP input for photon transport. Run MCNP photon 
-	transport problem.
+		gen_gammas.py mmgrid_output.h5m
+
+9) 	Modify forward neutron DAGMCNP input to be suited for photon transport problem using 
+	ModMCNPforPhotons.py.
+
+		ModMCNPforPhotons.py inp
+
+10) 	Run forward photon transport problem with custom DAGMCNP compiled with unique source.F90 
+	to obtain source sampling information from gammas file. 
+
+		dagmcnp5_p i=inp g=hemispheres.sat
+
