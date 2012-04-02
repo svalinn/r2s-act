@@ -18,7 +18,6 @@ class TestCalcVolumes(unittest.TestCase):
         self.mesh = iMesh.Mesh()
         filename = os.path.join(os.path.dirname(__file__), 'grid543.h5m')
         self.myScd = ScdMesh.fromFile(self.mesh, filename)
-        #self.mesh.open
 
     def test_calc_volumes_list_1(self):
         """
@@ -33,7 +32,6 @@ class TestCalcVolumes(unittest.TestCase):
 class TestGenGammasFile(unittest.TestCase):
 
     def setUp(self):
-        #os.system("rm " + meshfile)
         os.system("cp " + meshfile_orig + " " + meshfile)
         PhtnSrcToH5M.read_to_h5m(inputfile, meshfile)
 

@@ -12,17 +12,18 @@
 ######################################################################
 
 from optparse import OptionParser
-from itaps import iBase,iMesh
+from itaps import iBase,iMesh,iMeshExtensions
 import alias
 from scdmesh import ScdMesh, ScdMeshError
 
 
-def gen_gammas_file_from_h5m(inputfile, outfile="gammas", do_alias=False):
+def gen_gammas_file_from_h5m(meshfile, outfile="gammas", do_alias=False):
     """Generate gammas file using information from tags on a MOAB mesh.
     
     ACTION: Method reads tags with photon source strengths from an h5m
     file and generates the gammas file for the modified KIT source.f90 routine.
-    To do this, we generate meshstrengths and call gen_gammas_file().
+    To do this, we generate 'meshstrengths' for each voxel and write this
+    information to the gammas file, along with header information.
     REQUIRES: the .h5m moab mesh must have photon source strength tags of the
     form "phtn_src_group_###"
     Will read photon energy bin boundary values if the root set has the tag 
@@ -34,22 +35,22 @@ def gen_gammas_file_from_h5m(inputfile, outfile="gammas", do_alias=False):
     TODO:
     """
 
-    mesh = iMesh.Mesh()
+#    mesh = iMesh.Mesh()
 
-    # Create ScdMesh object, which also loads inputfile into mesh.
-    sm = ScdMesh.fromFile(mesh, inputfile)
+    # Create ScdMesh object, which also loads 'meshfile' into mesh.
+    sm = ScdMesh.fromFile(iMesh.Mesh(), meshfile)
 
     try:
-        grouptag = mesh.getTagHandle("phtn_src_group_001")
+        grouptag = sm.mesh.getTagHandle("phtn_src_group_001")
     except iBase.TagNotFoundError:
         print "ERROR: The file '{0}' does not contain tags of the " \
-                "form 'phtn_src_group_#'".format(inputfile)
+                "form 'phtn_src_group_#'".format(meshfile)
         return 0
 
-    voxels = mesh.getEntities(iBase.Type.region)
+    voxels = list(sm.iterateHex('xyz'))
 
     # Initialize list to first erg bin source strength value for each voxel
-    meshstrengths = [float(x) for x in grouptag[voxels]]
+    meshstrengths = [float(grouptag[x]) for x in voxels]
 
     numergbins = 0
 
@@ -57,7 +58,7 @@ def gen_gammas_file_from_h5m(inputfile, outfile="gammas", do_alias=False):
     #  to get the total source strength in each voxel
     for i in xrange(2,1000): #~ Arbitrary: we look for up to 1000 groups
         try:
-            grouptag = mesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
+            grouptag = sm.mesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
             for cnt, vox in enumerate(voxels):
                 meshstrengths[cnt] += float(grouptag[vox])
         except iBase.TagNotFoundError: 
@@ -69,8 +70,9 @@ def gen_gammas_file_from_h5m(inputfile, outfile="gammas", do_alias=False):
     vols = calc_volumes_list(sm)
 
     if len(vols) != len(meshstrengths):
-        print "ERROR: mismatch in calculated number of volumes and number of " \
-                "voxel source strengths."
+        print "ERROR: mismatch in calculated number of volumes ({0}) and " \
+                "number of voxel source strengths " \
+                "({1}).".format(len(vols), len(meshstrengths))
         return 0
 
     # We calcualte the normalization factor as the sum over all voxels of
@@ -92,13 +94,14 @@ def gen_gammas_file_from_h5m(inputfile, outfile="gammas", do_alias=False):
 
     # We now look for the tags with the energy bin boundary values
     try:
-        phtn_ergs = mesh.getTagHandle("PHTN_ERG")
-        myergbins = phtn_ergs[mesh.rootSet] #UNTESTED... does this need list() around it?
-        print "NOTE: photon energy bins were found in the .h5m mesh and added to " \
-                "'{0}'. The modified mcnp5/source.f90 looks for a file caled " \
-                "'gammas_ener'".format(outfile)
-    except: # if there is no PHTN_BINS tag, then we send an empty string in its place
-        myergbins = ""
+        phtn_ergs = sm.mesh.getTagHandle("PHTN_ERGS")
+        myergbins = phtn_ergs[sm.mesh.rootSet] 
+        print "Found a custom set of {0} energy bins in the PHTN_ERGS " \
+                "tag.".format(len(myergbins)-1)
+
+    # if there is no PHTN_ERGS tag, then we send an empty string in myergbins
+    except iBase.TagNotFoundError: 
+        myergbins = "" # _gen_gammas_header will skip the energies line
 
     # The header of the gammas file is created in outfile, and the file writing
     #  stream is returned to fw
@@ -112,9 +115,9 @@ def gen_gammas_file_from_h5m(inputfile, outfile="gammas", do_alias=False):
             # -sum up the total source strength (sourcetotal)
             # -make a list of bin source strengths and group #s (ergproblist)
             for i in xrange(1, numergbins + 1):
-                sourcetotal += float(mesh.getTagHandle( \
+                sourcetotal += float(sm.mesh.getTagHandle( \
                         "phtn_src_group_{0:03d}".format(i))[voxel])
-                ergproblist.append([float(mesh.getTagHandle( \
+                ergproblist.append([float(sm.mesh.getTagHandle( \
                         "phtn_src_group_{0:03d}".format(i))[voxel]), i])
 
             # Special case if there is no source strength
@@ -143,7 +146,7 @@ def gen_gammas_file_from_h5m(inputfile, outfile="gammas", do_alias=False):
             writestring = ""
             binval = 0.0
             for i in xrange(1, numergbins + 1):
-                binval += float(mesh.getTagHandle( \
+                binval += float(sm.mesh.getTagHandle( \
                         "phtn_src_group_{0:03d}".format(i))[voxel])
                 writestring += "{0:<12.5E}".format(binval/norm)
             fw.write(writestring + "\n")
@@ -179,12 +182,15 @@ def _gen_gammas_header(scd, outfile, ergbins):
     # create and write z mesh edges line (4th line)
     fw.write(" ".join([str(z) for z in scd.getDivisions('z')]) + "\n")
 
-    # create and write 5th line (list of activated materials... ?????)
+    # create and write 5th line (placeholder list of activated materials)
     fw.write(" ".join([str(x) for x in xrange(1,101)]) + "\n")
 
     # If storing the energy bins information, write line 6
+    # Line starts with 'e', then the number of energy GROUPS, then
+    #  lists all group boundaries
     if ergbins != "":
-        fw.write(" ".join([str(x) for x in ergbins]) + "\n")
+        fw.write("e " + str(len(ergbins)-1) + " " + \
+                " ".join([str(x) for x in ergbins]) + "\n")
 
     return fw
 
