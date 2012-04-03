@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import re
+import string
 from optparse import OptionParser
 
 
@@ -32,7 +33,13 @@ class ModMCNPforPhotons(object):
         self.block1Lines = []
         self.block2Lines = []
         self.block3Lines = []
+        
+        self.block1Comments = []
+        self.block2Comments = []
+        self.block3Comments = []
 
+        self.extraLines = []
+        
         # File reading object for MCNP input file
         fr = open(self.inputFileName, 'r')
         
@@ -42,18 +49,24 @@ class ModMCNPforPhotons(object):
         # The mcnp input file is read into it's three blocks
         # comment lines (beginning with 'c' are not included)
         if not self.dagmc:
-            self.mcnp_block_parser(fr, self.block1Lines)
-            self.mcnp_block_parser(fr, self.block2Lines)
-        self.mcnp_block_parser(fr, self.block3Lines)
+            self.mcnp_block_parser(fr, self.block1Lines, self.block1Comments)
+            self.mcnp_block_parser(fr, self.block2Lines, self.block2Comments)
+        self.mcnp_block_parser(fr, self.block3Lines, self.block3Comments)
+
+        # We store anything following the data block in another list
+        myLine = fr.readline()
+        while myLine != "": # EoF
+            self.extraLines.append(myLine)
+            myLine = fr.readline()
         
-        fr.close
+        fr.close()
 
         print "'{0}' has been read.\n".format(self.inputFileName)
 
         return 1
 
 
-    def mcnp_block_parser(self, fr, blockLines):
+    def mcnp_block_parser(self, fr, blockLines, commentLines):
         """Read lines from input file until an entire block has been read.
         
         Method receives a file reader ('fr'), and reads lines
@@ -70,9 +83,16 @@ class ModMCNPforPhotons(object):
             myLine = myLine.replace('\r','')
 
             if myLine.replace(" ","") == '\n': # If blank line, goto next section
-                myLine = '' # This is the while loop condition
+                myLine = '' # This escapes the while loop condition
             else:
-                blockLines.append(myLine)
+                # We split once at $, so that comments are unchanged
+                mySplit = string.split(myLine, sep='$', maxsplit=1)
+                blockLines.append(mySplit[0].replace('\n',''))
+
+                # We do a few list checks to avoid errors
+                if len(mySplit) > 1 and len(mySplit[1]) > 0:
+                    commentLines.append('$' + mySplit[1])
+                else: commentLines.append("\n")
                 myLine = fr.readline()
 
         return 1
@@ -88,9 +108,15 @@ class ModMCNPforPhotons(object):
         cntimp = 0
         
         for cnt, line in enumerate(self.block1Lines):
+            lineLower = line.lower()
+
+            # ignore comment lines
+            if lineLower.split()[0] == 'c':
+                continue
+
             # check for the case where both imp:n and imp:p are being used
-            if "imp:p" not in line:
-                line = line.replace("imp:n", "imp:p")
+            if "imp:p" not in lineLower:
+                line = lineLower.replace("imp:n", "imp:p")
                 cntimp += 1
 
             self.block1Lines[cnt] = line
@@ -136,6 +162,10 @@ class ModMCNPforPhotons(object):
         sourcecards = ["sdef","si","sp","sb","sc","ds","kcode","ksrc"]
 
         for cnt, line in enumerate(self.block3Lines):
+            
+            # ignore comment lines
+            if line.split()[0] == 'c' or line.split()[0] == 'C':
+                continue
 
             # If line is indented 5+ spaces and the previous non-indented 
             #  line was commented out, comment out out this line too.
@@ -159,15 +189,15 @@ class ModMCNPforPhotons(object):
                 notephys = "-phys:n was commented out \n"
 
             elif "mode" == linesplit[0]:
-                line = "mode p\n"
+                line = "mode p"
                 notemode = "-mode card replaced with 'mode p' \n"
 
             # keep same cell importances, but set them for photons
             elif "imp:n" == linesplit[0]:
-                line = "imp:p " + ' '.join(linesplit_orig[1:]) + '\n'
-                noteimp = "-imp:n card converted to imp:p \n"
+                line = "imp:p " + ' '.join(linesplit_orig[1:]) + ''
+                noteimp = "-imp:n card converted to imp:p with same values\n"
             
-            else:
+            else: # no changes to the line
                 continue
 
             commentout = True
@@ -179,11 +209,12 @@ class ModMCNPforPhotons(object):
                 "Note that tallies were not modified. Remember that neutron" \
                 " tallies\nshould probably be changed." \
                 "\n".format(cntsrc, notemode, notephys, noteimp)
+
         return 1
 
 
     def write_deck(self, outputFileName=""):
-        """Createa new MCNP input file from the object's contents.
+        """Create a new MCNP input file from the object's contents.
         
         ACTION: Method writes the contents of self.block#Lines to a new file.
             File name is determined automatically if not supplied.
@@ -204,11 +235,24 @@ class ModMCNPforPhotons(object):
         # Start writing to file - title card first
         fw.write(self.title)
         if not self.dagmc:
-            for line in self.block1Lines: fw.write(line) #block 1
+            for cnt, line in enumerate(self.block1Lines):
+                fw.write(line + self.block1Comments[cnt]) #block 1
+            
             fw.write('\n') #blank line dividing blocks 1 and 2
-            for line in self.block2Lines: fw.write(line) #block 2
+
+            for cnt, line in enumerate(self.block2Lines):
+                fw.write(line + self.block2Comments[cnt]) #block 2
+            
             fw.write('\n') #blank line dividing blocks 2 and 3
-        for line in self.block3Lines: fw.write(line) #block 3
+
+        for cnt, line in enumerate(self.block3Lines):
+            fw.write(line + self.block3Comments[cnt]) #block 3
+
+        if len(self.extraLines) > 0:
+            fw.write('\n') #blank line dividing block 3 and extra file contents
+
+        for line in self.extraLines:
+            fw.write(line) # extra file contents
 
         fw.close()
 
