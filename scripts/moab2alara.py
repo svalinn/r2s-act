@@ -12,7 +12,7 @@ import operator
 def parser():
     parser = OptionParser(usage="usage: %prog <in> -v VOLUME [options]")
     parser.add_option("-v", "--volume",
-                      action="store", dest="volume",
+                      action="store", dest="volume", default=1,
                       help="Total volume of mesh geometry")
     parser.add_option("-r", "--round",
                       action="store", dest="round", default="6",
