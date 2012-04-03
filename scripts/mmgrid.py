@@ -9,6 +9,7 @@ import optparse
 
 from itaps import iMesh
 import scdmesh
+from write_alara_geom import write_alara_geom
 from pydagmc import dagmc
 from pydagmc import util as dagutil
 
@@ -281,9 +282,11 @@ class mmGrid:
                 mattag[hx] = mat[matnum]
                 errtag[hx] = err[matnum]
 
-    def writeFile(self, filename):
+    def writeFile(self, filename, alara_geom_file=None ):
         mesh = self.scdmesh
         mesh.scdset.save(filename)
+        if alara_geom_file:
+            write_alara_geom(alara_geom_file, mesh)
 
 
 def main( arguments=None ):
@@ -307,6 +310,8 @@ def main( arguments=None ):
                    dest='quiet', default=False, action='store_true' )
     op.add_option( '-d','--divs', help='Number of mesh divisions to use when inferring mesh size, default=%default',
                    dest='ndivs', default=10 )
+    op.add_option( '-a', '--alara', help='Write alara geom to specified file name',
+                   dest='alara_geom_file', default=None, action='store')
     opts, args = op.parse_args( arguments )
     if len(args) != 1 and len(args) != 2:
         op.error( 'Need one or two arguments' )
@@ -323,7 +328,7 @@ def main( arguments=None ):
 
     grid.generate(opts.numrays, opts.usegrid)
     grid.createTags()
-    grid.writeFile( opts.output_filename )
+    grid.writeFile( opts.output_filename, opts.alara_geom_file )
 
 
 if __name__ == '__main__':
