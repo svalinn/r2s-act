@@ -81,7 +81,7 @@ def find_mesh_bounds(meshtal) :
       divs.append(linecache.getline(meshtal, count + x).split()[2:])
     divs.append(linecache.getline(meshtal, count+3).split()[3:])
 
-    print 'Meshtal dimensions: ({0},{1},{2} with {3} energy bins + Total bin)'.format\
+    print 'Meshtal dimensions: ({0},{1},{2}) with {3} energy bins + Total bin'.format\
            (len(divs[0])-1,len(divs[1])-1, len(divs[2])-1, len(divs[3])-2)
 
     return (divs[0],divs[1],divs[2],divs[3])
@@ -107,15 +107,13 @@ def tag_fluxes(meshtal, meshtal_type, m, spacial_points, \
         flux_data=[]
         error_data=[]
         for point in range(0, spacial_points) :
-           # print float(linecache.getline( meshtal,m+point+(e_group-1)*spacial_points ).split()[4])
             flux_data.append( float(linecache.getline( meshtal,m+point+(e_group-1)*spacial_points ).split()[4])*norm)
             error_data.append(float(linecache.getline( meshtal,m+point+(e_group-1)*spacial_points ).split()[5]))
-        print '\n\n\n\n'
+
         tag_flux[voxels]=flux_data
         tag_error[voxels]=error_data
-        #print e_group
     sm.scdset.save(mesh_output)
-    print 'Structed mesh creation complete'
+    print 'Structed mesh tagging complete'
 
 ###############################################################################
 
@@ -153,8 +151,10 @@ def main( arguments = None ) :
     mesh=iMesh.Mesh()
     if opts.mesh_input == 'False' :        
         sm=scdmesh.ScdMesh(mesh, x_bounds, y_bounds, z_bounds)
+        print 'Creating new structred mesh'
     else:
         sm = ScdMesh.fromFile(iMesh.Mesh(), opts.mesh_input)
+        print 'Reading user supplied structured mesh: ', opts.mesh_input
     norm=float(args[1])
     tag_fluxes(args[0], meshtal_type, m, spacial_points, \
                e_bins, sm, mesh, norm, opts.mesh_output)
