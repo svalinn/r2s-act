@@ -91,9 +91,9 @@ def find_mesh_bounds(meshtal) :
 
 def tag_fluxes(meshtal, meshtal_type, m, spacial_points, \
                e_bins, sm, mesh, norm, mesh_output) :
-    print spacial_points
+    
     voxels=list(sm.iterateHex('xyz'))
-    print e_bins
+    
     for e_group in range(1, e_bins +1) : #create a new tag for each E bin
         if e_group != e_bins:
             tag_flux=sm.mesh.createTag\
