@@ -34,8 +34,7 @@ def find_meshtal_type(meshtal) :
         photon_index=line.find('photon')
         count=count+1
         if count > 100 :
-            print >>sys.stderr, 'Meshtal type not detected in first 100 lines;\
-                                 check to make sure this is a meshtal file'
+            print >>sys.stderr, 'Meshtal type not detected in first 100 lines'
             sys.exit(1)
 
     if neutron_index != -1 :
@@ -78,11 +77,11 @@ def find_mesh_bounds(meshtal) :
    
     divs=[]
     for x in (0,1,2) :
-      divs.append(linecache.getline(meshtal, count + x).split()[2:])
+        divs.append(linecache.getline(meshtal, count + x).split()[2:])
     divs.append(linecache.getline(meshtal, count+3).split()[3:])
-
+    
     print 'Meshtal dimensions: ({0},{1},{2}) with {3} energy bins + Total bin'.format\
-           (len(divs[0])-1,len(divs[1])-1, len(divs[2])-1, len(divs[3])-2)
+           (len(divs[0])-1,len(divs[1])-1, len(divs[2])-1, len(divs[3])-1)
 
     return (divs[0],divs[1],divs[2],divs[3])
    
@@ -144,7 +143,7 @@ def main( arguments = None ) :
  
     spacial_points=(len(x_bounds)-1)*(len(y_bounds)-1)*(len(z_bounds)-1)
     e_bins=len(e_bounds) #dont substract 1; cancels with totals bin
-    print e_bins
+    
 
     #total_points=int(spacial_points*e_bins) 
 
