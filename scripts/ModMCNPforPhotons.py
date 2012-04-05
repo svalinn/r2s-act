@@ -114,8 +114,8 @@ class ModMCNPforPhotons(object):
             if lineLower.split()[0] == 'c':
                 continue
 
-            # check for the case where both imp:n and imp:p are being used
-            if "imp:p" not in lineLower:
+            # check for the case where only imp:n is being used
+            if "imp:p" not in lineLower and "imp:n" in lineLower:
                 line = lineLower.replace("imp:n", "imp:p")
                 cntimp += 1
 
