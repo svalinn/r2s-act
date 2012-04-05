@@ -3,7 +3,6 @@ import linecache
 from optparse import OptionParser
 import sys
 from itaps import iMesh, iBase
-import scdmesh
 from scdmesh import ScdMesh
 
 def find_num_e_groups(sm):
@@ -64,6 +63,14 @@ def print_fluxes(sm, num_e_groups, backward_bool, fluxin_name):
     print 'flux.in file {0} sucessfully created'.format(fluxin_name)
 
 
+def write_alara_fluxin( filename, sm, backwards=False ):
+
+    #Find number of energy groups
+    num_e_groups=find_num_e_groups(sm)
+
+    #Print flux.in file
+    print_fluxes(sm, num_e_groups, backwards, filename)
+
 def main( arguments = None ):
 
     #Instatiate options parser
@@ -84,15 +91,10 @@ def main( arguments = None ):
         ( '\nNeed exactly 1 argument: structured mesh file' )
 
     #Load Structured mesh from file
-    sm=ScdMesh.fromFile(iMesh.Mesh(),args[0])    
+    sm=ScdMesh.fromFile(iMesh.Mesh(),args[0])
 
-    #Find number of energy groups
-    num_e_groups=find_num_e_groups(sm)
-
-    #Print flux.in file
-    print_fluxes(sm,num_e_groups,opts.backward_bool,opts.fluxin_name)
-
+    write_alara_fluxin( opts.fluxin_name, sm, opts.backward_bool )
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
