@@ -1,5 +1,5 @@
 import unittest
-import ModMCNPforPhotons
+from r2s import mcnp_n2p
 import os.path
 import itertools
 
@@ -12,7 +12,7 @@ testfile_compare = "testing/inp_ModMCNPforPhotons_converted"
 class TestRegularMCNP(unittest.TestCase):
 
     def setUp(self):
-        self.obj = ModMCNPforPhotons.ModMCNPforPhotons(testfile, dagmc=False)
+        self.obj = mcnp_n2p.ModMCNPforPhotons(testfile, dagmc=False)
         self.obj.read()
         self.obj.change_block_1()
         self.obj.change_block_2()

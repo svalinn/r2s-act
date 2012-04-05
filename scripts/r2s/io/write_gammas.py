@@ -13,7 +13,7 @@
 
 from optparse import OptionParser
 from itaps import iBase,iMesh,iMeshExtensions
-import alias
+from r2s import alias
 from scdmesh import ScdMesh, ScdMeshError
 
 

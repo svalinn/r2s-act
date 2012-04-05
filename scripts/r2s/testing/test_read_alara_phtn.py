@@ -1,4 +1,4 @@
-import PhtnSrcToH5M
+from r2s.io import read_alara_phtn
 import os
 import unittest
 
@@ -24,37 +24,37 @@ class TestPhtn(unittest.TestCase):
         os.system("rm " + meshfile)
 
     def test_simple(self):
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile), 1)
+        self.assertEqual(read_alara_phtn.read_to_h5m(inputfile, meshfile), 1)
 
     def test_simple_with_totals(self):
         """Tag a mesh; tagging again should fail; then tagging again should
         succeed when we add the retag=True option"""
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, totals=True), 1)
+        self.assertEqual(read_alara_phtn.read_to_h5m(inputfile, meshfile, totals=True), 1)
 
     def test_unobtanium(self):
         """Supplied isotope doesn't exist in file."""
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, "unobtanium"), 0)
+        self.assertEqual(read_alara_phtn.read_to_h5m(inputfile, meshfile, "unobtanium"), 0)
 
     def test_cooling_num_pass(self):
         """We send a numeric value for the cooling step. Should return 1"""
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, coolingstep=3) , 1)
+        self.assertEqual(read_alara_phtn.read_to_h5m(inputfile, meshfile, coolingstep=3) , 1)
 
     def test_cooling_num_fail1(self):
         """We send an invalid numeric value for the cooling step. Should return 0"""
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, coolingstep=53), 0)
+        self.assertEqual(read_alara_phtn.read_to_h5m(inputfile, meshfile, coolingstep=53), 0)
     
     def test_cooling_num_fail2(self):
         """We send an invalid numeric value for the cooling step. Should return 0"""
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, coolingstep=-3), 0)
+        self.assertEqual(read_alara_phtn.read_to_h5m(inputfile, meshfile, coolingstep=-3), 0)
     
     def test_cooling_string_pass(self):
         """We send a valid string value for the cooling step. Should return 1"""
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, coolingstep="1 s"), 1)
+        self.assertEqual(read_alara_phtn.read_to_h5m(inputfile, meshfile, coolingstep="1 s"), 1)
     
     def test_cooling_string_fail(self):
         """We send an invalid string value for the cooling step.  String is not in 
         file and should return 0"""
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, coolingstep="never"), 0)
+        self.assertEqual(read_alara_phtn.read_to_h5m(inputfile, meshfile, coolingstep="never"), 0)
 
 
 class TestPhtnRetagging(unittest.TestCase):
@@ -65,31 +65,31 @@ class TestPhtnRetagging(unittest.TestCase):
 
     def setUp(self):
         os.system("cp " + meshfile_orig + " " + meshfile)
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile), 1)
+        self.assertEqual(read_alara_phtn.read_to_h5m(inputfile, meshfile), 1)
 
     def tearDown(self):
         os.system("rm " + meshfile)
 
     def test_retag_fail(self):
         """We try again to tag the same mesh. An error should be returned"""
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile), 0)
+        self.assertEqual(read_alara_phtn.read_to_h5m(inputfile, meshfile), 0)
 
     def test_retag_totals_fail(self):
         """We try again to tag the same mesh. An error should be returned.
         This test should be redundant as totals should not be reached before 
         the method fails."""
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, totals=True), 0)
+        self.assertEqual(read_alara_phtn.read_to_h5m(inputfile, meshfile, totals=True), 0)
 
     def test_retag_ok(self):
         """We try to tag the same mesh, but with the retag 
         parameter = True
         Should succeed fine."""
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, retag=True), 1)
+        self.assertEqual(read_alara_phtn.read_to_h5m(inputfile, meshfile, retag=True), 1)
 
     def test_retag_totals_fail(self):
         """We try to tag the same mesh, and also include totals; 
         Should have no problems. should not be reached before """
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, retag=True, totals=True), 1)
+        self.assertEqual(read_alara_phtn.read_to_h5m(inputfile, meshfile, retag=True, totals=True), 1)
 
 
 class TestPhtnTotalsRetagging(unittest.TestCase):
@@ -98,7 +98,7 @@ class TestPhtnTotalsRetagging(unittest.TestCase):
 
     def setUp(self):
         os.system("cp " + meshfile_orig + " " + meshfile)
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, totals=True), 1)
+        self.assertEqual(read_alara_phtn.read_to_h5m(inputfile, meshfile, totals=True), 1)
 
     def tearDown(self):
         os.system("rm " + meshfile)
@@ -106,7 +106,7 @@ class TestPhtnTotalsRetagging(unittest.TestCase):
     def test_retag_and_totals_ok(self):
         """We enable retagging and also make sure that the totals get retagged.
         """
-        self.assertEqual(PhtnSrcToH5M.read_to_h5m(inputfile, meshfile, retag=True, totals=True), 1)
+        self.assertEqual(read_alara_phtn.read_to_h5m(inputfile, meshfile, retag=True, totals=True), 1)
 
 
 

@@ -5,7 +5,7 @@ import itertools
 import numpy
 
 try:
-    import mmgrid
+    from r2s import mmgrid
     import pydagmc
 except ImportError as e:
     print >>sys.stderr, "Could not import mmgrid:", e
