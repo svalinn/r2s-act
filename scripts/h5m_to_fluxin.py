@@ -10,25 +10,37 @@ def find_num_e_groups(sm):
     
     num_e_groups=0
     for e_group in range(1,1000): #search for up to 1000 e_groups
-
+        
+        #Look for tags in the form n_group_'e_group'
         try:
             tag=sm.mesh.getTagHandle('n_group_{0:03d}'.format(e_group))
-            num_e_groups = num_e_groups + 1
+            num_e_groups = num_e_groups + 1 #increment if tag is found
 
+       # Stop iterating once a tag is not found
         except iBase.TagNotFoundError:
             break
-    print 'Energy groups found: {0}'.format(num_e_groups)  
+    
+
+    if num_e_groups != 0 :
+        print 'Energy groups found: {0}'.format(num_e_groups)
+
+    #Exit if no tags of the form n_group_XXX are found
+    else:
+        print >>sys.stderr, 'No tags of the form n_group_XXX found'
+        sys.exit(1)
+  
     return num_e_groups
 
 def print_fluxes(sm, num_e_groups, backward_bool, fluxin_name):
 
     output=file(fluxin_name, 'w')
-
     voxels=sm.iterateHex('xyz')
-    for voxel in voxels:
-    
-        count=0
 
+    #Print fluxes for each voxel in xyz order (z changing fastest)
+    for voxel in voxels:
+        
+        #Establish for loop bounds based on if forward or backward printing
+        #is requested
         if backward_bool == False :
             min = 1
             max= num_e_groups + 1
@@ -37,20 +49,26 @@ def print_fluxes(sm, num_e_groups, backward_bool, fluxin_name):
             min=num_e_groups
             max=0
             direction=-1
+        
+        #Print flux data to file
+        count=0
         for e_group in range(min,max,direction):
             output.write(str(sm.mesh.getTagHandle('n_group_{0:03d}'.format(e_group))[voxel])+' ')
             
+            #flux.in formatting: create a new line after every 8th entry
             count += 1   
             if count%8 == 0:
                 output.write('\n')
-        output.write('\n\n')   
+        output.write('\n\n')
+   
     print 'flux.in file {0} sucessfully created'.format(fluxin_name)
 
 
 def main( arguments = None ):
 
+    #Instatiate options parser
     parser = OptionParser\
-             (usage='%prog <mesh> [options]')
+             (usage='%prog <structured mesh> [options]')
 
     parser.add_option('-b', action='store_true', dest='backward_bool',\
         default=False, \
@@ -61,9 +79,17 @@ def main( arguments = None ):
 
     (opts, args) = parser.parse_args( arguments )
 
+    if len(args) != 1 :
+        parser.error\
+        ( '\nNeed exactly 1 argument: structured mesh file' )
+
+    #Load Structured mesh from file
     sm=ScdMesh.fromFile(iMesh.Mesh(),args[0])    
 
+    #Find number of energy groups
     num_e_groups=find_num_e_groups(sm)
+
+    #Print flux.in file
     print_fluxes(sm,num_e_groups,opts.backward_bool,opts.fluxin_name)
 
 
