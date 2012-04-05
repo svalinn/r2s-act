@@ -23,10 +23,10 @@ Instructions to perform 3D Activation and example command line syntax:
 
 2.c)   If you are planning to use a specific photon energy group structure that is not the 
 	default 42 group structure, create a file, e.g. ergs, that lists the energy group 
-	boundaries, one per line, lowest energy first. The tag_erg_bins.py script is then 
+	boundaries, one per line, lowest energy first. The ergbins_to_h5m.py script is then 
 	used to place these tags on the mesh.
 
-		tag_erg_bins.py ergs converted_scdmesh.h5m
+		ergbins_to_h5m.py ergs converted_scdmesh.h5m
 
 3)     Run mmgrid.py to obtain volume fractions of the spatial mesh elements represented
        in the converted_scdmesh.h5m. A mesh file named mmgrid_output.h5m will be created with 
