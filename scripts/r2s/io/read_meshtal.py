@@ -12,7 +12,6 @@
 ###############################################################################
 
 from itaps import iMesh
-import scdmesh
 from optparse import OptionParser
 import linecache
 import sys
@@ -104,7 +103,7 @@ def find_mesh_bounds(meshtal) :
 ###############################################################################
 
 def tag_fluxes(meshtal, meshtal_type, m, spacial_points, \
-               e_bins, sm, mesh, norm, mesh_output) :
+               e_bins, sm,  norm ) :
     
     voxels=list(sm.iterateHex('xyz'))
     
@@ -133,8 +132,23 @@ def tag_fluxes(meshtal, meshtal_type, m, spacial_points, \
         tag_flux[voxels]=flux_data
         tag_error[voxels]=error_data
 
-    sm.scdset.save(mesh_output)
-    print 'Structured mesh tagging complete'
+def read_meshtal( filename, norm=1):
+    #Getting relevant information from meshtal header
+    meshtal_type=find_meshtal_type( filename )
+    m=find_first_line( filename )
+    x_bounds, y_bounds, z_bounds, e_bounds = find_mesh_bounds( filename )
+ 
+    #Calculating pertainent information from meshtal header and input
+    spacial_points=(len(x_bounds)-1)*(len(y_bounds)-1)*(len(z_bounds)-1)
+    e_bins=len(e_bounds) #dont substract 1; cancels with totals bin
+
+    sm = ScdMesh( iMesh.Mesh(), x_bounds, y_bounds, z_bounds)
+
+    #Tagging structured mesh
+    tag_fluxes(filename, meshtal_type, m, spacial_points,
+               e_bins, sm, norm)
+
+    return sm
 
 ###############################################################################
 
@@ -146,10 +160,8 @@ def main( arguments = None ) :
 
     parser.add_option('-o', dest='mesh_output', default='flux_mesh.h5m',\
                       help = 'Name of mesh output file, default=%default')
-
-    parser.add_option('-m',  dest='mesh_input', default= 'False',\
-                      help = 'Tags fluxes onto a pre-existing structured mesh,\
-                              supply the path to the file')
+    parser.add_option('-n', dest='norm', default=1,
+                      help = 'Normalization factor, default=%default')
 
     (opts, args) = parser.parse_args( arguments )
     
@@ -157,36 +169,13 @@ def main( arguments = None ) :
         parser.error\
         ( '\nNeed exactly 2 arguments: meshtal file and normalization factor' )
 
+    sm = read_meshtal( args[0], opts.norm )
 
-    #Getting relevant information from meshtal header
-    meshtal_type=find_meshtal_type(args[0])
-    m=find_first_line(args[0])
-    x_bounds, y_bounds, z_bounds, e_bounds = find_mesh_bounds(args[0])
- 
-    #Calculating pertainent information from meshtal header and input
-    spacial_points=(len(x_bounds)-1)*(len(y_bounds)-1)*(len(z_bounds)-1)
-    e_bins=len(e_bounds) #dont substract 1; cancels with totals bin
-    norm=float(args[1])    
-
-    #Creating iMesh instance
-    mesh=iMesh.Mesh() 
-
-    #Creating new structured mesh if none is supplied
-    if opts.mesh_input == 'False' :      
-        sm=scdmesh.ScdMesh(mesh, x_bounds, y_bounds, z_bounds)
-        print 'Creating new structred mesh'
-
-    #Loading user supplied stuctured mesh if -m flag is used
-    else:
-        sm = ScdMesh.fromFile(mesh, opts.mesh_input)
-        print 'Reading user supplied structured mesh: ', opts.mesh_input
-
-    #Tagging structured mesh
-    tag_fluxes(args[0], meshtal_type, m, spacial_points, \
-               e_bins, sm, mesh, norm, opts.mesh_output)
+    sm.scdset.save(mesh_output)
+    print 'Structured mesh tagging complete'
 
 
 
 ###############################################################################
 if __name__ == '__main__':
-    main()
+    main( sys.argv )
