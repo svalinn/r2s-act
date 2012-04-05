@@ -15,9 +15,8 @@ outfile = "gammas_test"
 class TestCalcVolumes(unittest.TestCase):
 
     def setUp(self):
-        self.mesh = iMesh.Mesh()
         filename = os.path.join(thisdir, 'grid543.h5m')
-        self.myScd = ScdMesh.fromFile(self.mesh, filename)
+        self.sm = ScdMesh.fromFile(iMesh.Mesh(), filename)
 
     def test_calc_volumes_list_1(self):
         """
@@ -27,13 +26,14 @@ class TestCalcVolumes(unittest.TestCase):
                 48,40, 60,50, 60,50, \
                 48,40, 60,50, 60,50, \
                 48,40, 60,50, 60,50]
-        self.assertEqual(write_gammas.calc_volumes_list(self.myScd), volumes)
+        self.assertEqual(write_gammas.calc_volumes_list(self.sm), volumes)
     
 class TestGenGammasFile(unittest.TestCase):
 
     def setUp(self):
         os.system("cp " + meshfile_orig + " " + meshfile)
-        read_alara_phtn.read_to_h5m(inputfile, meshfile)
+        self.sm = ScdMesh.fromFile(iMesh.Mesh(), meshfile)
+        read_alara_phtn.read_to_h5m(inputfile, self.sm)
 
     def tearDown(self):
         os.system("rm " + meshfile)
@@ -42,5 +42,5 @@ class TestGenGammasFile(unittest.TestCase):
     def test_gen_gammas(self):
         """Tests a run-through of the method with 3x3x3 non-void geometry."""
         self.assertEqual(write_gammas.gen_gammas_file_from_h5m( \
-                meshfile, outfile), 1)
+                self.sm, outfile), 1)
 

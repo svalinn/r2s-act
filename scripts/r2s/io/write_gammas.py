@@ -17,7 +17,7 @@ from r2s import alias
 from scdmesh import ScdMesh, ScdMeshError
 
 
-def gen_gammas_file_from_h5m(meshfile, outfile="gammas", do_alias=False):
+def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
     """Generate gammas file using information from tags on a MOAB mesh.
     
     ACTION: Method reads tags with photon source strengths from an h5m
@@ -32,13 +32,7 @@ def gen_gammas_file_from_h5m(meshfile, outfile="gammas", do_alias=False):
     RECEIVES: The file (a moab mesh file) containing the mesh of interest.
     Optional: An output file name for the 'gammas' file; do_alias=True will
     generate the gammas_alias file with alias tables.
-    TODO:
     """
-
-#    mesh = iMesh.Mesh()
-
-    # Create ScdMesh object, which also loads 'meshfile' into mesh.
-    sm = ScdMesh.fromFile(iMesh.Mesh(), meshfile)
 
     try:
         grouptag = sm.mesh.getTagHandle("phtn_src_group_001")
@@ -277,7 +271,10 @@ def main():
         print "NOTE: Generated file will use name 'gammas_alias' instead " \
             "of 'gammas'."
 
-    gen_gammas_file_from_h5m( args[0], options.output, options.alias)
+    # Create ScdMesh object, which also loads 'meshfile' into mesh.
+    sm = ScdMesh.fromFile(iMesh.Mesh(), args[0])
+
+    gen_gammas_file_from_h5m(sm, options.output, options.alias)
 
     return 1
 
