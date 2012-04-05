@@ -5,21 +5,21 @@ from itaps import iBase,iMesh
 from scdmesh import ScdMesh, ScdMeshError
 
 
-def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, \
+def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
         retag=False, totals=False):
-    """Read in a phtn_src file and tag the contents to a moab mesh.
+    """Read in a phtn_src file and tag the contents to a structured mesh.
     
     ACTION: Method reads in a phtn_src file line by line, looking for
      a specific isotope at a specific cooling step.
-    Method tags the MOAB mesh at meshfile with the phtn source information,
+    Method tags the structured mesh ('sm') with the photon source information,
      and then saves the mesh.
-    RECEIVES: input file (ALARA phtn_src style), mesh file to write to,
+    RECEIVES: input file (ALARA phtn_src style), structured mesh object to tag,
      isotope identifier, cooling step number (0'th is 'shutdown')
-     OR cooling step name, whether to retag existing tags in mesh
+     OR cooling step name, whether to retag existing tags in mesh, whether to
+     tag the total photon source strength for each voxel
     """
     
     fr = open(inputfile, 'r')
-    line = ' '
 
     # First, we determine the coolingstep string to look for
     # ... if given a number, we take the nth line
@@ -74,10 +74,9 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, \
         print e
         return 0
 
-    # pyTaps stuff starts here
-    sm = ScdMesh.fromFile(iMesh.Mesh(), meshfile)
+    # structured mesh stuff starts here
 
-    # We grab the list of mesh entity objects
+    # We grab the list of structured mesh entity objects
     voxels = list(sm.iterateHex('xyz'))
 
     # We create a list of tag objects ('tagList') to use while parsing phtn_src
@@ -98,8 +97,9 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, \
             else:
                 # Or print error if retagging was not specified.
                 print "ERROR: The tag phtn_src_group_{0:03d} already exists " \
-                        "in the file {1}\nUse -r option to overwrite tags." \
-                        "".format(grp+1, meshfile)
+                        "in the structured mesh." \
+                        "\nUse -r option to overwrite tags." \
+                        "".format(grp+1)
                 return 0
 
     voxelcnt = 0
@@ -142,11 +142,9 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, \
             print "ERROR: failed to tagged the total photon source strengths."
             return 0
 
-    sm.mesh.save(meshfile)
-
-    print "The MOAB file '{0}' is now tagged with the photon source strengths" \
-            " for isotope '{1}' at cooling step '{2}'".format(meshfile, \
-            isotope, coolingstep)
+    print "The structured mesh is now tagged with the photon source strengths" \
+            " for isotope '{0}' at cooling step '{1}'" \
+            "".format(isotope, coolingstep)
 
     return 1
 
@@ -237,9 +235,14 @@ def main():
 
     (options, args) = parser.parse_args()
 
+    # Open an ScdMesh and then call read_to_h5m
+    sm = ScdMesh.fromFile(iMesh.Mesh(), options.meshfile)
+
     read_to_h5m( \
-                options.phtnsrcfile, options.meshfile, options.isotope, \
+                options.phtnsrcfile, sm, options.isotope, \
                 options.coolingstep, options.retag, options.totals)
+
+    sm.mesh.save(options.meshfile)
 
     return 1
 
