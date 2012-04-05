@@ -1,5 +1,6 @@
 from r2s.io import read_alara_phtn
 import os
+import os.path
 import unittest
 
 #
@@ -9,9 +10,10 @@ import unittest
 #
 
 # These directories are relative to scripts directory.
-inputfile = "../testcases/simplebox-3/phtn_src"
-meshfile_orig  = "../testcases/simplebox-3/matFracs.h5m"
-meshfile  = "../testcases/simplebox-3/matFracs3.h5m"
+thisdir = os.path.dirname(__file__)
+inputfile = os.path.join(thisdir,"sb3_phtn_src")
+meshfile_orig  = os.path.join(thisdir,"sb3_matFracs.h5m")
+meshfile  = os.path.join("sb3_matFracs3.h5m")
 
 
 class TestPhtn(unittest.TestCase):

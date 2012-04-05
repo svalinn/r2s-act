@@ -4,9 +4,10 @@ import os.path
 import itertools
 
 # These directories are relative to scripts directory.
-testfile = "testing/inp_ModMCNPforPhotons"
+thisdir = os.path.dirname(__file__)
+testfile = os.path.join(thisdir,"inp_ModMCNPforPhotons")
 testfile_out = "testing/inp_ModMCNPforPhotons_p"
-testfile_compare = "testing/inp_ModMCNPforPhotons_converted"
+testfile_compare = os.path.join(thisdir,"inp_ModMCNPforPhotons_converted")
 
 
 class TestRegularMCNP(unittest.TestCase):

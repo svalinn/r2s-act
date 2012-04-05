@@ -25,7 +25,7 @@ class ScdMeshTest(unittest.TestCase):
         self.assertEqual( sm.dims, (0,0,0,1,1,1) )
 
     def test_create_by_file(self):
-        filename = os.path.join(os.path.dirname(__file__), 'grid543.h5m')
+        filename = os.path.join(os.path.dirname(__file__), '../r2s/testing/grid543.h5m')
         sm = ScdMesh.fromFile(self.mesh, filename)
         self.assertEqual( sm.dims, (1, 11, -5, 5, 14, -3) )
 

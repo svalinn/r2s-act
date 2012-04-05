@@ -5,9 +5,9 @@ from scdmesh import ScdMesh, ScdMeshError
 from itaps import iMesh, iBase
 import os.path
 
-# These directories are relative to scripts directory.
-inputfile = "../testcases/simplebox-3/phtn_src" #revision controlled
-meshfile_orig = "r2s/testing/matFracsSCD3x3x3.h5m"
+thisdir = os.path.dirname(__file__)
+inputfile = os.path.join(thisdir,"sb3_phtn_src")
+meshfile_orig = os.path.join(thisdir,"matFracsSCD3x3x3.h5m")
 meshfile = "matFracsSCD3x3x3_tagged.h5m"
 outfile = "gammas_test"
 
@@ -16,7 +16,7 @@ class TestCalcVolumes(unittest.TestCase):
 
     def setUp(self):
         self.mesh = iMesh.Mesh()
-        filename = os.path.join(os.path.dirname(__file__), '../../testing/grid543.h5m')
+        filename = os.path.join(thisdir, 'grid543.h5m')
         self.myScd = ScdMesh.fromFile(self.mesh, filename)
 
     def test_calc_volumes_list_1(self):
