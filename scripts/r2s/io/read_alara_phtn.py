@@ -2,6 +2,7 @@
 
 from optparse import OptionParser
 from itaps import iBase,iMesh
+from scdmesh import ScdMesh, ScdMeshError
 
 
 def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, \
@@ -74,11 +75,10 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, \
         return 0
 
     # pyTaps stuff starts here
-    mesh = iMesh.Mesh()
-    mesh.load(meshfile)
+    sm = ScdMesh.fromFile(iMesh.Mesh(), meshfile)
 
     # We grab the list of mesh entity objects
-    voxels = mesh.getEntities(iBase.Type.region)
+    voxels = list(sm.iterateHex('xyz'))
 
     # We create a list of tag objects ('tagList') to use while parsing phtn_src
     tagList = []
@@ -86,20 +86,20 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, \
     for grp in xrange(numergbins): # group tags = parts in the line - 2
         try:
             # If tags are new to file... create tag
-            tagList.append(mesh.createTag( \
+            tagList.append(sm.mesh.createTag( \
                     "phtn_src_group_{0:03d}".format(grp+1), 1, float))
         except iBase.TagAlreadyExistsError:
             # Else if the tags already exist...
             if retag:
                 # Get existing tag
                 # We will overwrite tag values that already exist
-                tagList.append(mesh.getTagHandle( \
+                tagList.append(sm.mesh.getTagHandle( \
                         "phtn_src_group_{0:03d}".format(grp+1)))
             else:
                 # Or print error if retagging was not specified.
                 print "ERROR: The tag phtn_src_group_{0:03d} already exists " \
                         "in the file {1}\nUse -r option to overwrite tags." \
-                        "".format(grp+1, inputfile)
+                        "".format(grp+1, meshfile)
                 return 0
 
     voxelcnt = 0
@@ -129,20 +129,20 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, \
         grp = len(lineparts) - 2
         while grp:
             try:
-                tag = mesh.getTagHandle( \
+                tag = sm.mesh.getTagHandle( \
                         "phtn_src_group_"+"{0:03d}".format(grp+1))
                 # Normally an exception is thrown by above line
-                mesh.destroyTag(tag,force=True)
+                sm.mesh.destroyTag(tag,force=True)
                 grp += 1
             except iBase.TagNotFoundError:
                 grp = 0 # breaks the while loop
 
     if totals:
-        if not tag_phtn_src_totals(mesh, numergbins, retag):
+        if not tag_phtn_src_totals(sm, numergbins, retag):
             print "ERROR: failed to tagged the total photon source strengths."
             return 0
 
-    mesh.save(meshfile)
+    sm.mesh.save(meshfile)
 
     print "The MOAB file '{0}' is now tagged with the photon source strengths" \
             " for isotope '{1}' at cooling step '{2}'".format(meshfile, \
@@ -151,22 +151,22 @@ def read_to_h5m(inputfile, meshfile, isotope="TOTAL", coolingstep=0, \
     return 1
 
 
-def tag_phtn_src_totals(mesh, numergbins=-1, retag=False):
+def tag_phtn_src_totals(sm, numergbins=-1, retag=False):
     """Method tags the total photon source strength for each voxel.
 
     ACTION: Method calculate the total photon source strength, and 
-    if retagging is enabled or the tag does not exist, tags the mesh.
-    RECEIVES: mesh, an iMesh.Mesh object
+    if retagging is enabled or the tag does not exist, tags the structured mesh.
+    RECEIVES: sm, a iMesh.Mesh structured mesh object
     OPTIONAL: numergbins, number of energy group tags to read; retag,
     whether to overwrite an existing 'phtn_src_total' tag.
     """
 
-    voxels = mesh.getEntities(iBase.Type.region)
+    voxels = list(sm.iterateHex('xyz'))
 
     # Check if 'phtn_src_total' tag already exists
     try:
         # If tags are new to file... create tag
-        totalPhtnSrcTag = mesh.createTag( \
+        totalPhtnSrcTag = sm.mesh.createTag( \
                 "phtn_src_total", 1, float)
     except iBase.TagAlreadyExistsError:
         if not retag:
@@ -175,13 +175,13 @@ def tag_phtn_src_totals(mesh, numergbins=-1, retag=False):
             return 0
 
         else:
-            totalPhtnSrcTag = mesh.getTagHandle("phtn_src_total")
+            totalPhtnSrcTag = sm.mesh.getTagHandle("phtn_src_total")
  
     # If not supplied, se try/except to find number of energy bins
     if not numergbins:
         for i in xrange(1,1000): #~ Arbitrary: we look for up to 1000 groups
             try:
-                mesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
+                sm.mesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
             except iBase.TagNotFoundError: 
                 numergbins = i - 1
                 break
@@ -193,7 +193,7 @@ def tag_phtn_src_totals(mesh, numergbins=-1, retag=False):
 
         #get total for the voxel
         for i in xrange(1,numergbins + 1):
-            grouptag = mesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
+            grouptag = sm.mesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
             totstrength += float(grouptag[vox])
 
         # Add the total as a tag

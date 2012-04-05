@@ -4,7 +4,7 @@ import os.path
 import unittest
 
 #
-# The methods in PhtnSrcToH5M.py are written to return 1 or 0.
+# The methods in read_alara_phtn.py are written to return 1 or 0.
 #  0 corresponds with errors, and 1 is returned otherwise...
 # We use 'self.assertEquals(method(), 1 or 0)' to do the testing.
 #
