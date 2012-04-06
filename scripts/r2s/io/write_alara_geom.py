@@ -66,7 +66,7 @@ def write_zones( scdmesh, output_file ):
         output_file.write('\t{0}\tzone_{1}\n'.format(vol,idx))
     output_file.write('end\n\n')
 
-def write_mixtures( mixtures, mat_tags, output_file ):
+def write_mixtures( mixtures, mat_tags, name_dict, output_file ):
     """Write the mixture lines to the ALARA geometry output"""
     for mixture, voxels in sorted( mixtures.iteritems(), 
                                    key=operator.itemgetter(1,0) ):
@@ -74,7 +74,10 @@ def write_mixtures( mixtures, mat_tags, output_file ):
         output_file.write('mixture\tmix_{0}\n'.format(voxels[0]))
         for idx, m in enumerate(mixture[1:], start=1):
             if m == 0: continue 
-            output_file.write('\tmaterial\t{0}\t1\t{1}\n'.format(mat_tags[idx].name,m))
+            material_name = mat_tags[idx].name
+            if material_name in name_dict:
+                material_name = name_dict[material_name]
+            output_file.write('\tmaterial\t{0}\t1\t{1}\n'.format(material_name,m))
         output_file.write('end\n\n')
 
 def write_mat_loading( scdmesh, mat_tags, mixtures, output_file):
@@ -92,13 +95,13 @@ def write_mat_loading( scdmesh, mat_tags, mixtures, output_file):
     output_file.write('end\n\n')
 
 
-def write_alara_geom( filename, scdmesh ):
+def write_alara_geom( filename, scdmesh, namedict={} ):
     """Given a structured mesh with mmgrid tags, write an ALARA geometry"""
     mixtures, mat_tags = create_mixture_definitions( scdmesh )
 
     with open(filename,'w') as output_file:
         write_zones( scdmesh, output_file )
-        write_mixtures( mixtures, mat_tags, output_file )
+        write_mixtures( mixtures, mat_tags, namedict, output_file )
         write_mat_loading( scdmesh, mat_tags, mixtures, output_file )
 
 def main():
