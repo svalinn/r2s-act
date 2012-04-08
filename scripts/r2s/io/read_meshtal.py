@@ -132,7 +132,7 @@ def tag_fluxes(meshtal, meshtal_type, m, spacial_points, \
         tag_flux[voxels]=flux_data
         tag_error[voxels]=error_data
 
-def read_meshtal( filename, norm=1):
+def read_meshtal( filename, norm):
     #Getting relevant information from meshtal header
     meshtal_type=find_meshtal_type( filename )
     m=find_first_line( filename )
@@ -166,12 +166,12 @@ def main( arguments = None ) :
     (opts, args) = parser.parse_args( arguments )
     
     if len(args) != 2 :
-        parser.error\
-        ( '\nNeed exactly 2 arguments: meshtal file and normalization factor' )
+        parser.error('\nNeed 1 argument: meshtal file')
+        #( '\nNeed exactly 2 arguments: meshtal file and normalization factor' )
+         
+    sm = read_meshtal( args[1], float(opts.norm) )
 
-    sm = read_meshtal( args[0], opts.norm )
-
-    sm.scdset.save(mesh_output)
+    sm.scdset.save(opts.mesh_output)
     print 'Structured mesh tagging complete'
 
 
