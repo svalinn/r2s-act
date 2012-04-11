@@ -288,6 +288,16 @@ class mmGrid:
         if alara_geom_file:
             write_alara_geom(alara_geom_file, mesh)
 
+def load_geom(filename):
+    """Load geometry from the given file into dagmc
+
+    This is provided as a convenience so client code doesn't need to invoke pydagmc.
+
+    Note that DagMC can only have one set of geometry loaded per program invocation.
+    This means that this function should only be called once, and the resulting 
+    geometry will become globally visible to all clients of mmgrid.
+    """
+    dagmc.load( filename )
 
 def main( arguments=None ):
     global _quiet
@@ -318,7 +328,7 @@ def main( arguments=None ):
 
     _quiet = opts.quiet
 
-    dagmc.load( args[0] )
+    load_geom( args[0] )
     sm = None
     if len(args) == 2:
         sm = scdmesh.ScdMesh.fromFile(iMesh.Mesh(),args[1])
