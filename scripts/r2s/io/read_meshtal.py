@@ -15,7 +15,7 @@ from itaps import iMesh
 from optparse import OptionParser
 import linecache
 import sys
-from scdmesh import ScdMesh
+from scdmesh import ScdMesh, ScdMeshError
 
 ###############################################################################
 #Searchs the meshtal header to determine if it is a neutron or photon meshtal
@@ -132,7 +132,17 @@ def tag_fluxes(meshtal, meshtal_type, m, spacial_points, \
         tag_flux[voxels]=flux_data
         tag_error[voxels]=error_data
 
-def read_meshtal( filename, norm):
+def read_meshtal( filename, norm=1, **kw ):
+    """Read an MCNP meshtal file and return a structured mesh for it
+
+    The optional normalization factor will be multipled into each flux value.
+    This can be used to rescale a tally if a tally multiplier was not used
+    in the original MCNP problem.
+
+    Keyword arguments:
+        smesh: An existing scdmesh on which to tag the fluxes.  
+               A ScdMeshError is raised if this mesh has incompatible ijk dims
+    """
     #Getting relevant information from meshtal header
     meshtal_type=find_meshtal_type( filename )
     m=find_first_line( filename )
@@ -143,6 +153,12 @@ def read_meshtal( filename, norm):
     e_bins=len(e_bounds) #dont substract 1; cancels with totals bin
 
     sm = ScdMesh( iMesh.Mesh(), x_bounds, y_bounds, z_bounds)
+
+    if 'smesh' in kw:
+        dims = kw['smesh'].dims
+        if dims != sm.dims:
+            raise ScdMeshError('Incorrect dimension in preexisting structured mesh')
+        sm = kw['smesh']
 
     #Tagging structured mesh
     tag_fluxes(filename, meshtal_type, m, spacial_points,
@@ -162,14 +178,20 @@ def main( arguments = None ) :
                       help = 'Name of mesh output file, default=%default')
     parser.add_option('-n', dest='norm', default=1,
                       help = 'Normalization factor, default=%default')
+    parser.add_option('-m', dest='smesh_filename', default=None,
+                      help='Preexisting mesh on which to tag fluxes')
+                         
 
-    (opts, args) = parser.parse_args( arguments )
+    (opts, args) = parser.parse_args(arguments)
     
     if len(args) != 2 :
         parser.error('\nNeed 1 argument: meshtal file')
-        #( '\nNeed exactly 2 arguments: meshtal file and normalization factor' )
          
-    sm = read_meshtal( args[1], float(opts.norm) )
+    if opts.smesh_filename:
+        alt_sm = ScdMesh.fromFile(iMesh.Mesh(), opts.smesh_filename)
+        sm = read_meshtal(args[1], float(opts.norm), smesh=alt_sm)
+    else:
+        sm = read_meshtal(args[1], float(opts.norm))
 
     sm.scdset.save(opts.mesh_output)
     print 'Structured mesh tagging complete'
