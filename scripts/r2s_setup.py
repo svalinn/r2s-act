@@ -5,6 +5,50 @@ import os.path
 import optparse
 import ConfigParser
 
+class FileMissingError(Exception):
+    pass
+
+def get_input_file(config, key):
+    filename = config.get('r2s-files',key)
+    if not os.path.exists(filename):
+        raise FileMissingError(key +' file is missing: '+filename)
+    return filename
+
+
+def main():
+    op = optparse.OptionParser('Setup script for R2S workflow')
+    opts, args = op.parse_args(sys.argv)
+
+    cfgfile = 'r2s.cfg'
+    if len(args) > 1:
+        cfgfile = args[1]
+
+    if os.path.exists(cfgfile):
+        print 'Config file already exists:', cfgfile
+        print 'Will not overwrite.'
+    else:
+        with file(cfgfile,'w') as f:
+            f.write(default_config)
+            print 'Wrote default config file:', cfgfile
+
+    
+    # If the config file was written or already exists, write snippet if the
+    # specified snippet does not already exist
+    # Do nothing if config file exists but isn't the expected format.
+
+    config = ConfigParser.SafeConfigParser()
+    config.read(cfgfile)
+    snippet = config.get('r2s-files','alara_snippet')
+
+    if os.path.exists(snippet):
+        print 'Snippet file already exists:', snippet
+        print 'Will not overwrite.'
+    else:
+        with file(snippet,'w') as f:
+            f.write(default_snippet)
+            print 'Wrote ALARA snippet file:', snippet
+
+
 default_config = """
 ## Robust 2-step activation workflow
 ## Setup file
@@ -97,40 +141,6 @@ end
 truncation  1e-7
 impurity    5e-6    1e-3
 """
-
-
-def main():
-    op = optparse.OptionParser('Setup script for R2S workflow')
-    opts, args = op.parse_args(sys.argv)
-
-    cfgfile = 'r2s.cfg'
-    if len(args) > 1:
-        cfgfile = args[1]
-
-    if os.path.exists(cfgfile):
-        print 'Config file already exists:', cfgfile
-        print 'Will not overwrite.'
-    else:
-        with file(cfgfile,'w') as f:
-            f.write(default_config)
-            print 'Wrote default config file:', cfgfile
-
-    
-    # If the config file was written or already exists, write snippet if the
-    # specified snippet does not already exist
-    # Do nothing if config file exists but isn't the expected format.
-
-    config = ConfigParser.SafeConfigParser()
-    config.read(cfgfile)
-    snippet = config.get('r2s-files','alara_snippet')
-
-    if os.path.exists(snippet):
-        print 'Snippet file already exists:', snippet
-        print 'Will not overwrite.'
-    else:
-        with file(snippet,'w') as f:
-            f.write(default_snippet)
-            print 'Wrote ALARA snippet file:', snippet
 
 if __name__ == '__main__':
     main()
