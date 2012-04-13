@@ -22,10 +22,11 @@ def get_input_file(name):
     return r2s_input_file(config,name)
 
 def get_material_dict():
-    keys = config.options('r2s-material')
     d = {}
-    for key in keys:
-        d[key] = config.get('r2s-material',key)
+    if config.has_section('r2s-material'):
+        keys = config.options('r2s-material')
+        for key in keys:
+            d[key] = config.get('r2s-material',key)
     return d
 
 # Get the input files for this step: the meshtal and the mcnp geometry
@@ -79,8 +80,8 @@ print "Producing visualization file `{0}' with mbconvert".format(visfile)
 os.system('mbconvert {0} {1}'.format(datafile,visfile))
 
 print "Writing alara problem file `{0}'".format(alara_geom)
-write_alara_geom( alara_geom, smesh, 
-        {'mat2_rho-8.0':'316-SS', 'mat3_rho-1.0':'water' } )
+mdict = get_material_dict()
+write_alara_geom( alara_geom, smesh, mdict )
 
 if alara_snippet:
     print "Appending alara snippet file `{0}' to problem file".format(alara_snippet)
