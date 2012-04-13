@@ -64,7 +64,7 @@ neutron_meshtal = meshtal
 neutron_mcnp_input = mcnp_n.inp
 
 # DagMC CAD geometry corresponding to MCNP input file.
-# If this file does not against, we will attempt to create it
+# If this file does not exist, we will attempt to create it
 # using mcnp2cad.
 mcnp_geom = geom.sat
 

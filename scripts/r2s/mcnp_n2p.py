@@ -3,6 +3,10 @@
 import re
 import string
 from optparse import OptionParser
+import textwrap as tw
+
+from itaps import iMesh
+import scdmesh
 
 
 class ModMCNPforPhotons(object):
@@ -213,6 +217,60 @@ class ModMCNPforPhotons(object):
         return 1
 
 
+    def add_fmesh_from_scdmesh(self, sm):
+        """Geometry information is read to create a photon fmesh card.
+        
+        ACTION: Lines are appended to self.block3lines.
+        RECEIVES: A structured mesh object (scdmesh.py)
+        REQUIRES: Block 3 has been read into self.block3lines; photon energies
+         have been tagged to 'sm.mesh.rootSet'.
+        RETURNS: 1 if successful, 0 if an error occurs.
+        """
+        
+        # We get the coarse intervals and the number of steps in each interval
+        (xCoarse, xSteps) = _get_coarse_and_intervals(sm.getDivisions("x"))
+        (yCoarse, ySteps) = _get_coarse_and_intervals(sm.getDivisions("y"))
+        (zCoarse, zSteps) = _get_coarse_and_intervals(sm.getDivisions("z"))
+
+        # We look for the tag with the energy bin boundary values
+        try:
+            phtn_ergs = sm.mesh.getTagHandle("PHTN_ERGS")
+            myergbins = phtn_ergs[sm.mesh.rootSet] 
+
+        # if there is no PHTN_ERGS tag, then we send an empty string in myergbins
+        except iBase.TagNotFoundError: 
+            print "ERROR: Tag for photon energy group boundaries was not found."
+            return 0
+
+        mcnpWrap = tw.TextWrapper()
+        mcnpWrap.initial_indent = 0*' '
+        mcnpWrap.subsequent_indent = 6*' '
+        mcnpWrap.wdith = 80
+        mcnpWrap.break_on_hyphens = False
+
+        self.block3lines.append("fmesh444:p\n")
+        self.block3lines.append("      geom=xyz  origin={0} {1} {2}" \
+                "\n".format(xCoarse[0], yCoarse[0], zCoarse[0]))
+
+        self.block3lines.append( \
+                mcnpWrap.wrap("imesh="+" ".join(xCoarse[1:]))+"\n")
+        self.block3lines.append( \
+                mcnpWrap.wrap("iints="+" ".join(xSteps))+"\n")
+        self.block3lines.append( \
+                mcnpWrap.wrap("jmesh="+" ".join(yCoarse[1:]))+"\n")
+        self.block3lines.append( \
+                mcnpWrap.wrap("jints="+" ".join(ySteps))+"\n")
+        self.block3lines.append( \
+                mcnpWrap.wrap("kmesh="+" ".join(zCoarse[1:]))+"\n")
+        self.block3lines.append( \
+                mcnpWrap.wrap("kints="+" ".join(zSteps))+"\n")
+        
+        self.block3lines.append( \
+                mcnpWrap.wrap("emesh="+" ".join(phtn_ergs))+"\n")
+
+        return 1
+
+
     def write_deck(self, outputFileName=""):
         """Create a new MCNP input file from the object's contents.
         
@@ -259,6 +317,30 @@ class ModMCNPforPhotons(object):
         print "Modified input deck has been written to '{0}'".format(outputFileName)
 
         return 1
+
+
+def _get_coarse_and_intervals(xdiv):
+    """From list of mesh intervals get xmesh and xints for fmesh card
+    """
+    xCoarse = [xdiv[0]]
+    xSteps = list()
+            
+    dx = xdiv[1]-xdiv[0]
+    oldx = xdiv[1]
+    cnt = 1
+    for x in xdiv[2:]:
+        if round(dx,5) != round(x-oldx,5):
+            xCoarse.append(oldx)
+            xSteps.append(cnt)
+            cnt = 1
+            dx = x-oldx
+        else:
+            cnt += 1
+        oldx = x
+    xCoarse.append(oldx)
+    xSteps.append(cnt)
+
+    return (xCoarse, xSteps)
 
 
 def main():

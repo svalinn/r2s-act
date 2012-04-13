@@ -18,7 +18,7 @@ def gen_alias_table(bins):
     [[p1,v1],[p2,v2].... [pN,vN]]
     Where p1 is the probability of value v1 being chosen. p values must be
     already normalized.
-    RETURNS: The alias list, pairs.
+    RETURNS: The alias list, 'pairs.'
     """
 
     pairs = list() # This is our Alias Table
@@ -31,8 +31,6 @@ def gen_alias_table(bins):
     remainingbins = len(bins)
 
     bins.sort() # initial sort; sorts by probability (first value of each bin)
-
-    # n_inv = round(n_inv,5) #~had no effect?
 
     # Alias table generating loop
     while remainingbins > 0:
@@ -79,7 +77,7 @@ def gen_alias_table(bins):
     return pairs
 
 
-# Then we sample using the alias table
+# Then we can sample using the alias table
 
 def sample_alias_table(n, pairs):
     """Returns a list of values sampled from an alias table.

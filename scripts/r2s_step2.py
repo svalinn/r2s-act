@@ -44,7 +44,7 @@ if mcnp_p_problem:
     print "Modifying MCNP input file `{0}'".format(mcnp_n_problem)
 
     # Set dagmc to True if input only contains the title card and data block
-    dagmc=False
+    dagmc = False
     mod = mcnp_n2p.ModMCNPforPhotons(mcnp_n_problem, dagmc)
     mod.read()
 
@@ -52,5 +52,10 @@ if mcnp_p_problem:
         mod.change_block_1()
         mod.change_block_2()
     mod.change_block_3()
+
+    # If phtnfmesh is True, we generate an fmesh card with same layout as mesh
+    phtnfmesh = True
+    if phtnfmesh:
+        mod.add_fmesh_from_scdmesh(smesh)
 
     mod.write_deck(mcnp_p_problem)

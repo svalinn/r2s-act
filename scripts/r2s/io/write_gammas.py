@@ -86,7 +86,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
     
     norm = sumvoxelstrengths / sourcevolumetotal
 
-    # We now look for the tags with the energy bin boundary values
+    # We now look for the tag with the energy bin boundary values
     try:
         phtn_ergs = sm.mesh.getTagHandle("PHTN_ERGS")
         myergbins = phtn_ergs[sm.mesh.rootSet] 
