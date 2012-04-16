@@ -36,9 +36,10 @@ def read_and_tag_phtn_ergs(inputfile, mesh):
     fr.close()
 
     try:
-        mesh.createTag("PHTN_ERGS", len(ergs), float)
+        phtn_ergs = mesh.createTag("PHTN_ERGS", len(ergs), float)
 
     except iBase.TagAlreadyExistsError:
+        # We completely rewrite the tag if it already existed
         mesh.destroyTag(mesh.getTagHandle("PHTN_ERGS"), force=True)
         phtn_ergs = mesh.createTag("PHTN_ERGS", len(ergs), float)
 

@@ -5,7 +5,7 @@ import string
 from optparse import OptionParser
 import textwrap as tw
 
-from itaps import iMesh
+from itaps import iMesh, iBase, iMeshExtensions
 import scdmesh
 
 
@@ -159,6 +159,7 @@ class ModMCNPforPhotons(object):
         notemode = ""
         noteimp = ""
         notephys = ""
+        notefmesh = ""
 
         commentout = False # We toggle this to determine whether or not to
                             # comment out continued lines
@@ -201,6 +202,11 @@ class ModMCNPforPhotons(object):
                 line = "imp:p " + ' '.join(linesplit_orig[1:]) + ''
                 noteimp = "-imp:n card converted to imp:p with same values\n"
             
+            # comment out fmesh card
+            elif "fmesh" == linesplit[0][:5]:
+                line = "c " + line
+                notefmesh = "-fmesh card(s) commented out."
+
             else: # no changes to the line
                 continue
 
@@ -209,10 +215,10 @@ class ModMCNPforPhotons(object):
 
         print "Block 3 has been updated: \n" \
                 "-{0} source cards commented out\n" \
-                "{1}{2}{3}\n" \
+                "{1}{2}{3}{4}\n" \
                 "Note that tallies were not modified. Remember that neutron" \
                 " tallies\nshould probably be changed." \
-                "\n".format(cntsrc, notemode, notephys, noteimp)
+                "\n".format(cntsrc, notemode, notephys, noteimp, notefmesh)
 
         return 1
 
@@ -220,9 +226,9 @@ class ModMCNPforPhotons(object):
     def add_fmesh_from_scdmesh(self, sm):
         """Geometry information is read to create a photon fmesh card.
         
-        ACTION: Lines are appended to self.block3lines.
+        ACTION: Lines are appended to self.block3Lines.
         RECEIVES: A structured mesh object (scdmesh.py)
-        REQUIRES: Block 3 has been read into self.block3lines; photon energies
+        REQUIRES: Block 3 has been read into self.block3Lines; photon energies
          have been tagged to 'sm.mesh.rootSet'.
         RETURNS: 1 if successful, 0 if an error occurs.
         """
@@ -231,42 +237,56 @@ class ModMCNPforPhotons(object):
         (xCoarse, xSteps) = _get_coarse_and_intervals(sm.getDivisions("x"))
         (yCoarse, ySteps) = _get_coarse_and_intervals(sm.getDivisions("y"))
         (zCoarse, zSteps) = _get_coarse_and_intervals(sm.getDivisions("z"))
+        
+        # We then convert them from floats to strings
+        xCoarse = [str(x) for x in xCoarse]
+        xSteps = [str(x) for x in xSteps]
+        yCoarse = [str(y) for y in yCoarse]
+        ySteps = [str(y) for y in ySteps]
+        zCoarse = [str(z) for z in zCoarse]
+        zSteps = [str(z) for z in zSteps]
 
         # We look for the tag with the energy bin boundary values
         try:
             phtn_ergs = sm.mesh.getTagHandle("PHTN_ERGS")
-            myergbins = phtn_ergs[sm.mesh.rootSet] 
+            myergbins = [str(x) for x in phtn_ergs[sm.mesh.rootSet]]
 
         # if there is no PHTN_ERGS tag, then we send an empty string in myergbins
         except iBase.TagNotFoundError: 
-            print "ERROR: Tag for photon energy group boundaries was not found."
+            print "WARNING: Tag for photon energy group boundaries was not " \
+                    "found.\n\tA default fmesh card will not be added."
+
             return 0
 
         mcnpWrap = tw.TextWrapper()
-        mcnpWrap.initial_indent = 0*' '
-        mcnpWrap.subsequent_indent = 6*' '
+        mcnpWrap.initial_indent = 6*' '
+        mcnpWrap.subsequent_indent = (6+5)*' '
         mcnpWrap.wdith = 80
         mcnpWrap.break_on_hyphens = False
+        mcnpWrap.drop_whitespace = False
 
-        self.block3lines.append("fmesh444:p\n")
-        self.block3lines.append("      geom=xyz  origin={0} {1} {2}" \
+        self.block3Lines.append("fmesh444:p\n")
+        self.block3Lines.append("      geom=xyz origin={0} {1} {2}" \
                 "\n".format(xCoarse[0], yCoarse[0], zCoarse[0]))
-
-        self.block3lines.append( \
-                mcnpWrap.wrap("imesh="+" ".join(xCoarse[1:]))+"\n")
-        self.block3lines.append( \
-                mcnpWrap.wrap("iints="+" ".join(xSteps))+"\n")
-        self.block3lines.append( \
-                mcnpWrap.wrap("jmesh="+" ".join(yCoarse[1:]))+"\n")
-        self.block3lines.append( \
-                mcnpWrap.wrap("jints="+" ".join(ySteps))+"\n")
-        self.block3lines.append( \
-                mcnpWrap.wrap("kmesh="+" ".join(zCoarse[1:]))+"\n")
-        self.block3lines.append( \
-                mcnpWrap.wrap("kints="+" ".join(zSteps))+"\n")
         
-        self.block3lines.append( \
-                mcnpWrap.wrap("emesh="+" ".join(phtn_ergs))+"\n")
+        for line in mcnpWrap.wrap("imesh="+" ".join(xCoarse[1:])):
+            self.block3Lines.append(line+"\n")
+        for line in mcnpWrap.wrap("iints="+" ".join(xSteps)):
+            self.block3Lines.append(line+"\n")
+        for line in mcnpWrap.wrap("jmesh="+" ".join(yCoarse[1:])):
+            self.block3Lines.append(line+"\n")
+        for line in mcnpWrap.wrap("jints="+" ".join(ySteps)):
+            self.block3Lines.append(line+"\n")
+        for line in mcnpWrap.wrap("kmesh="+" ".join(zCoarse[1:])):
+            self.block3Lines.append(line+"\n")
+        for line in mcnpWrap.wrap("kints="+" ".join(zSteps)):
+            self.block3Lines.append(line+"\n")
+
+        for line in mcnpWrap.wrap("emesh="+" ".join(myergbins)):
+            self.block3Lines.append(line+"\n")
+
+        print "A default photon fmesh card has been added to the input, " \
+                "and matches the mesh structure found in the MOAB mesh.\n"
 
         return 1
 
@@ -304,7 +324,10 @@ class ModMCNPforPhotons(object):
             fw.write('\n') #blank line dividing blocks 2 and 3
 
         for cnt, line in enumerate(self.block3Lines):
-            fw.write(line + self.block3Comments[cnt]) #block 3
+            try:
+                fw.write(line + self.block3Comments[cnt]) #block 3
+            except IndexError:
+                fw.write(line)
 
         if len(self.extraLines) > 0:
             fw.write('\n') #blank line dividing block 3 and extra file contents
@@ -321,6 +344,8 @@ class ModMCNPforPhotons(object):
 
 def _get_coarse_and_intervals(xdiv):
     """From list of mesh intervals get xmesh and xints for fmesh card
+
+    RETURNS: xCoarse and xSteps, which are lists of loats
     """
     xCoarse = [xdiv[0]]
     xSteps = list()
