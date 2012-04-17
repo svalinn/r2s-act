@@ -55,7 +55,7 @@ class TestRegularMCNP(unittest.TestCase):
         Tests that resulting file is identical to expected resulting file.
         """
 
-        smesh = scdmesh.ScdMesh.fromFile(iMesh.Mesh(), meshfile)
+        smesh = scdmesh.ScdMesh.fromFile(meshfile)
         self.obj.add_fmesh_from_scdmesh(smesh)
 
         self.obj.write_deck(testfile_out)

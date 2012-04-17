@@ -23,7 +23,7 @@ class TestPhtn(unittest.TestCase):
 
     def setUp(self):
         os.system("cp " + meshfile_orig + " " + meshfile)
-        self.sm = ScdMesh.fromFile(iMesh.Mesh(), meshfile)
+        self.sm = ScdMesh.fromFile(meshfile)
 
     def tearDown(self):
         os.system("rm " + meshfile)
@@ -70,7 +70,7 @@ class TestPhtnRetagging(unittest.TestCase):
 
     def setUp(self):
         os.system("cp " + meshfile_orig + " " + meshfile)
-        self.sm = ScdMesh.fromFile(iMesh.Mesh(), meshfile)
+        self.sm = ScdMesh.fromFile(meshfile)
         read_alara_phtn.read_to_h5m(inputfile, self.sm)
 
     def tearDown(self):
@@ -104,7 +104,7 @@ class TestPhtnTotalsRetagging(unittest.TestCase):
 
     def setUp(self):
         os.system("cp " + meshfile_orig + " " + meshfile)
-        self.sm = ScdMesh.fromFile(iMesh.Mesh(), meshfile)
+        self.sm = ScdMesh.fromFile(meshfile)
         read_alara_phtn.read_to_h5m(inputfile, self.sm, totals=True)
 
     def tearDown(self):

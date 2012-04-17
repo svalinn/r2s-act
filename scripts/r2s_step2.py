@@ -30,7 +30,7 @@ if config.has_option('r2s-files','photon_mcnp_input'):
 # Do processing
 
 print "Loading step one data file `{0}'".format(datafile)
-smesh = ScdMesh.fromFile(iMesh.Mesh(), datafile)
+smesh = ScdMesh.fromFile(datafile)
 
 print "Reading alara photon source `{0}'".format(phtn_src)
 read_alara_phtn.read_to_h5m(phtn_src, smesh, isotope="TOTAL", coolingstep=0, \

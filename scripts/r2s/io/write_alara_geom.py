@@ -34,11 +34,11 @@ def create_mixture_definitions( scdmesh ):
 
     # The material tags are a subset of all the tags on a hex of the scdmesh
     # Pick the hex at minimum (i,j,k)
-    tags = scdmesh.mesh.getAllTags( scdmesh.getHex( *(scdmesh.dims[:3]) ))
+    tags = scdmesh.imesh.getAllTags( scdmesh.getHex( *(scdmesh.dims[:3]) ))
     # material tags have the name format 'mat{int}_rho{float}'
     mat_tags = [t for t in tags if re.match('^mat[0-9]+_rho[0-9\-\.eE]+$', t.name)]
     # Void is always the first material, so put it at the list's beginning
-    mat_tags = [ scdmesh.mesh.getTagHandle('matVOID') ] + mat_tags
+    mat_tags = [ scdmesh.imesh.getTagHandle('matVOID') ] + mat_tags
             
     unique_mixtures = dict()
 
@@ -106,7 +106,7 @@ def write_alara_geom( filename, scdmesh, namedict={} ):
 
 def main():
 
-    mesh = ScdMesh.fromFile( iMesh.Mesh(), sys.argv[1] )
+    mesh = ScdMesh.fromFile( sys.argv[1] )
     write_alara_geom( 'alara_geom', mesh )
 
 if __name__ == '__main__':

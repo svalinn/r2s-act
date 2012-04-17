@@ -85,14 +85,14 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
     for grp in xrange(numergbins): # group tags = parts in the line - 2
         try:
             # If tags are new to file... create tag
-            tagList.append(sm.mesh.createTag( \
+            tagList.append(sm.imesh.createTag( \
                     "phtn_src_group_{0:03d}".format(grp+1), 1, float))
         except iBase.TagAlreadyExistsError:
             # Else if the tags already exist...
             if retag:
                 # Get existing tag
                 # We will overwrite tag values that already exist
-                tagList.append(sm.mesh.getTagHandle( \
+                tagList.append(sm.imesh.getTagHandle( \
                         "phtn_src_group_{0:03d}".format(grp+1)))
             else:
                 # Or print error if retagging was not specified.
@@ -129,10 +129,10 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
         grp = len(lineparts) - 2
         while grp:
             try:
-                tag = sm.mesh.getTagHandle( \
+                tag = sm.imesh.getTagHandle( \
                         "phtn_src_group_"+"{0:03d}".format(grp+1))
                 # Normally an exception is thrown by above line
-                sm.mesh.destroyTag(tag,force=True)
+                sm.imesh.destroyTag(tag,force=True)
                 grp += 1
             except iBase.TagNotFoundError:
                 grp = 0 # breaks the while loop
@@ -154,7 +154,7 @@ def tag_phtn_src_totals(sm, numergbins=-1, retag=False):
 
     ACTION: Method calculate the total photon source strength, and 
     if retagging is enabled or the tag does not exist, tags the structured mesh.
-    RECEIVES: sm, a iMesh.Mesh structured mesh object
+    RECEIVES: sm, scdmesh.ScdMesh object
     OPTIONAL: numergbins, number of energy group tags to read; retag,
     whether to overwrite an existing 'phtn_src_total' tag.
     """
@@ -164,7 +164,7 @@ def tag_phtn_src_totals(sm, numergbins=-1, retag=False):
     # Check if 'phtn_src_total' tag already exists
     try:
         # If tags are new to file... create tag
-        totalPhtnSrcTag = sm.mesh.createTag( \
+        totalPhtnSrcTag = sm.imesh.createTag( \
                 "phtn_src_total", 1, float)
     except iBase.TagAlreadyExistsError:
         if not retag:
@@ -173,13 +173,13 @@ def tag_phtn_src_totals(sm, numergbins=-1, retag=False):
             return 0
 
         else:
-            totalPhtnSrcTag = sm.mesh.getTagHandle("phtn_src_total")
+            totalPhtnSrcTag = sm.imesh.getTagHandle("phtn_src_total")
  
     # If not supplied, se try/except to find number of energy bins
     if not numergbins:
         for i in xrange(1,1000): #~ Arbitrary: we look for up to 1000 groups
             try:
-                sm.mesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
+                sm.imesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
             except iBase.TagNotFoundError: 
                 numergbins = i - 1
                 break
@@ -191,7 +191,7 @@ def tag_phtn_src_totals(sm, numergbins=-1, retag=False):
 
         #get total for the voxel
         for i in xrange(1,numergbins + 1):
-            grouptag = sm.mesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
+            grouptag = sm.imesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
             totstrength += float(grouptag[vox])
 
         # Add the total as a tag
@@ -236,13 +236,13 @@ def main():
     (options, args) = parser.parse_args()
 
     # Open an ScdMesh and then call read_to_h5m
-    sm = ScdMesh.fromFile(iMesh.Mesh(), options.meshfile)
+    sm = ScdMesh.fromFile(options.meshfile)
 
     read_to_h5m( \
                 options.phtnsrcfile, sm, options.isotope, \
                 options.coolingstep, options.retag, options.totals)
 
-    sm.mesh.save(options.meshfile)
+    sm.imesh.save(options.meshfile)
 
     return 1
 

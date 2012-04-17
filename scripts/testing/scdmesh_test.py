@@ -14,7 +14,7 @@ class ScdMeshTest(unittest.TestCase):
         self.mesh = iMesh.Mesh()
 
     def test_create(self):
-        sm = ScdMesh( self.mesh, range(1,5), range(1,4), range(1,3) )
+        sm = ScdMesh( range(1,5), range(1,4), range(1,3), self.mesh )
         self.assertEqual( sm.dims, (0,0,0,3,2,1) )
 
     def test_create_by_set(self):
@@ -26,7 +26,7 @@ class ScdMeshTest(unittest.TestCase):
 
     def test_create_by_file(self):
         filename = os.path.join(os.path.dirname(__file__), '../r2s/testing/grid543.h5m')
-        sm = ScdMesh.fromFile(self.mesh, filename)
+        sm = ScdMesh.fromFile(filename)
         self.assertEqual( sm.dims, (1, 11, -5, 5, 14, -3) )
 
         # This mesh is interesting because the i/j/k space is not numbered from zero
@@ -38,11 +38,11 @@ class ScdMeshTest(unittest.TestCase):
 
         # loading a test file without structured mesh metadata should raise an error
         filename2 = os.path.join(os.path.dirname(__file__), 'test_matFracs.h5m')
-        self.assertRaises( ScdMeshError, ScdMesh.fromFile, iMesh.Mesh(), filename2 )
+        self.assertRaises( ScdMeshError, ScdMesh.fromFile, filename2 )
 
     def test_get_hex(self):
         # mesh with valid i values 0-4, j values 0-3, k values 0-2
-        sm = ScdMesh( self.mesh, range(11,16), range(21,25), range(31,34) )
+        sm = ScdMesh( range(11,16), range(21,25), range(31,34) )
         def check( e ):
             self.assertTrue( isinstance(e, iBase.Entity) )
         check(sm.getHex(0, 0, 0))
@@ -57,7 +57,7 @@ class ScdMeshTest(unittest.TestCase):
 
     def test_hex_volume(self):
 
-        sm = ScdMesh( self.mesh, [0,1,3], [-3,-2,0], [12,13,15] )
+        sm = ScdMesh( [0,1,3], [-3,-2,0], [12,13,15] )
         self.assertEqual( sm.getHexVolume(0,0,0), 1 )
         self.assertEqual( sm.getHexVolume(1,0,0), 2 )
         self.assertEqual( sm.getHexVolume(0,1,0), 2 )
@@ -76,7 +76,7 @@ class ScdMeshTest(unittest.TestCase):
         y_range = numpy.array(range(21,24),dtype=numpy.float64)
         z_range = numpy.array(range(31,33),dtype=numpy.float64)
 
-        sm = ScdMesh( self.mesh, x_range, y_range, z_range ) 
+        sm = ScdMesh( x_range, y_range, z_range, self.mesh ) 
 
         for i,x in enumerate(x_range):
             for j,y in enumerate(y_range):
@@ -90,7 +90,7 @@ class ScdMeshTest(unittest.TestCase):
         y = [-12, -10, -.5]
         z = [100, 200]
 
-        sm = ScdMesh( self.mesh, x, y, z )
+        sm = ScdMesh( x, y, z )
 
         self.assertEqual( sm.getDivisions('x'), x )
         self.assertEqual( sm.getDivisions('y'), y )
@@ -100,9 +100,10 @@ class ScdMeshIterateTest(unittest.TestCase):
 
     def setUp(self):
         self.mesh = iMesh.Mesh()
-        self.sm = ScdMesh( self.mesh, range(10,15), # i = 0,1,2,3
-                                      range(21,25), # j = 0,1,2
-                                      range(31,34)) # k = 0,1
+        self.sm = ScdMesh( range(10,15), # i = 0,1,2,3
+                           range(21,25), # j = 0,1,2
+                           range(31,34), # k = 0,1
+                           self.mesh )
 
         self.I = range(0,4)
         self.J = range(0,3)
@@ -233,7 +234,7 @@ class ScdPerfTest(unittest.TestCase):
     def test_large_iterator(self):
 
         print "building large mesh"
-        big = ScdMesh(iMesh.Mesh(), range(1,100), range(101,200), range(201,300))
+        big = ScdMesh(range(1,100), range(101,200), range(201,300))
         print "iterating (1)"
         for i in big.iterateHex():
             pass
@@ -269,17 +270,17 @@ class ScdConvertTest(unittest.TestCase):
         sm = sc_convert.convert_mesh( self.mesh, self.mesh.rootSet, m )
         for tname in ["FRACTIONS","ERRORS"]:
             t1 = self.mesh.getTagHandle(tname)
-            t2 = sm.mesh.getTagHandle(tname)
+            t2 = sm.imesh.getTagHandle(tname)
             for (e1,e2) in itertools.izip_longest( 
                                self.mesh.iterate( iBase.Type.region, iMesh.Topology.hexahedron ),
                                sm.iterateHex( 'xyz' )):
                 self.assertTrue( all( t1[e1] == t2[e2] ) )
         for tname in ["GRID_DIMS","MATS"]: # tags on root set
             t1 = self.mesh.getTagHandle(tname)
-            t2 = sm.mesh.getTagHandle(tname)
+            t2 = sm.imesh.getTagHandle(tname)
             self.assertTrue( all(t1[self.mesh.rootSet] == t2[sm.scdset]) )
 
     def test_error(self):
-        sm = ScdMesh( iMesh.Mesh(), *([range(5)]*3) )
+        sm = ScdMesh( *([range(5)]*3) )
         self.assertRaises( ScdMeshError, 
-                           sc_convert.convert_mesh, sm.mesh, sm.scdset, sm.mesh )
+                           sc_convert.convert_mesh, sm.imesh, sm.scdset, sm.imesh )

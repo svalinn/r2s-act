@@ -110,14 +110,14 @@ def tag_fluxes(meshtal, meshtal_type, m, spacial_points, \
     for e_group in range(1, e_bins +1) : 
 
         if e_group != e_bins: #create a new tag for each E bin
-            tag_flux=sm.mesh.createTag\
+            tag_flux=sm.imesh.createTag\
                     ('{0}_group_{1:03d}'.format(meshtal_type, e_group),1,float)
-            tag_error=sm.mesh.createTag\
+            tag_error=sm.imesh.createTag\
                     ('{0}_group_{1:03d}_error'.format(meshtal_type, e_group),1,float)
 
         else : #create a tags for totals grou
-            tag_flux=sm.mesh.createTag(meshtal_type+'_group_total',1,float)
-            tag_error=sm.mesh.createTag(meshtal_type+'_group_total_error',1,float)
+            tag_flux=sm.imesh.createTag(meshtal_type+'_group_total',1,float)
+            tag_error=sm.imesh.createTag(meshtal_type+'_group_total_error',1,float)
 
         #Create lists of data from meshtal file for energy group 'e_group'
         flux_data=[]
@@ -152,7 +152,7 @@ def read_meshtal( filename, norm=1, **kw ):
     spacial_points=(len(x_bounds)-1)*(len(y_bounds)-1)*(len(z_bounds)-1)
     e_bins=len(e_bounds) #dont substract 1; cancels with totals bin
 
-    sm = ScdMesh( iMesh.Mesh(), x_bounds, y_bounds, z_bounds)
+    sm = ScdMesh(x_bounds, y_bounds, z_bounds)
 
     if 'smesh' in kw:
         dims = kw['smesh'].dims
@@ -188,7 +188,7 @@ def main( arguments = None ) :
         parser.error('\nNeed 1 argument: meshtal file')
          
     if opts.smesh_filename:
-        alt_sm = ScdMesh.fromFile(iMesh.Mesh(), opts.smesh_filename)
+        alt_sm = ScdMesh.fromFile(opts.smesh_filename)
         sm = read_meshtal(args[1], float(opts.norm), smesh=alt_sm)
     else:
         sm = read_meshtal(args[1], float(opts.norm))

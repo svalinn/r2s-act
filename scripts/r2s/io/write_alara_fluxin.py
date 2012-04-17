@@ -12,7 +12,7 @@ def find_num_e_groups(sm):
         
         #Look for tags in the form n_group_'e_group'
         try:
-            tag=sm.mesh.getTagHandle('n_group_{0:03d}'.format(e_group))
+            tag=sm.imesh.getTagHandle('n_group_{0:03d}'.format(e_group))
             num_e_groups = num_e_groups + 1 #increment if tag is found
 
        # Stop iterating once a tag is not found
@@ -52,7 +52,7 @@ def print_fluxes(sm, num_e_groups, backward_bool, fluxin_name):
         #Print flux data to file
         count=0
         for e_group in range(min,max,direction):
-            output.write(str(sm.mesh.getTagHandle('n_group_{0:03d}'.format(e_group))[voxel])+' ')
+            output.write(str(sm.imesh.getTagHandle('n_group_{0:03d}'.format(e_group))[voxel])+' ')
             
             #flux.in formatting: create a new line after every 8th entry
             count += 1   
@@ -91,7 +91,7 @@ def main( arguments = None ):
         ( '\nNeed exactly 1 argument: structured mesh file' )
 
     #Load Structured mesh from file
-    sm=ScdMesh.fromFile(iMesh.Mesh(),args[0])
+    sm=ScdMesh.fromFile(args[0])
 
     write_alara_fluxin( opts.fluxin_name, sm, opts.backward_bool )
 

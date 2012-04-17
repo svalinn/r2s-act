@@ -117,7 +117,7 @@ class mmGrid:
         divisions = [0]*3
         for i in range(3):
             divisions[i] = np.linspace(low_corner[i],high_corner[i],ndiv,endpoint=True)
-        return cls( scdmesh.ScdMesh( iMesh.Mesh(), *divisions) )
+        return cls( scdmesh.ScdMesh(*divisions) )
 
     def _rayframe_count(self, dim):
 
@@ -272,7 +272,7 @@ class mmGrid:
         _msg("Maximum error: {0}".format(max_err))
 
     def createTags(self):
-        mesh = self.scdmesh.mesh
+        mesh = self.scdmesh.imesh
         for idx, ((mat, rho), (matnum,matname)) in enumerate(self.materials.iteritems()):
             mattag = mesh.createTag( matname, 1, np.float64 )
             errtag = mesh.createTag( matname+'_err', 1, np.float64 )
@@ -331,7 +331,7 @@ def main( arguments=None ):
     load_geom( args[0] )
     sm = None
     if len(args) == 2:
-        sm = scdmesh.ScdMesh.fromFile(iMesh.Mesh(),args[1])
+        sm = scdmesh.ScdMesh.fromFile(args[1])
         grid = mmGrid( sm )
     else:
         grid = mmGrid.fromDagGeom(opts.ndivs)

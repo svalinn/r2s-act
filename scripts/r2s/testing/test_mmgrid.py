@@ -61,7 +61,7 @@ class mmGridTest( unittest.TestCase ):
     def test_rayframes(self):
 
         # a mesh with divisions at -1, 0, and 1 for all three dimensions
-        sm = ScdMesh( iMesh.Mesh(), *([(-1, 0, 1)]*3) )
+        sm = ScdMesh( *([(-1, 0, 1)]*3) )
         mg = mmgrid.mmGrid(sm)
 
         squares = [ (-1,0,-1,0), (-1,0,0,1), (0,1,-1,0), (0,1,0,1) ]
@@ -74,7 +74,7 @@ class mmGridTest( unittest.TestCase ):
             self.assertEqual( ijk, ijk_test )
 
     def test_mmgrid_create(self):
-        sm = ScdMesh( iMesh.Mesh(), *([(-1, 0, 1)]*3) )
+        sm = ScdMesh( *([(-1, 0, 1)]*3) )
         grid = mmgrid.mmGrid( sm )
         self.assertEqual( grid.grid.shape, (2,2,2) )
         self.assertEqual( grid.grid[0,0,0]['mats'].shape, (3,) )
@@ -93,7 +93,7 @@ class mmGridTest( unittest.TestCase ):
 
     def test_mmgrid_generate(self):
         grid_side = [-5,-3.75,-2.5,-1.25,0,1.25,2.5,3.75,5]
-        sm = ScdMesh( iMesh.Mesh(), *([grid_side]*3) )
+        sm = ScdMesh( *([grid_side]*3) )
         grid = mmgrid.mmGrid( sm )
         grid.generate(2, True)
 
@@ -109,7 +109,7 @@ class mmGridTest( unittest.TestCase ):
     def test_unequal_grid_size(self):
         """Test creating an mmgrid on a mesh with uneven grid spacing"""
         grid_side = [-3,0,.1,.2,3]
-        sm = ScdMesh( iMesh.Mesh(), *([grid_side]*3) )
+        sm = ScdMesh( *([grid_side]*3) )
         grid = mmgrid.mmGrid( sm )
         grid.generate(5)#, True)
 

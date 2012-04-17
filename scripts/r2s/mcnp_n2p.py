@@ -229,7 +229,7 @@ class ModMCNPforPhotons(object):
         ACTION: Lines are appended to self.block3Lines.
         RECEIVES: A structured mesh object (scdmesh.py)
         REQUIRES: Block 3 has been read into self.block3Lines; photon energies
-         have been tagged to 'sm.mesh.rootSet'.
+         have been tagged to 'sm.imesh.rootSet'.
         RETURNS: 1 if successful, 0 if an error occurs.
         """
         
@@ -248,8 +248,8 @@ class ModMCNPforPhotons(object):
 
         # We look for the tag with the energy bin boundary values
         try:
-            phtn_ergs = sm.mesh.getTagHandle("PHTN_ERGS")
-            myergbins = [str(x) for x in phtn_ergs[sm.mesh.rootSet]]
+            phtn_ergs = sm.imesh.getTagHandle("PHTN_ERGS")
+            myergbins = [str(x) for x in phtn_ergs[sm.imesh.rootSet]]
 
         # if there is no PHTN_ERGS tag, then we send an empty string in myergbins
         except iBase.TagNotFoundError: 

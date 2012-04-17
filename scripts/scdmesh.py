@@ -9,7 +9,16 @@ class ScdMeshError(Exception):
 
 
 class ScdMesh:
-    """A structured mesh in the spirit of MOAB's ScdMesh interface."""
+    """A structured mesh in the spirit of MOAB's ScdMesh interface.
+    
+    Public member variables:
+        
+        self.imesh -- the iMesh instance in which this 
+                      structured mesh resides
+        self.dims -- A namedtuple indicating the minimum and maximum
+                     (i,j,k) coordinates of this structured mesh.
+    """
+
 
     # A six-element tuple corresponding to the BOX_DIMS tag on the
     # structured mesh.  See the MOAB library's metadata-info.doc file.
@@ -17,26 +26,33 @@ class ScdMesh:
                                ('imin', 'jmin', 'kmin',
                                 'imax', 'jmax', 'kmax'))
 
-    def __init__(self, mesh, x_points, y_points, z_points, **kw):
-        """Construct a ScdMesh from given x, y, and z coordinates
+    def __init__(self, x_points, y_points, z_points, imesh=None, **kw):
+        """Construct a ScdMesh from given x, y, and z coordinates.
+           The imesh parameter can be used to designate an iMesh instance
+           in which to place the mesh; if None, a new instance will be 
+           created.
 
            The i,j,k extents of the structured mesh will be numbered from 0.
 
            keyword arguments:
            bdtag = if the BOX_DIMS tag has already been looked up, it may
                    be passed thus
-           _scdset = an existing scdset to use; users should use fromEntSet
+           _scdset = an existing scdset to use; clients should use 
+                     fromEntSet() instead of using this parameter.
         """
-        self.mesh = mesh
+        if imesh:
+            self.imesh = imesh
+        else:
+            self.imesh = iMesh.Mesh()
         if x_points is None and y_points is None and z_points is None:
             self.scdset = kw['_scdset']
         else:
             extents = [0, 0, 0]
             extents.extend([len(x)-1 for x in [x_points, y_points, z_points]])
-            self.scdset = mesh.createStructuredMesh(
+            self.scdset = self.imesh.createStructuredMesh(
                     extents, i=x_points, j=y_points, k=z_points,
                     create_set=True)
-        bdtag = kw.get('bdtag', mesh.getTagHandle('BOX_DIMS'))
+        bdtag = kw.get('bdtag', self.imesh.getTagHandle('BOX_DIMS'))
         self.dims = ScdMesh.extents_tuple(*bdtag[self.scdset])
         vdims_incr = list(self.dims[0:3]) + [x + 1 for x in self.dims[3:6]]
         self.vdims = ScdMesh.extents_tuple(*vdims_incr)
@@ -47,20 +63,22 @@ class ScdMesh:
                                          iMesh.Topology.point)
 
     @classmethod
-    def fromFile(cls, mesh, filename):
+    def fromFile(cls, filename, imesh=None):
         """Load structured meshes from a file
 
         Returns one strutured mesh if the file contains one mesh, or a list if
         the file contains multiple meshes.
         """
         retlist = []
-        mesh.rootSet.load(filename)
-        for eset in mesh.rootSet.getEntSets():
+        if not imesh:
+            imesh = iMesh.Mesh()
+        imesh.rootSet.load(filename)
+        for eset in imesh.rootSet.getEntSets():
             try:
-                bdtag = mesh.getTagHandle('BOX_DIMS')
+                bdtag = imesh.getTagHandle('BOX_DIMS')
                 bdtag[eset]
-                retlist.append(ScdMesh(mesh, None, None, None,
-                                       _scdset=eset, bdtag=bdtag))
+                retlist.append(cls(None, None, None, imesh,
+                                   _scdset=eset, bdtag=bdtag))
             except iBase.TagNotFoundError:
                 pass
         if not retlist:
@@ -71,13 +89,13 @@ class ScdMesh:
             return retlist
 
     @classmethod
-    def fromEntSet(cls, mesh, eset):
+    def fromEntSet(cls, imesh, eset):
         """Constructor function: create a ScdMesh from an existing entity set
 
         The eset parameter must be a structured mesh set with the BOX_DIMS
         tag set on it.
         """
-        m = ScdMesh(mesh, None, None, None, _scdset=eset)
+        m = cls(None, None, None, imesh, _scdset=eset)
         return m
 
     def getVtx(self, i, j, k):
@@ -95,7 +113,7 @@ class ScdMesh:
         v = list(self.iterateVtx(x=[i, i + 1],
                                  y=[j, j + 1],
                                  z=[k, k + 1]))
-        coord = self.mesh.getVtxCoords(v)
+        coord = self.imesh.getVtxCoords(v)
         dx = coord[1][0] - coord[0][0]
         dy = coord[2][1] - coord[0][1]
         dz = coord[4][2] - coord[0][2]
@@ -188,7 +206,7 @@ class ScdMesh:
         """
         if len(dim) == 1 and dim in 'xyz':
             idx = 'xyz'.find(dim)
-            return [self.mesh.getVtxCoords(i)[idx]
+            return [self.imesh.getVtxCoords(i)[idx]
                     for i in self.iterateVtx(dim)]
         else:
             raise ScdMeshError('Invalid dimension: '+str(dim))

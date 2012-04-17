@@ -46,7 +46,7 @@ def convert_mesh( mesh1, meshset1, mesh2, **kw ):
     dims = extract_dimensions( mesh1, meshset1 )
     dims = [list(sorted(x)) for x in dims]
 
-    sm = scdmesh.ScdMesh( mesh2, *dims )
+    sm = scdmesh.ScdMesh( dims[0], dims[1], dims[2], mesh2 )
     
     # We want to copy all tags set on hexes; figure out what they are by 
     # checking meshset1's first hex for tags

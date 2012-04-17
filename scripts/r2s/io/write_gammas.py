@@ -35,7 +35,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
     """
 
     try:
-        grouptag = sm.mesh.getTagHandle("phtn_src_group_001")
+        grouptag = sm.imesh.getTagHandle("phtn_src_group_001")
     except iBase.TagNotFoundError:
         print "ERROR: The file '{0}' does not contain tags of the " \
                 "form 'phtn_src_group_#'".format(meshfile)
@@ -52,7 +52,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
     #  to get the total source strength in each voxel
     for i in xrange(2,1000): #~ Arbitrary: we look for up to 1000 groups
         try:
-            grouptag = sm.mesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
+            grouptag = sm.imesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
             for cnt, vox in enumerate(voxels):
                 meshstrengths[cnt] += float(grouptag[vox])
         except iBase.TagNotFoundError: 
@@ -88,8 +88,8 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
 
     # We now look for the tag with the energy bin boundary values
     try:
-        phtn_ergs = sm.mesh.getTagHandle("PHTN_ERGS")
-        myergbins = phtn_ergs[sm.mesh.rootSet] 
+        phtn_ergs = sm.imesh.getTagHandle("PHTN_ERGS")
+        myergbins = phtn_ergs[sm.imesh.rootSet] 
         print "Found a custom set of {0} energy bins in the PHTN_ERGS " \
                 "tag.".format(len(myergbins)-1)
 
@@ -109,9 +109,9 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
             # -sum up the total source strength (sourcetotal)
             # -make a list of bin source strengths and group #s (ergproblist)
             for i in xrange(1, numergbins + 1):
-                sourcetotal += float(sm.mesh.getTagHandle( \
+                sourcetotal += float(sm.imesh.getTagHandle( \
                         "phtn_src_group_{0:03d}".format(i))[voxel])
-                ergproblist.append([float(sm.mesh.getTagHandle( \
+                ergproblist.append([float(sm.imesh.getTagHandle( \
                         "phtn_src_group_{0:03d}".format(i))[voxel]), i])
 
             # Special case if there is no source strength
@@ -140,7 +140,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
             writestring = ""
             binval = 0.0
             for i in xrange(1, numergbins + 1):
-                binval += float(sm.mesh.getTagHandle( \
+                binval += float(sm.imesh.getTagHandle( \
                         "phtn_src_group_{0:03d}".format(i))[voxel])
                 writestring += "{0:<12.5E}".format(binval/norm)
             fw.write(writestring + "\n")
@@ -202,9 +202,9 @@ def calc_volumes_list(scd):
      -iterate x
     """
     
-    meshplanes = [ scd.getDivisions('x'), \
-                    scd.getDivisions('y'), \
-                    scd.getDivisions('z') ]
+    meshplanes = [ scd.getDivisions('x'),
+                   scd.getDivisions('y'),
+                   scd.getDivisions('z') ]
 
     oldz = meshplanes[2][0]
     oldy = meshplanes[1][0]
@@ -272,7 +272,7 @@ def main():
             "of 'gammas'."
 
     # Create ScdMesh object, which also loads 'meshfile' into mesh.
-    sm = ScdMesh.fromFile(iMesh.Mesh(), args[0])
+    sm = ScdMesh.fromFile(args[0])
 
     gen_gammas_file_from_h5m(sm, options.output, options.alias)
 

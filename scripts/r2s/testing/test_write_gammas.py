@@ -16,7 +16,7 @@ class TestCalcVolumes(unittest.TestCase):
 
     def setUp(self):
         filename = os.path.join(thisdir, 'grid543.h5m')
-        self.sm = ScdMesh.fromFile(iMesh.Mesh(), filename)
+        self.sm = ScdMesh.fromFile(filename)
 
     def test_calc_volumes_list_1(self):
         """
@@ -32,7 +32,7 @@ class TestGenGammasFile(unittest.TestCase):
 
     def setUp(self):
         os.system("cp " + meshfile_orig + " " + meshfile)
-        self.sm = ScdMesh.fromFile(iMesh.Mesh(), meshfile)
+        self.sm = ScdMesh.fromFile(meshfile)
         read_alara_phtn.read_to_h5m(inputfile, self.sm)
 
     def tearDown(self):
