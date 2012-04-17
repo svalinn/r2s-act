@@ -24,6 +24,7 @@ subroutine source
   use mcnp_random
   implicit real(dknd) (a-h,o-z)
         integer stat
+        integer(i8knd) :: ikffl = 0
         real(dknd),dimension(:,:), allocatable :: spectrum
         real(dknd),dimension(:),allocatable :: my_ener_phot
         integer i_ints,j_ints,k_ints,n_mesh_cells,n_active_mat,n_ener_grps
@@ -90,7 +91,7 @@ subroutine source
                             ! read into 'line'.
             n_ener_grps = 42
             ALLOCATE(my_ener_phot(1:42+1))
-            my_ener_phot=(/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
+            my_ener_phot=(/0.001,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15,&
               0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
               1.66,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0, &
               10.0,12.0,14.0,20.0,30.0,50.0/)
@@ -175,16 +176,16 @@ subroutine source
         wgt=spectrum(i,n_ener_grps) 
 
         ipt=2 ! particle type: 2 = photon
-        jsu=0
-        tme=0
+        jsu=0 ! current surface
+        tme=0 ! particle time
 !        
 !---------------------------------------------------------------------------------
 !        Determine in which cell you are starting. Subroutine is copied from MCNP code (sourcb.F90). 
 !       ICL and JUNF should be set to 0 for this part of the code to work.
 !---------------------------------------------------------------------------------
 !
-        icl=0
-        junf=0
+        icl=0  ! current cell 
+        junf=0 ! flag for repeated structures
         
   ! default for cel:  find the cell that contains xyz.
 470 continue

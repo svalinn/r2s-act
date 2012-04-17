@@ -27,6 +27,7 @@ subroutine source
   use mcnp_random
   implicit real(dknd) (a-h,o-z)
         integer stat
+        integer(i8knd) :: ikffl = 0
         real(dknd),dimension(:,:), allocatable :: spectrum
         real(dknd),dimension(:),allocatable :: my_ener_phot
         integer i_ints,j_ints,k_ints,n_mesh_cells,n_active_mat,n_ener_grps
@@ -93,7 +94,7 @@ subroutine source
                             ! read into 'line'.
             n_ener_grps = 42
             ALLOCATE(my_ener_phot(1:42+1))
-            my_ener_phot=(/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
+            my_ener_phot=(/0.001,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15,&
               0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
               1.66,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0, &
               10.0,12.0,14.0,20.0,30.0,50.0/)
@@ -168,10 +169,10 @@ subroutine source
         ! -energy bin # of the first secondary bin
         ! -energy bin # of the second secondary bin
         ! second rand chooses first or second bin in alias table bin
-        if ( rang().le.spectrum(i, 1 + r4     + 1) ) then
-          j = INT( spectrum(i, 1 + r4 + 1 + 1) )
+        if ( rang().le.spectrum(i, INT(1 + r4     + 1)) ) then
+          j = INT( spectrum(i, INT(1 + r4 + 1 + 1)) )
         else
-          j = INT( spectrum(i, 1 + r4 + 2 + 1) )
+          j = INT( spectrum(i, INT(1 + r4 + 2 + 1)) )
         endif
 
         erg=my_ener_phot(j)+(1-rang())*(my_ener_phot(j+1)-my_ener_phot(j))
