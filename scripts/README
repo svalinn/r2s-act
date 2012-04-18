@@ -1,26 +1,14 @@
-Scripts:
+User-facing scripts:
 
-alias.py: Module providing alias sampling method, used by gen_gammas.
+r2s_setup.py: Generates a per-problem r2s.cfg file and an ALARA snippet file.
+              These two files can be hand-edited to specify the files and input
+              values for running r2s_step1.py
 
-FluxParse.py: A script to parse raw MCNP mesh tally files to ALARA flux-in format.
-              This is the first step of the workflow.
+r2s_step1.py: Converts an MCNP (or DAG-MCNP) neutron problem input, and its 
+              associated meshtal file, into a set of ALARA inputs files.
 
-gen_gammas.py: Takes photon source data on a mesh (as produced by PhtnSrcToH5M.py),
-               normalizes source information, and generates the 'gammas' file for 
-               our custom source.F90 routine.
-
-mmgrid.py: Python replacement for mmGridGen; uses Monte Carlo techniques to estimate
-           material fractions, given a structured mesh and a CAD geometry.
-
-moab2alara.py: Converts mmgrid output to ALARA geometry and materials definitions.
-
-ModMCNPforPhotons.py: Modifies MCNP neutron problem definition, creating the corresponding
-                      photon problem to use with custom source.F90.
-
-PhtnSrcToH5M.py: Turn ALARA photon source output and converts it to MOAB representation.
-
-reTagMesh.py: Script to prepare visuzliations of volume fractions produced by
-              mmgrid.
+r2s_step2.py: Converts a set of ALARA output files into an MCNP (or DAG-MCNP)
+              photon problem.
 
 scdmesh.py: Module for representation of structured rectilinear hex meshes
             through PyTAPS; uses the PyTAPS structured mesh extension functions.
@@ -28,8 +16,52 @@ scdmesh.py: Module for representation of structured rectilinear hex meshes
 scdmesh_convert.py: Utility script to convert old-stype hex meshes into scdmeshes.
 
 ==================================================
+r2s package contents (most may be invoked as scripts by advanced users): 
 
-alt_photon_src: files related to older approach to doing photon source definitions,
+r2s/alias.py: Module providing alias sampling method, used by gen_gammas.
+
+r2s/mmgrid.py: Python replacement for mmGridGen; uses Monte Carlo techniques to estimate
+               material fractions, given a structured mesh and a CAD geometry.
+
+r2s/mcnp_n2p.py: Modifies MCNP neutron problem definition, creating the corresponding
+                 photon problem to use with custom source.F90.
+
+r2s/alara_ele2iso.py: Converts alara element library file to isotopy library file.
+
+r2s/tag_ebins.py: Tags mesh with energy bins boundaries
+
+r2s/tag_for_viz.py: Script to prepare visuzliations of volume fractions produced by
+                    mmGridGen.  (Not needed for newer workflows, should probably
+                    be moved to legacy/)
+
+r2s/io/read_alara_phtn.py: Turn ALARA photon source output and converts it to MOAB representation.
+
+r2s/io/write_gammas.py: Takes photon source data on a mesh (as produced by PhtnSrcToH5M.py),
+               normalizes source information, and generates the 'gammas' file for 
+               our custom source.F90 routine.
+
+r2s/io/read_meshtal.py: Parses an MCNP meshtal output file and creates a structured mesh
+
+r2s/io/write_alara_fluxin.py: Writes an alara fluxin file based on flux-tagged structured
+                              mesh from read_meshtal
+
+r2s/io/write_alara_geom.py: Writes alara geometry description for a structured mesh with
+                            material data
+
+==================================================
+legacy/ -- retired scripts that may still be useful for compatibility with problems
+           that used older verisons of this workflow.  Should not be used for new 
+           problems.
+
+legacy/moab2alara.py: Converts mmgrid output to ALARA geometry and materials definitions.
+
+legacy/FluxParse.py: A script to parse raw MCNP mesh tally files to ALARA flux-in format.
+              This is the first step of the workflow.
+
+
+==================================================
+
+legacy/alt_photon_src: files related to older approach to doing photon source definitions,
 using a very elaborate sdef card instead of a custom source routine.
 
 alt_photon_src/obj_phtn_src.py:
