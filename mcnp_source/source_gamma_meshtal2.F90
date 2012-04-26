@@ -90,7 +90,7 @@ subroutine source
             backspace(50) ! we reset the file to the beginning of the record we
                             ! read into 'line'.
             n_ener_grps = 42
-            ALLOCATE(my_ener_phot(1:42+1))
+            ALLOCATE(my_ener_phot(1:n_ener_grps+1))
             my_ener_phot=(/0.001,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15,&
               0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
               1.66,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0, &
