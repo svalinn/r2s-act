@@ -30,7 +30,8 @@ def gen_alias_table(bins):
     cnt = 0 # keeps track of the current alias table bin that we are working with
     remainingbins = len(bins)
 
-    bins.sort() # initial sort; sorts by probability (first value of each bin)
+    # Initial sort; sorts by probability (first value of each bin)
+    bins.sort()
 
     # Alias table generating loop
     while remainingbins > 0:
@@ -47,14 +48,16 @@ def gen_alias_table(bins):
             # Then add the largest bin as the second part of the alias table
             #  and then reduce the largest probability bin by: x - n_inv
             #  where x is the probability of the bin added above.
-            pairs[cnt].append([round(n_inv - bins[0][0],5), bins[remainingbins-1][1]])
+            pairs[cnt].append([ round(n_inv - bins[0][0], 5), \
+                    bins[remainingbins-1][1] ])
             bins[remainingbins-1][0] -= (n_inv - bins[0][0])
             bins[remainingbins-1][0] = round(bins[remainingbins-1][0],5)
 
             bins = bins[1:]
-            
+        
+        # UNVERIFIED: SEEMS THIS CASE DOES NOT EVER HAPPEN?
         elif bins[0][1] > n_inv:
-            pairs.append([[ n_inv,bins[0][1] ]])
+            pairs.append([[ n_inv, bins[0][1] ]])
             # above: we append [[1/n, bin #]] to alias table
             # then we reduce bins[0] by 1/n, and continue on
             bins[0][0] -= n_inv
@@ -62,12 +65,12 @@ def gen_alias_table(bins):
 
             pairs[cnt].append([0,0])
             
-        else: #~ least probable
+        else: # exactly equal; least probable
             pairs.append([bins[0]])
             bins = bins[1:]
             pairs[cnt].append([0,0])
 
-        # we set the alias bin's two secondary bin probabilities to toal 1
+        # we set the alias bin's two secondary bin probabilities to total 1
         pairs[cnt][0][0] *= n
         pairs[cnt][1][0] *= n
 

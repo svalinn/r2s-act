@@ -69,10 +69,10 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
                 "({1}).".format(len(vols), len(meshstrengths))
         return 0
 
-    # We calcualte the normalization factor as the sum over all voxels of
-    #  voxel source strength * voxel volume
+    # We calculate the normalization factor as the sum over all voxels of:
+    #  voxel volumetric source strength * voxel volume
     # Divided by the volume of all voxels with non-zero source strength.
-    # This applies for variabl voxel sizes in a structured mesh.
+    # This applies for variable voxel sizes in a structured mesh.
     numactivatedcells = 0
     sumvoxelstrengths = 0
     sourcevolumetotal = 0
@@ -84,6 +84,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
     print "The number of activated voxels and total number of voxels is " \
             "{0}/{1}".format(numactivatedcells, len(meshstrengths))
     
+    # norm is the average volumetric source strength
     norm = sumvoxelstrengths / sourcevolumetotal
 
     # We now look for the tag with the energy bin boundary values
@@ -102,7 +103,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
     fw = _gen_gammas_header(sm, outfile, myergbins)
 
     if do_alias:
-        for voxel in voxels:
+        for cnt, voxel in enumerate(voxels):
             sourcetotal = 0
             ergproblist = list()
             # We go through each energy group for the voxel and:
@@ -116,7 +117,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
 
             # Special case if there is no source strength
             if sourcetotal == 0:
-                fw.write(" ".join(["0"]*(numergbins*3+1)) + "\n")
+                fw.write(" ".join( ["0"]*(numergbins*3+1) ) + "\n")
                 continue
 
             # Reduce the source strengths to fractional probabilities
@@ -130,11 +131,18 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
             #  of 12 characters, with 5 values after the decimal point and 
             #  scientific notation for the probability values, and integer 
             #  format for the energy group numbers
-            aliasstrings = ["{0:<12.5E} {1} {2}".format(x[0][0],x[0][1],x[1][1]) \
-                    for x in aliastable]
+            aliasstrings = [ \
+                    "{0:<12.5E} {1} {2}".format(x[0][0],x[0][1],x[1][1]) \
+                    for x in aliastable ]
 
-            fw.write(str(sourcetotal/norm) + " " + " ".join(aliasstrings) + "\n")
+            # We write the alias table to one line, prepended by the source
+            #  strength of the voxel divided by the average source strength per
+            #  volume
+            # sourcetotal*vols[cnt]/norm can be used as the particle's weight
+            fw.write(str(sourcetotal*vols[cnt]/norm) + " " + \
+                    " ".join(aliasstrings) + "\n")
 
+    # Else, for each voxel, write the cummulative source strength at each energy
     else:
         for voxel in voxels:
             writestring = ""
