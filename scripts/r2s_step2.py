@@ -26,18 +26,35 @@ if config.has_option('r2s-files','photon_mcnp_input'):
     mcnp_n_problem = get_input_file(config,'neutron_mcnp_input')
     mcnp_p_problem = config.get('r2s-files','photon_mcnp_input')
     
-
+# Optional values
+if config.has_section('r2s-step2-options'):
+    opt_isotope = config.get('r2s-step2-options','photon_isotope')
+    opt_cooling = config.get('r2s-step2-options','photon_cooling')
+    opt_alias = bool(int(config.get('r2s-step2-options','alias_ergbins')))
+    opt_bias = bool(int(config.get('r2s-step2-options','photon_bias')))
+    opt_by_voxel = bool(int(config.get('r2s-step2-options','photon_by_voxel')))
+else:
+    opt_isotope = "TOTAL"
+    opt_cooling = 0
+    opt_alias = False
+    opt_bias = False
+    opt_by_voxel = False
+    
 # Do processing
 
 print "Loading step one data file `{0}'".format(datafile)
 smesh = ScdMesh.fromFile(datafile)
 
-print "Reading alara photon source `{0}'".format(phtn_src)
-read_alara_phtn.read_to_h5m(phtn_src, smesh, isotope="TOTAL", coolingstep=0, \
-        retag=True, totals=True)
+print "Reading ALARA photon source `{0}'".format(phtn_src)
+read_alara_phtn.read_to_h5m(phtn_src, smesh, isotope=opt_isotope, \
+        coolingstep=opt_cooling, retag=True, totals=True)
+
+print "Saving photon source information to '{0}'".format(datafile)
+smesh.imesh.save(datafile)
 
 print "Writing gammas file"
-write_gammas.gen_gammas_file_from_h5m(smesh)
+write_gammas.gen_gammas_file_from_h5m(smesh, do_alias=opt_alias, \
+        do_bias=opt_bias, by_voxel=opt_by_voxel)
 
 if mcnp_p_problem:
 

@@ -18,17 +18,18 @@ scdmesh_convert.py: Utility script to convert old-stype hex meshes into scdmeshe
 ==================================================
 r2s package contents (most may be invoked as scripts by advanced users): 
 
-r2s/alias.py: Module providing alias sampling method, used by gen_gammas.
+r2s/alias.py: Module providing alias table generation and alias sampling method, used 
+              by write_gammas.
 
-r2s/mmgrid.py: Python replacement for mmGridGen; uses Monte Carlo techniques to estimate
-               material fractions, given a structured mesh and a CAD geometry.
+r2s/mmgrid.py: Python replacement for mmGridGen; uses Monte Carlo techniques to
+               estimate material fractions, given a structured mesh and a CAD geometry.
 
 r2s/mcnp_n2p.py: Modifies MCNP neutron problem definition, creating the corresponding
                  photon problem to use with custom source.F90.
 
-r2s/alara_ele2iso.py: Converts alara element library file to isotopy library file.
+r2s/alara_ele2iso.py: Converts ALARA element library file to isotope library file.
 
-r2s/tag_ebins.py: Tags mesh with energy bins boundaries
+r2s/tag_ebins.py: Tags mesh with energy bins boundaries provided in a separate file.
 
 r2s/tag_for_viz.py: Script to prepare visuzliations of volume fractions produced by
                     mmGridGen.  (Not needed for newer workflows, should probably
@@ -42,10 +43,10 @@ r2s/io/write_gammas.py: Takes photon source data on a mesh (as produced by PhtnS
 
 r2s/io/read_meshtal.py: Parses an MCNP meshtal output file and creates a structured mesh
 
-r2s/io/write_alara_fluxin.py: Writes an alara fluxin file based on flux-tagged structured
+r2s/io/write_alara_fluxin.py: Writes an ALARA fluxin file based on flux-tagged structured
                               mesh from read_meshtal
 
-r2s/io/write_alara_geom.py: Writes alara geometry description for a structured mesh with
+r2s/io/write_alara_geom.py: Writes ALARA geometry description for a structured mesh with
                             material data
 
 ==================================================

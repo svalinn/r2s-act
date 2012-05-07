@@ -1,7 +1,7 @@
 #!/usr/bin/env python 
 
 ######################################################################
-#gen_gammas.py
+# write_gammas.py
 ######################################################################
 # This python script reads the photon source strength tags from a
 #  structured MOAB mesh, normalizes these values, and the creates the
@@ -17,7 +17,8 @@ from r2s import alias
 from scdmesh import ScdMesh, ScdMeshError
 
 
-def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
+def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False, \
+        do_bias=False, by_voxel=False):
     """Generate gammas file using information from tags on a MOAB mesh.
     
     ACTION: Method reads tags with photon source strengths from an h5m
@@ -31,7 +32,8 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
 
     RECEIVES: The file (a moab mesh file) containing the mesh of interest.
     Optional: An output file name for the 'gammas' file; do_alias=True will
-    generate the gammas_alias file with alias tables.
+    generate the gammas_alias file with alias tables; do_bias=True will add any
+    values found on the PHTN_BIAS tag to the gammas file.
     """
 
     try:
@@ -98,26 +100,50 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
     except iBase.TagNotFoundError: 
         myergbins = "" # _gen_gammas_header will skip the energies line
 
+    # If the user has enabled adding bias information to the gammas file,
+    #  check to see if there are corresponding tags on the mesh.
+    if do_bias:
+        # We look for the tag handle for voxel biasing information
+        try:
+            bias_tag = sm.imesh.getTagHandle("PHTN_BIAS")
+            have_bias_info = True
+            print "Found tags for biasing photon production based on source " \
+                    "voxel."
+
+        except iBase.TagNotFoundError:
+            print "The option for biasing photon production was chosen, "\
+                    "but corresponding tags were not found on the mesh."
+            have_bias_info = False
+
+    else:
+        have_bias_info = False
+
     # The header of the gammas file is created in outfile, and the file writing
     #  stream is returned to fw
-    fw = _gen_gammas_header(sm, outfile, myergbins)
+    fw = _gen_gammas_header(sm, outfile, myergbins, have_bias_info)
 
-    if do_alias:
+    if do_alias and by_voxel:
         for cnt, voxel in enumerate(voxels):
             sourcetotal = 0
             ergproblist = list()
             # We go through each energy group for the voxel and:
+            # -make list of energy bin source strengths & group #s (ergproblist)
             # -sum up the total source strength (sourcetotal)
-            # -make a list of bin source strengths and group #s (ergproblist)
             for i in xrange(1, numergbins + 1):
-                sourcetotal += float(sm.imesh.getTagHandle( \
-                        "phtn_src_group_{0:03d}".format(i))[voxel])
                 ergproblist.append([float(sm.imesh.getTagHandle( \
                         "phtn_src_group_{0:03d}".format(i))[voxel]), i])
+                sourcetotal += ergproblist[i-1][0]
+
+            if have_bias_info:
+                bias = str(bias_tag[voxel]) + " "
+            else: bias = ""
 
             # Special case if there is no source strength
             if sourcetotal == 0:
-                fw.write(" ".join( ["0"]*(numergbins*3+1) ) + "\n")
+                fw.write(" ".join( \
+                        ["0"]*(numergbins*3 + 1 + int(bool(have_bias_info))) ) \
+                        + "\n")
+                        # int(bool()) ensures either 1 or 0 is added
                 continue
 
             # Reduce the source strengths to fractional probabilities
@@ -139,10 +165,63 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
             #  strength of the voxel divided by the average source strength per
             #  volume
             # sourcetotal*vols[cnt]/norm can be used as the particle's weight
-            fw.write(str(sourcetotal*vols[cnt]/norm) + " " + \
+      #      print "gammas is using normalization for choosing voxels."
+            fw.write(str(sourcetotal*vols[cnt]/sumvoxelstrengths) + " " + bias + \
+                    " ".join(aliasstrings) + "\n")
+#            fw.write(str(sourcetotal/norm) + " " + bias + \
+#                    " ".join(aliasstrings) + "\n")
+
+    elif do_alias:
+        for cnt, voxel in enumerate(voxels):
+            sourcetotal = 0
+            ergproblist = list()
+            # We go through each energy group for the voxel and:
+            # -make list of energy bin source strengths & group #s (ergproblist)
+            # -sum up the total source strength (sourcetotal)
+            for i in xrange(1, numergbins + 1):
+                ergproblist.append([float(sm.imesh.getTagHandle( \
+                        "phtn_src_group_{0:03d}".format(i))[voxel]), i])
+                sourcetotal += ergproblist[i-1][0]
+
+            if have_bias_info:
+                bias = str(bias_tag[voxel]) + " "
+            else: bias = ""
+
+            # Special case if there is no source strength
+            if sourcetotal == 0:
+                fw.write(" ".join( \
+                        ["0"]*(numergbins*3 + 1 + int(bool(have_bias_info))) ) \
+                        + "\n")
+                        # int(bool()) ensures either 1 or 0 is added
+                continue
+
+            # Reduce the source strengths to fractional probabilities
+            ergproblist = [ [x[0]/sourcetotal,x[1]] for x in ergproblist ]
+
+            # And generate the alias table
+            aliastable = alias.gen_alias_table(ergproblist)
+
+            # We compactly format the alias table as a bunch of strings.
+            # The following list comprehension uses a format specifying output
+            #  of 12 characters, with 5 values after the decimal point and 
+            #  scientific notation for the probability values, and integer 
+            #  format for the energy group numbers
+            aliasstrings = [ \
+                    "{0:<12.5E} {1} {2}".format(x[0][0],x[0][1],x[1][1]) \
+                    for x in aliastable ]
+
+            # We write the alias table to one line, prepended by the source
+            #  strength of the voxel divided by the average source strength per
+            #  volume
+            # sourcetotal*vols[cnt]/norm can be used as the particle's weight
+#            fw.write(str(sourcetotal*vols[cnt]/sumvoxelstrengths) + " " + bias + \
+#                    " ".join(aliasstrings) + "\n")
+    #        print "gammas is using normalization for choosing a point and " \
+    #                "weighting the resulting particle accordingly."
+            fw.write(str(sourcetotal/norm) + " " + bias + \
                     " ".join(aliasstrings) + "\n")
 
-    # Else, for each voxel, write the cummulative source strength at each energy
+    # Else, for each voxel, write the cumulative source strength at each energy
     else:
         for voxel in voxels:
             writestring = ""
@@ -151,8 +230,14 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
                 binval += float(sm.imesh.getTagHandle( \
                         "phtn_src_group_{0:03d}".format(i))[voxel])
                 writestring += "{0:<12.5E}".format(binval/norm)
-            fw.write(writestring + "\n")
+
+            # Not implemented yet
+            if have_bias_info:
+                print "Adding bias information to the 'gammas' file is not " \
+                        "supported with the cummulative energy bins format."
     
+            fw.write(writestring + "\n")
+
     fw.close()
 
     print "The file '{0}' was created successfully".format(outfile)
@@ -160,7 +245,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False):
     return 1
 
 
-def _gen_gammas_header(scd, outfile, ergbins):
+def _gen_gammas_header(scd, outfile, ergbins, biasing):
     """Open a stream to write the header information for a gammas file
     
     ACTION: Method writes the header lines for gammas file, and method
@@ -193,6 +278,10 @@ def _gen_gammas_header(scd, outfile, ergbins):
     if ergbins != "":
         fw.write("e " + str(len(ergbins)-1) + " " + \
                 " ".join([str(x) for x in ergbins]) + "\n")
+
+    # If biasing information exists, write a line that starts with 'b'
+    if biasing:
+        fw.write("b" + "\n")
 
     return fw
 
