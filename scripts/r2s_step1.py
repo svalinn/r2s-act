@@ -76,8 +76,9 @@ grid.createTags()
 print "Saving fluxes and materials to `{0}'".format(datafile)
 smesh.imesh.save(datafile)
 
-print "Producing visualization file `{0}' with mbconvert".format(visfile)
-os.system('mbconvert {0} {1}'.format(datafile,visfile))
+if visfile != None:
+    print "Producing visualization file `{0}' with mbconvert".format(visfile)
+    os.system('mbconvert {0} {1}'.format(datafile,visfile))
 
 print "Writing alara problem file `{0}'".format(alara_geom)
 mdict = get_material_dict()
