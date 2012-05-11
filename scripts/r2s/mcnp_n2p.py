@@ -17,7 +17,8 @@ class ModMCNPforPhotons(object):
     """
 
     def __init__(self, myInputFileName, dagmc=True):
-        """Init function for class ModMCNPforPhotons. Receives an MCNP input file.
+        """Init function for class ModMCNPforPhotons. Receives an MCNP input 
+        file.
         """
         super(ModMCNPforPhotons, self).__init__()
 
@@ -246,47 +247,67 @@ class ModMCNPforPhotons(object):
         zCoarse = [str(z) for z in zCoarse]
         zSteps = [str(z) for z in zSteps]
 
+        # String com allows us to comment out the fmesh card if desired
+        com = ""
+
         # We look for the tag with the energy bin boundary values
         try:
             phtn_ergs = sm.imesh.getTagHandle("PHTN_ERGS")
             myergbins = [str(x) for x in phtn_ergs[sm.imesh.rootSet]]
 
-        # if there is no PHTN_ERGS tag, then we send an empty string in myergbins
+        # if there is no PHTN_ERGS tag then we send an empty string in myergbins
         except iBase.TagNotFoundError: 
             print "WARNING: Tag for photon energy group boundaries was not " \
-                    "found.\n\tA default fmesh card will not be added."
+                    "found.\n\tThe default fmesh card will be commented out."
+            myergbins = ""
+            com = "c "
 
-            return 0
-
+        # We set up a TextWrapper for the keywords, indenting lines 6 spaces
         mcnpWrap = tw.TextWrapper()
         mcnpWrap.initial_indent = 6*' '
-        mcnpWrap.subsequent_indent = (6+5)*' '
+        mcnpWrap.subsequent_indent = (6+6)*' '
         mcnpWrap.wdith = 80
         mcnpWrap.break_on_hyphens = False
         mcnpWrap.drop_whitespace = False
 
-        self.block3Lines.append("fmesh444:p\n")
-        self.block3Lines.append("      geom=xyz origin={0} {1} {2}" \
+        self.block3Lines.append(com + "fmesh444:p\n")
+        self.block3Lines.append(com + "      geom=xyz origin={0} {1} {2}" \
                 "\n".format(xCoarse[0], yCoarse[0], zCoarse[0]))
         
         for line in mcnpWrap.wrap("imesh="+" ".join(xCoarse[1:])):
-            self.block3Lines.append(line+"\n")
+            self.block3Lines.append(com+line+"\n")
         for line in mcnpWrap.wrap("iints="+" ".join(xSteps)):
-            self.block3Lines.append(line+"\n")
+            self.block3Lines.append(com+line+"\n")
         for line in mcnpWrap.wrap("jmesh="+" ".join(yCoarse[1:])):
-            self.block3Lines.append(line+"\n")
+            self.block3Lines.append(com+line+"\n")
         for line in mcnpWrap.wrap("jints="+" ".join(ySteps)):
-            self.block3Lines.append(line+"\n")
+            self.block3Lines.append(com+line+"\n")
         for line in mcnpWrap.wrap("kmesh="+" ".join(zCoarse[1:])):
-            self.block3Lines.append(line+"\n")
+            self.block3Lines.append(com+line+"\n")
         for line in mcnpWrap.wrap("kints="+" ".join(zSteps)):
-            self.block3Lines.append(line+"\n")
+            self.block3Lines.append(com+line+"\n")
 
         for line in mcnpWrap.wrap("emesh="+" ".join(myergbins)):
-            self.block3Lines.append(line+"\n")
+            self.block3Lines.append(com+line+"\n")
 
         print "A default photon fmesh card has been added to the input, " \
                 "and matches the mesh structure found in the MOAB mesh.\n"
+
+        # We look for the PHTN_SRC_TOTAL tag on the mesh and add it to a
+        #  commented out tally multiplier card for the meshtally.
+        try:
+            sumvoxelstrengths = sm.imesh.getTagHandle( \
+                    "PHTN_SRC_TOTAL")[sm.imesh.rootSet]
+            self.block3Lines.append("c This multiplier will convert tallies " \
+                    "from tallies per source particle\n" \
+                    "c  to tallies per second.\n")
+            self.block3Lines.append( \
+                    "c fm444 {0:e}\n".format(sumvoxelstrengths))
+            print "A tally multiplier card (fm444) has been added for " \
+                    "normalizing to the total photon source strength in the " \
+                    "problem."
+        except iBase.TagNotFoundError:
+            pass
 
         return 1
 

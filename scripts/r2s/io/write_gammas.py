@@ -39,8 +39,8 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False, \
     try:
         grouptag = sm.imesh.getTagHandle("phtn_src_group_001")
     except iBase.TagNotFoundError:
-        print "ERROR: The file '{0}' does not contain tags of the " \
-                "form 'phtn_src_group_#'".format(meshfile)
+        print "ERROR: The structured mesh does not contain tags of the " \
+                "form 'phtn_src_group_#.'"
         return 0
 
     voxels = list(sm.iterateHex('xyz'))
@@ -83,8 +83,13 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False, \
             numactivatedcells += 1
             sumvoxelstrengths += vols[cnt] * meshstr
             sourcevolumetotal += vols[cnt]
+
+    _tag_sumvoxelstrengths(sm, sumvoxelstrengths)
+
     print "The number of activated voxels and total number of voxels is " \
             "{0}/{1}".format(numactivatedcells, len(meshstrengths))
+    print "The total photon source strength of the model is {0:03e} photons/s. " \
+            "This is stored in the PHTN_SRC_TOTAL tag".format(sumvoxelstrengths)
     
     # norm is the average volumetric source strength
     norm = sumvoxelstrengths / sourcevolumetotal
@@ -245,12 +250,13 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False, \
     return 1
 
 
-def _gen_gammas_header(scd, outfile, ergbins, biasing):
+def _gen_gammas_header(sm, outfile, ergbins, biasing):
     """Open a stream to write the header information for a gammas file
     
     ACTION: Method writes the header lines for gammas file, and method
-    is used by both gen_gammas_file_from_h5m() and gen_gammas_file_aliasing().
-    RECEIVES: scd is an scdmesh.ScdMesh object.
+    is used by gen_gammas_file_from_h5m().
+    RECEIVES: sm is an scdmesh.ScdMesh object. ergbins is either a null string
+    or a list of energies. biasing is a boolean.
     RETURNS: A file writing object, fw.
     """
     
@@ -258,16 +264,16 @@ def _gen_gammas_header(scd, outfile, ergbins, biasing):
 
     fw = open(outfile, 'w')
     
-    # write 1st line (intervals for x, y, z)
-    extents = [scd.dims[3], scd.dims[4], scd.dims[5]]
+    # write number of intervals for x, y, z dimensions (1st line)
+    extents = [sm.dims[3], sm.dims[4], sm.dims[5]]
     fw.write(" ".join([str(x) for x in extents]) + "\n")
     
     # create and write x mesh edges line (2nd line)
-    fw.write(" ".join([str(x) for x in scd.getDivisions('x')]) + "\n")
+    fw.write(" ".join([str(x) for x in sm.getDivisions('x')]) + "\n")
     # create and write y mesh edges line (3rd line)
-    fw.write(" ".join([str(y) for y in scd.getDivisions('y')]) + "\n")
+    fw.write(" ".join([str(y) for y in sm.getDivisions('y')]) + "\n")
     # create and write z mesh edges line (4th line)
-    fw.write(" ".join([str(z) for z in scd.getDivisions('z')]) + "\n")
+    fw.write(" ".join([str(z) for z in sm.getDivisions('z')]) + "\n")
 
     # create and write 5th line (placeholder list of activated materials)
     fw.write(" ".join([str(x) for x in xrange(1,101)]) + "\n")
@@ -286,11 +292,11 @@ def _gen_gammas_header(scd, outfile, ergbins, biasing):
     return fw
 
 
-def calc_volumes_list(scd):
+def calc_volumes_list(sm):
     """Create list of voxel volumes for a cartesian mesh
     
     ACTION: Method creates a 1D list of voxel volumes
-    RECEIVES: scd, a scdmesh.ScdMesh object.
+    RECEIVES: sm, a scdmesh.ScdMesh object.
     RETURNS: vols, a 1D list of voxel volumes in order 'xyz'
 
     NOTE: Voxel ordering follows meshtal file convention which is
@@ -299,9 +305,9 @@ def calc_volumes_list(scd):
      -iterate x
     """
     
-    meshplanes = [ scd.getDivisions('x'),
-                   scd.getDivisions('y'),
-                   scd.getDivisions('z') ]
+    meshplanes = [ sm.getDivisions('x'),
+                   sm.getDivisions('y'),
+                   sm.getDivisions('z') ]
 
     oldz = meshplanes[2][0]
     oldy = meshplanes[1][0]
@@ -329,6 +335,17 @@ def calc_volumes_list(scd):
         oldx = x
     
     return vols
+
+def _tag_sumvoxelstrengths(sm, val):
+    # Get the Tag object called PHTN_BIAS
+    try:
+        tag = sm.imesh.createTag("PHTN_SRC_TOTAL",1,"d")
+    except iBase.TagAlreadyExistsError:
+        tag = sm.imesh.getTagHandle("PHTN_SRC_TOTAL")
+
+    tag[sm.imesh.rootSet] = val
+
+    return 1
 
 
 def main():
