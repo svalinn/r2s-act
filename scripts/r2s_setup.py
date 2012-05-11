@@ -92,6 +92,15 @@ alara_phtn_src = phtn_src
 # MCNP photon problem input file for last step of workflow
 photon_mcnp_input = mcnp_p.inp
 
+[r2s-params]
+# Non-filename parameters for r2s workflow
+
+# The number of rays per mesh row to fire
+# during Monte Carlo generation of the macromaterial grid.
+# Raising this number will reduce material errors, but 
+# also increase the runtime of r2s_step1.
+mmgrid_rays = 10
+
 [r2s-material]
 # This section may be used to map material idenfitiers to material names.
 # The mapping is used when writing out mixtures to ALARA's format,

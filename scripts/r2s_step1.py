@@ -69,8 +69,16 @@ smesh = read_meshtal(meshtal_file)
 print "Loading geometry file `{0}'".format(mcnp_geom)
 mmgrid.load_geom(mcnp_geom)
 
+mmgrid_rays = 10
+if config.has_section('r2s-params') and config.has_option('r2s-params','mmgrid_rays'):
+    mmgrid_rays = int(config.get('r2s-params','mmgrid_rays'))
+else:
+    print "No 'mmgrid_rays' parameter in the 'r2s-params' section, using default."
+
+print "Will use {0} rays per mesh row".format(mmgrid_rays)
+
 grid = mmgrid.mmGrid( smesh )
-grid.generate( 10, False )
+grid.generate( mmgrid_rays, False )
 grid.createTags()
 
 print "Saving fluxes and materials to `{0}'".format(datafile)
