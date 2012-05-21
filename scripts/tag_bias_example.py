@@ -101,7 +101,7 @@ for cnt, vox in enumerate(smesh.iterateHex('xyz')):
     bias_tag[vox] = -1 * (centers[cnt][chkDim] + offset) / norm \
             * maxBias + 1
     # quadratic scaling of bias value:
-    #bias_tag[vox] = (((centers[cnt][chkDim]-offset)*maxBias/norm)**2)/maxBias + 1
+    #bias_tag[vox] = (((centers[cnt][chkDim]+offset)*maxBias/norm)**2)/maxBias + 1
 
 
 smesh.imesh.save(datafile)

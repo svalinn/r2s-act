@@ -2,7 +2,7 @@ User-facing scripts:
 
 r2s_setup.py: Generates a per-problem r2s.cfg file and an ALARA snippet file.
               These two files can be hand-edited to specify the files and input
-              values for running r2s_step1.py
+              values for running r2s_step1.py and r2s_step2.py.
 
 r2s_step1.py: Converts an MCNP (or DAG-MCNP) neutron problem input, and its 
               associated meshtal file, into a set of ALARA inputs files.

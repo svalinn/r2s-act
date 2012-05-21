@@ -101,6 +101,22 @@ photon_mcnp_input = mcnp_p.inp
 # also increase the runtime of r2s_step1.
 mmgrid_rays = 10
 
+# These parameters are for step 2
+# -photon_isotope default is TOTAL. This is the isotope taken from phtn_src
+#  for tagging
+# -photon_cooling is the cooling step read from phtn_src. 0 is shutdown,
+#  other numbers correspond with cooling times listed in your ALARA input.
+# -if photon_bias is 1 (true), the gammas file will try to include voxel bias
+#  values from the mesh (stored as PHTN_BIAS tag)
+# -if alias_ergbins is 1 (true), photon energy bin distribution for each voxel
+#  is stored in alias table format. This increases size of gammas, but makes
+#  MCNP calculations slightly faster.
+photon_isotope = TOTAL
+photon_cooling = 0
+# Next two use 0 for false, 1 for true
+photon_bias = 0
+alias_ergbins = 1
+
 [r2s-material]
 # This section may be used to map material idenfitiers to material names.
 # The mapping is used when writing out mixtures to ALARA's format,
@@ -137,13 +153,13 @@ output zone
           1e7  1.2e7  1.4e7  2e7  3e7  5e7
 end
 
-flux flux_1 fluxin 1.0 0 default
+flux flux_1 alara_fluxin 1.0 0 default
 
 schedule    total
-    .85 y   flux_1  3.9FPYpulsed    0  s
+    .85 y   flux_1  pulse    0  s
 end
 
-pulsehistory    3.9FPYpulsed
+pulsehistory    pulse
     5   .15 y
 end
 

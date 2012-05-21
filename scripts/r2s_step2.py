@@ -27,12 +27,12 @@ if config.has_option('r2s-files','photon_mcnp_input'):
     mcnp_p_problem = config.get('r2s-files','photon_mcnp_input')
     
 # Optional values
-if config.has_section('r2s-step2-options'):
-    opt_isotope = config.get('r2s-step2-options','photon_isotope')
-    opt_cooling = config.get('r2s-step2-options','photon_cooling')
-    opt_alias = bool(int(config.get('r2s-step2-options','alias_ergbins')))
-    opt_bias = bool(int(config.get('r2s-step2-options','photon_bias')))
-    opt_by_voxel = bool(int(config.get('r2s-step2-options','photon_by_voxel')))
+if config.has_section('r2s-params'):
+    opt_isotope = config.get('r2s-params','photon_isotope')
+    opt_cooling = config.get('r2s-params','photon_cooling')
+    opt_alias = bool(int(config.get('r2s-params','alias_ergbins')))
+    opt_bias = bool(int(config.get('r2s-params','photon_bias')))
+    opt_by_voxel = bool(int(config.get('r2s-params','photon_by_voxel')))
 else:
     opt_isotope = "TOTAL"
     opt_cooling = 0
