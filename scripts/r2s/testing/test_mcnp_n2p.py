@@ -9,10 +9,10 @@ import scdmesh
 
 # These directories are relative to scripts directory.
 thisdir = os.path.dirname(__file__)
-testfile = os.path.join(thisdir,"inp_n2p")
+testfile = os.path.join(thisdir,"files_test_mcnp_n2p/inp_n2p")
 testfile_out = "testing/inp_n2p_p"
-testfile_compare = os.path.join(thisdir,"inp_n2p_converted")
-testfile_compare_ergs = os.path.join(thisdir,"inp_n2p_converted_ergs")
+testfile_compare = os.path.join(thisdir,"files_test_mcnp_n2p/inp_n2p_converted")
+testfile_compare_ergs = os.path.join(thisdir,"files_test_mcnp_n2p/inp_n2p_converted_ergs")
 meshfile = os.path.join(thisdir,"n2p_grid543.h5m")
 
 

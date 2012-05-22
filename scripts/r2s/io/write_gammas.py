@@ -170,11 +170,8 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False, \
             #  strength of the voxel divided by the average source strength per
             #  volume
             # sourcetotal*vols[cnt]/norm can be used as the particle's weight
-      #      print "gammas is using normalization for choosing voxels."
-            fw.write(str(sourcetotal*vols[cnt]/sumvoxelstrengths) + " " + bias + \
-                    " ".join(aliasstrings) + "\n")
-#            fw.write(str(sourcetotal/norm) + " " + bias + \
-#                    " ".join(aliasstrings) + "\n")
+            fw.write(str(sourcetotal*vols[cnt]/sumvoxelstrengths) + " " + \
+                    bias + " ".join(aliasstrings) + "\n")
 
     elif do_alias:
         for cnt, voxel in enumerate(voxels):
@@ -228,6 +225,13 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False, \
 
     # Else, for each voxel, write the cumulative source strength at each energy
     else:
+        if by_voxel:
+            print "Warning: You specified a gammas file for voxel sampling " \
+                    "but this requires that the energy bins be an alias table" \
+                    " via the do_alias keyword."
+            print "Defaulting to gammas file for direct discrete sampling " \
+                    "with cumulative energy bins format."
+
         for voxel in voxels:
             writestring = ""
             binval = 0.0
@@ -239,7 +243,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False, \
             # Not implemented yet
             if have_bias_info:
                 print "Adding bias information to the 'gammas' file is not " \
-                        "supported with the cummulative energy bins format."
+                        "supported with the cumulative energy bins format."
     
             fw.write(writestring + "\n")
 
