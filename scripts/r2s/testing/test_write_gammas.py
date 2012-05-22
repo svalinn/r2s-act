@@ -13,11 +13,12 @@ meshfile_orig = os.path.join(thisdir,"matFracsSCD3x3x3.h5m")
 meshfile = "matFracsSCD3x3x3_tagged.h5m"
 outfile = "gammas_test"
 
+# .h5m files for generating different gammas files
 meshfile1 = os.path.join(thisdir,"files_test_write_gammas/uniform_ergdirect.h5m")
 meshfile2 = os.path.join(thisdir,"files_test_write_gammas/uniform_ergalias.h5m")
 meshfile3 = os.path.join(thisdir,"files_test_write_gammas/voxel_nobias.h5m")
 meshfile4 = os.path.join(thisdir,"files_test_write_gammas/voxel_bias.h5m")
-
+# gammas files for comparing test result with expected result
 gammas1 = os.path.join(thisdir,"files_test_write_gammas/gammas_uniform_ergdirect")
 gammas2 = os.path.join(thisdir,"files_test_write_gammas/gammas_uniform_ergalias")
 gammas3 = os.path.join(thisdir,"files_test_write_gammas/gammas_voxel_nobias")
@@ -71,21 +72,26 @@ class TestWriteGammas_Runs(unittest.TestCase):
                 self.sm, outfile, do_bias=True), 1)
 
     def test_voxel_alias(self):
-        """Tests a run-through of the method with 3x3x3 non-void geometry."""
+        """Tests a run-through with: voxel sampling specified.
+        Note: do_alias must be True for voxel sampling gammas to be made, so
+        code defaults to regular direct discrete behavior"""
         self.assertEqual(write_gammas.gen_gammas_file_from_h5m( \
                 self.sm, outfile, by_voxel=True), 1)
 
     def test_voxel_alias_with_bias_and_erg_alias_bins(self):
-        """Tests a run-through of the method with 3x3x3 non-void geometry."""
+        """Tests a run-through with: voxel sampling with biasing."""
         self.assertEqual(write_gammas.gen_gammas_file_from_h5m( \
             self.sm, outfile, do_alias=True, by_voxel=True, do_bias=True), 1)
+
 
 class TestWriteGammas_Correct(unittest.TestCase):
     # Tests in this class are done with 1x3x1 geometry. Resulting gammas files
     #  are compared for discrepancies.
 
+    def setUp(self):
+        pass
+
     def tearDown(self):
-        #os.system("rm " + self.meshfile)
         os.system("rm " + outfile)
 
     def compare_gammas(self, myoutfile, mygammas):
@@ -100,14 +106,14 @@ class TestWriteGammas_Correct(unittest.TestCase):
         fw2.close()
 
     def test_uniform_ergdirect(self):
-        """ """
+        """Verify gammas file for uniform sampling with direct erg bin sampling"""
         self.meshfile = meshfile1
         self.sm = ScdMesh.fromFile(self.meshfile)
         write_gammas.gen_gammas_file_from_h5m(self.sm, outfile)
         self.compare_gammas(outfile, gammas1)
     
     def test_uniform_ergalias(self):
-        """ """
+        """Verify gammas file for uniform sampling with alias erg bin sampling"""
         self.meshfile = meshfile2
         self.sm = ScdMesh.fromFile(self.meshfile)
         write_gammas.gen_gammas_file_from_h5m(self.sm, outfile, \
@@ -115,7 +121,7 @@ class TestWriteGammas_Correct(unittest.TestCase):
         self.compare_gammas(outfile, gammas2)
 
     def test_voxel_nobias(self):
-        """ """
+        """Verify gammas file for voxel sampling without biasing"""
         self.meshfile = meshfile3
         self.sm = ScdMesh.fromFile(self.meshfile)
         write_gammas.gen_gammas_file_from_h5m(self.sm, outfile, \
@@ -123,7 +129,7 @@ class TestWriteGammas_Correct(unittest.TestCase):
         self.compare_gammas(outfile, gammas3)
 
     def test_voxel_bias(self):
-        """ """
+        """Verify gammas file for voxel sampling with biasing"""
         self.meshfile = meshfile4
         self.sm = ScdMesh.fromFile(self.meshfile)
         write_gammas.gen_gammas_file_from_h5m(self.sm, outfile, \
