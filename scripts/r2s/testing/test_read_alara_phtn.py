@@ -116,6 +116,51 @@ class TestPhtnTotalsRetagging(unittest.TestCase):
         self.assertEqual(read_alara_phtn.read_to_h5m(inputfile, self.sm, retag=True, totals=True), 1)
 
 
+class TestGetCoolingStepName(unittest.TestCase):
+    """We test the get_cooling_step_name() method with direct calls
+    """
+
+    def setUp(self):
+        # Create the file reader to pass to methond being tested
+        self.fr = open(inputfile, 'r')
+        
+    def tearDown(self):
+        self.fr.close()
+        
+    def test_get_cooling_step_name1(self):
+        """Verify passing 0 as cooling step
+        """
+        (coolingstep, numergbins) = read_alara_phtn.get_cooling_step_name( \
+                0, self.fr)
+        self.assertEqual(coolingstep, 'shutdown')
+        self.assertEqual(numergbins, 42)
+
+    def test_get_cooling_step_name2(self):
+        """Verify passing a string (regardless if it exists) as cooling step
+        """
+        self.assertRaises(ValueError, read_alara_phtn.get_cooling_step_name, \
+                'never', self.fr)
+
+    def test_get_cooling_step_name3(self):
+        """Verify passing non-zero cooling step
+        """
+        (coolingstep, numergbins) = read_alara_phtn.get_cooling_step_name( \
+                5, self.fr)
+        self.assertEqual(coolingstep, '1 y')
+        self.assertEqual(numergbins, 42)
+
+    def test_get_cooling_step_name4(self):
+        """Verify passing a cooling step value > # of cooling steps in phtn_src
+        """
+        self.assertRaises(Exception, read_alara_phtn.get_cooling_step_name, \
+                15, self.fr)
+
+    def test_get_cooling_step_name5(self):
+        """Verify passing a negative cooling step value
+        """
+        self.assertRaises(Exception, read_alara_phtn.get_cooling_step_name, \
+                -1, self.fr)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -22,57 +22,23 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
     fr = open(inputfile, 'r')
 
     # First, we determine the coolingstep string to look for
-    # ... if given a number, we take the nth line
-    try:
-        coolingstep = int(coolingstep)
+    try: # get_cooling_step_name() can throw a few exceptions
+        (coolingstep, numergbins) = get_cooling_step_name(coolingstep, fr)
 
-        if coolingstep < 0: 
-            raise Exception("ERROR: A negative integer was given for the " \
-                    "cooling step")
-
-        # With a numerical value for coolingstep, we read the first few
-        #  lines in from the phtn_src file to get the cooling step string.
-        i = 0
-        while i <= coolingstep:
-            line = fr.readline()
-            
-            # Record first isotope to avoid counting through multiple isotopes
-            if i == 0: firstisotope = line.split('\t')[0]
-            
-            if line == '':
-                raise Exception("Problem reading file contents.")
-
-            # If coolingstep is a larger number than the number of cooling steps
-            #  (assessed by counting coolingsteps for first isotope in 
-            #   first voxel, AKA whether isotope name has changed)
-            if firstisotope != line.split('\t')[0]:
-                raise Exception("ERROR: File '{0}' does not contain {1} " \
-                        "coolingsteps.".format(inputfile, coolingstep) )
-                return 0
-            
-            i += 1
-
-        # The phtn_src file is formated with columns separated by tabs
-        #  and some extraneous spaces adjacent to the tabs.  We split lines
-        #  by the tabs, and remove these extraneous spaces.
-        lineparts = line.split('\t')
-
-        coolingstep = lineparts[1].strip(' ')
-        
-        print "The cooling step being read is '{0}'".format(coolingstep)
-    
     except ValueError:
         # The specified cooling step is a string...
         # should catch this exception, and continue on - coolingstep is
         # presumed to be a valid string
-        line = fr.readline()
-        lineparts=line.split('\t')
+        lineparts = fr.readline().split('\t')
+        numergbins = len(lineparts) - 2
     
     except Exception as e:
         # File reading problem, e.g. malformed phtn_src file
         # We lack an actual example of this happening...
         print e
         return 0
+
+    print "The cooling step being read is '{0}'".format(coolingstep)
 
     # structured mesh stuff starts here
 
@@ -81,7 +47,6 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
 
     # We create a list of tag objects ('tagList') to use while parsing phtn_src
     tagList = []
-    numergbins = len(lineparts) - 2
     for grp in xrange(numergbins): # group tags = parts in the line - 2
         try:
             # If tags are new to file... create tag
@@ -104,9 +69,13 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
 
     voxelcnt = 0
 
+    # We close and reopen the input file to read from beginning again
+    fr.close()
+    fr = open(inputfile, 'r')
+
     # Now go through rest of file, tagging mesh with info from lines
     #  that match the isotope and coolingstep specified.
-    while line != '':
+    for line in fr:
         lineparts = line.split('\t')
 
         if lineparts[0].strip(' ') == isotope and \
@@ -115,13 +84,12 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
                          (tagList[grp])[voxels[voxelcnt]] = float(val)
                     voxelcnt += 1
 
-        line = fr.readline()
-
     fr.close()
     
     if voxelcnt == 0:
-        print "ERROR: Tagging mesh cells failed.\n\t'{0}' was probably " \
-                "not found in {1}.".format(isotope, inputfile)
+        print "ERROR: No voxels were tagged.\n\tEither cooling step '{0}' or " \
+                "isotope '{1}' was probably not found in " \
+                "{2}.".format(coolingstep, isotope, inputfile)
         return 0
 
     # We get rid of tags corresponding with higher energy groups
@@ -147,6 +115,54 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
             "".format(isotope, coolingstep)
 
     return 1
+
+
+def get_cooling_step_name(coolingstep, fr):
+    """Method determines the user-specified cooling step name in a phtn_src file
+
+    ACTION: If coolingstep is a number, we search for the corresponding line in
+    the file stream 'fr', and determine the corresponding cooling step string.
+    RECEIVES: coolingstep is a number or string; fr is a file reader stream
+    RETURNS: A 2 value tuple: (the cooling step string name, the number of
+               photon energy bins used in the phtn_src file)
+    """
+    
+    # ... if given a number, we take the nth line. Otherwise expect a ValueError
+    coolingstep = int(coolingstep)
+
+    if coolingstep < 0: 
+        raise Exception("ERROR: A negative integer was given for the " \
+                "cooling step")
+
+    # With a numerical value for coolingstep, we read the first few
+    #  lines in from the phtn_src file to get the cooling step string.
+    # Note: coolingstep+1 makes sure we read correct number of lines
+    for i in xrange(coolingstep+1):
+        line = fr.readline()
+        
+        # Record first isotope to avoid counting through multiple isotopes
+        if i == 0: firstisotope = line.split('\t')[0]
+        
+        if line == '':
+            raise Exception("Problem reading file contents.")
+
+        # If coolingstep is a larger number than the number of cooling steps
+        #  (assessed by counting cooling steps for first isotope in 
+        #   first voxel, AKA whether isotope name has changed)
+        if firstisotope != line.split('\t')[0]:
+            raise Exception("ERROR: Filestream does not contain {0} " \
+                    "coolingsteps.".format(coolingstep) )
+            return 0
+
+    # The phtn_src file is formated with columns separated by tabs
+    #  and some extraneous spaces adjacent to the tabs.  We split lines
+    #  by the tabs, and remove these extraneous spaces.
+    lineparts = line.split('\t')
+
+    coolingstep = lineparts[1].strip(' ')
+    numergbins = len(lineparts) - 2
+
+    return (coolingstep, numergbins)
 
 
 def tag_phtn_src_totals(sm, numergbins=-1, retag=False):
