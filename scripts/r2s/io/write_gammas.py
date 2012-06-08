@@ -11,8 +11,10 @@
 #
 ######################################################################
 
+import os.path
 from optparse import OptionParser
 from itaps import iBase,iMesh,iMeshExtensions
+
 from r2s import alias
 from scdmesh import ScdMesh, ScdMeshError
 
@@ -90,6 +92,9 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False, \
             "{0}/{1}".format(numactivatedcells, len(meshstrengths))
     print "The total photon source strength of the model is {0:03e} photons/s. " \
             "This is stored in the PHTN_SRC_TOTAL tag".format(sumvoxelstrengths)
+
+    # This is command line call is useful for tracking sumvoxelstrengths
+    os.system("echo {0:03e} >> phtn_src_totals".format(sumvoxelstrengths))
     
     # norm is the average volumetric source strength
     norm = sumvoxelstrengths / sourcevolumetotal
@@ -97,7 +102,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", do_alias=False, \
     # We now look for the tag with the energy bin boundary values
     try:
         phtn_ergs = sm.imesh.getTagHandle("PHTN_ERGS")
-        myergbins = phtn_ergs[sm.imesh.rootSet] 
+        myergbins = phtn_ergs[sm.scdset] 
         print "Found a custom set of {0} energy bins in the PHTN_ERGS " \
                 "tag.".format(len(myergbins)-1)
 

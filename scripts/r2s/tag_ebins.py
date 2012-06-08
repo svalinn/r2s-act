@@ -7,55 +7,57 @@
 from optparse import OptionParser
 from itaps import iBase,iMesh,iMeshExtensions
 
-def read_and_tag_phtn_ergs(inputfile, mesh):
+from scdmesh import ScdMesh
+
+def read_and_tag_phtn_ergs(fr, sm):
     """ Method reads a list of energies and tags them to the root set.
 
-    ACTION: Reads a single energy from each line of 'inputfile', creating a list
-    of these values. These values are tagged to the rootSet of the 'mesh'
+    ACTION: Reads a single energy from each line of 'fr', creating a list
+    of these values. These values are tagged to the scdset of the 'sm'
     mesh under the tag 'PHTN_ERGS'. Method destroys the 'PHTN_ERGS' tag if it
     already exists.
     RECEIVES: 
-    -inputfile is a plain text file listing one energy per line. It should have
+    -fr is a file stream listing one energy per line. It should have
      n+1 entries where n is the number of energy groups. Low energy first!
-    -mesh is a MOAB mesh object (itaps.iMesh.Mesh)
+    -sm is a structured mesh object (scdmesh.ScdMesh) derived from MOAB mesh
     """
 
-    fr = open(inputfile, 'r')
     ergs = list()
 
-    line = fr.readline()
-    while line != '': # EoF
+    for line in fr: #while line != '': # EoF
         # We float() the values to get rid of whitespace
         try:
             ergs.append(float(line))
         except ValueError:
-            print "A non-numeric value was found in '{0}'".format(inputfile)
+            print "A non-numeric value was found in the list of energies."
             return 0
-        line = fr.readline()
+        #line = fr.readline()
         
-    fr.close()
+        if len(ergs) > 1 and ergs[-1] <= ergs[-2]:
+            print "Energy values are not in order. Must start with lowest."
+            return 0
 
     try:
-        phtn_ergs = mesh.createTag("PHTN_ERGS", len(ergs), float)
+        phtn_ergs = sm.imesh.createTag("PHTN_ERGS", len(ergs), float)
 
     except iBase.TagAlreadyExistsError:
         # We completely rewrite the tag if it already existed
-        mesh.destroyTag(mesh.getTagHandle("PHTN_ERGS"), force=True)
-        phtn_ergs = mesh.createTag("PHTN_ERGS", len(ergs), float)
+        sm.imesh.destroyTag(sm.imesh.getTagHandle("PHTN_ERGS"), force=True)
+        phtn_ergs = sm.imesh.createTag("PHTN_ERGS", len(ergs), float)
 
-    # Give the values to the mesh tag on the rootSet
-    phtn_ergs[mesh.rootSet] = ergs
+    # Give the values to the mesh tag on the scdset
+    phtn_ergs[sm.scdset] = ergs
     print "{0} energies have been added to the mesh on the PHTN_SRC tag of " \
-            "the rootSet.".format(len(ergs))
+            "the scdset.".format(len(ergs))
 
     return 1
 
 
-def destroy_erg_bins_tag(mesh):
+def destroy_erg_bins_tag(sm):
     """Method removes the 'PHTN_ERGS' tag from a MOAB mesh"""
 
     try:
-        mesh.destroyTag(mesh.getTagHandle("PHTN_ERGS"), force=True)
+        sm.imesh.destroyTag(mesh.imesh.getTagHandle("PHTN_ERGS"), force=True)
     except:
         print "Failed to delete 'PHTN_ERGS' tag from the MOAB mesh."
         return 0
@@ -80,17 +82,18 @@ def main():
 
     (options, args) = parser.parse_args()
 
-    mesh = iMesh.Mesh()
-    mesh.load(args[1])
+    fr = open(args[0])
+    sm = ScdMesh.fromFile(args[1])
 
-    # Call the method to read inputfile and tag mesh
-    read_and_tag_phtn_ergs( args[0], mesh)
+    # Call the method to read fr and tag mesh
+    read_and_tag_phtn_ergs(fr, sm)
 
     mesh.save(args[1])
+    fr.close()
 
     return 1
 
 
 # Handles module being called as a script.
-if __name__=='__main__':
+if __name__ == '__main__':
     main()
