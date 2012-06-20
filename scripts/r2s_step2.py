@@ -49,6 +49,7 @@ print "Reading ALARA photon source `{0}'".format(phtn_src)
 read_alara_phtn.read_to_h5m(phtn_src, smesh, isotope=opt_isotope, \
         coolingstep=opt_cooling, retag=True, totals=True)
 
+# Tagging mesh
 print "Saving photon source information to '{0}'".format(datafile)
 smesh.imesh.save(datafile)
 
@@ -58,21 +59,30 @@ write_gammas.gen_gammas_file_from_h5m(smesh, do_alias=opt_alias, \
 
 if mcnp_p_problem:
 
-    print "Modifying MCNP input file `{0}'".format(mcnp_n_problem)
+    if os.path.exists(mcnp_p_problem):
+        print "MCNP photon transport input file '{0}' already exists and will" \
+                " not be recreated.".format(mcnp_p_problem)
 
-    # Set dagmc to True if input only contains the title card and data block
-    dagmc = False
-    mod = mcnp_n2p.ModMCNPforPhotons(mcnp_n_problem, dagmc)
-    mod.read()
+    else:
 
-    if not dagmc:
-        mod.change_block_1()
-        mod.change_block_2()
-    mod.change_block_3()
+        print "Modifying MCNP input file `{0}'".format(mcnp_n_problem)
 
-    # If phtnfmesh is True, we generate an fmesh card with same layout as mesh
-    phtnfmesh = True
-    if phtnfmesh:
-        mod.add_fmesh_from_scdmesh(smesh)
+        # Set dagmc to True if input only contains the title card and data block
+        dagmc = False
+        mod = mcnp_n2p.ModMCNPforPhotons(mcnp_n_problem, dagmc)
+        mod.read()
 
-    mod.write_deck(mcnp_p_problem)
+        if not dagmc:
+            mod.change_block_1()
+            mod.change_block_2()
+        mod.change_block_3()
+
+        # If phtnfmesh is True, we generate an fmesh card with same 
+        #  layout as found on the scdmesh.
+        phtnfmesh = True
+        if phtnfmesh:
+            mod.add_fmesh_from_scdmesh(smesh)
+
+        mod.write_deck(mcnp_p_problem)
+
+print "" # Empty line to separate output from multiple runs of this script

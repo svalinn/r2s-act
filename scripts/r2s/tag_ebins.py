@@ -24,14 +24,13 @@ def read_and_tag_phtn_ergs(fr, sm):
 
     ergs = list()
 
-    for line in fr: #while line != '': # EoF
+    for line in fr:
         # We float() the values to get rid of whitespace
         try:
             ergs.append(float(line))
         except ValueError:
             print "A non-numeric value was found in the list of energies."
             return 0
-        #line = fr.readline()
         
         if len(ergs) > 1 and ergs[-1] <= ergs[-2]:
             print "Energy values are not in order. Must start with lowest."
