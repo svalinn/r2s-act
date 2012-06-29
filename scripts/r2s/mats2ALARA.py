@@ -52,17 +52,22 @@ def get_data_array(inp, x) :
     data=[]
     count = x
     line=linecache.getline(inp,count)
-    
+    print x
     # Iterate through the
     while count == x or line.split()[0][0].isdigit() == True:
 
         # If the first line is in the form mX XXXX XXXX then ignore the mX
-        if count==x and len(line.split()) > 1:
-            line_array=line.split()[1:3]
+        if count==x :
+            if len(line.split()) > 1:            
+                line_array=line.split()[1:3]
+            else :
+                count +=1
+                line=linecache.getline(inp,count)
+                continue
         else :
             line_array=line.split()[0:2]
 
-        # Delete xslib specification
+        # Delete xsdir specification
         if line_array[0].find('.') != -1 :
             line_array[0]=line_array[0].split('.')[0]
        
