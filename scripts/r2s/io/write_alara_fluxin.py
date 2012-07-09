@@ -86,12 +86,12 @@ def main( arguments = None ):
 
     (opts, args) = parser.parse_args( arguments )
 
-    if len(args) != 1 :
+    if len(args) != 2 :
         parser.error\
         ( '\nNeed exactly 1 argument: structured mesh file' )
 
     #Load Structured mesh from file
-    sm=ScdMesh.fromFile(args[0])
+    sm=ScdMesh.fromFile(args[1])
 
     write_alara_fluxin( opts.fluxin_name, sm, opts.backward_bool )
 
