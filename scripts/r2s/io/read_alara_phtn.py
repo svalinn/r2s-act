@@ -208,7 +208,19 @@ def tag_phtn_src_totals(sm, numergbins=-1, retag=False):
         #get total for the voxel
         for i in xrange(1,numergbins + 1):
             grouptag = sm.imesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
-            totstrength += float(grouptag[vox])
+            try:
+                totstrength += float(grouptag[vox])
+            except iBase.TagNotFoundError:
+                if totstrength == 0.0:
+                    print "ERROR: phtn_src_group_# tags not found on first " \
+                            "voxel. Tags are probably missing."
+                else:
+                    print "ERROR: phtn_src_group_# tags not found on a non-" \
+                            "first voxel. phtn_src file used to create tags " \
+                            "probably did not include enough voxels. This is " \
+                            "a problem with ALARA and voids. Replace void " \
+                            "with a low density material, e.g. neon."
+                return 0
 
         # Add the total as a tag
         totalPhtnSrcTag[vox] = float(totstrength)
