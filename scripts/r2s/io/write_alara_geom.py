@@ -43,7 +43,7 @@ def create_mixture_definitions( scdmesh ):
     unique_mixtures = dict()
 
     voxcount = 0
-    for voxel in scdmesh.iterateHex():
+    for voxel in scdmesh.iterateHex('xyz'):
         voxcount += 1
         fracs = [ t[voxel] for t in mat_tags ]
         mixture = _create_mixture_tuple( fracs )
@@ -62,7 +62,7 @@ def write_zones( scdmesh, output_file ):
     output_file.write('geometry rectangular\n\n')
 
     output_file.write('volume\n')
-    for idx, vol in enumerate(scdmesh.iterateHexVolumes()):
+    for idx, vol in enumerate(scdmesh.iterateHexVolumes('xyz')):
         output_file.write('\t{0}\tzone_{1}\n'.format(vol,idx))
     output_file.write('end\n\n')
 
@@ -84,7 +84,7 @@ def write_mat_loading( scdmesh, mat_tags, mixtures, output_file):
     """Write the mat_loading information to the ALARA geometry output"""
     output_file.write('mat_loading\n')
 
-    for idx, voxel in enumerate(scdmesh.iterateHex()):
+    for idx, voxel in enumerate(scdmesh.iterateHex('xyz')):
         fracs = [t[voxel] for t in mat_tags]
         mixture = _create_mixture_tuple(fracs)
         if mixture[0] == 1: # a void material
