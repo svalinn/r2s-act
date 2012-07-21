@@ -60,12 +60,14 @@ module source_data
        
 end module source_data
 
+
 subroutine source_setup
-  ! subroutine
+  ! subroutine handles parsing of the 'gammas' file
   use mcnp_global
   use source_data
   implicit real(dknd) (a-h,o-z)
  
+        ! initialize an empty array
         do i=1,100
           active_mat(i)=0
         enddo
@@ -95,26 +97,23 @@ subroutine source_setup
         enddo
         n_active_mat=i-1
 
-        ! We read in the energy bins if there is an 'e' starting the next line
-        ! Otherwise we reset this line ('record') and go on to reading the
-        !  bias information and gamma spectrum, and use default energies.
-        read(50,'(A1)',advance='NO') read_ergs ! reads first character
-        if (read_ergs.eq.'e') then
-          read(50,*) n_ener_grps ! reads an integer
-          backspace(50) ! dirty hack since read(50,*,advance='NO') is invalid
-          ALLOCATE(my_ener_phot(1:n_ener_grps+1))
-          read(50,*,end=888) read_ergs, n_erg_grps, &
-                      (my_ener_phot(i),i=1,n_ener_grps+1)
-888       continue
+        ! Initialize parameters to false (except voxel sampling), then read
+        !  any parameters that exist. Parameters exist if line 6 starts with
+        !  a 'p'.
+        bias = 0
+        samp_vox = 1
+        samp_uni = 0
+        debug = 0
+        ergs = 0
+        mat_rej = 1
 
-          write(*,*) "The following custom energy bins are being used:"
-          DO i=1,n_ener_grps
-            write(*,'(2es11.3)') my_ener_phot(i), my_ener_phot(i+1)
-          ENDDO
-          
-        else ! use default energy groups
-          backspace(50) ! we reset the file to the beginning of the record we
-                          ! read into 'line'.
+        call read_params(50)
+
+        ! If ergs flag was found, we call read_custom_ergs.  Otherwise 
+        !  we use default energies.
+        if (ergs.eq.1) then
+          call read_custom_ergs
+        else ! use default energy groups; 42 groups
           n_ener_grps = 42
           ALLOCATE(my_ener_phot(1:n_ener_grps+1))
           my_ener_phot=(/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
@@ -123,21 +122,6 @@ subroutine source_setup
             10.0,12.0,14.0,20.0,30.0,50.0/)
         endif
 
-        ! We look for a 'b' starting the next line.
-        ! If not found, we reset this line ('record') and proceed to read
-        !  spectrum information
-        bias = 0
-        read(50,'(A1)',advance='NO') read_bias ! reads first character
-        if (read_bias.eq.'b') then
-          ! We set bias to 1 and use it both for conditionals and as
-          !  an offset value for array indices for the spectrum array
-          bias = 1
-          write(*,*) "Biased sampling of source voxels is being used."
-
-        else ! no biasing was used
-          backspace(50) ! we reset the file to the beginning of the record we
-                          ! read into 'line'.
-        endif
 
         ! Prepare to read in spectrum information
         ! set the spectrum array to: # of mesh cells * # energy groups
@@ -161,7 +145,9 @@ subroutine source_setup
 
         write(*,*) 'Reading gammas file completed!'
 
-        call gen_alias_table
+        if (samp_vox.eq.1) then
+          call gen_voxel_alias_table
+        endif
         
         debug = 2
         if (debug.eq.1) then
@@ -170,6 +156,105 @@ subroutine source_setup
         endif
 
 end subroutine source_setup
+
+subroutine read_params (myunit)
+
+  use mcnp_global
+  use source_data
+
+        integer,intent(IN) :: myunit
+
+        character,dimension(1:30) :: letter
+        character*30 :: paramline
+
+        ! read in the possible parameters line.
+        ! line should start with a 'p' and have single characters
+        !  that are space delimited.
+        read(myunit,'(A)') paramline
+
+        do i=1,30
+          letter(i) = " "
+        enddo
+
+        ! Read in individual characters to a list
+        read(paramline,*,end=876) (letter(i),i=1,30)
+876     continue
+
+        write(*,*) letter
+
+        if (letter(1).ne.'p') then
+          backspace(myunit)
+          return
+        endif 
+
+        ! If parameters present, we assume everything is disabled initially
+        bias = 0
+        samp_vox = 0
+        samp_uni = 0
+        debug = 0
+        ergs = 0
+        mat_rej = 0
+
+        do i=2,30
+         ! read(myunit,'(a)') letter
+         ! if (letter.eq.'') then
+         ! backspace(myunit) ! Necessary?
+         ! exit
+         ! endif
+
+          SELECT CASE (letter(i))
+          CASE (' ')
+            !backspace(myunit) !Necessary?
+            exit
+          CASE ('e')
+            write(*,*) "Custom energy bins will be read."
+            ergs = 1
+          CASE ('m')
+            write(*,*) "Material-based rejection enabled."
+            mat_rej = 1
+          CASE ('b')
+            write(*,*) "Biased sampling of source voxels is enabled."
+            bias = 1
+          ! only want on type of sampling enabled.
+          CASE ('v')
+            write(*,*) "Voxel sampling enabled."
+            samp_uni = 0
+            samp_vox = 1
+          CASE ('u')
+            write(*,*) "Uniform sampling enabled."
+            samp_uni = 1
+            samp_vox = 0
+          CASE ('d')
+            debug = 1
+          CASE DEFAULT
+            write(*,*) " "
+            write(*,*) "Invalid parameter!:", letter(i)
+          END SELECT
+
+          write(*,*) letter(i)
+
+        enddo
+
+
+
+end subroutine read_params
+
+
+subroutine read_custom_ergs
+
+  use mcnp_global
+  use source_data
+          read(50,*) n_ener_grps ! reads an integer
+          backspace(50) ! dirty hack since read(50,*,advance='NO') is invalid
+          ALLOCATE(my_ener_phot(1:n_ener_grps+1))
+          read(50,*,end=888) n_erg_grps, (my_ener_phot(i),i=1,n_ener_grps+1)
+888       continue
+
+          write(*,*) "The following custom energy bins are being used:"
+          DO i=1,n_ener_grps
+            write(*,'(2es11.3)') my_ener_phot(i), my_ener_phot(i+1)
+          ENDDO
+end subroutine read_custom_ergs
 
 subroutine source
   ! adapted from dummy source.F90 file.
@@ -198,17 +283,11 @@ subroutine source
 
         endif
 
-!
-!---------------------------------------------------------------------------------
-!        Sample in the volume of the mesh tally.
-!       The same number of hits homogeneously in volume.
-!       ~Weight is adjusted, apparently.
-!---------------------------------------------------------------------------------
-!
-
-        samp_vox = 1
-        samp_uni = 0
-
+        ! Call position sampling subroutine
+        !  sampling subroutine must set:
+        ! -voxel
+        ! -xxx, yyy and zzz
+        ! -ii, jj, and kk
 10      if (samp_vox.eq.1) then
           call voxel_sample
         elseif (samp_uni.eq.1) then
@@ -218,55 +297,10 @@ subroutine source
 ! c program adressing (but starts with 0, in fortran not possible, therefore ii-1 .. and final result +1):
 !   adr=z+y*k_ints+x*j_ints*k_ints+i_mat*i_ints*j_ints*k_ints;
 
-        i=kk+jj*k_ints+ii*j_ints*k_ints+1
-        
         ! sample a new position if voxel has zero source strength
         if (spectrum(voxel,1).eq.0) goto 10
 
-!        write(*,*) i, kk, jj, ii, xxx, yyy, zzz
-!
-!-------------------------------------------------------------------------------
-!       Sample the alias table of energy bins for the selected voxel. 
-!-------------------------------------------------------------------------------
-!
-        
-        ! choose energy bins alias table indice   
-        r4 = INT(rang() * n_ener_grps) * 3 
-
-        ! three values are associated with the alias bin:
-        ! -probability of the first secondary bin
-        ! -energy bin # of the first secondary bin
-        ! -energy bin # of the second secondary bin
-        ! second rand chooses first or second bin in alias table bin
-        if ( rang().le.spectrum(i, INT(1 + bias + r4     + 1)) ) then
-          j = INT( spectrum(i, INT(1 + bias + r4 + 1 + 1)) )
-        else
-          j = INT( spectrum(i, INT(1 + bias + r4 + 2 + 1)) )
-        endif
-
-        erg=my_ener_phot(j)+(1-rang())*(my_ener_phot(j+1)-my_ener_phot(j))
-
-!        
-!-------------------------------------------------------------------------------
-!        Determine weight.
-!       IPT=2 for photons. JSU=TME=0 works well.
-!-------------------------------------------------------------------------------
-!
-
-        ! wgt=spectrum(i,1) 
-        if (bias.eq.1) then
-          !wgt = bias_probability_sum / spectrum(voxel,2)
-          wgt = spectrum(voxel,2)
-        else
-          wgt=1.0
-        endif
-        ! we calculate the weight based on the biasing
-
-        
-        if (debug.eq.1) then
-                call print_debug
-        endif
-                
+               
         !        write(57,*) xxx, yyy, zzz, wgt, alias_bin, voxel, ii
         ipt=2 ! particle type: 2 = photon
         jsu=0
@@ -274,10 +308,10 @@ subroutine source
 
 ! The following is exactly as it was received from KIT
 !        
-!-------------------------------------------------------------------------------
+!----------------------------------------------------------------------------
 !        Determine in which cell you are starting. Subroutine is copied from MCNP code (sourcb.F90). 
 !       ICL and JUNF should be set to 0 for this part of the code to work.
-!-------------------------------------------------------------------------------
+!----------------------------------------------------------------------------
 !
         icl=0
         junf=0
@@ -332,27 +366,57 @@ subroutine source
       & 'the source point is not in the source cell.')
   endif
 !        
-!---------------------------------------------------------------------------------
+!----------------------------------------------------------------------------
 !       ICL should be set correctly at this point, this means everything is set.
-!---------------------------------------------------------------------------------
+!----------------------------------------------------------------------------
 !
-543 continue
-    do i=1,n_active_mat
-      !if (nmt(mat(icl)).eq.active_mat(i)) then
-              return
-      !endif
-    enddo
-!    write (*,'(i5,3es10.3,i5)') ikffl,xxx,yyy,zzz,nmt(mat(icl))
-    goto 10
 
+543 continue
+    if (mat_rej.eq.1) then
+      do i=1,n_active_mat
+        !if (nmt(mat(icl)).eq.active_mat(i)) then
+                goto 544 !return
+        !endif
+      enddo
+    else
+      goto 544
+    endif
+
+    goto 10 ! particle rejected... sample anew.
+  
+544 continue
+
+    call sample_erg 
+!        
+!-------------------------------------------------------------------------------
+!        Determine weight.
+!       IPT=2 for photons. JSU=TME=0 works well.
+!-------------------------------------------------------------------------------
+!
+
+    ! wgt=spectrum(i,1) 
+    if (samp_vox.eq.1) then
+      if (bias.eq.1) then
+        !wgt = bias_probability_sum / spectrum(voxel,2)
+        wgt = spectrum(voxel,2)
+      else
+        wgt=1.0
+      endif
+    elseif (samp_uni.eq.1) then
+      wgt=spectrum(voxel,n_ener_grps) 
+    endif
+    ! we calculate the weight based on the biasing
+
+    
+    if (debug.eq.1) then
+            call print_debug
+    endif
+
+    !
+    return
+ 
 end subroutine source
 
-subroutine read_params
-  use mcnp_global
-  use source_data
-  implicit real(dknd) (a-h,o-z)
-
-end subroutine read_params
 
 subroutine voxel_sample
   use source_data
@@ -379,17 +443,68 @@ subroutine voxel_sample
         zzz=k_bins(kk+1)+rang()*(k_bins(kk+2)-k_bins(kk+1))
 end subroutine voxel_sample
 
+
 subroutine uniform_sample
   use source_data
   use mcnp_global
+!---------------------------------------------------------------------
+!        Sample in the volume of the mesh tally.
+!       The same number of hits homogeneously in volume.
+!---------------------------------------------------------------------
+
+        xxx=i_bins(1)+rang()*(i_bins(i_ints+1)-i_bins(1))
+        yyy=j_bins(1)+rang()*(j_bins(j_ints+1)-j_bins(1))
+        zzz=k_bins(1)+rang()*(k_bins(k_ints+1)-k_bins(1))
+
+        do ii=1,i_ints
+          if (i_bins(ii).le.xxx.and.xxx.lt.i_bins(ii+1)) exit
+        enddo
+        do jj=1,j_ints
+          if (j_bins(jj).le.yyy.and.yyy.lt.j_bins(jj+1)) exit
+        enddo
+        do kk=1,k_ints
+          if (k_bins(kk).le.zzz.and.zzz.lt.k_bins(kk+1)) exit
+        enddo
 
 end subroutine uniform_sample
 
+
+subroutine sample_erg
 !
+  use mcnp_global
+  use source_data
+  implicit real(dknd) (a-h,o-z)
+!
+!-------------------------------------------------------------------------------
+!       Sample the alias table of energy bins for the selected voxel. 
+!-------------------------------------------------------------------------------
+!
+        i=kk+jj*k_ints+ii*j_ints*k_ints+1
+        write(*,*) i, voxel
+        
+        ! choose energy bins alias table indice   
+        r4 = INT(rang() * n_ener_grps) * 3 
+
+        ! three values are associated with the alias bin:
+        ! -probability of the first secondary bin
+        ! -energy bin # of the first secondary bin
+        ! -energy bin # of the second secondary bin
+        ! second rand chooses first or second bin in alias table bin
+        if ( rang().le.spectrum(i, INT(1 + bias + r4     + 1)) ) then
+          j = INT( spectrum(i, INT(1 + bias + r4 + 1 + 1)) )
+        else
+          j = INT( spectrum(i, INT(1 + bias + r4 + 2 + 1)) )
+        endif
+
+        erg=my_ener_phot(j)+(1-rang())*(my_ener_phot(j+1)-my_ener_phot(j))
+
+end subroutine sample_erg
+
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! Generate Alias Table
+! Generate Alias Table of Voxels
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-subroutine gen_alias_table
+subroutine gen_voxel_alias_table
 !
   use mcnp_global
   use source_data
@@ -488,7 +603,7 @@ subroutine gen_alias_table
      write(*,*) 'Alias table of source voxels generated!'
 
 
-end subroutine gen_alias_table
+end subroutine gen_voxel_alias_table
 
 ! subroutine locates where to move the last bin in bins to,
 ! such that bins is presumably completely sorted again.
