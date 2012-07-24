@@ -26,6 +26,7 @@ module source_data
 
   use mcnp_global
   implicit real(dknd) (a-h,o-z)
+        integer(i8knd) :: ikffl = 0
         ! Parameters - these are toggled by gammas
         integer :: bias, samp_vox, samp_uni, debug, ergs, mat_rej, cumulative
         ! Voxel alias table variables
@@ -139,7 +140,7 @@ subroutine source_setup
           do i=1,n_mesh_cells
             tot_list(i) = spectrum(i,n_ener_grps)
             do j=n_ener_grps,2,-1
-              spectrum(i,j) = spectrum(i,j) - spectrum(i,j-1)
+              spectrum(i,j) = (spectrum(i,j) - spectrum(i,j-1)) / tot_list(i)
             enddo
             call gen_erg_alias_table (i, n_ener_grps, spectrum(i,1:n_ener_grps))
           enddo
@@ -459,7 +460,6 @@ subroutine source
       endif
     elseif (samp_uni.eq.1) then
       wgt=tot_list(voxel) 
-      !write(*,*) "wgt",wgt,"vox",voxel
     endif
     ! we calculate the weight based on the biasing
 
@@ -497,7 +497,7 @@ subroutine voxel_sample
         xxx=i_bins(ii+1)+rang()*(i_bins(ii+2)-i_bins(ii+1))
         yyy=j_bins(jj+1)+rang()*(j_bins(jj+2)-j_bins(jj+1))
         zzz=k_bins(kk+1)+rang()*(k_bins(kk+2)-k_bins(kk+1))
-        !write(*,*) 'voxel: ', voxel, xxx, yyy, zzz
+        
 end subroutine voxel_sample
 
 
@@ -568,7 +568,7 @@ subroutine sample_erg
 end subroutine sample_erg
 
 subroutine gen_erg_alias_table (x, len, ergsList)
-! ergsList values must total 1?
+! ergsList values must total 1!
   use source_data
   implicit real(dknd) (a-h,o-z)
 
@@ -668,7 +668,7 @@ subroutine gen_alias_table(bins, pairs, probs_list, len)
      ! probs_list stores the probability of the first value in the
      !  alias table bin being used
      n_inv = (1._dknd/len)
-     
+
      do j=1,len
 
        ! resort last bin
