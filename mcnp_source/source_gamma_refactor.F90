@@ -27,20 +27,25 @@ module source_data
   use mcnp_global
   implicit real(dknd) (a-h,o-z)
         ! Parameters - these are toggled by gammas
-        integer :: bias, samp_vox, samp_uni, debug, ergs, mat_rej
+        integer :: bias, samp_vox, samp_uni, debug, ergs, mat_rej, cumulative
         ! Voxel alias table variables
-        real(dknd) :: sourceSum, n_inv 
+        real(dknd) :: sourceSum, n_inv, norm
         real(dknd),dimension(:,:), allocatable :: bins
         real(dknd),dimension(:),allocatable :: pairsProbabilities
         integer(i4knd),dimension(:,:), allocatable :: pairs
         integer :: voxel, alias_bin
+        real(dknd),dimension(:),allocatable :: tot_list
         ! Biasing variables
         real(dknd) :: bias_probability_sum
+        real(dknd),dimension(:),allocatable :: bias_list
         character :: read_bias
         ! Energy bins variables
         real(dknd),dimension(:,:), allocatable :: spectrum
         real(dknd),dimension(:),allocatable :: my_ener_phot
         integer :: n_ener_grps
+        ! Energy bins alias table variables
+        real(dknd),dimension(:,:),allocatable :: ergPairsProbabilities
+        integer(i4knd),dimension(:,:,:),allocatable :: ergPairs
         ! Other variables
         integer stat
         integer :: i_ints,j_ints,k_ints,n_mesh_cells,n_active_mat,&
@@ -48,15 +53,17 @@ module source_data
         real,dimension(:),allocatable:: i_bins,j_bins,k_bins
         integer,dimension(100) :: active_mat
         ! Saved variables will be unchanged next time source is called
-        save spectrum,i_ints,j_ints,k_ints,n_active_mat,n_ener_grps, &
+        !save spectrum,i_ints,j_ints,k_ints,n_active_mat,n_ener_grps, &
+        save i_ints,j_ints,k_ints,n_active_mat,n_ener_grps, &
              i_bins,j_bins,k_bins,active_mat,my_ener_phot,tvol,ikffl,pairs, &
-             pairsProbabilities, n_mesh_cells, bias, bias_probability_sum
+             pairsProbabilities, n_mesh_cells, bias, bias_probability_sum, &
+             ergPairsProbabilities,ergPairs,tot_list,bias_list,ii,kk,jj,voxel
 
         ! IMPORTANT - make sure this is a long enough string.
         character*3000 :: line
         character :: read_ergs
 
-        save ii, kk, jj, voxel
+        !save 
        
 end module source_data
 
@@ -67,13 +74,123 @@ subroutine source_setup
   use source_data
   implicit real(dknd) (a-h,o-z)
  
+        close(50)
+        open(unit=50,form='formatted',file='gammas')
+
+        ! Read first 5 lines of gammas
+        call read_header(50)
+
+        ! Look for parameters line, and read parameters if found.
+        call read_params(50)
+
+        ! If ergs flag was found, we call read_custom_ergs.  Otherwise 
+        !  we use default energies.
+        if (ergs.eq.1) then
+          call read_custom_ergs
+        else ! use default energy groups; 42 groups
+          n_ener_grps = 42
+          ALLOCATE(my_ener_phot(1:n_ener_grps+1))
+          my_ener_phot=(/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
+            0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
+            1.66,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0, &
+            10.0,12.0,14.0,20.0,30.0,50.0/)
+        endif
+
+        ! Prepare to read in spectrum information
+        ! set the spectrum array to: # of mesh cells * # energy groups
+        ALLOCATE(spectrum(1:n_mesh_cells, 1:bias + n_ener_grps))
+        !ALLOCATE(bins(1:n_mesh_cells,1:2))
+        ALLOCATE(tot_list(1:n_mesh_cells))
+        if (bias.eq.1) ALLOCATE(bias_list(1:n_mesh_cells))
+
+!        ! initiallizing spectrum array ! seems pointless!
+!        do i=1,n_mesh_cells
+!          do j=1,1 + bias + 3 * n_ener_grps
+!            spectrum(i,j)=0.0
+!          enddo
+!        enddo
+         
+        ! reading in source strength and alias table for each voxel 
+        i=1 ! i keeps track of # of voxel entries
+        do
+          read(50,*,iostat=stat) (spectrum(i,j), j=1,bias + n_ener_grps)
+          if (stat /= 0) then
+            i=i-1
+            exit ! exit the do loop
+          endif
+          if (bias.eq.1) bias_list(i) = spectrum(i,bias+n_ener_grps)
+          i=i+1
+        enddo
+        
+        ! Check for correct number of voxel entries in gammas file.
+        if (i.ne.n_mesh_cells) write(*,*) 'ERROR: ', i, ' voxels found in ' // &
+                        'gammas file. ', n_mesh_cells, ' expected.'
+
+        close(50)
+        write(*,*) 'Reading gammas file completed!'
+
+        ALLOCATE(ergPairs(1:n_mesh_cells, 1:n_ener_grps, 1:2))
+        ALLOCATE(ergPairsProbabilities(1:n_mesh_cells, 1:n_ener_grps))
+
+        ! Create bins list.  Depending on if cumulative probabilities
+        !  were supplied, convert to individual bin probabilities so that
+        !  alias table of erg bins can be generated, too.
+        if (cumulative.eq.1) then
+          do i=1,n_mesh_cells
+            tot_list(i) = spectrum(i,n_ener_grps)
+            do j=n_ener_grps,2,-1
+              spectrum(i,j) = spectrum(i,j) - spectrum(i,j-1)
+            enddo
+            call gen_erg_alias_table (i, n_ener_grps, spectrum(i,1:n_ener_grps))
+          enddo
+        else
+          do i=1,n_mesh_cells
+            tot_list(i) = sum(spectrum(i,1:n_ener_grps))
+            call gen_erg_alias_table (i, n_ener_grps, spectrum(i,1:n_ener_grps))
+          enddo
+        endif
+
+        ! We calculate the number of source voxels.
+        n_source_cells = 0
+        do i=1,n_mesh_cells
+          if (tot_list(i).gt.0) n_source_cells = n_source_cells + 1
+        enddo
+        write(*,*) "n_mesh_cells:", n_mesh_cells, &
+                "n_source_cells:", n_source_cells
+
+        ! Generate alias table of voxels if needed
+        if (samp_vox.eq.1) then
+          call gen_voxel_alias_table
+        ! else, tot_list will be used as the weights for uniform sampling;
+        ! but we need to normalize tot_list, e.g. in the case where sequential
+        ! bins are used for uniform sampling.
+        elseif (samp_uni.eq.1) then
+          norm = sum(tot_list) / float(n_source_cells)
+          write(*,*) "norm ", norm, "sum: ", sum(tot_list)
+          do i=1,n_mesh_cells
+            tot_list(i) = tot_list(i) / norm
+          enddo
+          !write(*,*) sum(tot_list)/n_source_cells
+        endif
+
+        ! Create new debug output file if debugging is enabled.
+        if (debug.eq.1) then
+          OPEN(UNIT=57, FILE="source_debug", ACCESS="APPEND", STATUS="REPLACE")
+          CLOSE(57)
+        endif
+
+end subroutine source_setup
+
+subroutine read_header (myunit)
+! read in first 5 lines of gammas file
+  use source_data
+        
+        integer,intent(IN) :: myunit
+
         ! initialize an empty array
         do i=1,100
           active_mat(i)=0
         enddo
-
-        close(50)
-        open(unit=50,form='formatted',file='gammas')
 
         ! read first line
         read(50,*) i_ints,j_ints,k_ints
@@ -97,69 +214,14 @@ subroutine source_setup
         enddo
         n_active_mat=i-1
 
-        ! Initialize parameters to false (except voxel sampling), then read
-        !  any parameters that exist. Parameters exist if line 6 starts with
-        !  a 'p'.
-        bias = 0
-        samp_vox = 1
-        samp_uni = 0
-        debug = 0
-        ergs = 0
-        mat_rej = 1
+end subroutine read_header
 
-        call read_params(50)
-
-        ! If ergs flag was found, we call read_custom_ergs.  Otherwise 
-        !  we use default energies.
-        if (ergs.eq.1) then
-          call read_custom_ergs
-        else ! use default energy groups; 42 groups
-          n_ener_grps = 42
-          ALLOCATE(my_ener_phot(1:n_ener_grps+1))
-          my_ener_phot=(/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
-            0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
-            1.66,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0, &
-            10.0,12.0,14.0,20.0,30.0,50.0/)
-        endif
-
-
-        ! Prepare to read in spectrum information
-        ! set the spectrum array to: # of mesh cells * # energy groups
-        ALLOCATE(spectrum(1:n_mesh_cells, 1 + bias + 3 * n_ener_grps))
-        ! initiallizing spectrum array
-        do i=1,n_mesh_cells
-          do j=1,1 + bias + 3 * n_ener_grps
-            spectrum(i,j)=0.0
-          enddo
-        enddo
-      
-        ! reading in source strength and alias table for each voxel 
-        i=1
-        do
-          read(50,*,iostat=stat) (spectrum(i,j),j=1, 1 + bias + 3 * n_ener_grps)
-          if (stat /= 0) exit ! exit the do loop
-          i=i+1
-        enddo
-
-        close(50)
-
-        write(*,*) 'Reading gammas file completed!'
-
-        if (samp_vox.eq.1) then
-          call gen_voxel_alias_table
-        endif
-        
-        debug = 2
-        if (debug.eq.1) then
-          OPEN(UNIT=57, FILE="source_debug", ACCESS="APPEND", STATUS="REPLACE")
-          CLOSE(57)
-        endif
-
-end subroutine source_setup
 
 subroutine read_params (myunit)
-
-  use mcnp_global
+! read in the parameters line, if there is one.
+! line should start with a 'p' and have single characters
+!  that are space delimited.
+! set various parameters to 1 (true) if they exist.
   use source_data
 
         integer,intent(IN) :: myunit
@@ -167,20 +229,26 @@ subroutine read_params (myunit)
         character,dimension(1:30) :: letter
         character*30 :: paramline
 
-        ! read in the possible parameters line.
-        ! line should start with a 'p' and have single characters
-        !  that are space delimited.
+        ! Initialize parameters such that gammas format specified by Leichtle
+        !  will be read correctly without a parameters line.
+        bias = 0
+        samp_vox = 1
+        samp_uni = 0
+        debug = 0
+        ergs = 0
+        mat_rej = 1
+        cumulative = 1
+
+        ! Read enough characters to fill paramline
         read(myunit,'(A)') paramline
 
-        do i=1,30
+        do i=1,30 ! fill list of parameters with placeholder character
           letter(i) = " "
         enddo
 
-        ! Read in individual characters to a list
+        ! Place individual characters in a list
         read(paramline,*,end=876) (letter(i),i=1,30)
 876     continue
-
-        write(*,*) letter
 
         if (letter(1).ne.'p') then
           backspace(myunit)
@@ -188,23 +256,13 @@ subroutine read_params (myunit)
         endif 
 
         ! If parameters present, we assume everything is disabled initially
-        bias = 0
         samp_vox = 0
-        samp_uni = 0
-        debug = 0
-        ergs = 0
         mat_rej = 0
+        cumulative = 0
 
         do i=2,30
-         ! read(myunit,'(a)') letter
-         ! if (letter.eq.'') then
-         ! backspace(myunit) ! Necessary?
-         ! exit
-         ! endif
-
           SELECT CASE (letter(i))
-          CASE (' ')
-            !backspace(myunit) !Necessary?
+          CASE (' ') ! indicates all parameters have been handled.
             exit
           CASE ('e')
             write(*,*) "Custom energy bins will be read."
@@ -215,7 +273,7 @@ subroutine read_params (myunit)
           CASE ('b')
             write(*,*) "Biased sampling of source voxels is enabled."
             bias = 1
-          ! only want on type of sampling enabled.
+          ! only want one type of sampling enabled.
           CASE ('v')
             write(*,*) "Voxel sampling enabled."
             samp_uni = 0
@@ -224,18 +282,19 @@ subroutine read_params (myunit)
             write(*,*) "Uniform sampling enabled."
             samp_uni = 1
             samp_vox = 0
+            bias = 0 !biasing in conjunction with uniform sampling not supported
           CASE ('d')
+            write(*,*) "Debug output of starting positions enabled."
             debug = 1
+          CASE ('c')
+            write(*,*) "Enabled reading of cumulative energy bins."
+            cumulative = 1
           CASE DEFAULT
             write(*,*) " "
-            write(*,*) "Invalid parameter!:", letter(i)
+            write(*,*) "Invalid parameter!: ", letter(i)
           END SELECT
 
-          write(*,*) letter(i)
-
         enddo
-
-
 
 end subroutine read_params
 
@@ -271,14 +330,13 @@ subroutine source
                                                        
 !        
 !------------------------------------------------------------------------------
-!       In the first history (ikffl) read 'gammas' file. ikffl under MPI works ?
+!     In the first history (ikffl) read 'gammas' file. ikffl under MPI works ?
 !------------------------------------------------------------------------------
 !
         ikffl=ikffl+1
         if (ikffl.eq.1) then ! if first particle ...
           call source_setup
                    
-                    write(*,*) 'Source particle position debugging is active!'
           npart_write = 0
 
         endif
@@ -298,10 +356,11 @@ subroutine source
 !   adr=z+y*k_ints+x*j_ints*k_ints+i_mat*i_ints*j_ints*k_ints;
 
         ! sample a new position if voxel has zero source strength
-        if (spectrum(voxel,1).eq.0) goto 10
+        !if (spectrum(voxel,1).eq.0) goto 10
+        if (tot_list(voxel).eq.0) goto 10
 
                
-        !        write(57,*) xxx, yyy, zzz, wgt, alias_bin, voxel, ii
+!       IPT=2 for photons. JSU=TME=0 works well.
         ipt=2 ! particle type: 2 = photon
         jsu=0
         tme=0
@@ -387,29 +446,26 @@ subroutine source
 544 continue
 
     call sample_erg 
-!        
+
 !-------------------------------------------------------------------------------
 !        Determine weight.
-!       IPT=2 for photons. JSU=TME=0 works well.
 !-------------------------------------------------------------------------------
-!
-
-    ! wgt=spectrum(i,1) 
     if (samp_vox.eq.1) then
       if (bias.eq.1) then
         !wgt = bias_probability_sum / spectrum(voxel,2)
-        wgt = spectrum(voxel,2)
+        wgt=bias_list(voxel)
       else
         wgt=1.0
       endif
     elseif (samp_uni.eq.1) then
-      wgt=spectrum(voxel,n_ener_grps) 
+      wgt=tot_list(voxel) 
+      !write(*,*) "wgt",wgt,"vox",voxel
     endif
     ! we calculate the weight based on the biasing
 
     
     if (debug.eq.1) then
-            call print_debug
+      call print_debug
     endif
 
     !
@@ -441,6 +497,7 @@ subroutine voxel_sample
         xxx=i_bins(ii+1)+rang()*(i_bins(ii+2)-i_bins(ii+1))
         yyy=j_bins(jj+1)+rang()*(j_bins(jj+2)-j_bins(jj+1))
         zzz=k_bins(kk+1)+rang()*(k_bins(kk+2)-k_bins(kk+1))
+        !write(*,*) 'voxel: ', voxel, xxx, yyy, zzz
 end subroutine voxel_sample
 
 
@@ -466,6 +523,8 @@ subroutine uniform_sample
           if (k_bins(kk).le.zzz.and.zzz.lt.k_bins(kk+1)) exit
         enddo
 
+        voxel = (kk-1)+(jj-1)*k_ints+(ii-1)*j_ints*k_ints+1
+
 end subroutine uniform_sample
 
 
@@ -479,33 +538,61 @@ subroutine sample_erg
 !       Sample the alias table of energy bins for the selected voxel. 
 !-------------------------------------------------------------------------------
 !
-        i=kk+jj*k_ints+ii*j_ints*k_ints+1
-        write(*,*) i, voxel
+        !i=kk+jj*k_ints+ii*j_ints*k_ints+1
+        !write(*,*) i, voxel
         
         ! choose energy bins alias table indice   
-        r4 = INT(rang() * n_ener_grps) * 3 
+        !r4 = INT(rang() * n_ener_grps) * 3 
 
         ! three values are associated with the alias bin:
         ! -probability of the first secondary bin
         ! -energy bin # of the first secondary bin
         ! -energy bin # of the second secondary bin
         ! second rand chooses first or second bin in alias table bin
-        if ( rang().le.spectrum(i, INT(1 + bias + r4     + 1)) ) then
-          j = INT( spectrum(i, INT(1 + bias + r4 + 1 + 1)) )
-        else
-          j = INT( spectrum(i, INT(1 + bias + r4 + 2 + 1)) )
-        endif
+      !  if ( rang().le.spectrum(i, INT(1 + bias + r4     + 1)) ) then
+      !    j = INT( spectrum(i, INT(1 + bias + r4 + 1 + 1)) )
+      !  else
+      !    j = INT( spectrum(i, INT(1 + bias + r4 + 2 + 1)) )
+      !  endif
 
+        ! Sampling the alias table
+        alias_bin = INT(rang() * n_ener_grps) + 1
+        if (rang().lt.ergPairsProbabilities(voxel,alias_bin)) then
+          j = ergPairs(voxel,alias_bin,1) - 1
+        else
+          j = ergPairs(voxel,alias_bin,2) - 1
+        endif
+       
         erg=my_ener_phot(j)+(1-rang())*(my_ener_phot(j+1)-my_ener_phot(j))
 
 end subroutine sample_erg
 
+subroutine gen_erg_alias_table (x, len, ergsList)
+! ergsList values must total 1?
+  use source_data
+  implicit real(dknd) (a-h,o-z)
+
+      integer,intent(IN) :: x, len
+      real(dknd),dimension(1:len),intent(IN) :: ergsList
+
+      integer :: i
+      real(dknd),dimension(1:len,1:2) :: mybins
+
+      do i=1,len
+        mybins(i,1) = ergsList(i)
+        mybins(i,2) = i
+      enddo
+
+      call gen_alias_table(mybins, ergPairs(x,1:len,1:2), &
+                ergPairsProbabilities(x,1:len), len)
+
+end subroutine gen_erg_alias_table
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Generate Alias Table of Voxels
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 subroutine gen_voxel_alias_table
-!
+! tot_list does not have to be normalized prior to calling this subroutine
   use mcnp_global
   use source_data
   implicit real(dknd) (a-h,o-z)
@@ -513,16 +600,12 @@ subroutine gen_voxel_alias_table
      ! a relative probability of that voxel being the source location.
      ! If biasing is used, the second entry is the bias value of the voxel
      ! Sum up a normalization factor
-     sourceSum = 0.0_rknd
-     n_source_cells = 0
-     do i=1,n_mesh_cells
-       sourceSum = sourceSum + spectrum(i,1)
-       if (spectrum(i,1).gt.0) n_source_cells = n_source_cells + 1
-     enddo
-
-     write(*,*) "sourceSum:", sourceSum, "n_source_cells:", n_source_cells
+     sourceSum = sum(tot_list)
+     write(*,*) "sourceSum:", sourceSum 
 
      ALLOCATE(bins(1:n_mesh_cells,1:2))
+     ALLOCATE(pairs(1:n_mesh_cells, 1:2))
+     ALLOCATE(pairsProbabilities(1:n_mesh_cells))
 
      ! make the unsorted list of bins
      bias_probability_sum = 0
@@ -530,7 +613,7 @@ subroutine gen_voxel_alias_table
        ! the average bin(i,1) value assigned is n_inv
        ! bins(i,1) = spectrum(i,1) / sourceSum * n_mesh_cells
        ! bins(i,1) = spectrum(i,1) / n_source_cells !* &
-       bins(i,1) = spectrum(i,1) / sourceSum
+       bins(i,1) = tot_list(i) / sourceSum
        !         (real(n_mesh_cells)/real(n_source_cells))
        bins(i,2) = i
 
@@ -538,7 +621,7 @@ subroutine gen_voxel_alias_table
        !  where for bin i, p_i is bin probability, b_i is bin bias
        if (bias.eq.1) then
          bias_probability_sum = & 
-                           bias_probability_sum + bins(i,1) * spectrum(i,2)
+                           bias_probability_sum + bins(i,1) * bias_list(i)
        endif
      enddo
 
@@ -546,51 +629,74 @@ subroutine gen_voxel_alias_table
      !  and then update the bias values so that they are now particle wgt
      if (bias.eq.1) then
        do i=1,n_mesh_cells
-         bins(i,1) = bins(i,1) * spectrum(i,2) / bias_probability_sum
-         spectrum(i,2) = bias_probability_sum / spectrum(i,2)
+         bins(i,1) = bins(i,1) * bias_list(i) / bias_probability_sum
+         !spectrum(i,2) = bias_probability_sum / spectrum(i,2)
+         ! !!! spectrum(i,2) value is now a weight, rather than a probabilty
+         bias_list(i) = bias_probability_sum / bias_list(i)
+         !!! bias_list(i) value is now a weight, rather than a probabilty
        enddo
      endif
 
+     call gen_alias_table(bins, pairs, pairsProbabilities, n_mesh_cells)
+
+     write(*,*) 'Alias table of source voxels generated!'
+
+
+end subroutine gen_voxel_alias_table
+
+
+subroutine gen_alias_table(bins, pairs, probs_list, len)
+! note that bins is a list of pairs of the form (probability,value)
+!  The sum of the probabilities in bins must be 1.
+  use mcnp_global
+  implicit real(dknd) (a-h,o-z)
+     ! subroutine argument variables
+     real(dknd),dimension(1:len,1:2),intent(inout) :: bins
+     integer(i4knd),dimension(1:len,1:2), intent(out) :: pairs
+     real(dknd),dimension(1:len), intent(out) :: probs_list
+     integer, intent(in) :: len
+
+     ! internal variables
+     real(dknd) :: n_inv 
+
      ! do an initial sort
-     call heap_sort(bins, n_mesh_cells)
+     call heap_sort(bins, len)
 
      ! With each pass through the following loop, we ignore another bin
      !  (the j'th bin) by setting its probability vaue to -1.
      ! pairs stores the two possible values for each alias table bin
-     ! pairsProbabilities stores the probability of the first value in the
+     ! probs_list stores the probability of the first value in the
      !  alias table bin being used
-     ALLOCATE(pairs(1:n_mesh_cells, 1:2))
-     ALLOCATE(pairsProbabilities(1:n_mesh_cells))
-     n_inv = (1._dknd/n_mesh_cells)
+     n_inv = (1._dknd/len)
      
-     do j=1,n_mesh_cells
+     do j=1,len
 
        ! resort last bin
-       call sort_for_alias_table(bins, n_mesh_cells)
+       call sort_for_alias_table(bins, len)
 
        ! Lowest bin is less than 1/n, and thus needs a second bin with
        !  which to fill the alias bin.
        if ( bins(j,1).lt.n_inv ) then
-         pairsProbabilities(j) = bins(j,1) * n_mesh_cells
+         probs_list(j) = bins(j,1) * len
          pairs(j,1) = bins(j,2)
 
          ! don't need to store second probability
-         pairs(j,2) = bins(n_mesh_cells,2)
+         pairs(j,2) = bins(len,2)
 
-         bins(n_mesh_cells,1) = bins(n_mesh_cells,1) - (n_inv - bins(j,1))
+         bins(len,1) = bins(len,1) - (n_inv - bins(j,1))
          
        ! Lowest bin should never have a probablity > 1/n, I think?
        else if (bins(j,1).gt.n_inv) then
          !write(*,*) "Problem generating alias table. See source.F90"
          pairs(j,1) = bins(j,2)
          pairs(j,2) = 0
-         pairsProbabilities(j) = 1.0
+         probs_list(j) = 1.0
 
          bins(j,1) = bins(j,1) - n_inv
 
        ! Lowest bin is exactly 1/n
        else ! (bins(j,1).eq.1) ! single possible value for given bin
-         pairsProbabilities(j) = 1.0
+         probs_list(j) = 1.0
          pairs(j,1) = bins(j,2)
          pairs(j,2) = 0
 
@@ -600,10 +706,7 @@ subroutine gen_voxel_alias_table
 
      enddo
 
-     write(*,*) 'Alias table of source voxels generated!'
-
-
-end subroutine gen_voxel_alias_table
+end subroutine gen_alias_table
 
 ! subroutine locates where to move the last bin in bins to,
 ! such that bins is presumably completely sorted again.
