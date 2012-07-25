@@ -78,6 +78,7 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
     if isotope.strip() != 'TOTAL': specialIsotope = True
     else: specialIsotope = False
     writeZeros = True
+    foundIsoCool = False
 
     # Now go through entire file, tagging mesh with info from lines
     #  that match both the isotope and coolingstep specified.
@@ -91,6 +92,7 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
                 lineparts[1].strip(' ') == coolingstep:
                     for grp, val, in enumerate(lineparts[2:]):
                          (tagList[grp])[voxels[voxelcnt]] = float(val)
+                    foundIsoCool = True
                     if specialIsotope: 
                         writeZeros = False # Ignores TOTAL line in this voxel
                     else: voxelcnt += 1
@@ -107,7 +109,7 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
 
     fr.close()
     
-    if voxelcnt == 0:
+    if not foundIsoCool:
         print "ERROR: No voxels were tagged.\n\tEither cooling step '{0}' or " \
                 "isotope '{1}' was probably not found in " \
                 "{2}.".format(coolingstep, isotope, inputfile)
