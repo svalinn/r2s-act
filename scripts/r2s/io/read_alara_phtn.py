@@ -73,8 +73,17 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
     fr.close()
     fr = open(inputfile, 'r')
 
-    # Now go through rest of file, tagging mesh with info from lines
-    #  that match the isotope and coolingstep specified.
+    # Initial settings for variables that enable correct parsing when interested
+    #  in specific isotopes.
+    if isotope.strip() != 'TOTAL': specialIsotope = True
+    else: specialIsotope = False
+    writeZeros = True
+
+    # Now go through entire file, tagging mesh with info from lines
+    #  that match both the isotope and coolingstep specified.
+    # Because phtn_src may not include a given isotope in all voxels' entries,
+    #  we do some trickery. We use TOTAL lines to keep track of voxels, and if a
+    #  voxel didn't contain the isotope of interest, we tag 0's for that voxel.
     for line in fr:
         lineparts = line.split('\t')
 
@@ -82,7 +91,19 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
                 lineparts[1].strip(' ') == coolingstep:
                     for grp, val, in enumerate(lineparts[2:]):
                          (tagList[grp])[voxels[voxelcnt]] = float(val)
+                    if specialIsotope: 
+                        writeZeros = False # Ignores TOTAL line in this voxel
+                    else: voxelcnt += 1
+
+        # Note voxels that do not have the isotope of interest, and tag
+        #  them as 0.0 source strength.
+        elif lineparts[0] == 'TOTAL' and \
+                lineparts[1].strip(' ') == coolingstep:
+                    if writeZeros:
+                        for grp, val, in enumerate(lineparts[2:]):
+                             (tagList[grp])[voxels[voxelcnt]] = 0.0
                     voxelcnt += 1
+                    writeZeros = True # Reset to true at end of voxel's entry
 
     fr.close()
     
