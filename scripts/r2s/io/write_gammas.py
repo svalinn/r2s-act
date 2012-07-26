@@ -15,7 +15,6 @@ import os.path
 from optparse import OptionParser
 from itaps import iBase,iMesh,iMeshExtensions
 
-from r2s import alias
 from scdmesh import ScdMesh, ScdMeshError
 
 
