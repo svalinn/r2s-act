@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 import sys
 import ConfigParser
+import os.path
 
 from r2s.io import read_alara_phtn, write_gammas
 from r2s import mcnp_n2p
@@ -16,7 +17,11 @@ config = ConfigParser.SafeConfigParser()
 config.read(cfgfile)
 
 # Required input files
-datafile = get_input_file(config, 'step1_datafile')
+if config.has_option('r2s-files', 'step2_datafile'):
+    datafile = get_input_file(config, 'step2_datafile')
+else:
+    datafile = get_input_file(config, 'step1_datafile')
+
 phtn_src = get_input_file(config, 'alara_phtn_src')
 
 
@@ -26,36 +31,38 @@ if config.has_option('r2s-files','photon_mcnp_input'):
     mcnp_n_problem = get_input_file(config,'neutron_mcnp_input')
     mcnp_p_problem = config.get('r2s-files','photon_mcnp_input')
     
-# Optional values
+# Optional values from r2s-params section.
 if config.has_section('r2s-params'):
     opt_isotope = config.get('r2s-params','photon_isotope')
     opt_cooling = config.get('r2s-params','photon_cooling')
-    opt_alias = bool(int(config.get('r2s-params','alias_ergbins')))
+    opt_sampling = config.get('r2s-params','sampling')
+    opt_ergs = bool(int(config.get('r2s-params','custom_ergbins')))
     opt_bias = bool(int(config.get('r2s-params','photon_bias')))
-    opt_by_voxel = bool(int(config.get('r2s-params','photon_by_voxel')))
+    opt_cumulative = bool(int(config.get('r2s-params','cumulative')))
 else:
     opt_isotope = "TOTAL"
     opt_cooling = 0
-    opt_alias = False
+    opt_sampling = 'v'
+    opt_ergs = False
     opt_bias = False
-    opt_by_voxel = False
+    opt_cumulative = False
     
 # Do processing
 
 print "Loading step one data file `{0}'".format(datafile)
 smesh = ScdMesh.fromFile(datafile)
 
+# Tagging mesh
 print "Reading ALARA photon source `{0}'".format(phtn_src)
 read_alara_phtn.read_to_h5m(phtn_src, smesh, isotope=opt_isotope, \
         coolingstep=opt_cooling, retag=True, totals=True)
 
-# Tagging mesh
 print "Saving photon source information to '{0}'".format(datafile)
 smesh.imesh.save(datafile)
 
 print "Writing gammas file"
-write_gammas.gen_gammas_file_from_h5m(smesh, do_alias=opt_alias, \
-        do_bias=opt_bias, by_voxel=opt_by_voxel)
+write_gammas.gen_gammas_file_from_h5m(smesh, sampling=opt_sampling, \
+        do_bias=opt_bias, cumulative=opt_cumulative, cust_ergbins=opt_ergs)
 
 if mcnp_p_problem:
 

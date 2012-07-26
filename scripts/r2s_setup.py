@@ -106,20 +106,22 @@ mmgrid_rays = 10
 #  for tagging
 # -photon_cooling is the cooling step read from phtn_src. 0 is shutdown,
 #  other numbers correspond with cooling times listed in your ALARA input.
+# -sampling determines the sampling method used:
+#   u for uniform sampling; v for voxel sampling (default)
 # -if photon_bias is 1 (true), the gammas file will try to include voxel bias
 #  values from the mesh (stored as PHTN_BIAS tag). Currently requires
 #  photon_by_voxel to be 1.
-# -if alias_ergbins is 1 (true), photon energy bin distribution for each voxel
-#  is stored in alias table format. This increases size of gammas, but makes
-#  MCNP calculations slightly faster.
-# -if photon_by_voxel is 1 (true), gammas file is written for voxel sampling
-#  version of source.F90.
+# -if custom_ergbins is 1 (true), custom erg bins will be looked for on the 
+#   mesh, and included in gammas file if found. (default:false; 42 grps used)
+# -cumulative determines the format for listing voxels in gammas file. Default
+#   is zero (false), which is preferred.
 photon_isotope = TOTAL
 photon_cooling = 0
-# Next two use 0 for false, 1 for true
+sampling = v
+# Next three use 0 for false, 1 for true
 photon_bias = 0
-alias_ergbins = 1
-photon_by_voxel = 1
+custom_ergbins = 0
+cumulative = 0
 
 [r2s-material]
 # This section may be used to map material idenfitiers to material names.
