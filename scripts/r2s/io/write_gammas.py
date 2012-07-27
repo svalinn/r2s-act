@@ -141,9 +141,20 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", \
         # We go through each energy group for the voxel and:
         # -make list of energy bin source strengths & group #s (ergproblist)
         # -sum up the total source strength (sourcetotal)
+        # Note an important distinction depending on sampling approach:
+        # -We account for voxel volume in voxel sampling
+        # -We do not do this for uniform sampling, because it is already
+        #   accounted for - more particles start in a voxel if it is larger
+        # How to think of this difference: for correct 'normalization' in the 
+        #  sampling process, we want photons/s/voxel for voxel sampling, and 
+        #  photons/s/volume for uniform sampling.
         for i in xrange(1, numergbins + 1):
-            ergproblist.append(vols[cnt] * float(sm.imesh.getTagHandle( \
-                    "phtn_src_group_{0:03d}".format(i))[voxel]))
+            if sampling == 'v':
+                ergproblist.append(float(vols[cnt] * sm.imesh.getTagHandle( \
+                        "phtn_src_group_{0:03d}".format(i))[voxel]) / norm)
+            elif sampling == 'u':
+                ergproblist.append(float(sm.imesh.getTagHandle( \
+                        "phtn_src_group_{0:03d}".format(i))[voxel]) / norm)
             sourcetotal += ergproblist[i-1]
             if cumulative: ergproblist[i-1] = sourcetotal
 
@@ -159,16 +170,9 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", \
                     # int(bool()) ensures either 1 or 0 is added
             continue
 
-        # Reduce the source strengths to fractional probabilities
-        #unnecessary!
-        #ergproblist = [ x/sourcetotal for x in ergproblist ]
-
         if have_bias_info:
             bias = " " + str(bias_tag[voxel])
         else: bias = ""
-
-        if cumulative:
-            ergproblist = [x/norm for x in ergproblist]
 
         # We write the alias table to one line, prepended by the source
         #  strength of the voxel divided by the average source strength per
@@ -176,30 +180,6 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", \
         # sourcetotal*vols[cnt]/norm can be used as the particle's weight
         fw.write(" ".join(["{0:<12.5E}".format(x) for x in ergproblist]) + \
                 bias + "\n")
-
-#    # Else, for each voxel, write the cumulative source strength at each energy
-#    else:
-#        if by_voxel:
-#            print "Warning: You specified a gammas file for voxel sampling " \
-#                    "but this requires that the energy bins be an alias table" \
-#                    " via the do_alias keyword."
-#            print "Defaulting to gammas file for direct discrete sampling " \
-#                    "with cumulative energy bins format."
-#
-#        for voxel in voxels:
-#            writestring = ""
-#            binval = 0.0
-#            for i in xrange(1, numergbins + 1):
-#                binval += float(sm.imesh.getTagHandle( \
-#                        "phtn_src_group_{0:03d}".format(i))[voxel])
-#                writestring += "{0:<12.5E}".format(binval/norm)
-#
-#            # Not implemented yet
-#            if have_bias_info:
-#                print "Adding bias information to the 'gammas' file is not " \
-#                        "supported with the cumulative energy bins format."
-#    
-#            fw.write(writestring + "\n")
 
     fw.close()
 

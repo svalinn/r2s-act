@@ -191,15 +191,6 @@ subroutine source_setup
         ! Generate alias table of voxels if needed
         if (samp_vox.eq.1) then
           call gen_voxel_alias_table
-        ! else, tot_list will be used as the weights for uniform sampling;
-        ! but we need to normalize tot_list, e.g. in the case where sequential
-        ! bins are used for uniform sampling.
-        elseif (samp_uni.eq.1) then
-          norm = sum(tot_list) / float(n_source_cells)
-          write(*,*) "norm ", norm, "sum: ", sum(tot_list)
-          do i=1,n_mesh_cells
-            tot_list(i) = tot_list(i) / norm
-          enddo
         endif
 
         ! Create new debug output file if debugging is enabled.
@@ -548,9 +539,9 @@ subroutine sample_erg
         ! Sampling the alias table
         alias_bin = INT(rang() * n_ener_grps) + 1
         if (rang().lt.ergPairsProbabilities(voxel,alias_bin)) then
-          j = ergPairs(voxel,alias_bin,1) - 1
+          j = ergPairs(voxel,alias_bin,1)
         else
-          j = ergPairs(voxel,alias_bin,2) - 1
+          j = ergPairs(voxel,alias_bin,2)
         endif
        
         erg=my_ener_phot(j)+(1-rang())*(my_ener_phot(j+1)-my_ener_phot(j))
