@@ -173,6 +173,9 @@ subroutine source_setup
         else
           do i=1,n_mesh_cells
             tot_list(i) = sum(spectrum(i,1:n_ener_grps))
+            do j=n_ener_grps,2,-1
+              spectrum(i,j) = spectrum(i,j) / tot_list(i)
+            enddo
             call gen_erg_alias_table (i, n_ener_grps, spectrum(i,1:n_ener_grps))
           enddo
         endif
