@@ -5,7 +5,7 @@
 !  Dieter Leichtle from KIT.
 ! Changes have been made by Eric Relson with UW-Madison/CNERG goals in mind.
 ! 
-! This source file implements photon source sampling on a mesh.
+! This source file implements photon source sampling on a cartesian mesh.
 ! Two photon position sampling methods are avaiable: 
 !             (1) voxel sampling and (2) uniform sampling
 !
@@ -43,28 +43,30 @@
 ! Two formats are supported, cumulative bins, or non-cumulative bins. In both
 !  cases, lines list bin values from low energy to high energy, delimited by
 !  spaces.
-! For the cumulative format normalization should be done such that the last bin
-!  is also the weight of source particles from a given voxel (e.g. for uniform
-!  sampling).
-! Non-cumulative bins list individual bins. Correct sampling is achieved if for
-!  an arbitrary set of voxels, the ratios of the totals of the voxels' bins 
-!  are proportional to the relative source strengths (phtns/sec) of the voxels.
-! Note that for both cases, the correct normalization depends on whether
+! Note that the normalization for voxel and uniform sampling is different, and 
+!  will result in differing gammas files. In general, for voxel sampling,
+!  normalization is based on the average source strength in photons/voxel/s; 
+!  For uniform sampling, we want average source strength in phtons/cm3/s.
+! As an exercise to verify that the gammas files are being generated correctly,
+!  do a test problem and verify that you get the same average energy per source
+!  particle in all test cases, and that all uniform sampling test cases have a
+!  weight of 1.0 per source particle. (See the summary table in MCNP output)
+! Note that correct normalization also depends on whether
 !  material rejection is being used.
 ! In either case, the last bin can be followed by a bias value for the voxel.
 !  An arbitrary range of bias values can be used since the source routine does
 !  the necessary re-normalization for voxel sampling.
 ! 
-! OTHER:
+! Other notes:
 ! Voxel sampling and energy sampling use a sampling technique referred to as
 !  'alias discrete' or 'alias table' sampling.  This provides efficiency
-!  benefits over 'direct discrete' sampling. Creating of the alias tables uses
+!  benefits over 'direct discrete' sampling. Creation of the alias tables uses
 !  the heap sort algorithm.
 
 module source_data
-! Variables used/shared by various subroutines.
+! Variables used/shared by most of the subroutines in this file.
   use mcnp_global
-  implicit real(dknd) (a-h,o-z)
+   
         character*30 :: gammas_file = 'gammas'
         integer(i8knd) :: ikffl = 0 ! = local record of history #
         ! Parameters - these are toggled by gammas
@@ -88,6 +90,7 @@ module source_data
         ! Energy bins alias table variables
         real(dknd),dimension(:,:),allocatable :: ergPairsProbabilities
         integer(i4knd),dimension(:,:,:),allocatable :: ergPairs
+        integer :: ii,kk,jj
         ! Other variables
         integer :: stat
         integer :: i_ints,j_ints,k_ints,n_mesh_cells,n_active_mat
@@ -97,7 +100,7 @@ module source_data
         ! Saved variables will be unchanged next time source is called
         !save spectrum,i_ints,j_ints,k_ints,n_active_mat,n_ener_grps, &
         save i_ints,j_ints,k_ints,n_active_mat,n_ener_grps, &
-             i_bins,j_bins,k_bins,active_mat,my_ener_phot,tvol,ikffl,pairs, &
+             i_bins,j_bins,k_bins,active_mat,my_ener_phot,ikffl,pairs, &
              pairsProbabilities, n_mesh_cells, bias, bias_probability_sum, &
              ergPairsProbabilities,ergPairs,tot_list,bias_list,ii,kk,jj,voxel
        
@@ -107,7 +110,7 @@ end module source_data
 subroutine source_setup
   ! subroutine handles parsing of the 'gammas' file and related initializations
   use source_data
-  implicit real(dknd) (a-h,o-z)
+   
  
         CLOSE(50)
         OPEN(unit=50,form='formatted',file=gammas_file)
@@ -201,8 +204,9 @@ subroutine source_setup
 
 end subroutine source_setup
 
+
 subroutine read_header (myunit)
-! read in first 5 lines of gammas file
+! Read in first 5 lines of gammas file
 ! These lines contain the x,y,z mesh intervals
 !  and the list of active materials
   use source_data
@@ -347,8 +351,7 @@ subroutine source
   use mcnp_debug
   use mcnp_random
   use source_data
-  implicit real(dknd) (a-h,o-z)
-                                                       
+   
 !------------------------------------------------------------------------------
 !     In the first history (ikffl) read 'gammas' file. ikffl under MPI works ?
 !------------------------------------------------------------------------------
@@ -534,8 +537,7 @@ end subroutine uniform_sample
 subroutine sample_erg
 ! Sample the alias table of energy bins for the selected voxel. 
   use source_data
-  implicit real(dknd) (a-h,o-z)
-
+   
         ! Sampling the alias table
         alias_bin = INT(rang() * n_ener_grps) + 1
         if (rang().lt.ergPairsProbabilities(voxel,alias_bin)) then
@@ -551,8 +553,7 @@ end subroutine sample_erg
 subroutine gen_erg_alias_table (x, len, ergsList)
 ! ergsList values must total 1!
   use source_data
-  implicit real(dknd) (a-h,o-z)
-
+   
         integer,intent(IN) :: x, len
         real(dknd),dimension(1:len),intent(IN) :: ergsList
 
@@ -575,7 +576,7 @@ end subroutine gen_erg_alias_table
 subroutine gen_voxel_alias_table
 ! tot_list does not have to be normalized prior to calling this subroutine
   use source_data
-  implicit real(dknd) (a-h,o-z)
+   
         ! Note that the first entry for each voxel in 'gammas' is
         ! a relative probability of that voxel being the source location.
         ! If biasing is used, the second entry is the bias value of the voxel
@@ -628,7 +629,7 @@ subroutine gen_alias_table(bins, pairs, probs_list, len)
 ! note that bins is a list of pairs of the form (probability,value)
 !  The sum of the probabilities in bins must be 1.
   use mcnp_global
-  implicit real(dknd) (a-h,o-z)
+   
         ! subroutine argument variables
         real(dknd),dimension(1:len,1:2),intent(inout) :: bins
         integer(i4knd),dimension(1:len,1:2), intent(out) :: pairs
@@ -692,8 +693,6 @@ subroutine sort_for_alias_table(bins, length)
 ! such that bins is presumably completely sorted again.
   use mcnp_global
 
-        implicit none
-
         integer,intent(IN) :: length
         real(dknd),intent(INOUT),dimension(1:length,1:2) :: bins
 
@@ -734,8 +733,6 @@ subroutine heap_sort(a, len)
 ! Method implements the heap sort algorithm with subroutines
 ! heapify and siftDown.
   use mcnp_global
-    
-        implicit none
 
         real(dknd),dimension(1:len,1:2),intent(INOUT) :: a
         integer,intent(IN) :: len
@@ -763,8 +760,6 @@ end subroutine heap_sort
 subroutine heapify(a, len)
 ! Method creates a binary heap from an unsorted list
   use mcnp_global
-    
-        implicit none
 
         real(dknd),dimension(1:len,1:2),intent(INOUT) :: a
         integer,intent(IN) :: len
@@ -785,8 +780,6 @@ subroutine siftDown(a, len, start, ende)
 ! siftDown compares a parent with its two child and swaps
 ! with the larger child if either is greater than the parent
   use mcnp_global
-    
-        implicit none
 
         real(dknd),dimension(1:len,1:2),intent(INOUT) :: a
         integer,intent(IN) :: len, start, ende
@@ -824,8 +817,6 @@ end subroutine siftDown
 subroutine doSwap(a, len, i, j)
 ! Method swaps the elements in array a at positions i and j.
   use mcnp_global
-    
-        implicit none
 
         integer,intent(IN) :: len, i, j
         real(dknd),dimension(1:len,1:2),intent(INOUT) :: a
@@ -843,7 +834,6 @@ subroutine print_debug
 ! subroutine stores debug info in an array, and write the array to a file
 !  after every 10000 particles.
   use source_data
-  implicit real(dknd) (a-h,o-z)
 
         ! Debugging stuff
         real(dknd),dimension(1:10000,1:4) :: source_debug_array
