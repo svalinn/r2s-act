@@ -96,7 +96,11 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", \
     os.system("echo {0:03e} >> phtn_src_totals".format(sumvoxelstrengths))
     
     # norm is the average volumetric source strength (phtns/s/cm3)
-    norm = sumvoxelstrengths / sourcevolumetotal
+    try:
+        norm = sumvoxelstrengths / sourcevolumetotal
+    except ZeroDivisionError:
+        print "ERROR: Zero photon source strength was found on the mesh."
+        return 0
 
     if cust_ergbins:
         # We now look for the tag with the energy bin boundary values

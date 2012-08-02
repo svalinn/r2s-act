@@ -225,7 +225,7 @@ def tag_phtn_src_totals(sm, numergbins=-1, retag=False):
 
     # We go voxel by voxel, calculating total photon source, and then adding
     #  these tags.
-    for vox in voxels:
+    for cnt, vox in enumerate(voxels):
         totstrength = 0.0
 
         #get total for the voxel
@@ -234,7 +234,7 @@ def tag_phtn_src_totals(sm, numergbins=-1, retag=False):
             try:
                 totstrength += float(grouptag[vox])
             except iBase.TagNotFoundError:
-                if totstrength == 0.0:
+                if cnt == 0:
                     print "ERROR: phtn_src_group_# tags not found on first " \
                             "voxel. Tags are probably missing."
                 else:
