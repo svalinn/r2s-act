@@ -124,7 +124,11 @@ subroutine source_setup
         ! If ergs flag was found, we call read_custom_ergs.  Otherwise 
         !  we use default energies.
         if (ergs.eq.1) then
-          call read_custom_ergs
+          call read_custom_ergs(50)
+          write(*,*) "The following custom energy bins are being used:"
+          DO i=1,n_ener_grps
+            write(*,'(2es11.3)') my_ener_phot(i), my_ener_phot(i+1)
+          ENDDO
         else ! use default energy groups; 42 groups
           n_ener_grps = 42
           ALLOCATE(my_ener_phot(1:n_ener_grps+1))
@@ -219,7 +223,7 @@ subroutine read_header (myunit)
         enddo
 
         ! read first line
-        read(50,*) i_ints,j_ints,k_ints
+        read(myunit,*) i_ints,j_ints,k_ints
         n_mesh_cells = i_ints * j_ints * k_ints
 
         ALLOCATE(i_bins(1:i_ints+1))
@@ -227,10 +231,10 @@ subroutine read_header (myunit)
         ALLOCATE(k_bins(1:k_ints+1))
 
         ! read lines 2,3,4,5
-        read(50,*) (i_bins(i),i=1,i_ints+1)
-        read(50,*) (j_bins(i),i=1,j_ints+1)
-        read(50,*) (k_bins(i),i=1,k_ints+1)
-        read(50,'(A)') line
+        read(myunit,*) (i_bins(i),i=1,i_ints+1)
+        read(myunit,*) (j_bins(i),i=1,j_ints+1)
+        read(myunit,*) (k_bins(i),i=1,k_ints+1)
+        read(myunit,'(A)') line
         read(line,*,end=887) (active_mat(i),i=1,100)
 887     continue
 
@@ -325,19 +329,18 @@ subroutine read_params (myunit)
 end subroutine read_params
 
 
-subroutine read_custom_ergs
+subroutine read_custom_ergs (myunit)
 ! Read line from gammas file to get a custom set of energy bins
   use source_data
-        read(50,*) n_ener_grps ! reads an integer for # of grps
-        backspace(50) ! dirty hack since read(50,*,advance='NO') is invalid
+        
+        integer,intent(IN) :: myunit
+
+        read(myunit,*) n_ener_grps ! reads an integer for # of grps
+        backspace(myunit) ! dirty hack since read(myunit,*,advance='NO') is invalid
         ALLOCATE(my_ener_phot(1:n_ener_grps+1))
-        read(50,*,end=888) n_erg_grps, (my_ener_phot(i),i=1,n_ener_grps+1)
+        read(myunit,*,end=888) n_erg_grps, (my_ener_phot(i),i=1,n_ener_grps+1)
 888     continue
 
-        write(*,*) "The following custom energy bins are being used:"
-        DO i=1,n_ener_grps
-          write(*,'(2es11.3)') my_ener_phot(i), my_ener_phot(i+1)
-        ENDDO
 end subroutine read_custom_ergs
 
 
