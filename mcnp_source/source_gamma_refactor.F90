@@ -312,7 +312,6 @@ subroutine read_params (myunit)
             write(*,*) "Uniform sampling enabled."
             samp_uni = 1
             samp_vox = 0
-            bias = 0 !biasing in conjunction with uniform sampling not supported
           CASE ('d')
             write(*,*) "Debug output of starting positions enabled."
             debug = 1
@@ -325,6 +324,9 @@ subroutine read_params (myunit)
           END SELECT
 
         enddo
+
+        ! Biasing in conjunction with uniform sampling not supported
+        if (samp_uni.eq.1) bias = 0
 
 end subroutine read_params
 
