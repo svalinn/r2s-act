@@ -175,7 +175,9 @@ subroutine source_setup
             do j=n_ener_grps,2,-1
               spectrum(i,j) = (spectrum(i,j) - spectrum(i,j-1)) / tot_list(i)
             enddo
-            call gen_erg_alias_table (i, n_ener_grps, spectrum(i,1:n_ener_grps))
+            call gen_erg_alias_table (n_ener_grps, spectrum(i,1:n_ener_grps), &
+                        ergPairs(i,1:n_ener_grps,1:2), &
+                        ergPairsProbabilities(i,1:n_ener_grps))
           enddo
         else
           do i=1,n_mesh_cells
@@ -183,7 +185,9 @@ subroutine source_setup
             do j=n_ener_grps,2,-1
               spectrum(i,j) = spectrum(i,j) / tot_list(i)
             enddo
-            call gen_erg_alias_table (i, n_ener_grps, spectrum(i,1:n_ener_grps))
+            call gen_erg_alias_table (n_ener_grps, spectrum(i,1:n_ener_grps), &
+                        ergPairs(i,1:n_ener_grps,1:2), &
+                        ergPairsProbabilities(i,1:n_ener_grps))
           enddo
         endif
 
@@ -555,25 +559,32 @@ subroutine sample_erg
 
 end subroutine sample_erg
 
-subroutine gen_erg_alias_table (x, len, ergsList)
+
+subroutine gen_erg_alias_table (len, ergsList, myErgPairs, &
+                                        myErgPairsProbabilities)
+! len is the length of ergsList
 ! ergsList values must total 1!
   use source_data
    
-        integer,intent(IN) :: x, len
+        integer,intent(IN) :: len
         real(dknd),dimension(1:len),intent(IN) :: ergsList
+        integer(i4knd),dimension(1:len,1:2),intent(OUT) :: myErgPairs
+        real(dknd),dimension(1:len), intent(OUT) :: myErgPairsProbabilities
 
         integer :: i
         real(dknd),dimension(1:len,1:2) :: mybins
 
+        ! Create pairs of probabilities and erg bin indices
         do i=1,len
           mybins(i,1) = ergsList(i)
           mybins(i,2) = i
         enddo
 
-        call gen_alias_table(mybins, ergPairs(x,1:len,1:2), &
-                  ergPairsProbabilities(x,1:len), len)
+        call gen_alias_table(mybins, myErgPairs(1:len,1:2), &
+                  myErgPairsProbabilities(1:len), len)
 
 end subroutine gen_erg_alias_table
+
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Generate Alias Table of Voxels
