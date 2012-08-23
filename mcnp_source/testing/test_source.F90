@@ -1,13 +1,13 @@
 !+
-!
+! This program runs a set of tests on the individual subroutines for a 
+!  mesh-based photon source sampling routine in MCNP.
+! In lieu of packaging a unit testing framework, current tests are ad-hoc
+!  checks using conditionals.
 !
 module tests_mod
 ! Module contains all tests
         use mcnp_global
         use source_data
-
-        !EXTERNAL :: heap_sort, read_custom_ergs
-        !EXTERNAL :: rand
 
 contains 
 

@@ -5,7 +5,7 @@ As of May 21, 2012, the most up to date/capable source.F90 and executable are so
 
 The different source.F90 versions:
 
-From KIT (Germany): (originals are in vendor folder)
+From KIT (Germany): (originals are in mcnp_source/vendor folder)
 a) source_gamma_meshtal1.F90
 b) source_gamma_meshtal2.F90
 
