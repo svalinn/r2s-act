@@ -272,7 +272,7 @@ end subroutine test_uniform_sample
 end module tests_mod
 
 
-program test_alias
+program test_source
 ! Main program that runs all of the test subroutines
         use tests_mod
 
@@ -284,6 +284,6 @@ program test_alias
         call test_gen_erg_alias_table
         call test_uniform_sample
 
-end program test_alias
+end program test_source
 
 

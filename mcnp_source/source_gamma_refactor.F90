@@ -91,6 +91,8 @@ module source_data
         real(dknd),dimension(:,:),allocatable :: ergPairsProbabilities
         integer(i4knd),dimension(:,:,:),allocatable :: ergPairs
         integer :: ii,kk,jj
+        ! Debug output variables
+        integer(i8knd) :: npart_write = 0 ! = counter for debug output
         ! Other variables
         integer :: stat
         integer :: i_ints,j_ints,k_ints,n_mesh_cells,n_active_mat
@@ -368,7 +370,7 @@ subroutine source
         if (ikffl.eq.1) then ! if first particle ...
           ! Call setup subroutine
           call source_setup
-          npart_write = 0
+          write(*,*) 'Source setup complete!'
         endif
 
         ! Call position sampling subroutine
@@ -853,8 +855,7 @@ subroutine print_debug
 
         ! Debugging stuff
         real(dknd),dimension(1:10000,1:4) :: source_debug_array
-        integer :: npart_write
-        save source_debug_array, npart_write
+        save source_debug_array
  
         ! Write information for debugging where source particles are started.
         npart_write = npart_write + 1
