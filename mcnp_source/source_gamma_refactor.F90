@@ -470,7 +470,8 @@ subroutine source
 544     continue
 
         ! Determine photon energy
-        call sample_erg 
+        call sample_erg (erg, voxel, n_ener_grps, n_mesh_cells, &
+                        ergPairsProbabilities, ergPairs)
 
         ! Determine weight.
         if (samp_vox.eq.1) then
@@ -545,25 +546,31 @@ subroutine uniform_sample
 end subroutine uniform_sample
 
 
-subroutine sample_erg
+subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, pairsList)
 ! Sample the alias table of energy bins for the selected voxel. 
   use source_data
-   
+        real(dknd),intent(OUT) :: myerg
+        integer,intent(IN) :: myvoxel, n_grp, n_vox
+        real(dknd),dimension(1:n_vox,1:n_grp), intent(IN) :: probList
+        integer(i4knd),dimension(1:n_vox,1:n_grp,1:2),intent(IN) :: pairsList
+
+    
         ! Sampling the alias table
-        alias_bin = INT(rang() * n_ener_grps) + 1
-        if (rang().lt.ergPairsProbabilities(voxel,alias_bin)) then
-          j = ergPairs(voxel,alias_bin,1)
+        alias_bin = INT(rang() * n_grp) + 1
+        if (rang().lt.probList(myvoxel,alias_bin)) then
+          j = pairsList(myvoxel,alias_bin,1)
         else
-          j = ergPairs(voxel,alias_bin,2)
+          j = pairsList(myvoxel,alias_bin,2)
         endif
        
-        erg=my_ener_phot(j)+(1-rang())*(my_ener_phot(j+1)-my_ener_phot(j))
+        myerg=my_ener_phot(j)+(1-rang())*(my_ener_phot(j+1)-my_ener_phot(j))
 
 end subroutine sample_erg
 
 
 subroutine gen_erg_alias_table (len, ergsList, myErgPairs, &
                                         myErgPairsProbabilities)
+! Create alias table for energy bins of a single voxel
 ! len is the length of ergsList
 ! ergsList values must total 1!
   use source_data

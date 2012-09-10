@@ -6,3 +6,5 @@ This script can be modified at the top to change the location of the source file
 Of note is that source file is modified before testing. The modifications made are:
 -comment out the source subroutine; avoids needing several mcnp-internal arrays
 -comment out write(*,*) statements so that output from testing is easily observed
+
+If you want write(*,*) statements to go through, change the capitalization, e.g. WRITE(*,*) ...

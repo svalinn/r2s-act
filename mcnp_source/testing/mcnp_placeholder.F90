@@ -255,7 +255,7 @@ CONTAINS
 
     ! set defaults, override if input supplied: seed, mult, stride
     npart1     = 1
-    print_info = .true.
+    print_info = .false. !.true.
     RN_COUNT_TOTAL   = 0
     RN_COUNT_MAX     = 0
     RN_COUNT_MAX_NPS = 0

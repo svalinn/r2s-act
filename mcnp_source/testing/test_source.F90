@@ -238,6 +238,51 @@ subroutine test_gen_erg_alias_table
 
 end subroutine test_gen_erg_alias_table
 
+subroutine test_erg_sampling_distrib
+! Subroutine does 'testcnt' energy samplings for ten energy bins, and finds
+!  the largest relative error in bin sampling frequency.
+        real(dknd),dimension(1:10) :: binList
+        integer(i4knd),dimension(1:10) :: tallyList
+        integer(i4knd),dimension(1:1,1:10,1:2) :: pairsList
+        real(dknd),dimension(1:1,1:10) :: probList
+        real(dknd) :: a,b,testerg,maxdev,val
+        integer(i4knd) :: nbins, cnt, talcnt, testcnt
+
+        nbins = 10
+        binList = (/ .01,.04,.05,.07,.09,.1,.13,.2,.22,.09 /)
+        tallyList = (/ 0,0,0,0,0,0,0,0,0,0 /)
+        
+        call gen_erg_alias_table(nbins, binList, pairsList(1,1:10,1:2), &
+                                              probList(1,1:10) )
+
+        testcnt = 100000
+        do cnt=1,testcnt
+          !
+          call sample_erg (testerg, 1, nbins, 1, probList, pairsList)
+
+          ! Tally the energies.
+          do talcnt=1,nbins
+            if (testerg.lt.my_ener_phot(talcnt + 1)) then
+              tallyList(talcnt) = tallyList(talcnt) + 1
+              exit
+            endif
+          enddo
+
+        enddo
+        
+        maxdev = 0
+        do talcnt=1,nbins
+          val = abs(tallyList(talcnt)/binList(talcnt) - testcnt) / testcnt
+          if (val.gt.maxdev) then
+            maxdev = val
+          endif
+        enddo
+
+        write(*,'(a,a,es10.3)') " test_erg_sampling_distrib: maximum ", &
+                "relative error in bin sampling frequency - ", maxdev
+
+end subroutine test_erg_sampling_distrib
+
 subroutine test_uniform_sample
 ! 
         deallocate(i_bins)
@@ -276,13 +321,17 @@ program test_source
 ! Main program that runs all of the test subroutines
         use tests_mod
 
+        call RN_init_problem() ! init random number generator to defaults
+
         write(*,*) "Running Fortran tests --"
         call test_heap_sort
         call test_read_custom_ergs
         call test_read_header
         call test_read_params
         call test_gen_erg_alias_table
+        call test_erg_sampling_distrib
         call test_uniform_sample
+
 
 end program test_source
 
