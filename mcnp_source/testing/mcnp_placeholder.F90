@@ -194,7 +194,208 @@ CONTAINS
 
     return
   end function rang
+  !-------------------------------------------------------------------
+  subroutine RN_init_problem( new_seed,                 &
+    &                         new_stride,         new_part1,         &
+    &                         new_count_total,    new_count_stride,  &
+    &                         new_count_max,      new_count_max_nps, &
+    &                         new_standard_gen,   output )
+    ! Description:
+    ! * initialize MCNP random number parameters for problem,
+    !   based on user input.  This routine should be called
+    !   only from the main thread, if OMP threading is being used.
+    !
+    ! * all args are optional
+    !
+    ! * for initial & continue runs, these args should be set:
+    !     new_standard_gen - index of built-in standard RN generator,
+    !                        from RAND gen=   (or dbcn(14)
+    !     new_seed   - from RAND seed=        (or dbcn(1))
+    !     new_stride - from RAND stride=      (or dbcn(13))
+    !     new_part1  - from RAND hist=        (or dbcn(8))
+    !     output     - logical, print RN seed & mult if true
+    !
+    ! * for continue runs only, these should also be set:
+    !     new_count_total   - from "rnr"   at end of previous run
+    !     new_count_stride  - from nrnh(1) at end of previous run
+    !     new_count_max     - from nrnh(2) at end of previous run
+    !     new_count_max_nps - from nrnh(3) at end of previous run
+    !
+    ! * check on size of long-ints & long-int arithmetic
+    ! * check the multiplier
+    ! * advance the base seed for the problem
+    ! * set the initial particle seed
+    ! * initialize the counters for RN stats
+
+    implicit none
+    integer,     intent(in), OPTIONAL :: new_standard_gen
+    integer(I8), intent(in), OPTIONAL :: new_seed,          new_stride,      &
+      &                                  new_part1,         new_count_total, &
+      &                                  new_count_stride,  new_count_max,   &
+      &                                  new_count_max_nps
+    logical,     intent(in), OPTIONAL :: output
+    integer(I8) ::  npart1, itemp1, itemp2, itemp3, itemp4, itemp5
+    logical     ::  print_info
+
+    ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    ! parameters for standard generators
+    !
+    standard_generator(1) = &
+    & RN_GEN( 1,               5_I8**19, 0_I8, 48, 152917_I8, 5_I8**19, 'mcnp std' )
+    !
+    standard_generator(2) = &
+    & RN_GEN( 2, 9219741426499971445_I8, 1_I8, 63, 152917_I8, 1_I8,     'LEcuyer1' )
+    !
+    standard_generator(3) = &
+    & RN_GEN( 3, 2806196910506780709_I8, 1_I8, 63, 152917_I8, 1_I8,     'LEcuyer2' )
+    !
+    standard_generator(4) = &
+    & RN_GEN( 4, 3249286849523012805_I8, 1_I8, 63, 152917_I8, 1_I8,     'LEcuyer3' )
+    ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    ! set defaults, override if input supplied: seed, mult, stride
+    npart1     = 1
+    print_info = .true.
+    RN_COUNT_TOTAL   = 0
+    RN_COUNT_MAX     = 0
+    RN_COUNT_MAX_NPS = 0
+    RN_COUNT_STRIDE  = 0
+    if( present(new_standard_gen) ) then
+      !if( new_standard_gen<1 .or. new_standard_gen>n_RN_GEN ) then
+      !  call expire( 0, 'RN_init_problem', &
+      !    & ' ***** ERROR: illegal index for built-in RN generator')
+      !endif
+      RN_INDEX   = new_standard_gen
+      RN_MULT    = standard_generator(RN_INDEX)%mult
+      RN_ADD     = standard_generator(RN_INDEX)%add
+      RN_STRIDE  = standard_generator(RN_INDEX)%stride
+      RN_SEED0   = standard_generator(RN_INDEX)%initseed
+      RN_BITS    = standard_generator(RN_INDEX)%log2mod
+      RN_MOD     = ishft( 1_I8,       RN_BITS )
+      RN_MASK    = ishft( not(0_I8),  RN_BITS-64 )
+      RN_NORM    = 2._R8**(-RN_BITS)
+      if( RN_ADD==0 ) then
+        RN_PERIOD  = ishft( 1_I8, RN_BITS-2 )
+      else
+        RN_PERIOD  = ishft( 1_I8, RN_BITS )
+      endif
+    endif
+    if( present(new_seed) ) then
+      if( new_seed>0 )    RN_SEED0  = new_seed
+    endif
+    if( present(new_stride) ) then
+      if( new_stride>0 )    RN_STRIDE = new_stride
+    endif
+    if( present(new_part1) ) then
+      if( new_part1>0 )    npart1    = new_part1
+    endif
+    if( present(output)            )  print_info       = output
+    if( present(new_count_total)   )  RN_COUNT_TOTAL   = new_count_total
+    if( present(new_count_stride)  )  RN_COUNT_STRIDE  = new_count_stride
+    if( present(new_count_max)     )  RN_COUNT_MAX     = new_count_max
+    if( present(new_count_max_nps) )  RN_COUNT_MAX_NPS = new_count_max_nps
+
+    if( print_info ) then
+      write(printseed,'(i20)') RN_SEED0
+      write( iuo,1) RN_INDEX, RN_SEED0, RN_MULT, RN_ADD, RN_BITS, RN_STRIDE
+      write(jtty,2) RN_INDEX, adjustl(printseed)
+    endif
+1   format( &
+      & /,' ***************************************************', &
+      & /,' * Random Number Generator  = ',i20,             ' *', &
+      & /,' * Random Number Seed       = ',i20,             ' *', &
+      & /,' * Random Number Multiplier = ',i20,             ' *', &
+      & /,' * Random Number Adder      = ',i20,             ' *', &
+      & /,' * Random Number Bits Used  = ',i20,             ' *', &
+      & /,' * Random Number Stride     = ',i20,             ' *', &
+      & /,' ***************************************************',/)
+2   format(' comment. using random number generator ',i2,', initial seed = ',a20)
+
+    ! double-check on number of bits in a long int
+    !if( bit_size(RN_SEED)<64 ) then
+    !  call expire( 0, 'RN_init_problem', &
+    !    & ' ***** ERROR: <64 bits in long-int, can-t generate RN-s')
+    !endif
+    itemp1 = 5_I8**25
+    itemp2 = 5_I8**19
+    itemp3 = ishft(2_I8**62-1_I8,1) + 1_I8
+    itemp4 = itemp1*itemp2
+    !if( iand(itemp4,itemp3)/=8443747864978395601_I8 ) then
+    !  call expire( 0, 'RN_init_problem', &
+    !    & ' ***** ERROR: can-t do 64-bit integer ops for RN-s')
+    !endif
+
+    if( npart1/=1_I8 ) then
+
+      ! advance the problem seed to that for new_part1
+      RN_SEED0 = RN_skip_ahead( RN_SEED0, (npart1-1_I8)*RN_STRIDE )
+
+      if( print_info ) then
+        itemp1 = RN_skip_ahead( RN_SEED0, RN_STRIDE )
+        write(printseed,'(i20)') itemp1
+        write( iuo,3) npart1,  RN_SEED0, itemp1
+        write(jtty,4) npart1,  adjustl(printseed)
+      endif
+3     format( &
+        & /,' ***************************************************', &
+        & /,' * Random Number Seed will be advanced to that for *', &
+        & /,' * previous particle number = ',i20,             ' *', &
+        & /,' * New RN Seed for problem  = ',i20,             ' *', &
+        & /,' * Next Random Number Seed  = ',i20,             ' *', &
+        & /,' ***************************************************',/)
+4     format(' comment. advancing random number to particle ',i10, &
+        &', initial seed = ',a20)
+    endif
+
+    ! set the initial particle seed
+    RN_SEED  = RN_SEED0
+    RN_COUNT = 0
+    RN_NPS   = 0
+
+    return
+  end subroutine RN_init_problem
+ 
+  function RN_skip_ahead( seed, skip )
+    ! Description:
+    ! advance the seed "skip" RNs:   seed*RN_MULT^n mod RN_MOD
+
+    implicit none
+    integer(I8) :: RN_skip_ahead
+    integer(I8), intent(in)  :: seed, skip
+    integer(I8) :: nskip, gen, g, inc, c, gp, rn
+
+    ! add period till nskip>0
+    nskip = skip
+    do while( nskip<0_I8 )
+      nskip = nskip + RN_PERIOD
+    enddo
+
+    ! get gen=RN_MULT^n,  in log2(n) ops, not n ops !
+    nskip = iand( nskip, RN_MASK )
+    gen   = 1
+    g     = RN_MULT
+    inc   = 0
+    c     = RN_ADD
+    do while( nskip>0_I8 )
+      if( btest(nskip,0) )  then
+        gen = iand( gen*g, RN_MASK )
+        inc = iand( inc*g, RN_MASK )
+        inc = iand( inc+c, RN_MASK )
+      endif
+      gp    = iand( g+1,  RN_MASK )
+      g     = iand( g*g,  RN_MASK )
+      c     = iand( gp*c, RN_MASK )
+      nskip = ishft( nskip, -1 )
+    enddo
+    rn = iand( gen*seed, RN_MASK )
+    rn = iand( rn + inc, RN_MASK )
+    RN_skip_ahead = rn
+    return
+  end function RN_skip_ahead
+
+
 end module mcnp_random
+
 
 module mcnp_global
 
