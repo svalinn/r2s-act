@@ -150,7 +150,7 @@ subroutine source_setup
         i=1 ! i keeps track of # of voxel entries
         do
           read(50,*,iostat=stat) (spectrum(i,j), j=1,bias + n_ener_grps)
-          if (stat /= 0) then
+          if (stat.ne.0) then
             i=i-1
             exit ! exit the do loop
           endif
@@ -247,7 +247,7 @@ subroutine read_header (myunit)
 
         ! counting number of activated materials specified
         do i=1,100
-          if (active_mat(i)==0) exit
+          if (active_mat(i).eq.0) exit
         enddo
         n_active_mat=i-1
 
@@ -403,34 +403,34 @@ subroutine source
         junf=0
         
   ! default for cel:  find the cell that contains xyz.
-        if( icl==0 ) then
-          if( junf==0 ) then ! if repeated structures are NOT used...
+        if( icl.eq.0 ) then
+          if( junf.eq.0 ) then ! if repeated structures are NOT used...
             do m=1,nlse         ! nlse = # cells in list lse
               icl = lse(klse+m) ! lse = cells already starting source particles
               call chkcel(icl,2,j)
-              if( j==0 )  goto 543
+              if( j.eq.0 )  goto 543
             enddo 
             do icl_tmp=1,mxa ! mxa = # cells in probelm
               icl = icl_tmp
               call chkcel(icl,2,j)
-              if( j==0 )  goto 540
+              if( j.eq.0 )  goto 540
             enddo
             icl = icl_tmp
           else               ! else, repeated structures are used
             do m=1,nlse         ! nlse = # cells in list lse
               icl = lse(klse+m) ! lse = cells already starting source particles
-              if( jun(icl)/=0 )  cycle 
+              if( jun(icl).ne.0 )  cycle 
               call chkcel(icl,2,j)
-              if( j==0 ) then
-                if( mfl(1,icl)/=0 )  call levcel
+              if( j.eq.0 ) then
+                if( mfl(1,icl).ne.0 )  call levcel
                 goto 543
               endif
             enddo 
             do icl_tmp=1,mxa ! mxa = # cells in probelm
               icl = icl_tmp
-              if( jun(icl)/=0 )  cycle 
+              if( jun(icl).ne.0 )  cycle 
               call chkcel(icl,2,j)
-              if( j==0 )  goto 540
+              if( j.eq.0 )  goto 540
             enddo
             icl = icl_tmp
           endif
@@ -439,15 +439,15 @@ subroutine source
 540       continue
           nlse = nlse+1
           lse(klse+nlse) = icl
-          if( junf==0 )  goto 543
-          if( mfl(1,icl)==0 )  goto 543
+          if( junf.eq.0 )  goto 543
+          if( mfl(1,icl).eq.0 )  goto 543
           call levcel
-        elseif( icl<0 ) then
+        elseif( icl.lt.0 ) then
           call levcel
         else
-          if( krflg==0 )  goto 543
+          if( krflg.eq.0 )  goto 543
           call chkcel(icl,2,j)
-          if( j/=0 ) call errprn(1,-1,0,zero,zero,' ',' ',&
+          if( j.ne.0 ) call errprn(1,-1,0,zero,zero,' ',' ',&
             & 'the source point is not in the source cell.')
         endif
 
@@ -731,7 +731,7 @@ subroutine sort_for_alias_table(bins, length)
           ! The logic in this do loop may be problematic at 
           !  cnt = length or cnt = 1...
           do cnt=length,1,-1
-            if (bins(length,1).GE.bins(cnt-1,1)) exit
+            if (bins(length,1).ge.bins(cnt-1,1)) exit
           enddo
           
           temp(1,1:2) = bins(length,1:2)
