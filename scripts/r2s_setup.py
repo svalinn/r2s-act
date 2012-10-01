@@ -101,7 +101,12 @@ photon_mcnp_input = mcnp_p.inp
 # also increase the runtime of r2s_step1.
 mmgrid_rays = 10
 
-# These parameters are for step 2
+# If step2setup is 1, runs the r2s_step2setup.py script at the end of 
+#  r2s_step1.py.  r2s_step2setup.py creates folders for all cooling steps
+#  and isotopes specified
+step2setup = 0
+
+# These parameters are for step 2.
 # -photon_isotope default is TOTAL. This is the isotope taken from phtn_src
 #  for tagging
 # -photon_cooling is the cooling step read from phtn_src. 0 is shutdown,
@@ -115,6 +120,8 @@ mmgrid_rays = 10
 #   mesh, and included in gammas file if found. (default:false; 42 grps used)
 # -cumulative determines the format for listing voxels in gammas file. Default
 #   is zero (false), which is preferred.
+# Note: photon_isotope and photon_cooling have multiple, comma delimited entries
+#  for use in conjunction with r2s_step2setup.py.
 photon_isotope = TOTAL
 photon_cooling = 0
 sampling = v
