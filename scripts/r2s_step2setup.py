@@ -85,10 +85,10 @@ for folder, iso, time in path_list:
                     data)
 
             changed = re.sub('neutron_mcnp_input =.*?\n',
-                    'neutron_mcnp_input = ./{0}\n'.format(mcnp_n_problem),
+                    'neutron_mcnp_input = ../{0}\n'.format(mcnp_n_problem),
                     data)
             changed = re.sub('alara_phtn_src =.*?\n',
-                    'alara_phtn_src = ./{0}\n'.format(phtn_src),
+                    'alara_phtn_src = ../{0}\n'.format(phtn_src),
                     data)
 
             target.write(changed)    
