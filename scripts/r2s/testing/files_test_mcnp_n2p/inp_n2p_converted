@@ -16,37 +16,37 @@ mode p
 mode p$ Comment CapItiLizAtioN shoudln't change
 c mode n
 c 
-c phys:n
-c PHYS:n
+c $ phys:n
+c $ PHYS:n
 imp:p 1 1 1 1$ note double spacing is not currently preserved
 imp:p 1 1 1 1
 imp:p 1 1 1 1$ Should stay on same line
 c
-c sdef par n erg 1
-c SDEF par n erg 1
+c $ sdef par n erg 1
+c $ SDEF par n erg 1
 c
-c kcode
-c KCODE
+c $ kcode
+c $ KCODE
 c
-c ksrc
-c KSRC
+c $ ksrc
+c $ KSRC
 c
-c si
-c SI
-c si1
-c SI1
+c $ si
+c $ SI
+c $ si1
+c $ SI1
 c
-c sp1
-c SP1
+c $ sp1
+c $ SP1
 c
-c sb1
-c SB1
+c $ sb1
+c $ SB1
 c
-c sc1
-c SC1
+c $ sc1
+c $ SC1
 c
-c ds1
-c DS1
+c $ ds1
+c $ DS1
 
 We can type stuff here and it shouldn't be modified.
 But it should be preserved!

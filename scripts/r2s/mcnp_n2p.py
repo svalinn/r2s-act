@@ -165,6 +165,8 @@ class ModMCNPforPhotons(object):
         commentout = False # We toggle this to determine whether or not to
                             # comment out continued lines
 
+        com = "c $ " # using $ avoids issue with long lines.
+
         sourcecards = ["sdef","si","sp","sb","sc","ds","kcode","ksrc"]
 
         for cnt, line in enumerate(self.block3Lines):
@@ -187,11 +189,11 @@ class ModMCNPforPhotons(object):
             # remove numbers from first string part, and try to match with
             #  the basic source cards.
             if re.sub("\d+","",linesplit[0]) in sourcecards:
-                line = "c " + line
+                line = com + line
                 cntsrc += 1
 
             elif "phys:n" == linesplit[0]:
-                line = "c " + line
+                line = com + line
                 notephys = "-phys:n was commented out \n"
 
             elif "mode" == linesplit[0]:
@@ -205,7 +207,7 @@ class ModMCNPforPhotons(object):
             
             # comment out fmesh card
             elif "fmesh" == linesplit[0][:5]:
-                line = "c " + line
+                line = com + line
                 notefmesh = "-fmesh card(s) commented out."
 
             else: # no changes to the line
@@ -266,7 +268,7 @@ class ModMCNPforPhotons(object):
         mcnpWrap = tw.TextWrapper()
         mcnpWrap.initial_indent = 6*' '
         mcnpWrap.subsequent_indent = (6+6)*' '
-        mcnpWrap.wdith = 80
+        mcnpWrap.wdith = 80 - len(com) # avoid commented lines being too long
         mcnpWrap.break_on_hyphens = False
         mcnpWrap.drop_whitespace = False
 
