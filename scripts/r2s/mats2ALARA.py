@@ -9,6 +9,7 @@
 
 from optparse import OptionParser
 import linecache
+import sys
 
 ###############################################################################
 # This function searchs through inp and returns an array of the line numbers of
@@ -16,11 +17,11 @@ import linecache
 
 def find_mat_lines( inp ) :
 
-    mat_count=0
-    line_count=1
-    line=linecache.getline(inp,line_count)
-    line_array=[]
-    mat_nums=[]
+    mat_count = 0
+    line_count = 1
+    line = linecache.getline(inp,line_count)
+    line_array = []
+    mat_nums = []
 
     # scroll through every line of the mcnp inp file
     while line != '':
@@ -32,13 +33,14 @@ def find_mat_lines( inp ) :
             if len(line.split()[0]) > 1 :
 
                 # check to see if first string is in the form m* where * is a digit
-                if line.split()[0][0]=='m' and line.split()[0][1].isdigit() == True:
+                if line.split()[0][0] == 'm' and \
+                        line.split()[0][1].isdigit() == True:
                     # add line number to line array
                     line_array.append(line_count)   
                     mat_nums.append(line.split()[0][1:])                                    
 
         line_count += 1
-        line=linecache.getline(inp,line_count)
+        line = linecache.getline(inp,line_count)
 
     return line_array, mat_nums
 
@@ -49,44 +51,44 @@ def find_mat_lines( inp ) :
 def get_data_array(inp, x) :
    
     
-    data=[]
+    data = []
     count = x
-    line=linecache.getline(inp,count)
+    line = linecache.getline(inp,count)
     print x
     # Iterate through the
     while count == x or line.split()[0][0].isdigit() == True:
 
         # If the first line is in the form mX XXXX XXXX then ignore the mX
-        if count==x :
+        if count == x :
             if len(line.split()) > 1:            
-                line_array=line.split()[1:3]
+                line_array = line.split()[1:3]
             else :
-                count +=1
-                line=linecache.getline(inp,count)
+                count += 1
+                line = linecache.getline(inp,count)
                 continue
         else :
-            line_array=line.split()[0:2]
+            line_array = line.split()[0:2]
 
         # Delete xsdir specification
         if line_array[0].find('.') != -1 :
-            line_array[0]=line_array[0].split('.')[0]
+            line_array[0] = line_array[0].split('.')[0]
        
         # Ensure element name is in ZZZAAA format
-        line_array[0]='{0:06d}'.format(int(line_array[0])) 
+        line_array[0] = '{0:06d}'.format(int(line_array[0])) 
 
         # Split ZZZAAA into ZZZ and AAA (adding another column)
-        line_array=[int(line_array[0][1:3]),int(line_array[0][3:6]),float(line_array[1])]
+        line_array = [int(line_array[0][1:3]),int(line_array[0][3:6]),float(line_array[1])]
 
         # Add another column: the atomic symbol
         line_array.append(A_to_sym(line_array[0]))
         
         # If element has natural composition, change the AAA to average mass
-        if line_array[1]==0:
-             line_array[1]=sym_to_nat_abun(line_array[3])
+        if line_array[1] == 0:
+             line_array[1] = sym_to_nat_abun(line_array[3])
 
         data.append(line_array)
-        count +=1
-        line=linecache.getline(inp,count)
+        count += 1
+        line = linecache.getline(inp,count)
 
         # if the next line has less then 2 strings this materail def is over so
         # the loop is broken, otherwise while isdigit criteria is out of range
@@ -100,18 +102,18 @@ def get_data_array(inp, x) :
 # then calculates the normalized weight percents accordingly.
 
 def calc_weight_percents(data) :
-    product_sum=0
+    product_sum = 0
     if str(data[0][2])[0] == '-' :
         for x in data :
             product_sum += x[2]
         for x in data :
-            x[2]=x[2]/product_sum*100
+            x[2] = x[2]/product_sum*100
  
     else :
         for x in data:
             product_sum += x[2]*x[1]    
         for x in data :
-            x[2]=x[2]*x[1]/product_sum*100
+            x[2] = x[2]*x[1]/product_sum*100
     
     return data
 
@@ -121,7 +123,7 @@ def calc_weight_percents(data) :
 
 def print_alara_mats(w_percents, mat_num, output) :
 
-   output.write('mat_{0}\t<rho>\t{1}\n'.format(mat_num,len(w_percents)))
+   output.write('mat{0}_rho-<rho>\t<rho>\t{1}\n'.format(mat_num,len(w_percents)))
    
    for x in w_percents :
        # if single isotope, write in the form sym:AAA
@@ -138,7 +140,7 @@ def print_alara_mats(w_percents, mat_num, output) :
 
 def A_to_sym(A) :
 
-    sym={1:'h', 2:'he', 3:'li', 4:'be', 5:'b', 6:'c', 7:'n', 8:'o', 9:'f',
+    sym = {1:'h', 2:'he', 3:'li', 4:'be', 5:'b', 6:'c', 7:'n', 8:'o', 9:'f',
          10:'ne', 11:'na', 12:'mg', 13:'al', 14:'si', 15:'p', 16:'s',
          17:'cl', 18:'ar', 19:'k', 20:'ca', 21:'sc', 22:'ti', 23:'v',
          24:'cr', 25:'mn', 26:'fe', 27:'co', 28:'ni', 29:'cu', 30:'zn',
@@ -186,34 +188,38 @@ def sym_to_nat_abun(sym) :
 
     return nat_abun[sym]
 
-###############################################################################prin
+###########################################################################prin
 
 def main( arguments = None ) :
 
    #Instantiate option parser
-    parser = OptionParser\
-             (usage='%prog <mcnp_input> [options]')
+    parser = OptionParser(usage='%prog <mcnp_input> [options]')
 
     parser.add_option('-o', dest='output', default='matlib.out',\
-                      help = 'Name of mesh output file, default=%default')
+                      help='Name of materials output file, default=%default')
 
     (opts, args) = parser.parse_args( arguments )
 
-    inp=args[0]
+    inp = args[0]
 
     # find lines of input file that begin mat defs, and also the mat numbers
-    mat_lines, mat_nums =find_mat_lines(inp)
+    mat_lines, mat_nums = find_mat_lines(inp)
 
-    output=file(opts.output, 'w')
+    output = file(opts.output, 'w')
 
     for i, x in enumerate(mat_lines) :
-        data=get_data_array(inp,x)
-        w_percents=calc_weight_percents(data)
+        data = get_data_array(inp,x)
+        w_percents = calc_weight_percents(data)
         print_alara_mats(w_percents, mat_nums[i], output)
 
     output.close()
 
     print '{0} material definitions written'.format(len(mat_nums))
-###############################################################################
+
+
 if __name__ == '__main__':
+    # No arguments case -> print help output
+    if len(sys.argv) == 1:
+        sys.argv.append('-h')
+
     main()
