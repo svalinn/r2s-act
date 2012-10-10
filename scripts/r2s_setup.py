@@ -141,7 +141,7 @@ cumulative = 0
 
 default_snippet = """
 material_lib    matlib
-element_lib     elelib
+element_lib     isolib
 data_library alaralib FENDL2
 
 cooling
@@ -166,7 +166,8 @@ output zone
           1e7  1.2e7  1.4e7  2e7  3e7  5e7
 end
 
-flux flux_1 alara_fluxin 1.0 0 default
+#    flux name  flux file     norm   shift   unused
+flux flux_1     alara_fluxin  1.0    0     default
 
 schedule    total
     .85 y   flux_1  pulse    0  s
@@ -176,7 +177,7 @@ pulsehistory    pulse
     5   .15 y
 end
 
-truncation  1e-7
+truncation  1e-12
 impurity    5e-6    1e-3
 """
 
