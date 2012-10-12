@@ -99,7 +99,7 @@ if alara_snippet:
             f.write(snip.read())
 
 print "Writing alara fluxin file `{0}'".format(fluxin)
-write_alara_fluxin( fluxin, smesh )
+write_alara_fluxin( fluxin, smesh, backwards=True )
 
 
 print "It should now be possible to run `alara {0}'".format(alara_geom)
