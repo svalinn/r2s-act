@@ -79,7 +79,8 @@ def main( arguments = None ):
 
     parser.add_option('-b', action='store_true', dest='backward_bool',\
         default=False, \
-        help='Print to ALARA fluxin in fluxes in  decreasing energy')
+        help='Print to ALARA fluxin in fluxes in  decreasing energy. ' \
+        'Default=%default')
 
     parser.add_option('-o', dest='fluxin_name', default='ALARAflux.in',\
         help='Name of ALARA fluxin output file, default=%default')

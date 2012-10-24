@@ -49,6 +49,7 @@ def main():
             print 'Wrote ALARA snippet file:', snippet
 
 
+# Default contents of the r2s.cfg file
 default_config = """
 ## Robust 2-step activation workflow
 ## Setup file
@@ -77,7 +78,7 @@ mcnp_geom = geom.sat
 
 #-------------------------------------------------------------------------------
 # Files produced in Step 1
-# This file are created by r2s_step1.py. Specify the desired file names.
+# These files are created by r2s_step1.py. Specify the desired file names.
 #-------------------------------------------------------------------------------
 
 # Intermediate mesh file containing data from step 1.
@@ -95,7 +96,7 @@ alara_geom = alara_geom
 alara_snippet = alara_problem
 
 # To produce a visualizable file at the end of step 1,
-# comment out the following:
+# uncomment the following:
 # step1_visfile = n_fluxes_and_materials.vtk
 
 #-------------------------------------------------------------------------------
@@ -103,7 +104,8 @@ alara_snippet = alara_problem
 # These files must exist prior to running r2s_step2.py
 #-------------------------------------------------------------------------------
 
-# ALARA photon source file.
+# ALARA photon source file; ALARA generates this file using a filename specified
+# in the ALARA input.
 alara_phtn_src = phtn_src
 
 #-------------------------------------------------------------------------------
@@ -113,6 +115,9 @@ alara_phtn_src = phtn_src
 
 # MCNP photon problem input file for last step of workflow
 photon_mcnp_input = mcnp_p.inp
+
+# The 'gammas' file is created by r2s_step2.py, but alternate names are not
+# supported currently.
 
 
 ###############################################################################
@@ -149,16 +154,16 @@ step2setup = 0
 # -if photon_bias is 1 (true), the gammas file will try to include voxel bias
 #  values from the mesh (stored as PHTN_BIAS tag). Currently requires
 #  photon_by_voxel to be 1.
-# -if custom_ergbins is 1 (true), custom erg bins will be looked for on the 
-#   mesh, and included in gammas file if found. (default:false; 42 grps used)
+# -if custom_ergbins is 1 (true), custom energy bins will be looked for on the 
+#   mesh, and included in gammas file if found. (default: false; 42 grps used)
 # -cumulative determines the format for listing voxels in gammas file. Default
 #   is zero (false), which is preferred.
-# Note: photon_isotope and photon_cooling have multiple, comma delimited entries
-#  for use in conjunction with r2s_step2setup.py.
+# Note: photon_isotope and photon_cooling can have multiple, comma delimited
+#  entries for use in conjunction with the r2s_step2setup.py script.
 photon_isotope = TOTAL
 photon_cooling = 0
 sampling = v
-# Next three use 0 for false, 1 for true
+# Next three use 0 for false, 1 for true; See above.
 photon_bias = 0
 custom_ergbins = 0
 cumulative = 0
@@ -176,6 +181,7 @@ cumulative = 0
 """
 
 
+# Default contents of the ALARA input template file
 default_snippet = default_snippet = """
 # ALARA Snippet file: See ALARA user manual for additional syntax information
 
