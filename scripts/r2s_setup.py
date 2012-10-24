@@ -55,7 +55,14 @@ default_config = """
 ## This file has python ConfigParser/.ini syntax,
 ## and should be hand-edited to match your problem definition.
 
+###############################################################################
 [r2s-files]
+###############################################################################
+
+#-------------------------------------------------------------------------------
+# Files needed for Step 1
+# These files must exist prior to running r2s_step1.py
+#-------------------------------------------------------------------------------
 
 # MCNP neutron mesh tally from first step of workflow.
 neutron_meshtal = meshtal
@@ -67,6 +74,11 @@ neutron_mcnp_input = mcnp_n.inp
 # If this file does not exist, we will attempt to create it
 # using mcnp2cad.
 mcnp_geom = geom.sat
+
+#-------------------------------------------------------------------------------
+# Files produced in Step 1
+# This file are created by r2s_step1.py. Specify the desired file names.
+#-------------------------------------------------------------------------------
 
 # Intermediate mesh file containing data from step 1.
 # Must be a format that supports global tags, such at .h5m
@@ -86,14 +98,31 @@ alara_snippet = alara_problem
 # comment out the following:
 # step1_visfile = n_fluxes_and_materials.vtk
 
+#-------------------------------------------------------------------------------
+# Files needed for Step 2
+# These files must exist prior to running r2s_step2.py
+#-------------------------------------------------------------------------------
+
 # ALARA photon source file.
 alara_phtn_src = phtn_src
+
+#-------------------------------------------------------------------------------
+# Files produced in Step 2
+# This file are created by r2s_step2.py. Specify the desired file names.
+#-------------------------------------------------------------------------------
 
 # MCNP photon problem input file for last step of workflow
 photon_mcnp_input = mcnp_p.inp
 
+
+###############################################################################
 [r2s-params]
 # Non-filename parameters for r2s workflow
+###############################################################################
+
+#-------------------------------------------------------------------------------
+# Step 1 Parameters
+#-------------------------------------------------------------------------------
 
 # The number of rays per mesh row to fire
 # during Monte Carlo generation of the macromaterial grid.
@@ -105,6 +134,10 @@ mmgrid_rays = 10
 #  r2s_step1.py.  r2s_step2setup.py creates folders for all cooling steps
 #  and isotopes specified
 step2setup = 0
+
+#-------------------------------------------------------------------------------
+# Step 2 Parameters
+#-------------------------------------------------------------------------------
 
 # These parameters are for step 2.
 # -photon_isotope default is TOTAL. This is the isotope taken from phtn_src
@@ -130,20 +163,28 @@ photon_bias = 0
 custom_ergbins = 0
 cumulative = 0
 
+
+###############################################################################
 [r2s-material]
 # This section may be used to map material idenfitiers to material names.
 # The mapping is used when writing out mixtures to ALARA's format,
 # as well as for material tagging.
-#
+###############################################################################
+
 # Example:
 # mat1_rho-1.0 = water
 """
 
-default_snippet = """
+
+default_snippet = default_snippet = """
+# ALARA Snippet file: See ALARA user manual for additional syntax information
+
+# Specify the material, element, and data libraries.
 material_lib    matlib
 element_lib     isolib
 data_library alaralib FENDL2
 
+# Specify the cooling times for which activation results are desired
 cooling
     1   s
     1   m
@@ -152,23 +193,12 @@ cooling
     1   y
 end
 
-dump_file   dump.file
-
-output zone
-       units Ci cm3
-#   constituent
-       specific_activity
-       photon_source  FENDL2  phtn_src 42  1e4  2e4
-          3e4  4.5e4  6e4  7e4  7.5e4  1e5  1.5e5  2e5  3e5
-          4e5  4.5e5  5.1e5  5.12e5  6e5  7e5  8e5  1e6  1.33e6
-          1.34e6  1.5e6  1.66e6  2e6  2.5e6  3e6  3.5e6
-          4e6  4.5e6  5e6  5.5e6  6e6  6.5e6  7e6  7.5e6  8e6
-          1e7  1.2e7  1.4e7  2e7  3e7  5e7
-end
-
+# Specify the fluxin file and normalization, if needed 
 #    flux name  flux file     norm   shift   unused
 flux flux_1     alara_fluxin  1.0    0     default
 
+# Specify the irradiation schedule using "schedule" and "pulsehistory"
+# Syntax is found in the ALARA user manual
 schedule    total
     .85 y   flux_1  pulse    0  s
 end
@@ -177,8 +207,24 @@ pulsehistory    pulse
     5   .15 y
 end
 
+# Specify desired ALARA output (e.g. constituant, specific activity).
+# Photon source card must be present to produce the pthn_src file for step2.
+output zone
+       units Ci cm3
+       # constituent
+       # specific_activity
+       photon_source  FENDL2  phtn_src 42  1e4  2e4
+          3e4  4.5e4  6e4  7e4  7.5e4  1e5  1.5e5  2e5  3e5
+          4e5  4.5e5  5.1e5  5.12e5  6e5  7e5  8e5  1e6  1.33e6
+          1.34e6  1.5e6  1.66e6  2e6  2.5e6  3e6  3.5e6
+          4e6  4.5e6  5e6  5.5e6  6e6  6.5e6  7e6  7.5e6  8e6
+          1e7  1.2e7  1.4e7  2e7  3e7  5e7
+end
+
+#other parameters
 truncation  1e-12
 impurity    5e-6    1e-3
+dump_file   dump.file
 """
 
 if __name__ == '__main__':
