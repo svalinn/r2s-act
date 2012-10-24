@@ -159,6 +159,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", \
             elif sampling == 'u':
                 ergproblist.append(float(sm.imesh.getTagHandle( \
                         "phtn_src_group_{0:03d}".format(i))[voxel]) / norm)
+
             sourcetotal += ergproblist[i-1]
             if cumulative: ergproblist[i-1] = sourcetotal
 
@@ -280,6 +281,7 @@ def calc_volumes_list(sm):
         oldx = x
     
     return vols
+
 
 def _tag_sumvoxelstrengths(sm, val):
     # Get the Tag object called PHTN_BIAS
