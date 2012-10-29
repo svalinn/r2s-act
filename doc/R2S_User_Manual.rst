@@ -21,15 +21,15 @@ _______________________________________________________________________________
 University of Wisconsin Rigorous Two Step Activation Work Flow (UW-R2S)
 _______________________________________________________________________________
 
-UW-R2S is composed of a series of scripts written in the Python programming language to facilitate R2S calculations in complex 3D geometries. The end product of UW-R2S is a single Cartesian mesh file with each voxel tagged with:
+UW-R2S is composed of a series of scripts written in the Python programming language to facilitate R2S calculations in complex 3D geometries. The end product of UW-R2S is a single Cartesian MOAB mesh file with each voxel tagged with:
 
 1. neutron fluxes and relative errors for every neutron energy group, total neutron flux (neutrons/cm^2/s)
 2. material fractions and relative errors for every material in the geometry
 3. photon source strengths for every photon energy group (photons/cm^2/s)
-4. total photon source strength (photons/s)
+4. total photon source strength over the entire geometry (photons/s)
 5. photon flux and/or dose for every photon energy group and relative errors, total flux and/or dose (photons/cm^2/s, any dose units)
 
-The backbone of UW-R2S are the physics codes used for transport and activation. The Direct Accelerated Monte Carlo (DAG-MC) version of MCNP5 (Los Alamos National Laboratory), known as DAG-MCNP5 (UW-Madison) is used for both neutron and photon transport. This allows for geometry and materials information to be specified using CAD software, namely CubIt (Sandia National Laboratory). For the photon transport step, a custom compiled version of DAG-MCNP5, with a custom source.F90, is used. Analytic and Laplacian Adaptive Radioactivity Analysis (ALARA), developed at UW-Madison, is used for material activation.
+The backbone of UW-R2S is the physics codes used for transport and activation. The Direct Accelerated Monte Carlo (DAG-MC) version of MCNP5 (Los Alamos National Laboratory), known as DAG-MCNP5 (UW-Madison) is used for both neutron and photon transport. This allows for geometry and materials information to be specified using CAD software, namely CubIt (Sandia National Laboratory). For the photon transport step, a custom compiled version of DAG-MCNP5, with a custom source.F90, is used. Analytic and Laplacian Adaptive Radioactivity Analysis (ALARA), developed at UW-Madison, is used for material activation.
 
 ...............................................................................
 
@@ -69,21 +69,21 @@ Running UW-R2S
 
 UW-R2S contains 2 wrapper scripts (r2s_step1.py, r2s_step2.py) that call all necessary scripts in the correct order. In some cases, users may want to run certain scripts individually. To do this, users should consult the R2S Step 1 and R2S Step 2 section of this manual for information about running these individual scripts. The work flow using the wrapper scripts is detailed below:
 
-**1. Create geometry.** Using CubIt, create the geometry specify materials by adding volumes to materials groups. Group names should be formatted like "mat_X_rhoY" where X is the material number and Y is either mass density (negative value) or atom density (positive volume). Instructions for doing this can be found in the DAG-MCNP5 user manual. Be sure to remember to imprint and merge all of the geometry. Once completed, export the geometry as a .sat file and specify and ACIS version of 1600. Next, write and MCNP input file for your problem, including everything but the geometry. Alternatively, if the geometry already exists in the form of an MCNP input file, MCNP2CAD can be used to convert the geometry information from the MCNP input file into a .sat file. Once the .sat file exists, it can be converted to an .h5m file using dagmc_preproc. This is not necessary, but it prevents DAG-MCNP5 from having to process the .sat file every time it is run. Using a .h5m file also allows for the use of of a DAG-MCNP5 version that is not build against CubIt.
+**1. Create geometry.** Using CubIt, create the geometry and specify materials by adding volumes to materials groups. Group names should be formatted like "mat_X_rhoY" where X is the material number and Y is either mass density (negative value) or atom density (positive volume). Instructions for doing this can be found in the DAG-MCNP5 user manual. Be sure to remember to imprint and merge all of the geometry. Once completed, export the geometry as a .sat file and when prompted specify an ACIS version of 1600 and "export attributes" option. Alternatively, if the geometry already exists in the form of an MCNP input file, MCNP2CAD can be used to convert the geometry information from the MCNP input file into a .sat file. In either case, once the .sat file exists, it can be converted to an .h5m file using dagmc_preproc. This is not necessary, but it prevents DAG-MCNP5 from having to process the .sat file every time it is run. Using a .h5m file also allows for the use of of a DAG-MCNP5 version that is not build against CubIt.
 
-**2. Create DAG-MCNP5 input file and run neutron transport calculation.** Other than the geometry cards, the rest of the DAG-MCNP5 input file should be identical to that of a native MCNP input file. DAG-MCNP5 input files must contain an FMESH4 tally over the geometry of interest for neutron activation. The output from this tally will appear in a MCNP meshtal output file, in units of neutrons/cm2/source particle. This output need to be converted to flux, by multiplying by the total neutron source strength  (referred to as the neutron normalization factor) which has units of source particles/time. The recommended way of doing this is to use and FM tally multiplier card  to specify the neutron normalization factor on the FMESH4 tally, which will result in a meshtal file with fluxes in the correct units. If this is not done, normalization can be done manually using the read_meshtal.py script.
+**2. Create DAG-MCNP5 input file and run neutron transport calculation.** Other than the geometry cards, the rest of the DAG-MCNP5 input file should be identical to that of a native MCNP input file. Make sure the material numbers in the input file match the numbers of the material groups in CubIt. DAG-MCNP5 input files must contain an FMESH4 tally over the geometry of interest for neutron activation. The output from this tally will appear in a MCNP meshtal output file, in units of neutrons/cm2/source particle. This output needs to be converted to flux, by multiplying by the total neutron source strength  (referred to as the neutron normalization factor) which has units of source particles/time. The recommended way of doing this is to use and FM tally multiplier card  to specify the neutron normalization factor on the FMESH4 tally, which will result in a meshtal file with fluxes in the correct units. If this is not done, normalization can be done when fluxes are tagged to mesh using the read_meshtal.py script.
 
 **3. Run r2s_setup.py.** This script creates two configuration files called "r2s.cfg" and "alara_snippet" in whatever folder the script is run from. It is best to run all subsequent scripts out of this folder.
 
-**4. Modify r2s.cfg to suit the problem.** The configuration file allows the user to specify important parameters and also the names of files used by and created by r2s_step1.py, ALARA, and r2s_step2.py. The file r2s.cfg is printed with default file names and parameters and also some instructive annotations. Typically there is no reason to change the file names aside from personal preference. In order to better understand the parameters specified, users should consult the "R2S Step 1" and "R2S Step 2" portion of this file.
+**4. Modify r2s.cfg to suit the problem.** The configuration file allows the user to specify important parameters and also the names of files used by and created by r2s_step1.py, ALARA, and r2s_step2.py. The file r2s.cfg is printed with default file names and parameters and also some instructive annotations. Typically there is no reason to change the file names aside from personal preference. In order to better understand the parameters specified, users should consult the "Step 1 Parameters" and "Step 2 Parameters" portion of this file.
 
 **5. Create ALARA materials library.** The script mats2ALARA.py can be used to convert MCNP materials definitions to ALARA materials definitions. However, generally speaking activation definitions should be much more detailed than transport definitions, as minor impurities can dominate activations. ALARA material libraries rely on isotope libraries. A script to write both MCNP and ALARA definitions for R2S style problems is currently in development.
 
-**6. Modify ALARA snippet.** The ALARA snippet file is appended to the ALARA geometry file produced by r2s_step1.py to create the full ALARA input file. Most of the entries in the default snipppet produced by r2s_setup.py need not be changed. However, every problem will have a different irradiation schedule so special attention should be taken to change this from default irradiation schedule. The ALARA snippet file also specifies the isotope library, material library, and data libraries. These libaries, or links to them must be present in the folder that ALARA is run out of. The default activation and photon source libraries are both specified as "FENDL2" in the ALARA snippet. However, soft links to these files must be named "FENDL2.bin" and "FENDL2.gam" for the activation and photon source libraries, respectively.
+**6. Modify ALARA snippet.** The ALARA snippet file contains all of the information needed to run ALARA, apart from the geometry and materials information. It is appended to the ALARA geometry/materials file produced by r2s_step1.py to create the full ALARA input file. Most of the entries in the default snipppet produced by r2s_setup.py need not be changed. However, every problem will have a different irradiation schedule so special attention should be taken to change this from the default irradiation schedule. The ALARA snippet file also specifies the isotope library, material library, and data libraries. These libaries, or links to them must be present in the folder that ALARA is run out of. The default activation and photon source libraries are both specified as "FENDL2" in the ALARA snippet. However, soft links to these files must be named "FENDL2.bin" and "FENDL2.gam" for the activation and photon source libraries, respectively.
 
-**7. Run r2s_step1.py.** This script is a wrapper script that reads the meshtal, geometry, MCNP neutron input file, and alara_snippet file specified in r2s.cfg and outputs a structured mesh file tagged with neutron fluxes and materials and a complete ALARA input file.
+**7. Run r2s_step1.py.** This script is a wrapper script that reads the meshtal, geometry, MCNP neutron input file, and alara_snippet file specified in r2s.cfg and outputs a structured mesh file tagged with neutron fluxes with relative errors, material fractions with relative errors, and a complete ALARA input file.
 
-**8. Run ALARA.** ALARA reads in the geometry, material, and irradiation scheduling information from the ALARA input file and outputs a file containing photon source strengths (phtn_src) for every voxel and energy group. In addition, ALARA can calculate isotopic inventories, decay heat, and more, which is printed to standard output by default. This output can be piped to an output file. Assuming the ALARA snippet file was written correctly and appended the command for this step will be "/path/to/ALARA/ alara_geom > output_file." Currently, ALARA does not print out phtn_src entries for entries of material "void." This causes indexing problems in Step 2. To get around this, use SED or some text editor to replace "void" with "pseudo_void"  (or something similar). Then make an entry in the ALARA material library for "pseudo_void" and assign the density to be equal to zero. This produces output that is mathematically correct.
+**8. Run ALARA.** ALARA reads in the geometry, material, and irradiation schedule information from the ALARA input file and outputs a file containing photon source strengths (phtn_src) for every voxel and energy group. In addition, ALARA can calculate isotopic inventories, decay heat, and more (see ALARA user manual), which is printed to standard output by default. This output can be piped to an output file. Assuming the ALARA snippet file was written correctly and appended the command for this step will be "/path/to/ALARA/ alara_geom > output_file." Currently, ALARA does not print out phtn_src entries for entries of material "void." This causes indexing problems in Step 2. To get around this, use SED or some text editor to replace "void" with "pseudo_void"  (or something similar). Then make an entry in the ALARA material library for "pseudo_void" and assign the density to be equal to zero. This produces output that is mathematically correct.
 
 **9. Run r2s_step2.py.** This script takes an ALARA phtn_src file, tags the information onto the structured mesh file from Step 1 and creates a "gammas" file used to specify the photon source distribution for the gamma transport step. It also modifies the MCNP neutron input file to create an MCNP photon input file. However this file may need additional user attention before running DAG-MCNP5, especially if the photon tally region is different from the neutron tally region. Flux to dose conversion factors may be used if dose results are desired.
 
@@ -91,7 +91,7 @@ UW-R2S contains 2 wrapper scripts (r2s_step1.py, r2s_step2.py) that call all nec
 
 **10. Run read_meshtal.py.** Run this script with the -m flag in order tag photon fluxes and/or doses onto the mesh with the rest of the information on it. This script is run by r2s_step1.py, so more information about this script can be found in the "Scripts run by r2s_step1.py" section of this manual.
 
-**12. Visualize Results.** The best way of visualizing results is using VisIT. Fluxes/doses are best viewed as "pseudo color" or "volume" plots. The geometry can be superimposed on these plots. To do this, save the geometry as a .stl file in CubIt. Then open this file in VisIt and visualize it as a "mesh" plot. It is often useful to visualize results during intermediate steps of the work flow. For example it may be useful to visualize the neutron flux distribution and errors prior to continuing with the work flow.
+**12. Visualize Results.** The best way of visualizing results is using VisIT. Fluxes/doses are best viewed as "pseudo color" or "volume" plots. The geometry can be superimposed onto these plots. To do this, save the geometry as a .stl file in CubIt. Then open this file in VisIt and visualize it as a "mesh" plot. It is often useful to visualize results during intermediate steps of the work flow. For example it may be useful to visualize the neutron flux distribution and errors prior to continuing with the work flow.
 
 ...............................................................................
 
@@ -112,9 +112,7 @@ _______________________________________________________________________________
 :Options: None
 :Path:r2s-act/scripts/r2s_setup.py
 
-The script r2s_step1.py automatically run all of the Step 1 scripts in the proper order, using the file names and parameters specified in the r2s.cfg file. Certain use cases my required running this script individually. The steps that r2s_step1.py runs are detailed below. Description of the individual scripts are found in "Scripts run by r2s_step1.py"
-
-_______________________________________________________________________________
+______________________________________________________________________________
 r2s_step1.py
 _______________________________________________________________________________
 
@@ -181,7 +179,7 @@ mmgrid.py
 write_alara_geom.py
 ...............................................................................
 
-:Purpose: This script takes the structured mesh with materials from mmgrid.py and creates a file (alara_geom) with ALARA geometry and materials entries
+:Purpose: This script takes the structured mesh with materials from mmgrid.py and creates a file (alara_geom) with ALARA geometry and materials entries.
 :Inputs: Structured mesh tagged with materials entries
 :Outputs: alara_geom, a file with ALARA geometry and materials 
 :Syntax: ./write_alara_geom.py 
@@ -190,7 +188,7 @@ write_alara_geom.py
 
 
 _______________________________________________________________________________
-Parameters for r2s_step1.py
+Step 1 Parameters
 _______________________________________________________________________________
 
 :mmgrid_rays: The number of rays per mesh row to fire during Monte Carlo generation of the macromaterial grid. Raising this number will reduce material errors, but also increase the runtime of r2s_step1.
@@ -209,7 +207,7 @@ _______________________________________________________________________________
 r2s_step2.py
 _______________________________________________________________________________
 
-:Purpose: This script takes the phtn_src file produced by ALARA and tags the source strengths onto the the structured mesh. It also creates a gammas file and converts the MCNP neutron input file to a photon input file.
+:Purpose: This script takes the phtn_src file produced by ALARA and tags the source strengths ontothe structured mesh. It also creates a gammas file and converts the MCNP neutron input file to a photon input file.
 :Inputs: structured mesh from Step 1, pthn_src file, MCNP neutron input file
 :Outputs: structured mesh with source strengths, gammas file, MCNP photon input file
 :Syntax: ./r2s_step2.py
@@ -236,7 +234,7 @@ read_alara_phtn.py
   -c COOLINGSTEP        The cooling step number or string identifier. (0 is first cooling step)  Default: 0
   -r, --retag           Option enables retagging of .h5m meshes. Default: False
   -t, --totals          Option enables adding the total photon source strength for all energy groups as a tag for each voxel. Default: False
-:Path:r2s-act/scripts/r2s/io/read_alara_phtn.py
+:Path: r2s-act/scripts/r2s/io/read_alara_phtn.py
 
 
 ...............................................................................
