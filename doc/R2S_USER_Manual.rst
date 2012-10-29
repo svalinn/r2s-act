@@ -107,7 +107,7 @@ _______________________________________________________________________________
 
 :Purpose: The scripts prints two set-up files used in the R2S workflow: r2s.cfg and alara_snippet.
 :Inputs: None
-:Outputs:r2s.cfg, alara_snippet.
+:Outputs: r2s.cfg, alara_snippet.
 :Syntax: ./r2s_setup.py
 :Options: None
 :Path:r2s-act/scripts/r2s_setup.py
@@ -138,10 +138,11 @@ read_meshtal.py:
 :Inputs: MCNP meshtal file
 :Outputs: Structure mesh tagged with fluxes and errors
 :Syntax: ./read_meshtal.py <meshtal file> [options]
-:Options:  -h, --help         show this help message and exit
-           -o MESH_OUTPUT     Name of mesh output file, default=flux_mesh.h5m
-           -n NORM            Normalization factor, default=1
-           -m SMESH_FILENAME  Preexisting mesh on which to tag fluxes
+:Options:
+ -h, --help         show this help message and exit
+ -o MESH_OUTPUT     Name of mesh output file, default=flux_mesh.h5m
+ -n NORM            Normalization factor, default=1
+ -m SMESH_FILENAME  Preexisting mesh on which to tag fluxes
 :Path: r2s-act/scripts/r2s/io/read_mesthal.py
 
 ...............................................................................
@@ -166,17 +167,13 @@ mmgrid.py
 :Outputs: ALARA geometery and materials entries
 :Syntax: mmgrid.py [options] geometry_file [structured_mesh_file]
 :Options:
-  -h, --help            help message and exit
-  -n NUMRAYS            Set N. N^2 rays fired per row.  Default N=20
-  -g, --grid            Use grid of rays instead of randomly selected starting points
-  -o OUTPUT_FILENAME, --output=OUTPUT_FILENAME
-                        Output file name, default=mmgrid_output.h5m
-  -q, --quiet           Suppress non-error output from mmgrid
-  -d NDIVS, --divs=NDIVS
-                        Number of mesh divisions to use when inferring mesh
-                        size, default=10
-  -a ALARA_GEOM_FILE, --alara=ALARA_GEOM_FILE
-                        Write alara geom to specified file name
+  -h, --help                                   help message and exit
+  -n NUMRAYS                                   Set N. N^2 rays fired per row.  Default N=20
+  -g, --grid                                   Use grid of rays instead of randomly selected starting points
+  -o OUTPUT_FILENAME, --output=OUTPUT_FILENAME Output file name, default=mmgrid_output.h5m
+  -q, --quiet                                  Suppress non-error output from mmgrid
+  -d NDIVS, --divs=NDIVS                       Number of mesh divisions to use when inferring mesh size, default=10
+  -a ALARA_GEOM_FILE, --alara=ALARA_GEOM_FILE  Write alara geom to specified file name
 :Path: r2s-act/scripts/r2s/mmgrid.py
 
 
@@ -196,16 +193,9 @@ _______________________________________________________________________________
 Parameters for r2s_step1.py
 _______________________________________________________________________________
 
-# The number of rays per mesh row to fire
-# during Monte Carlo generation of the macromaterial grid.
-# Raising this number will reduce material errors, but 
-# also increase the runtime of r2s_step1.
-mmgrid_rays = 10
+:mmgrid_rays: The number of rays per mesh row to fire during Monte Carlo generation of the macromaterial grid. Raising this number will reduce material errors, but also increase the runtime of r2s_step1.
 
-# If step2setup is 1, runs the r2s_step2setup.py script at the end of 
-#  r2s_step1.py.  r2s_step2setup.py creates folders for all cooling steps
-#  and isotopes specified
-step2setup = 0
+:step2setup=0: If step2setup is 1, runs the r2s_step2setup.py script at the end of r2s_step1.py.  r2s_step2setup.py creates folders for all cooling steps and isotopes specified.
 
 ...............................................................................
 
@@ -240,22 +230,12 @@ read_alara_phtn.py
 :Outputs: structured mesh tagged with source strengths
 :Syntax: ./read_alara_phtn.py [options] arg
 :Options:
--p PHTNSRCFILE, --phtn=PHTNSRCFILE
-                        The photon source strengths are read fromFILENAME.
-  -m MESHFILE, --mesh=MESHFILE
-                        file to write source information to, or file name for
-                        saving a modified mesh.
-  -i ISOTOPE, --isotope=ISOTOPE
-                        The isotope string identifier or 'TOTAL'. Default:
-                        TOTAL
-  -c COOLINGSTEP, --coolingstep=COOLINGSTEP
-                        The cooling step number or string identifier. (0 is
-                        first cooling step)  Default: 0
-  -r, --retag           Option enables retagging of .h5m meshes. Default:
-                        False
-  -t, --totals          Option enables adding the total photon source strength
-                        for all energy groups as a tag for each voxel.
-                        Default: False
+  -p PHTNSRCFILE, --phtn=PHTNSRCFILE        The photon source strengths are read fromFILENAME.
+  -m MESHFILE, --mesh=MESHFILE              File to write source information to, or file name for saving a modified mesh.
+  -i ISOTOPE, --isotope=ISOTOPE             The isotope string identifier or 'TOTAL'. Default: TOTAL
+  -c COOLINGSTEP, --coolingstep=COOLINGSTEP The cooling step number or string identifier. (0 is first cooling step)  Default: 0
+  -r, --retag           Option enables retagging of .h5m meshes. Default: False
+  -t, --totals          Option enables adding the total photon source strength for all energy groups as a tag for each voxel. Default: False
 :Path:r2s-act/scripts/r2s/io/read_alara_phtn.py
 
 
@@ -268,20 +248,9 @@ write_gammas.py
 :Outputs: gammas file
 :Syntax: write_gammas.py input-h5m-file [options]
 :Options:
--h, --help            show this help message and exit
-  -o OUTPUT, --output=OUTPUT
-                        Option specifies the name of the 'gammas'file.
-                        Default: gammas
-  -a, --alias           Generate the gammas file with an alias table of energy
-                        bins for each voxel. Default: False   Default file
-                        name changes to 'gammas_alias'   Creates the file
-                        gammas with the photon energy bins for each
-                        voxel stored as alias tables. Reads directly from
-                        phtn_src file.               Each voxel's line
-                        corresponds with an alias table of the form:
-                        [total source strength, p1, g1a, g1b, p2, g2a, g2b ...
-                        pN, gNa, gNb]             Where each p#, g#a, g#b are
-                        the info for one bin in the alias table.
+  -h, --help                  Show message and exit
+  -o OUTPUT, --output=OUTPUT  Option specifies the name of the 'gammas'file. Default: gammas
+  -a, --alias           Generate the gammas file with an alias table of energy bins for each voxel. Default: False. Default file name changes to'gammas_alias.' Creates the file gammas with the photon energy bins for each voxel stored as alias tables. Reads directly from phtn_src file. Each voxel's line corresponds with an alias table of the form: [total source strength, p1, g1a, g1b, p2, g2a, g2b ... pN, gNa, gNb] Where each p#, g#a, g#b are the info for one bin in the alias table.
 :Path: r2s-act/scripts/r2s/io/write_gammas.py
 
 ...............................................................................
@@ -293,12 +262,9 @@ mcnp_n2p.py
 :Outputs: 
 :Syntax: mcnp_n2p.py INPUTFILE [options]
 :Options:
-  -h, --help            show this help message and exit
-  -o OUTPUTFILE, --output=OUTPUTFILE
-                        Filename to write modified MCNP input to. Default is
-                        to append input filename with '_p'.
-  -d, --dagmc           Add flag to parse file like a DAG-MCNP file (which has
-                        only title card and block 3 cards). Default: False
+  -h, --help                         show this help message and exit
+  -o OUTPUTFILE, --output=OUTPUTFILE Filename to write modified MCNP input to. Default is to append input filename with '_p'.
+  -d, --dagmc           Add flag to parse file like a DAG-MCNP file (which has only title card and block 3 cards). Default: False
 :Path:/r2s-act/scripts/r2s/mcnp_n2p.py
 
 ...............................................................................
