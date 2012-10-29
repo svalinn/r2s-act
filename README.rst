@@ -1,1 +1,1 @@
-doc/R2S_USER_Manual.rst
+doc/R2S_User_Manual.rst
