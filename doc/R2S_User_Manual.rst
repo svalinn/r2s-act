@@ -171,7 +171,7 @@ mmgrid.py
   -o Output_file                               Output file name, default=mmgrid_output.h5m
   -q, --quiet                                  Suppress non-error output from mmgrid
   -d NDIVS                                     Number of mesh divisions to use when inferring mesh size, default=10
-  -a ALARA_GEOM_FILE                           Write alara geom to specified file name
+  -a GEOM_FILE                                 Write alara geom to specified file name
 :Path: r2s-act/scripts/r2s/mmgrid.py
 
 
@@ -273,9 +273,7 @@ _______________________________________________________________________________
 
 :photon_isotope: Speficify what isotope should be considered for activation (for reading phtn_src file). The default is all isotopes, TOTAL.
 : photon_cooling: The cooling step read from phtn_src. 0 is shutdown, other numbers correspond with cooling times listed in the ALARA input.
-:sampling: determines the sampling method used:
-           u for uniform sampling
-           v for voxel sampling (default)
+:sampling: determines the sampling method used. For uniform sampling, specify "u" and for voxel sampling specify "v" (default).
 :photon_bias: 0 for false, 1 for true. If true, the gammas file will try to include voxel bias values from the mesh (stored as PHTN_BIAS tag). Currently requires photon_by_voxel to be 1.
 :custom_ergbins: 0 for false, 1 for true. If custom_ergbins is 1 (true), custom energy bins will be looked for on the mesh, and included in gammas file if found. (default: false; 42 grps used)
 :cumulative: 0 for false, 1 for true. Cumulative determines the format for listing voxels in gammas file. Default is zero (false), which is preferred.
