@@ -69,7 +69,9 @@ Running UW-R2S
 
 UW-R2S contains 2 wrapper scripts (r2s_step1.py, r2s_step2.py) that call all necessary scripts in the correct order. In some cases, users may want to run certain scripts individually. To do this, users should consult the R2S Step 1 and R2S Step 2 section of this manual for information about running these individual scripts. The work flow using the wrapper scripts is detailed below:
 
-**1. Create geometry.** Using CubIt, create the geometry and specify materials by adding volumes to materials groups. Group names should be formatted like "mat_X_rhoY" where X is the material number and Y is either mass density (negative value) or atom density (positive volume). Instructions for doing this can be found in the DAG-MCNP5 user manual. Be sure to remember to imprint and merge all of the geometry. Once completed, export the geometry as a .sat file (Standard ACIS Text format) and when prompted specify an ACIS version of 1600 and "export attributes" option. Alternatively, if the geometry already exists in the form of an MCNP input file, MCNP2CAD can be used to convert the geometry information from the MCNP input file into a .sat file. In either case, once the .sat file exists, it can be converted to an .h5m file (binary format MOAB mesh file) using dagmc_preproc. This is not necessary, but it prevents DAG-MCNP5 from having to process the .sat file every time it is run. Using a .h5m file also allows for the use of of a DAG-MCNP5 version that is not build against CubIt.
+**1. Create geometry.** Using CubIt, create the geometry and specify materials by adding volumes to materials groups. Group names should be formatted like "mat_X_rhoY" where X is the material number and Y is either mass density (negative value) or atom density (positive volume). Instructions for doing this can be found in the DAG-MCNP5 user manual. Be sure to remember to imprint and merge all of the geometry. Once completed, export the geometry as a .sat file (Standard ACIS Text format) and when prompted specify an ACIS version of 1900 and "export attributes" option. Alternatively, if the geometry already exists in the form of an MCNP input file, MCNP2CAD can be used to convert the geometry information from the MCNP input file into a .sat file. If the geometry contains small features, users may need to specify a smaller tolerance for merging surfaces (using the -t flag).
+
+Once the .sat file exists, it can be converted to an .h5m file (binary format MOAB mesh file) using dagmc_preproc. This is not necessary, but it prevents DAG-MCNP5 from having to process the .sat file every time it is run. Using a .h5m file also allows for the use of of a DAG-MCNP5 version that is not build against CubIt. In either case, either DAG-MCNNP or dagmc_preproc creates a faceted representation of the geometry. Users can specify the maximum distance between the points in the geometry and the faceted representation on the geometry. This is known as the faceting tolerance. In dagmc_preproc, this is specified with the -f flag. In DAG-MCNP5 this can be specified on the command line by using ftol=faceting_tolerace (e.g. ftol=1E-4). In addtion, dagmc_preproc can also be used to specify a length tolerance using the -l flag. The length tolerance is the maximum length of a facet edge.
 
 **2. Create DAG-MCNP5 input file and run neutron transport calculation.** Other than the geometry cards, the rest of the DAG-MCNP5 input file should be identical to that of a native MCNP input file. Make sure the material numbers in the input file match the numbers of the material groups in CubIt. DAG-MCNP5 input files must contain an FMESH4 tally over the geometry of interest for neutron activation. The output from this tally will appear in a MCNP meshtal output file, in units of neutrons/cm^2/source particle. This output needs to be converted to flux, by multiplying by the total neutron source strength  (referred to as the neutron normalization factor) which has units of source particles/time. The recommended way of doing this is to use and FM tally multiplier card  to specify the neutron normalization factor on the FMESH4 tally, which will result in a meshtal file with fluxes in the correct units. If this is not done, normalization can be done when fluxes are tagged to mesh using the read_meshtal.py script.
 
@@ -91,7 +93,7 @@ UW-R2S contains 2 wrapper scripts (r2s_step1.py, r2s_step2.py) that call all nec
 
 **10. Run read_meshtal.py.** Run this script with the -m flag in order tag photon fluxes and/or doses onto the mesh with the rest of the information on it. This script is run by r2s_step1.py, so more information about this script can be found in the "Scripts run by r2s_step1.py" section of this manual.
 
-**12. Visualize Results.** The best way of visualizing results is using VisIT. Fluxes/doses are best viewed as "pseudo color" or "volume" plots. The geometry can be superimposed onto these plots. To do this, save the geometry as a .stl file in CubIt. Then open this file in VisIt and visualize it as a "mesh" plot. It is often useful to visualize results during intermediate steps of the work flow. For example it may be useful to visualize the neutron flux distribution and errors prior to continuing with the work flow.
+**12. Visualize Results.** To visualize results, stuctured mesh .h5m files must be first converted to .vtk viles. This can be done using the MOAB mbconvert tool (syntax:mbconvert <mesh_file.h5m> <mesh_file.vtk>). The best way of visualizing the results on the resulting .vtk file is using VisIT. Fluxes/doses are best viewed as "pseudo color" or "volume" plots. The geometry can be superimposed onto these plots. To do this, save the geometry as a .stl file in CubIt. Then open this file in VisIt and visualize it as a "mesh" plot. It is often useful to visualize results during intermediate steps of the work flow. For example it may be useful to visualize the neutron flux distribution and errors prior to continuing with the work flow.
 
 ...............................................................................
 
@@ -294,10 +296,23 @@ _______________________________________________________________________________
   -h, --help  show this help message and exit
   -o OUTPUT   Name of materials output file, default=matlib.out
 
-:Path: ``r2s-act/scripts/materials/mats2ALARA.py``
+:Path: ``r2s-act/scripts/tools/mats2ALARA.py``
 
 _______________________________________________________________________________
-r2s/tag_ebins.py
+get_mesh_values.py
+_______________________________________________________________________________
+
+:Purpose: This script is used to print the value of a tag on a structured mesh. The script will automatically search for a tag in the for tag_name+_error. If it exists, the error value will be appended to the answer: value (plus/minus) error
+:Inputs: Structured mesh
+:Outputs: value with error to standard output
+:Syntax: ./get_value.py <structured_mesh> <x_value> <y_value> <z_value> <tag_name>
+:Options:
+  -h, --help  show help message and exit
+:Path: ``r2s-act/scripts/tools/mats2ALARA.py``
+
+
+_______________________________________________________________________________
+tag_ebins.py
 _______________________________________________________________________________
 
 :Purpose: Tags mesh with energy bins boundaries provided in a separate file.
