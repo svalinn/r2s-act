@@ -1,0 +1,11 @@
+# Ignore possible build & documentation
+
+# Ignore various temp files
+*.pyc
+.*.swp
+*~
+
+# Ignore binary files
+#
+
+# Ignore specific files
