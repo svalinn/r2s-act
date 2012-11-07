@@ -40,6 +40,7 @@ subroutine test_heap_sort
 
 end subroutine test_heap_sort
 
+
 subroutine test_read_custom_ergs
 ! Reads in values from 'test_ergs_list.txt' and matches them to expected values 
         integer :: n_grps = 42
@@ -50,7 +51,7 @@ subroutine test_read_custom_ergs
         call read_custom_ergs(50)
         CLOSE(50)
 
-        test_ener_phot=(/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
+        test_ener_phot = (/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
             0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
             1.66,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0, &
             10.0,12.0,14.0,20.0,30.0,50.0/)
@@ -69,6 +70,7 @@ subroutine test_read_custom_ergs
         write(*,*) "test_custom_ergs: successfully read bins"
 
 end subroutine test_read_custom_ergs
+
 
 subroutine test_read_header
 ! Reads in multiple sets of 5 header lines from 'test_header.txt'.
@@ -100,6 +102,7 @@ subroutine test_read_header
         write(*,*) "test_read_header: successfully tested"
 
 end subroutine test_read_header
+
 
 subroutine test_read_params
 ! Reads in several combinations of parameter specifications from the file
@@ -200,13 +203,14 @@ subroutine test_read_params
 
 end subroutine test_read_params
 
+
 subroutine test_gen_erg_alias_table
 ! Fake (normalized) probabiltiies are supplied to gen_erg_alias_table, and the
 !  resulting probList and pairsList are matched to expected result.
         real(dknd),dimension(1:10) :: binList
         integer(i4knd),dimension(1:10,1:2) :: pairsList, expectedPairsList
         real(dknd),dimension(1:10) :: probList, expectedProbList
-        real(dknd) :: a,b
+        real(dknd) :: a, b
 
         binList = (/ .01,.04,.05,.07,.09,.1,.13,.2,.22,.09 /)
 
@@ -238,6 +242,7 @@ subroutine test_gen_erg_alias_table
 
 end subroutine test_gen_erg_alias_table
 
+
 subroutine test_erg_sampling_distrib
 ! Subroutine does 'testcnt' energy samplings for ten energy bins, and finds
 !  the largest relative error in bin sampling frequency.
@@ -245,7 +250,7 @@ subroutine test_erg_sampling_distrib
         integer(i4knd),dimension(1:10) :: tallyList
         integer(i4knd),dimension(1:1,1:10,1:2) :: pairsList
         real(dknd),dimension(1:1,1:10) :: probList
-        real(dknd) :: a,b,testerg,maxdev,val
+        real(dknd) :: a, b, testerg, maxdev, val
         integer(i4knd) :: nbins, cnt, talcnt, testcnt
 
         nbins = 10
@@ -282,6 +287,7 @@ subroutine test_erg_sampling_distrib
                 "relative error in bin sampling frequency - ", maxdev
 
 end subroutine test_erg_sampling_distrib
+
 
 subroutine test_uniform_sample
 ! 
@@ -332,7 +338,4 @@ program test_source
         call test_erg_sampling_distrib
         call test_uniform_sample
 
-
 end program test_source
-
-
