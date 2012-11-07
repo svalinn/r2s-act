@@ -95,16 +95,17 @@ module source_data
         integer(i8knd) :: npart_write = 0 ! = counter for debug output
         ! Other variables
         integer :: stat
-        integer :: i_ints,j_ints,k_ints,n_mesh_cells,n_active_mat
-        real,dimension(:),allocatable :: i_bins,j_bins,k_bins
+        integer :: i_ints, j_ints, k_ints, n_mesh_cells, n_active_mat
+        real,dimension(:),allocatable :: i_bins, j_bins, k_bins
         integer,dimension(100) :: active_mat
         character*3000 :: line ! needed for reading active_mat from gammas
         ! Saved variables will be unchanged next time source is called
         !save spectrum,i_ints,j_ints,k_ints,n_active_mat,n_ener_grps, &
-        save i_ints,j_ints,k_ints,n_active_mat,n_ener_grps, &
-             i_bins,j_bins,k_bins,active_mat,my_ener_phot,ikffl,pairs, &
+        save i_ints, j_ints, k_ints, n_active_mat, n_ener_grps, &
+             i_bins, j_bins, k_bins, active_mat, my_ener_phot, ikffl, pairs, &
              pairsProbabilities, n_mesh_cells, bias, bias_probability_sum, &
-             ergPairsProbabilities,ergPairs,tot_list,bias_list,ii,kk,jj,voxel
+             ergPairsProbabilities, ergPairs, tot_list, bias_list, &
+             ii, kk, jj, voxel
        
 end module source_data
 
@@ -134,7 +135,7 @@ subroutine source_setup
         else ! use default energy groups; 42 groups
           n_ener_grps = 42
           ALLOCATE(my_ener_phot(1:n_ener_grps+1))
-          my_ener_phot=(/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
+          my_ener_phot = (/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
             0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
             1.66,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0, &
             10.0,12.0,14.0,20.0,30.0,50.0/)
