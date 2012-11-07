@@ -400,7 +400,7 @@ subroutine source
 !       Subroutine is copied from MCNP code (sourcb.F90). 
 !       ICL and JUNF should be set to 0 for this part of the code to work.
 !----------------------------------------------------------------------------
-        icl = 0
+555     icl = 0
         junf = 0
         
   ! default for cel:  find the cell that contains xyz.
@@ -463,6 +463,14 @@ subroutine source
               goto 544 ! Position is ok; particle starts in activated material
             endif
           enddo
+        elseif (samp_vox.eq.1) then
+          if (nmt(mat(icl)).eq.0) then
+            ! particle rejected... resample within the voxel
+            call sample_within_voxel
+            goto 555
+          else
+            goto 544
+          endif
         else
           goto 544 ! skip material rejection
         endif
@@ -514,13 +522,23 @@ subroutine voxel_sample
         kk = mod(mod(voxel, k_ints*j_ints), k_ints)
 
         voxel = voxel + 1
+
+        call sample_within_voxel
+        
+end subroutine voxel_sample
+
+
+subroutine sample_within_voxel
+! Samples within the extents of a voxel
+! ii, jj, kk are presumed to have been already determined.
+  use source_data
  
 !       Sample random spot within the voxel
         xxx = i_bins(ii+1)+rang()*(i_bins(ii+2)-i_bins(ii+1))
         yyy = j_bins(jj+1)+rang()*(j_bins(jj+2)-j_bins(jj+1))
         zzz = k_bins(kk+1)+rang()*(k_bins(kk+2)-k_bins(kk+1))
-        
-end subroutine voxel_sample
+
+end subroutine sample_within_voxel
 
 
 subroutine uniform_sample
