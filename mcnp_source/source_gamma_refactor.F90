@@ -730,6 +730,7 @@ subroutine gen_alias_table(bins, pairs, probs_list, len)
 
 end subroutine gen_alias_table
 
+
 subroutine sort_for_alias_table(bins, length)
 ! subroutine locates where to move the last bin in bins to,
 ! such that bins is presumably completely sorted again.
