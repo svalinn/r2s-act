@@ -228,7 +228,7 @@ subroutine test_gen_erg_alias_table
           b = expectedProbList(i)
           if (abs(a-b).gt.(1e-5*max(a,b))) then
             write(*,*) "ERROR - test_gen_erg_alias_table in" // &
-                                " table's probablities", a, b
+                                " table's probabilities", a, b
             return
           endif
           if (pairsList(i,1).ne.expectedPairsList(i,1)) then
