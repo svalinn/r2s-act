@@ -2,7 +2,7 @@ This test problem is used to verify that voxel sampling resamples a voxel when p
 
 To run the test problem:
 
-``../../mcnp5p i=void_rejection_test.inp``
+``../../mcnp5p_refactor i=void_rejection_test.inp``
 
 Then, plot the results (requires that matplotlib is installed):
 
