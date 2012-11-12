@@ -25,13 +25,13 @@ subroutine test_heap_sort
         numberlist(1:20,2) = (/ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, &
                 19,20 /)
         
-        call heap_sort(numberlist,20)
+        call heap_sort(numberlist, 20)
         
         ! iterate through, checking that list is in order
         do i=2,20
           !assert
           if (numberlist(i-1,1).gt.numberlist(i,1)) then
-            write(*,*) "Sorting error!"
+            write(*,*) "ERROR - test_heap_sort: List not in proper order."
             return
           endif
         enddo 
@@ -39,6 +39,35 @@ subroutine test_heap_sort
         write(*,*) "test_heap_sort: list sorted correctly"
 
 end subroutine test_heap_sort
+
+
+subroutine test_sort_for_alias_table
+! Test checks for off by one error in sorted alias table
+! Example numbers taken from testing where off by one error has happened before
+        
+        real(dknd),dimension(1:6,1:2) :: binList
+        integer(i4knd),dimension(1:6,1:2) :: pairsList, expectedPairsList
+        real(dknd),dimension(1:6) :: probList, expectedProbList
+        real(dknd) :: a, b
+
+        binList = reshape( (/ 2.0, 2.0, 6.0, 6.0, 8.0, 4.0, &
+                     0.0, 0.0, 0.0, 0.0, 0.0, 0.0 /), shape(binList))
+
+        call sort_for_alias_table(binList, 6)
+
+        ! iterate through, checking that list is in order
+        do i=2,6
+          !assert
+          if (binList(i-1,1).gt.binList(i,1)) then
+            write(*,*) "ERROR - test_sort_for_alias_table: " // &
+                "List not in proper order. Probable off-by-one error."
+            return
+          endif
+        enddo 
+
+        write(*,*) "test_sort_for_alias_table: list sorted correctly"
+
+end subroutine test_sort_for_alias_table
 
 
 subroutine test_read_custom_ergs
@@ -331,6 +360,7 @@ program test_source
 
         write(*,*) "Running Fortran tests --"
         call test_heap_sort
+        call test_sort_for_alias_table
         call test_read_custom_ergs
         call test_read_header
         call test_read_params
