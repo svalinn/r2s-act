@@ -693,8 +693,10 @@ subroutine gen_alias_table(bins, pairs, probs_list, len)
 
         do j=1,len
 
-          ! resort last bin
-          call sort_for_alias_table(bins, len)
+          if ( bins(len,1).lt.n_inv ) then
+            ! resort last bin
+            call sort_for_alias_table(bins, len)
+          endif
 
           ! Lowest bin is less than 1/n, and thus needs a second bin with
           !  which to fill the alias bin.

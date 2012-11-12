@@ -243,12 +243,14 @@ subroutine test_gen_erg_alias_table
 
         binList = (/ .01,.04,.05,.07,.09,.1,.13,.2,.22,.09 /)
 
-        expectedPairsList = reshape( (/ 1,2,3,4,8,5,10,9,6,7,9,8,8,9, &
-                                7,7,7,7,0,0 /), shape(expectedPairsList))
-        expectedProbList = (/ 9.99999E-002,0.3999999,0.50000000, &
-                 0.7000000,0.9000000,0.9000000,0.9000000,0.9999999, &
-                 1.000000000,1.0000000 /)
+        expectedPairsList = reshape( (/ 1,2,3,9,4,8,5,10,6,7,9,9,8,8, &
+                                8,7,7,7,0,0 /), shape(expectedPairsList))
 
+        expectedProbList = (/ 9.9999997E-002,0.3999999,0.5000000, &
+                 0.6999999,0.7000000,0.9000000, &
+                 0.9000000,0.9000000,1.0000000, &
+                 1.0000000 /)
+ 
         call gen_erg_alias_table(10, binList, pairsList, probList)
 
         do i=1,10
@@ -256,12 +258,17 @@ subroutine test_gen_erg_alias_table
           a = probList(i)
           b = expectedProbList(i)
           if (abs(a-b).gt.(1e-5*max(a,b))) then
-            write(*,*) "ERROR - test_gen_erg_alias_table in" // &
-                                " table's probabilities", a, b
+            write(*,*) "ERROR - test_gen_erg_alias_table: " // &
+                                "discrepancy in table's probabilities", a, b
+            write(*,*) "Full list of expected probabilities:", expectedProbList
+            write(*,*) "Full list of actual probabilities:", probList
             return
           endif
           if (pairsList(i,1).ne.expectedPairsList(i,1)) then
-            write(*,*) "ERROR - test_gen_erg_alias_table in table's bin pairs"
+            write(*,*) "ERROR - test_gen_erg_alias_table: " // &
+                                "mismatch in table's bin pairs"
+            write(*,*) "Expected:", expectedPairsList
+            write(*,*) "Result:", pairsList
             return
           endif
         enddo
