@@ -288,7 +288,7 @@ _______________________________________________________________________________
 mats2ALARA.py
 _______________________________________________________________________________
 
-:Purpose: This script reads an MCNP input file and prints out ALARA materials definitions for all the materials specified within it. The user must manually define the densities for each material [g/cm^3] by replacing all instances of <rho> in the resulting file.
+:Purpose: This script reads an MCNP input file and prints out ALARA materials definitions for all the materials specified within it. The user must manually define the densities for each material [g/cm^3] by replacing all instances of <rho> in the resulting file. Material defintions must be formated so that the material number (e.g. m1, m2) and each isotope occupy seperate lines.
 :Inputs: MCNP input file
 :Outputs: ALARA materials definitions
 :Syntax: ``./mats2ALARA.py <mcnp_input_file>``
