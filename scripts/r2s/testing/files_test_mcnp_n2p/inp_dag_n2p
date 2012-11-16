@@ -1,0 +1,57 @@
+Title that should remain unchanged imp:n=1
+c c Note that this is not a valid MCNP input file. imp:n=5
+c 1  0   -1   imp:n=1
+c 1  0   -1   iMp:n=2 $ Should preserve importance of 2
+c 1  0   -1   imp:p=1 $ Shouldn't change
+c c 1  0   -1   imp:n=1 $ Shouldn't change
+c 2  0    1   imp:n=0
+c 2  0    1   imP:n=0 $ Should change, but not this: imp:n=1
+c 2  0    1   imp:p=0 $ Shouldn't change imp:n=1
+c 
+c 1 so 1
+c c nothing in block two should be changed
+c
+mode n
+mode N
+MODE n $ Comment CapItiLizAtioN shoudln't change
+c mode n
+c 
+phys:n
+PHYS:n
+imp:n  1 1  1 1 $ note double spacing is not currently preserved
+IMP:n  1 1  1 1
+imp:n  1 1  1 1 $ Should stay on same line
+c
+sdef par n erg 1
+SDEF par n erg 1
+   sdef par n erg 1
+   SDEF par n erg 1
+c
+kcode
+KCODE
+c
+ksrc
+KSRC
+c
+si
+SI
+si1
+SI1
+c
+sp1
+SP1
+c
+sb1
+SB1
+c
+sc1
+SC1
+c
+ds1
+DS1
+
+We can type stuff here and it shouldn't be modified.
+But it should be preserved!
+imp:n 1 1 1
+sdef par n erg 1
+ksrc

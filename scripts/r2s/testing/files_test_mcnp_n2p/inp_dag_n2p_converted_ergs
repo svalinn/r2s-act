@@ -1,0 +1,69 @@
+Title that should remain unchanged imp:n=1
+c c Note that this is not a valid MCNP input file. imp:n=5
+c 1  0   -1   imp:n=1
+c 1  0   -1   iMp:n=2 $ Should preserve importance of 2
+c 1  0   -1   imp:p=1 $ Shouldn't change
+c c 1  0   -1   imp:n=1 $ Shouldn't change
+c 2  0    1   imp:n=0
+c 2  0    1   imP:n=0 $ Should change, but not this: imp:n=1
+c 2  0    1   imp:p=0 $ Shouldn't change imp:n=1
+c 
+c 1 so 1
+c c nothing in block two should be changed
+c
+mode p
+mode p
+mode p$ Comment CapItiLizAtioN shoudln't change
+c mode n
+c 
+c $ phys:n
+c $ PHYS:n
+imp:p 1 1 1 1$ note double spacing is not currently preserved
+imp:p 1 1 1 1
+imp:p 1 1 1 1$ Should stay on same line
+c
+c $ sdef par n erg 1
+c $ SDEF par n erg 1
+c $    sdef par n erg 1
+c $    SDEF par n erg 1
+c
+c $ kcode
+c $ KCODE
+c
+c $ ksrc
+c $ KSRC
+c
+c $ si
+c $ SI
+c $ si1
+c $ SI1
+c
+c $ sp1
+c $ SP1
+c
+c $ sb1
+c $ SB1
+c
+c $ sc1
+c $ SC1
+c
+c $ ds1
+c $ DS1
+fmesh444:p
+      geom=xyz origin=1.0 1.0 -10.0
+      imesh=5.0
+      iints=4
+      jmesh=5.0 15.0
+      jints=1 2
+      kmesh=2.0 12.0
+      kints=1 1
+      emesh=0.001 0.01 0.02 0.03 0.045 0.06 0.07 0.075 0.1 0.15 0.2 
+            0.3 0.4 0.45 0.51 0.512 0.6 0.7 0.8 1.0 1.33 1.34 1.5 1.66
+             2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5 6.0 6.5 7.0 7.5 8.0 10.0 
+            12.0 14.0 20.0 30.0 50.0
+
+We can type stuff here and it shouldn't be modified.
+But it should be preserved!
+imp:n 1 1 1
+sdef par n erg 1
+ksrc
