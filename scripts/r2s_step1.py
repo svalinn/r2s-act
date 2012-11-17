@@ -4,7 +4,7 @@ import sys
 import os.path
 import ConfigParser
 
-from r2s.io.read_meshtal import read_meshtal
+from r2s.io.read_meshtal import read_meshtal, find_tallies
 from r2s.io.write_alara_fluxin import write_alara_fluxin
 from r2s.io.write_alara_geom import write_alara_geom
 from r2s import mmgrid
@@ -64,7 +64,8 @@ alara_matdict = get_material_dict()
 # Process data
 
 print "Loading mesh tally file `{0}'".format(meshtal_file)
-smesh = read_meshtal(meshtal_file)
+tally_numbers, tally_lines =find_tallies(meshtal_file)
+smesh = read_meshtal(meshtal_file, tally_lines[0])
 
 print "Loading geometry file `{0}'".format(mcnp_geom)
 mmgrid.load_geom(mcnp_geom)

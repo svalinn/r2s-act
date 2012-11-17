@@ -150,7 +150,7 @@ def tag_fluxes(meshtal, meshtal_type, m, spacial_points, \
         tag_error[voxels]=error_data
     print '\tFluxes multiplied by source normalization of {0}'.format(norm)
 
-def read_meshtal( filename, tally_line, norm,  **kw ):
+def read_meshtal( filename, tally_line, norm=1,  **kw ):
     """Read an MCNP meshtal file and return a structured mesh for it
 
     The optional normalization factor will be multipled into each flux value.
