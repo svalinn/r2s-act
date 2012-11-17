@@ -27,6 +27,11 @@ SDEF par n erg 1
    sdef par n erg 1
    SDEF par n erg 1
 c
+sdef par n $ test indented line comment-outs
+     erg 1
+     this line would be an invalid card
+    so would this one, but it won't be modified.
+c
 kcode
 KCODE
 c

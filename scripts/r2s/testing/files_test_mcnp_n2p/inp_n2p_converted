@@ -24,6 +24,13 @@ imp:p 1 1 1 1$ Should stay on same line
 c
 c $ sdef par n erg 1
 c $ SDEF par n erg 1
+c $    sdef par n erg 1
+c $    SDEF par n erg 1
+c
+c $ sdef par n $ test indented line comment-outs
+c     erg 1
+c     this line would be an invalid card
+    so would this one, but it won't be modified.
 c
 c $ kcode
 c $ KCODE

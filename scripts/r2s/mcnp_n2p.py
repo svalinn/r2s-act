@@ -171,7 +171,7 @@ class ModMCNPforPhotons(object):
 
         for cnt, line in enumerate(self.block3Lines):
             
-            # ignore comment lines
+            # ignore existing comment lines
             if line.split()[0] == 'c' or line.split()[0] == 'C':
                 continue
 
@@ -411,6 +411,8 @@ def main():
     parser.add_option("-d","--dagmc",action="store_true",dest="dagmc", \
             default=False, help="Add flag to parse file like a DAG-MCNP file " \
             "(which has only title card and block 3 cards). Default: %default")
+    # TODO add commandline passing of mesh to add fmesh card
+    #
 
     (options, args) = parser.parse_args()
     
