@@ -151,22 +151,27 @@ step2setup = 0
 #  other numbers correspond with cooling times listed in your ALARA input.
 # -sampling determines the sampling method used:
 #   u for uniform sampling; v for voxel sampling (default)
-# -if photon_bias is 1 (true), the gammas file will try to include voxel bias
-#  values from the mesh (stored as PHTN_BIAS tag). Currently requires
+# -if photon_bias is 1 (true), the gammas file will try to include voxel
+#  bias values from the mesh (stored as PHTN_BIAS tag). Currently requires
 #  photon_by_voxel to be 1.
-# -if custom_ergbins is 1 (true), custom energy bins will be looked for on the 
-#   mesh, and included in gammas file if found. (default: false; 42 grps used)
-# -cumulative determines the format for listing voxels in gammas file. Default
-#   is zero (false), which is preferred.
-# Note: photon_isotope and photon_cooling can have multiple, comma delimited
-#  entries for use in conjunction with the r2s_step2setup.py script.
+# -if custom_ergbins is 1 (true), custom energy bins will be looked for on
+#   the mesh, and included in gammas file if found. 
+#   (Default: false; 42 grps used)
+# -cumulative determines the format for listing voxels in gammas file.
+#   Default is zero (false), which is preferred.
+# -add_fmesh_card adds an fmesh tally with mesh information to the MCNP
+#   photon input file that is created. Mesh information is taken from 
+#   step1_datafile.
+# Note: photon_isotope and photon_cooling can have multiple, comma 
+#  delimited entries for use in conjunction with the r2s_step2setup.py script.
 photon_isotope = TOTAL
 photon_cooling = 0
 sampling = v
-# Next three use 0 for false, 1 for true; See above.
+# Next four use 0 for false, 1 for true; See above.
 photon_bias = 0
 custom_ergbins = 0
 cumulative = 0
+add_fmesh_card = 1
 
 
 ###############################################################################

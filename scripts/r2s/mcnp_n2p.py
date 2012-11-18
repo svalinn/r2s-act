@@ -6,7 +6,7 @@ from optparse import OptionParser
 import textwrap as tw
 
 from itaps import iMesh, iBase, iMeshExtensions
-import scdmesh
+from scdmesh import ScdMesh, ScdMeshError
 
 
 class ModMCNPforPhotons(object):
@@ -16,14 +16,17 @@ class ModMCNPforPhotons(object):
      block 2, and block 3.
     """
 
-    def __init__(self, myInputFileName, dagmc=True):
+    def __init__(self, myInputFileName, dagmc=None):
         """Init function for class ModMCNPforPhotons. Receives an MCNP input 
         file.
         """
         super(ModMCNPforPhotons, self).__init__()
 
         self.inputFileName = myInputFileName
+
         self.dagmc = dagmc
+        if self.dagmc is None:
+            self.dagmc = _is_dagmc(self.inputFileName)
 
 
     def read(self):
@@ -35,6 +38,7 @@ class ModMCNPforPhotons(object):
         Blocks 1 and 2 are used to create a surface parser object
         """
 
+        # empty initializations
         self.block1Lines = []
         self.block2Lines = []
         self.block3Lines = []
@@ -69,6 +73,19 @@ class ModMCNPforPhotons(object):
         print "'{0}' has been read.\n".format(self.inputFileName)
 
         return 1
+
+
+    def convert(self):
+        """
+
+        """
+
+        if not self.dagmc:
+            self.change_block_1()
+            self.change_block_2()
+        self.change_block_3()
+
+        return
 
 
     def mcnp_block_parser(self, fr, blockLines, commentLines):
@@ -365,6 +382,32 @@ class ModMCNPforPhotons(object):
         return 1
 
 
+def _is_dagmc(filename):
+    """Use first non-title, non-comment line to determin if input is for DAGMCNP
+
+    The test to determine this has two cases:
+    - First character of line is a number -> regular MCNP input
+    - Otherwise, first character corresponds
+       with some data card... -> DAG MCNP input
+    """
+
+    fr = open(filename, 'r')
+
+    line = fr.readline()
+    line = fr.readline()
+
+    while line[:2] == 'c ' or line == 'c':
+        line = fr.readline().strip().lower()
+
+    try:
+        int(line[0])
+        # number -> regular MCNP input
+        return False
+    except ValueError:
+        # non-number -> DAG MCNP input
+        return True
+
+
 def _get_coarse_and_intervals(xdiv):
     """From list of mesh intervals get xmesh and xints for fmesh card
 
@@ -411,8 +454,9 @@ def main():
     parser.add_option("-d","--dagmc",action="store_true",dest="dagmc", \
             default=False, help="Add flag to parse file like a DAG-MCNP file " \
             "(which has only title card and block 3 cards). Default: %default")
-    # TODO add commandline passing of mesh to add fmesh card
-    #
+    parser.add_option("-m","--mesh",action="store",dest="fmesh", \
+            default=None, help="Add meshtally (fmesh card), with mesh taken " \
+            "from a .h5m or .vtk file that is supplied with this option.")
 
     (options, args) = parser.parse_args()
     
@@ -420,10 +464,10 @@ def main():
         x = ModMCNPforPhotons(args[0], options.dagmc)
 
         x.read()
-        if not x.dagmc:
-            x.change_block_1()
-            x.change_block_2()
-        x.change_block_3()
+        x.convert()
+        if options.fmesh != None:
+            smesh = ScdMesh.fromFile(options.fmesh)
+            x.add_fmesh_from_scdmesh(smesh)
         x.write_deck(options.outputfile)
     
     else:
