@@ -80,7 +80,6 @@ class TestDAGMCNP(unittest.TestCase):
         self.obj.read()
         # change only block 3
         self.obj.convert()
-        #self.obj.change_block_3()
 
     def tearDown(self):
         os.system("rm " + dag_testfile_out)
@@ -123,7 +122,7 @@ class TestDAGMCNP(unittest.TestCase):
         fw2.close()
 
 
-auto_testfile_out = os.path.join(thisdir, "files_test_mcnp_n2p/inp_dag_n2p_p")
+auto_testfile_out = os.path.join(thisdir, "files_test_mcnp_n2p/inp_auto_dag_n2p_p")
 
 class TestAutoDetermineInputType(unittest.TestCase):
 
@@ -136,13 +135,11 @@ class TestAutoDetermineInputType(unittest.TestCase):
     def test_mcnp_input_run(self):
         self.obj = mcnp_n2p.ModMCNPforPhotons(testfile)
         self.obj.read()
-        # change only block 3
         self.obj.convert()
 
     def test_dag_input_run(self):
         self.obj = mcnp_n2p.ModMCNPforPhotons(dag_testfile)
         self.obj.read()
-        # change only block 3
         self.obj.convert()
 
     def test_mcnp_consistent(self):
