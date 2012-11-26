@@ -574,10 +574,12 @@ subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, pairsList)
         real(dknd),dimension(1:n_vox,1:n_grp), intent(IN) :: probList
         integer(i4knd),dimension(1:n_vox,1:n_grp,1:2),intent(IN) :: pairsList
 
+        real(dknd) :: rand
     
         ! Sampling the alias table
-        alias_bin = INT(rang() * n_grp) + 1
-        if (rang().lt.probList(myvoxel,alias_bin)) then
+        rand = rang() * n_grp
+        alias_bin = INT(rand) + 1
+        if ((rand - (alias_bin - 1)).lt.probList(myvoxel,alias_bin)) then
           j = pairsList(myvoxel,alias_bin,1)
         else
           j = pairsList(myvoxel,alias_bin,2)
