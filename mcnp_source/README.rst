@@ -79,7 +79,7 @@ For those in CNERG, a custom DAG-MCNP/MCNP5 executable compiled with the custom 
 
 Custom-compiled dag-mcnp/mcnp5 executable links:
 
-:``mcnp5p_voxel``: compiled with ``source_gamma_voxel_alias.F90``
+:``mcnp5p``: compiled with ``source_gamma.F90``
 
 testing/
 ---------
