@@ -1,5 +1,5 @@
 # Modify and copy source.F90 file
-python hide_source.py ../source_gamma_refactor.F90
+python hide_source.py ../source_gamma.F90
 
 # Generate the .o files..
 gfortran -c mcnp_placeholder.F90 -g

@@ -12,63 +12,6 @@ module tests_mod
 contains 
 
 ! Beginning of test subroutines
-subroutine test_heap_sort
-! Runs heap_sort on a random list of 20 numbers (each paired with an integer)
-!  and checks that the pairs are sorted from low to high.
-
-        real(dknd),dimension(1:20,1:2) :: numberlist
-
-        numberlist(1:20,1) = (/-8.1301, 4.11258, 7.79718, -1.85288, -7.95862, &
-                -8.08673, -6.6186, -5.81336, 7.07123, -9.04205, 3.03174, &
-                2.94209, 9.71009, 2.17249, 9.2046, -1.40283, -7.6387, &
-                -8.28028, -8.89815, -6.27705 /)
-        numberlist(1:20,2) = (/ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, &
-                19,20 /)
-        
-        call heap_sort(numberlist, 20)
-        
-        ! iterate through, checking that list is in order
-        do i=2,20
-          !assert
-          if (numberlist(i-1,1).gt.numberlist(i,1)) then
-            write(*,*) "ERROR - test_heap_sort: List not in proper order."
-            return
-          endif
-        enddo 
-
-        write(*,*) "test_heap_sort: list sorted correctly"
-
-end subroutine test_heap_sort
-
-
-subroutine test_sort_for_alias_table
-! Test checks for off by one error in sorted alias table
-! Example numbers taken from testing where off by one error has happened before
-        
-        real(dknd),dimension(1:6,1:2) :: binList
-        integer(i4knd),dimension(1:6,1:2) :: pairsList, expectedPairsList
-        real(dknd),dimension(1:6) :: probList, expectedProbList
-        real(dknd) :: a, b
-
-        binList = reshape( (/ 2.0, 2.0, 6.0, 6.0, 8.0, 4.0, &
-                     0.0, 0.0, 0.0, 0.0, 0.0, 0.0 /), shape(binList))
-
-        call sort_for_alias_table(binList, 6)
-
-        ! iterate through, checking that list is in order
-        do i=2,6
-          !assert
-          if (binList(i-1,1).gt.binList(i,1)) then
-            write(*,*) "ERROR - test_sort_for_alias_table: " // &
-                "List not in proper order. Probable off-by-one error."
-            return
-          endif
-        enddo 
-
-        write(*,*) "test_sort_for_alias_table: list sorted correctly"
-
-end subroutine test_sort_for_alias_table
-
 
 subroutine test_read_custom_ergs
 ! Reads in values from 'test_ergs_list.txt' and matches them to expected values 
@@ -243,13 +186,13 @@ subroutine test_gen_erg_alias_table
 
         binList = (/ .01,.04,.05,.07,.09,.1,.13,.2,.22,.09 /)
 
-        expectedPairsList = reshape( (/ 1,2,3,9,4,8,5,10,6,7,9,9,8,8, &
-                                8,7,7,7,0,0 /), shape(expectedPairsList))
+        expectedPairsList = reshape( (/ 1,2,3,4,5,6,7,8,9,10,8,9,9,9, &
+                                9,-1,-1,7,8,9 /), shape(expectedPairsList))
 
         expectedProbList = (/ 9.9999997E-002,0.3999999,0.5000000, &
-                 0.6999999,0.7000000,0.9000000, &
-                 0.9000000,0.9000000,1.0000000, &
-                 1.0000000 /)
+                 0.7000000,0.9000000,1.0000000, &
+                 1.0000000,0.7000000,0.6000000, &
+                 0.9000000 /)
  
         call gen_erg_alias_table(10, binList, pairsList, probList)
 
@@ -269,6 +212,8 @@ subroutine test_gen_erg_alias_table
                                 "mismatch in table's bin pairs"
             write(*,*) "Expected:", expectedPairsList
             write(*,*) "Result:", pairsList
+            write(*,*) "Full list of expected probabilities:", expectedProbList
+            write(*,*) "Full list of actual probabilities:", probList
             return
           endif
         enddo
@@ -298,10 +243,10 @@ subroutine test_erg_sampling_distrib
 
         testcnt = 100000
         do cnt=1,testcnt
-          !
+          ! Sample an energy, testerg
           call sample_erg (testerg, 1, nbins, 1, probList, pairsList)
 
-          ! Tally the energies.
+          ! Tally the energy bin corresponding with testerg
           do talcnt=1,nbins
             if (testerg.lt.my_ener_phot(talcnt + 1)) then
               tallyList(talcnt) = tallyList(talcnt) + 1
@@ -321,12 +266,13 @@ subroutine test_erg_sampling_distrib
 
         write(*,'(a,a,es10.3)') " test_erg_sampling_distrib: maximum ", &
                 "relative error in bin sampling frequency - ", maxdev
+        write(*,*) tallyList
 
 end subroutine test_erg_sampling_distrib
 
 
 subroutine test_uniform_sample
-! 
+! Tests that sampled positions are within problem; does 1e4 test samplings.
         deallocate(i_bins)
         deallocate(j_bins)
         deallocate(k_bins)
@@ -366,8 +312,6 @@ program test_source
         call RN_init_problem() ! init random number generator to defaults
 
         write(*,*) "Running Fortran tests --"
-        call test_heap_sort
-        call test_sort_for_alias_table
         call test_read_custom_ergs
         call test_read_header
         call test_read_params
