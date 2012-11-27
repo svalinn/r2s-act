@@ -33,10 +33,15 @@ def main():
             fw.write("!" + line)
             if line.split()[-1:] != ["&"]:
                 commentout += 3
+        # Hide output from write(*,*) statements.
+        # Use e.g wrITE(*,*) to get around this when debugging.
         elif line.split()[0:1] == ["write(*,*)"]:
             fw.write("!" + line)
             if line.split()[-1:] == ["&"]:
                 commentout -= 3
+        # Hide calls to expirx, since we don't distribute that function.
+        elif line.split()[0:1] == ['call'] and line.split()[1][:6] == 'expirx':
+            fw.write("        continue\n")
         else:
             fw.write(line)
 

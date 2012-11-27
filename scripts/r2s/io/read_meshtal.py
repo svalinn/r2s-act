@@ -75,7 +75,7 @@ def find_first_line(meshtal, tally_line) :
     heading=['Result', 'Rel', 'Error']
     m=tally_line
     line_array=[]
-    while line_array[4:7] != heading :
+    while line_array[-3:] != heading :
         line=linecache.getline(meshtal,m)
         line_array=line.split()
         m += 1
