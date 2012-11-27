@@ -141,9 +141,9 @@ def tag_fluxes(meshtal, meshtal_type, m, spacial_points, \
         error_data=[]
         for point in range(0, spacial_points) :
             flux_data.append( float(linecache.getline( meshtal,m+point+\
-                               (e_group-1)*spacial_points ).split()[4])*norm)
+                               (e_group-1)*spacial_points ).split()[-2])*norm)
             error_data.append(float(linecache.getline( meshtal,m+point+\
-                               (e_group-1)*spacial_points ).split()[5]))
+                               (e_group-1)*spacial_points ).split()[-1]))
 
         #Tag data for energy group 'e_group' onto all voxels
         tag_flux[voxels]=flux_data
