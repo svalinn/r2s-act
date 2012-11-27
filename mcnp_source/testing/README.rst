@@ -4,11 +4,14 @@ This script can be modified at the top to change the location of the source file
 
 -----
 
-Actual tests are contained in ```test_source.F90```.
+Actual tests are contained in ``test_source.F90``.
 
 Of note is that ``source.F90`` file being tested is modified before testing. The modifications made are:
 
-- comment out the ``source`` subroutine; avoids needing several mcnp-internal arrays
+- comment out the ``source`` subroutine; avoids needing several mcnp-internal arrays/variables
 - comment out ``write(*,*)`` statements so that output from testing is easily observed
+- replaces ``expirx`` calls with ``continue``
 
 If you want ``write(*,*)`` statements to go through, change the capitalization, e.g. ``WRITE(*,*)`` ...
+
+

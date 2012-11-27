@@ -6,20 +6,20 @@ The R2S-ACT workflow uses a custom photon sampling source routine in MCNP in ord
 
 This folder contains a modified version(s) of the ``source.F90`` file, and a link to the custom-compiled DAG-MCNP executable that uses this custom ``source.F90`` file (link is only applicable for user in *cnergg* group on Wisconsin's CAE; see section *CNERG custom executables*).
 
-As of Oct. 30, 2012, the most up to date/capable ``source.F90`` replacement is ``source_gamma_refactor.F90``.
+As of Nov. 27, 2012, the most up to date/capable ``source.F90`` replacement is ``source_gamma.F90``.
 
 source.F90 files
 ----------------
 
-The different source.F90 versions...
+The different ``source.F90`` versions...
 
 Wisconsin R2S-ACT:
 
-:``source_gamma_refactor.F90``: Derived from ``vendor/source_gamma_meshtal2.F90``; Implements alias table sampling of voxels, as well as alias table sampling of photon energies. Also implements biasing. Uses *gammas* file that can include bias values and custom energy bins.  The original code was modified from 24 energy groups to 42 groups (or custom), and dynamic array allocation was added.
+:``source_gamma.F90``: Derived from ``vendor/source_gamma_meshtal2.F90``; Implements alias table sampling of voxels, as well as alias table sampling of photon energies. Also implements biasing. Uses *gammas* file that can include bias values and custom energy bins.  The original code was modified from 24 energy groups to 42 groups (or custom), and dynamic array allocation was added.
 
-From KIT (Germany); Details specified in *Leichtle_R2Smesh_Source_20111006.pdf*:
+From KIT (Germany); Details specified in *vendor/Leichtle_R2Smesh_Source_20111006.pdf*:
 
-:``vendor/source_gamma_meshtal1.F90``: uses RDUM and IDUm cards in MCNP
+:``vendor/source_gamma_meshtal1.F90``: uses RDUM and IDUM cards in MCNP
 :``vendor/source_gamma_meshtal2.F90``: reads in data from file ``gammas`` 
 
 From CCFE (UK):
@@ -43,7 +43,7 @@ On a CAE system, one should be able to use the mcnp5p links for running problems
 
 Alternately, to use one of these in a custom compile of MCNP/DAG-MCNP, one can check out the DAG-MCNP source, and then link the files in the repository to the ``DAG-MCNP/5.1.51/trunk/Source/src`` folder like this:
 
-``ln -s *path to this folder*/source_gamma_meshtal2.F90 source.F90``
+``ln -s *path to this folder*/source_gamma.F90 source.F90``
 
 (or you could copy the file to that folder, but it won't get updated when changes happen in the repository)
 
