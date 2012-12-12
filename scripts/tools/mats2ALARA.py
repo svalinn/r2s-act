@@ -35,23 +35,22 @@ def find_mat_lines( inp ) :
 
     # scroll through every line of the mcnp inp file
     while line != '':
+        lineparts = line.split().lower()
 
         # check to see if there are characters in line
-        if len(line.split()) > 0:
+        #  and check to see if the first string has more than one character
+        if len(lineparts) > 0 and len(lineparts[0]) > 1:
 
-            # check to see if the first string has more than one character
-            if len(line.split()[0]) > 1 :
-
-                # check to see if first string is in the form m* where * is a digit
-                if line.split()[0][0] == 'm'or line.split()[0][0] == 'M' and \
-                        line.split()[0][1].isdigit() == True:
-                    # add line number to line array
-                    line_array.append(line_count)   
-                    mat_nums.append(line.split()[0][1:])                                    
-
+            # check to see if first string is in the form m* where * is a digit
+            if lineparts[0][0] == 'm' and \
+                    lineparts[0][1].isdigit() == True:
+                # add line number to line array
+                line_array.append(line_count)   
+                mat_nums.append(lineparts[0][1:])                                    
         line_count += 1
         line = linecache.getline(inp,line_count)
 
+    print line_array
     return line_array, mat_nums
 
 ###############################################################################
