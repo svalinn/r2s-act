@@ -35,7 +35,7 @@ def find_mat_lines( inp ) :
 
     # scroll through every line of the mcnp inp file
     while line != '':
-        lineparts = line.split().lower()
+        lineparts = [part.lower() for part in line.split()]
 
         # check to see if there are characters in line
         #  and check to see if the first string has more than one character
