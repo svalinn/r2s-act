@@ -242,7 +242,7 @@ def tag_phtn_src_totals(sm, numergbins=-1, retag=False):
                             "first voxel. phtn_src file used to create tags " \
                             "probably did not include enough voxels. This is " \
                             "a problem with ALARA and voids. Replace void " \
-                            "with a low density material, e.g. neon."
+                            "with any zero density material to fix this."
                 return 0
 
         # Add the total as a tag
