@@ -90,22 +90,22 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
 
         if lineparts[0].strip(' ') == isotope and \
                 lineparts[1].strip(' ') == coolingstep:
-                    for grp, val, in enumerate(lineparts[2:]):
-                         (tagList[grp])[voxels[voxelcnt]] = float(val)
-                    foundIsoCool = True
-                    if specialIsotope: 
-                        writeZeros = False # Ignores TOTAL line in this voxel
-                    else: voxelcnt += 1
+            for grp, val, in enumerate(lineparts[2:]):
+                 (tagList[grp])[voxels[voxelcnt]] = float(val)
+            foundIsoCool = True
+            if specialIsotope: 
+                writeZeros = False # Ignores TOTAL line in this voxel
+            else: voxelcnt += 1
 
         # Note voxels that do not have the isotope of interest, and tag
         #  them as 0.0 source strength.
         elif lineparts[0] == 'TOTAL' and \
                 lineparts[1].strip(' ') == coolingstep:
-                    if writeZeros:
-                        for grp, val, in enumerate(lineparts[2:]):
-                             (tagList[grp])[voxels[voxelcnt]] = 0.0
-                    voxelcnt += 1
-                    writeZeros = True # Reset to true at end of voxel's entry
+            if writeZeros:
+                for grp, val, in enumerate(lineparts[2:]):
+                     (tagList[grp])[voxels[voxelcnt]] = 0.0
+            voxelcnt += 1
+            writeZeros = True # Reset to true at end of voxel's entry
 
     fr.close()
     
