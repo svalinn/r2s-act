@@ -224,7 +224,7 @@ class mmGrid:
     def generate(self, N, use_grid=False ):
         """Sample the DagMC geometry and store the results on this grid.
 
-        N is the number of samples to take per voxel per dimsion
+        N is the number of samples to take per voxel per dimension
         """
         count = 1
         if use_grid:
