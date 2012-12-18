@@ -25,6 +25,7 @@ gammas6 = os.path.join(thisdir,"files_test_write_gammas/gammas_voxel_seq_bias")
 gammas7 = os.path.join(thisdir,"files_test_write_gammas/gammas_voxel_cum")
 gammas8 = os.path.join(thisdir,"files_test_write_gammas/gammas_voxel_cum_bias")
 
+totalsfile = os.path.join(os.getcwd(), "phtn_src_totals")
 
 class TestCalcVolumes(unittest.TestCase):
 
@@ -53,6 +54,7 @@ class TestWriteGammas_Runs(unittest.TestCase):
     def tearDown(self):
         os.system("rm " + meshfile)
         os.system("rm " + outfile)
+        os.system("rm " + totalsfile)
     
     def test_gen_gammas(self):
         """Tests a run-through with defaults; direct discrete."""
@@ -94,6 +96,7 @@ class TestWriteGammas_Correct(unittest.TestCase):
 
     def tearDown(self):
         os.system("rm " + outfile)
+        os.system("rm " + totalsfile)
 
     def compare_gammas(self, myoutfile, mygammas):
         # Method does comparisons of two files.
