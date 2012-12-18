@@ -10,6 +10,7 @@ from r2s.io.write_alara_geom import write_alara_geom
 from r2s import mmgrid
 from r2s_setup import get_input_file as r2s_input_file
 from r2s_setup import FileMissingError
+from scdmesh import ScdMesh, ScdMeshError
 
 cfgfile = 'r2s.cfg'
 if len(sys.argv) > 1:
@@ -29,6 +30,9 @@ def get_material_dict():
             d[key] = config.get('r2s-material',key)
     return d
 
+###########################
+# Read in config file information
+
 # Get the input files for this step: the meshtal and the mcnp geometry
 
 meshtal_file = get_input_file('neutron_meshtal')
@@ -42,6 +46,10 @@ except FileMissingError:
     mcnp_file = get_input_file('neutron_mcnp_input')
     os.system('mcnp2cad -o {0} {1}'.format(filename,mcnp_file))
     mcnp_geom = get_input_file('mcnp_geom')
+
+gen_mmgrid = True
+if config.has_option('r2s-params','gen_mmgrid'):
+    gen_mmgrid = bool(int( config.get('r2s-params', 'gen_mmgrid') ))
 
 try:
     alara_snippet = get_input_file('alara_snippet')
@@ -61,26 +69,46 @@ fluxin = config.get('r2s-files','alara_fluxin')
 alara_geom = config.get('r2s-files','alara_geom')
 alara_matdict = get_material_dict()
 
-# Process data
+
+###########################
+# Do step 1
 
 print "Loading mesh tally file `{0}'".format(meshtal_file)
-tally_numbers, tally_lines =find_tallies(meshtal_file)
-smesh = read_meshtal(meshtal_file, tally_lines[0])
+tally_numbers, tally_lines = find_tallies(meshtal_file)
+# If not regenerating the mmGrid info, attempt to load existing datafile
+if gen_mmgrid == False:
+    print "Attempting to re-use existing ScdMesh file '{0}'".format(datafile)
+    alt_sm = ScdMesh.fromFile(datafile)
+    try:
+        smesh = read_meshtal(meshtal_file, tally_lines[0], smesh=alt_sm)
+    except ScdMeshError:
+        print "ERROR:"
+        print "Existing mesh in '{0}' does not match mesh in '{1}'. Set the " \
+                "'gen_mmgrid' option to True in your 'r2s.cfg' file.".format( \
+                datafile, meshtal_file)
+        sys.exit()
+else:
+    smesh = read_meshtal(meshtal_file, tally_lines[0])
 
 print "Loading geometry file `{0}'".format(mcnp_geom)
 mmgrid.load_geom(mcnp_geom)
 
-mmgrid_rays = 10
-if config.has_section('r2s-params') and config.has_option('r2s-params','mmgrid_rays'):
-    mmgrid_rays = int(config.get('r2s-params','mmgrid_rays'))
-else:
-    print "No 'mmgrid_rays' parameter in the 'r2s-params' section, using default."
+# Do ray tracing to create macromaterials, if enabled.
+if gen_mmgrid:
+    mmgrid_rays = 10
+    if config.has_section('r2s-params') and config.has_option( \
+            'r2s-params','mmgrid_rays'):
+        mmgrid_rays = int(config.get('r2s-params','mmgrid_rays'))
+    else:
+        print "No 'mmgrid_rays' parameter in the 'r2s-params' section, " \
+                "using default."
 
-print "Will use {0} rays per mesh row".format(mmgrid_rays)
+    print "Will use {0} rays per mesh row".format(mmgrid_rays)
 
-grid = mmgrid.mmGrid( smesh )
-grid.generate( mmgrid_rays, False )
-grid.createTags()
+    grid = mmgrid.mmGrid( smesh )
+    grid.generate( mmgrid_rays, False )
+    grid.createTags()
+
 
 print "Saving fluxes and materials to `{0}'".format(datafile)
 smesh.imesh.save(datafile)

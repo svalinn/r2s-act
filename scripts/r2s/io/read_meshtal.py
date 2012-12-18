@@ -12,7 +12,7 @@
 ################################################################################
 # Written by Elliott Biondo, Biondo@wisc.edu
 ###############################################################################
-from itaps import iMesh
+from itaps import iMesh, iBase
 from optparse import OptionParser
 import linecache
 import sys
@@ -126,19 +126,26 @@ def tag_fluxes(meshtal, meshtal_type, m, spacial_points, \
     voxels=list(sm.iterateHex('xyz'))
     
     for e_group in range(1, e_bins +1) : 
+        # Create tags if they do not already exist
+        if e_group != e_bins: # tag name for each E bin
+            flux_str = '{0}_group_{1:03d}'.format(meshtal_type, e_group)
+            error_str = '{0}_group_{1:03d}_error'.format(meshtal_type, e_group)
+        elif e_group == e_bins or e_bins == 1: # tag name for totals group
+            flux_str = meshtal_type + '_group_total'
+            error_str = meshtal_type+'_group_total_error'
 
-        if e_group != e_bins: #create a new tag for each E bin
-            tag_flux=sm.imesh.createTag\
-                    ('{0}_group_{1:03d}'.format(meshtal_type, e_group),1,float)
-            tag_error=sm.imesh.createTag\
-                    ('{0}_group_{1:03d}_error'.format(meshtal_type, e_group),1,float)
-        elif e_group==e_bins or e_bins == 1: #create a tags for totals group
-            tag_flux=sm.imesh.createTag(meshtal_type+'_group_total',1,float)
-            tag_error=sm.imesh.createTag(meshtal_type+'_group_total_error',1,float)
+        try:
+            tag_flux=sm.imesh.createTag(flux_str, 1, float)
+        except iBase.TagAlreadyExistsError:
+            tag_flux = sm.imesh.getTagHandle(flux_str)
+        try:
+            tag_error=sm.imesh.createTag(error_str ,1, float)
+        except iBase.TagAlreadyExistsError:
+            tag_error = sm.imesh.getTagHandle(error_str)
 
         #Create lists of data from meshtal file for energy group 'e_group'
-        flux_data=[]
-        error_data=[]
+        flux_data = list()
+        error_data = list()
         for point in range(0, spacial_points) :
             flux_data.append( float(linecache.getline( meshtal,m+point+\
                                (e_group-1)*spacial_points ).split()[-2])*norm)

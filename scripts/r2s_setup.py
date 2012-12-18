@@ -135,6 +135,12 @@ photon_mcnp_input = mcnp_p.inp
 # also increase the runtime of r2s_step1.
 mmgrid_rays = 10
 
+# If 
+# If gen_mmgrid is 1, ray tracing is performed to generate the macromaterials
+#  grid during r2s_step1.py. If the macromaterial grid already exists, set this
+#  parameter to 0 (False) to avoid re-running the ray tracing.
+gen_mmgrid = 1
+
 # If step2setup is 1, runs the r2s_step2setup.py script at the end of 
 #  r2s_step1.py.  r2s_step2setup.py creates folders for all cooling steps
 #  and isotopes specified

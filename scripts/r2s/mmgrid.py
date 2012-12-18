@@ -7,7 +7,7 @@ import random
 import sys
 import optparse
 
-from itaps import iMesh
+from itaps import iMesh, iBase
 import scdmesh
 from io.write_alara_geom import write_alara_geom
 from pydagmc import dagmc
@@ -272,10 +272,18 @@ class mmGrid:
         _msg("Maximum error: {0}".format(max_err))
 
     def createTags(self):
+        """ """
         mesh = self.scdmesh.imesh
         for idx, ((mat, rho), (matnum,matname)) in enumerate(self.materials.iteritems()):
-            mattag = mesh.createTag( matname, 1, np.float64 )
-            errtag = mesh.createTag( matname+'_err', 1, np.float64 )
+            try: 
+                mattag = mesh.createTag( matname, 1, np.float64 )
+            except iBase.TagAlreadyExistsError:
+                mattag = mesh.getTagHandle( matname )
+            try:
+                errtag = mesh.createTag( matname+'_err', 1, np.float64 )
+            except iBase.TagAlreadyExistsError:
+                errtag = mesh.getTagHandle( matname + '_err')
+
             for ijk, (mat,err) in np.ndenumerate(self.grid):
                 offset_ijk = [x+y for x,y in zip(ijk,self.scdmesh.dims[0:3])]
                 hx = self.scdmesh.getHex(*offset_ijk)
@@ -283,6 +291,7 @@ class mmGrid:
                 errtag[hx] = err[matnum]
 
     def writeFile(self, filename, alara_geom_file=None ):
+        """ """
         mesh = self.scdmesh
         mesh.scdset.save(filename)
         if alara_geom_file:
