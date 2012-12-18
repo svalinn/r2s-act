@@ -4,7 +4,7 @@ import itertools
 
 from r2s.io import read_alara_phtn
 from r2s.io import write_gammas
-from scdmesh import ScdMesh, ScdMeshError
+from r2s.scdmesh import ScdMesh, ScdMeshError
 from itaps import iMesh, iBase
 
 thisdir = os.path.dirname(__file__)

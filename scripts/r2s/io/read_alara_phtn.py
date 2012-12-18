@@ -2,7 +2,7 @@
 
 from optparse import OptionParser
 from itaps import iBase,iMesh
-from scdmesh import ScdMesh, ScdMeshError
+from r2s.scdmesh import ScdMesh, ScdMeshError
 
 
 def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \

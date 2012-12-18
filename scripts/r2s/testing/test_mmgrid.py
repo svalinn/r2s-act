@@ -14,7 +14,7 @@ except ImportError as e:
     raise nose.SkipTest
    
 from itaps import iMesh, iMeshExtensions
-from scdmesh import ScdMesh
+from r2s.scdmesh import ScdMesh
 
 class mmGridHelperTest( unittest.TestCase) :
 

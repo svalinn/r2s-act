@@ -3,7 +3,7 @@ import linecache
 from optparse import OptionParser
 import sys
 from itaps import iMesh, iBase
-from scdmesh import ScdMesh
+from r2s.scdmesh import ScdMesh
 
 def find_num_e_groups(sm):
     

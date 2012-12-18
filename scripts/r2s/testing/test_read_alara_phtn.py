@@ -1,5 +1,5 @@
 from r2s.io import read_alara_phtn
-from scdmesh import ScdMesh, ScdMeshError
+from r2s.scdmesh import ScdMesh, ScdMeshError
 import os
 import os.path
 import unittest

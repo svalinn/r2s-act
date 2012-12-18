@@ -4,7 +4,8 @@ import itertools
 from itaps import iMesh
 
 from r2s import mcnp_n2p
-import scdmesh
+#import scdmesh
+from r2s import scdmesh
 
 
 # These directories are relative to scripts directory.

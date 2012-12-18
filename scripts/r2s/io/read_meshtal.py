@@ -16,7 +16,7 @@ from itaps import iMesh, iBase
 from optparse import OptionParser
 import linecache
 import sys
-from scdmesh import ScdMesh, ScdMeshError
+from r2s.scdmesh import ScdMesh, ScdMeshError
 
 ################################################################################
 #Searches the meshtal file to determine the number of tallies present and

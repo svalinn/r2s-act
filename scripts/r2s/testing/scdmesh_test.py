@@ -5,7 +5,7 @@ import os.path
 import itertools
 from operator import itemgetter
 
-from scdmesh import ScdMesh, ScdMeshError
+from r2s.scdmesh import ScdMesh, ScdMeshError
 
 class ScdMeshTest(unittest.TestCase):
 

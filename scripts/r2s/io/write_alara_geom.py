@@ -5,7 +5,7 @@ import re
 import operator
 
 from itaps import iBase, iMesh, iMeshExtensions
-from scdmesh import ScdMesh
+from r2s.scdmesh import ScdMesh
 
 def _create_mixture_tuple( v ):
     """Create a tuple from a sequence of numbers

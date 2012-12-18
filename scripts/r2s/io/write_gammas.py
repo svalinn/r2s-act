@@ -15,7 +15,7 @@ import os.path
 from optparse import OptionParser
 from itaps import iBase,iMesh,iMeshExtensions
 
-from scdmesh import ScdMesh, ScdMeshError
+from r2s.scdmesh import ScdMesh, ScdMeshError
 
 
 def gen_gammas_file_from_h5m(sm, outfile="gammas", \

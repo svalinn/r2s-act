@@ -4,7 +4,7 @@ import itertools
 import StringIO
 
 from r2s import tag_ebins as te
-from scdmesh import ScdMesh, ScdMeshError
+from r2s.scdmesh import ScdMesh, ScdMeshError
 from itaps import iMesh, iBase
 
 

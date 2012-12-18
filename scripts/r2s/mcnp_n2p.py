@@ -6,7 +6,7 @@ from optparse import OptionParser
 import textwrap as tw
 
 from itaps import iMesh, iBase, iMeshExtensions
-from scdmesh import ScdMesh, ScdMeshError
+from r2s.scdmesh import ScdMesh, ScdMeshError
 
 
 class ModMCNPforPhotons(object):

@@ -7,7 +7,7 @@
 from optparse import OptionParser
 from itaps import iBase,iMesh,iMeshExtensions
 
-from scdmesh import ScdMesh
+from r2s.scdmesh import ScdMesh
 
 def read_and_tag_phtn_ergs(fr, sm):
     """ Method reads a list of energies and tags them to the root set.
