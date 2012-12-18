@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+
 import sys
 import ConfigParser
 import os.path
@@ -17,6 +18,9 @@ if len(sys.argv) > 1:
 config = ConfigParser.SafeConfigParser()
 config.read(cfgfile)
 
+
+###########################
+# Read in config file information
 
 # Required input files
 if config.has_option('r2s-files', 'step2_datafile'):
@@ -63,7 +67,8 @@ for param in param_guide:
 (opt_isotope, opt_cooling, opt_sampling, opt_ergs, opt_bias, opt_cumulative, opt_phtnfmesh) = param_list
 
 
-# Do processing
+###########################
+# Do step 2
 
 print "Loading step one data file '{0}'".format(datafile)
 smesh = ScdMesh.fromFile(datafile)
