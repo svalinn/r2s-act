@@ -130,7 +130,8 @@ class TestAutoDetermineInputType(unittest.TestCase):
         pass
 
     def tearDown(self):
-        os.system("rm " + auto_testfile_out)
+        if os.path.isfile(auto_testfile_out):
+            os.system("rm " + auto_testfile_out)
 
     def test_mcnp_input_run(self):
         self.obj = mcnp_n2p.ModMCNPforPhotons(testfile)
