@@ -8,10 +8,10 @@ from scdmesh import ScdMesh, ScdMeshError
 from itaps import iMesh, iBase
 
 thisdir = os.path.dirname(__file__)
-inputfile = os.path.join(thisdir,"sb3_phtn_src")
-meshfile_orig = os.path.join(thisdir,"matFracsSCD3x3x3.h5m")
-meshfile = "matFracsSCD3x3x3_tagged.h5m"
-outfile = "gammas_test"
+inputfile = os.path.join(thisdir, "sb3_phtn_src")
+meshfile_orig = os.path.join(thisdir, "h5m_files/matFracsSCD3x3x3.h5m")
+meshfile = os.path.join(thisdir, "h5m_files/matFracsSCD3x3x3_tagged.h5m")
+outfile = os.path.join(thisdir, "gammas_test")
 
 # .h5m files for generating different gammas files
 meshfile_g = os.path.join(thisdir,"files_test_write_gammas/example_with_bias.h5m")
@@ -29,7 +29,7 @@ gammas8 = os.path.join(thisdir,"files_test_write_gammas/gammas_voxel_cum_bias")
 class TestCalcVolumes(unittest.TestCase):
 
     def setUp(self):
-        filename = os.path.join(thisdir, 'grid543.h5m')
+        filename = os.path.join(thisdir, 'h5m_files/grid543.h5m')
         self.sm = ScdMesh.fromFile(filename)
 
     def test_calc_volumes_list_1(self):

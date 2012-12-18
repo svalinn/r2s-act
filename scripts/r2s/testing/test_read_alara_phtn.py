@@ -14,9 +14,9 @@ from itaps import iMesh,iBase,iMeshExtensions
 
 # These directories are relative to scripts directory.
 thisdir = os.path.dirname(__file__)
-inputfile = os.path.join(thisdir,"sb3_phtn_src")
-meshfile_orig  = os.path.join(thisdir,"sb3_matFracs.h5m")
-meshfile  = os.path.join("sb3_matFracs3.h5m")
+inputfile = os.path.join(thisdir, "sb3_phtn_src")
+meshfile_orig  = os.path.join(thisdir, "h5m_files/sb3_matFracs.h5m")
+meshfile  = os.path.join(thisdir, "h5m_files/sb3_matFracs3.h5m")
 
 
 class TestPhtn(unittest.TestCase):

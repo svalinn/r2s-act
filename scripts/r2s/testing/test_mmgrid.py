@@ -43,7 +43,7 @@ class mmGridTest( unittest.TestCase ):
     # must load dagmc geometry only once; use this alphabetically first name to ensure
     # this function runs before other tests
     def test__load(self):
-        path = os.path.join( os.path.dirname( __file__ ), 'hemispheres.h5m' )
+        path = os.path.join( os.path.dirname( __file__ ), 'h5m_files/hemispheres.h5m' )
         pydagmc.dagmc.load( path )
 
     def test_matset(self):

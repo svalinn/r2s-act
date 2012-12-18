@@ -9,7 +9,7 @@ from itaps import iMesh, iBase
 
 
 thisdir = os.path.dirname(__file__)
-meshfile = os.path.join(thisdir,"sb3_matFracs.h5m")
+meshfile = os.path.join(thisdir, "h5m_files/sb3_matFracs.h5m")
 
 
 class TestEbins(unittest.TestCase):
