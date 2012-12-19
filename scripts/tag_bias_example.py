@@ -6,7 +6,7 @@ from itaps import iBase, iMesh
 import ConfigParser
 
 from r2s import mmgrid
-from scdmesh import ScdMesh, ScdMeshError
+from r2s.scdmesh import ScdMesh, ScdMeshError
 from r2s_setup import get_input_file
 from r2s_setup import FileMissingError
 

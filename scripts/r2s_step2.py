@@ -6,7 +6,7 @@ import os.path
 
 from r2s.io import read_alara_phtn, write_gammas
 from r2s import mcnp_n2p
-from scdmesh import ScdMesh, ScdMeshError
+from r2s.scdmesh import ScdMesh, ScdMeshError
 from itaps import iMesh, iMeshExtensions
 from r2s_setup import get_input_file, FileMissingError
 

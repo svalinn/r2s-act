@@ -10,7 +10,7 @@ from r2s.io.write_alara_geom import write_alara_geom
 from r2s import mmgrid
 from r2s_setup import get_input_file as r2s_input_file
 from r2s_setup import FileMissingError
-from scdmesh import ScdMesh, ScdMeshError
+from r2s.scdmesh import ScdMesh, ScdMeshError
 
 cfgfile = 'r2s.cfg'
 if len(sys.argv) > 1:
