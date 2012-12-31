@@ -15,9 +15,9 @@ The different ``source.F90`` versions...
 
 Wisconsin R2S-ACT:
 
-:``source_gamma.F90``: Derived from ``vendor/source_gamma_meshtal2.F90``; Implements alias table sampling of voxels, as well as alias table sampling of photon energies. Also implements biasing. Uses *gammas* file that can include bias values and custom energy bins.  The original code was modified from 24 energy groups to 42 groups (or custom), and dynamic array allocation was added.
+:``source_gamma.F90``: Derived from ``vendor/source_gamma_meshtal2.F90``; Implements alias table sampling of voxels, as well as alias table sampling of photon energies. Also implements biasing. Uses ``gammas`` file that can include bias values and custom energy bins.  The original code was modified from 24 energy groups to 42 groups (or custom), and dynamic array allocation was added.
 
-From KIT (Germany); Details specified in *vendor/Leichtle_R2Smesh_Source_20111006.pdf*:
+From KIT (Germany); Details specified in ``vendor/Leichtle_R2Smesh_Source_20111006.pdf``:
 
 :``vendor/source_gamma_meshtal1.F90``: uses RDUM and IDUM cards in MCNP
 :``vendor/source_gamma_meshtal2.F90``: reads in data from file ``gammas`` 
@@ -43,7 +43,7 @@ On a CAE system, one should be able to use the mcnp5p links for running problems
 
 Alternately, to use one of these in a custom compile of MCNP/DAG-MCNP, one can check out the DAG-MCNP source, and then link the files in the repository to the ``DAG-MCNP/5.1.51/trunk/Source/src`` folder like this:
 
-``ln -s *path to this folder*/source_gamma.F90 source.F90``
+``ln -s *path to mcnp_source folder*/source_gamma.F90 source.F90``
 
 (or you could copy the file to that folder, but it won't get updated when changes happen in the repository)
 
