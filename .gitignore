@@ -5,6 +5,12 @@
 .*.swp
 *~
 
+# Ignore mcnp output files
+out?
+runtp?
+como?
+source_debug
+
 # Ignore binary files
 #
 
