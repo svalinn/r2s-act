@@ -221,16 +221,33 @@ subroutine read_header (myunit)
 ! Read in first 5 lines of gammas file
 ! These lines contain the x,y,z mesh intervals
 !  and the list of active materials
+! Also skips over any comment lines (beginning with # character) at start of
+!  file.
   use source_data
         
         integer,intent(IN) :: myunit
+        character :: letter
+        character*30 :: commentline
 
-        ! initialize an empty array
+        ! initialize an empty 'activated materials' array
         do i=1,100
           active_mat(i)=0
         enddo
 
-        ! read first line
+        ! Read and skip over comment lines
+        do
+          letter = " "
+          read(myunit,'(A)') commentline
+          read(commentline,*,end=976) letter
+976       continue
+
+          if (letter.ne.'#') then
+            backspace(myunit)
+            exit
+          endif
+        enddo
+
+        ! read first parameter line
         read(myunit,*) i_ints,j_ints,k_ints
         n_mesh_cells = i_ints * j_ints * k_ints
 
@@ -267,7 +284,8 @@ subroutine read_params (myunit)
         character,dimension(1:30) :: letter
         character*30 :: paramline
 
-        ! Initialize parameters such that gammas format specified by Leichtle
+        ! Initialize parameters to defaults.
+        ! Defaults are chosen such that gammas format specified by Leichtle
         !  will be read correctly without a parameters line.
         bias = 0
         samp_vox = 1
@@ -280,7 +298,8 @@ subroutine read_params (myunit)
         ! Read enough characters to fill paramline
         read(myunit,'(A)') paramline
 
-        do i=1,30 ! fill list of parameters with placeholder character
+        ! fill list of parameters with placeholder character
+        do i=1,30
           letter(i) = " "
         enddo
 
@@ -346,7 +365,7 @@ subroutine read_custom_ergs (myunit)
         integer,intent(IN) :: myunit
 
         read(myunit,*) n_ener_grps ! reads an integer for # of grps
-        backspace(myunit) ! dirty hack since read(myunit,*,advance='NO') is invalid
+        backspace(myunit) ! bit of a hack since read(myunit,*,advance='NO') is invalid Fortran
         ALLOCATE(my_ener_phot(1:n_ener_grps+1))
         read(myunit,*,end=888) n_erg_grps, (my_ener_phot(i),i=1,n_ener_grps+1)
 888     continue
@@ -494,7 +513,7 @@ subroutine source
           wgt = tot_list(voxel) 
         endif
         
-        ! Debug output if enabled
+        ! Debug output, if enabled
         if (debug.eq.1) then
           call print_debug
         endif
@@ -784,16 +803,18 @@ subroutine print_debug
 !  after every 10000 particles.
   use source_data
 
-        ! Debugging stuff
+        ! Array storing debug information
         real(dknd),dimension(1:10000,1:4) :: source_debug_array
         save source_debug_array
  
-        ! Write information for debugging where source particles are started.
+        ! Save information for debugging where source particles are started.
         npart_write = npart_write + 1
         source_debug_array(npart_write,1) = xxx
         source_debug_array(npart_write,2) = yyy
         source_debug_array(npart_write,3) = zzz
         source_debug_array(npart_write,4) = wgt
+
+        ! Write debug information for 10000 histories to file
         if (npart_write.eq.10000) then
   
           write(*,*) 'writing to source debug file.'
