@@ -1,4 +1,4 @@
-To run tests, run the script ``run_tests.sh``
+To run unit tests, run the script ``run_unit_tests.sh``
 
 This script can be modified at the top to change the location of the source file that it is testing.
 
@@ -12,6 +12,6 @@ Of note is that ``source.F90`` file being tested is modified before testing. The
 - comment out ``write(*,*)`` statements so that output from testing is easily observed
 - replaces ``expirx`` calls with ``continue``
 
-If you want ``write(*,*)`` statements to go through, change the capitalization, e.g. ``WRITE(*,*)`` ...
+If you are making your own modifications/testing and want ``write(*,*)`` statements to go through, change the capitalization, e.g. ``WRITE(*,*)`` or ``wRIte(*,*)`` ...
 
 

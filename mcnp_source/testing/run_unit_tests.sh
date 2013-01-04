@@ -8,7 +8,7 @@ gfortran -c source.F90 -g
 # compile!
 gfortran test_source.F90 -o test_source   mcnp_placeholder.o source.o -g
 
-# run test
+# run unit tests
 ./test_source
 
 # cleanup
