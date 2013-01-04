@@ -281,7 +281,7 @@ subroutine read_params (myunit)
 
         integer,intent(IN) :: myunit
 
-        character,dimension(1:30) :: letter
+        character,dimension(1:30) :: letters
         character*30 :: paramline
 
         ! Initialize parameters to defaults.
@@ -300,14 +300,15 @@ subroutine read_params (myunit)
 
         ! fill list of parameters with placeholder character
         do i=1,30
-          letter(i) = " "
+          letters(i) = " "
         enddo
 
         ! Place individual characters in a list
-        read(paramline,*,end=876) (letter(i),i=1,30)
+        read(paramline,*,end=876) (letters(i),i=1,30)
 876     continue
 
-        if (letter(1).ne.'p') then
+        ! No parameter line found
+        if (letters(1).ne.'p') then
           backspace(myunit)
           return
         endif 
@@ -318,7 +319,7 @@ subroutine read_params (myunit)
         cumulative = 0
 
         do i=2,30
-          SELECT CASE (letter(i))
+          SELECT CASE (letters(i))
           CASE (' ') ! indicates all parameters have been handled.
             exit
           CASE ('e')
@@ -347,7 +348,7 @@ subroutine read_params (myunit)
             cumulative = 1
           CASE DEFAULT
             write(*,*) " "
-            write(*,*) "Invalid parameter!: ", letter(i)
+            write(*,*) "Invalid parameter!: ", letters(i)
           END SELECT
 
         enddo
