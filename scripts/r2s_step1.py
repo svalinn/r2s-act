@@ -49,7 +49,7 @@ except FileMissingError:
 
 gen_mmgrid = True
 if config.has_option('r2s-params','gen_mmgrid'):
-    gen_mmgrid = bool(int( config.get('r2s-params', 'gen_mmgrid') ))
+    gen_mmgrid = config.getboolean('r2s-params', 'gen_mmgrid')
 
 try:
     alara_snippet = get_input_file('alara_snippet')

@@ -41,15 +41,15 @@ if config.has_option('r2s-files','photon_mcnp_input'):
 # Read other parameters from r2s.cfg
 
 # This list stores (1) parameter names as listed in r2s.cfg; (2) their defaults;
-#  (3) whether these variables need to be converted to a boolean.
-param_guide = [ #parameter  #default #boolean?
-        [ 'photon_isotope', "TOTAL", False],
-        [ 'photon_cooling', 0,       False],
-        [ 'sampling'      , 'v',     False],
-        [ 'custom_ergbins', False,   True ],
-        [ 'photon_bias'   , False,   True ],
-        [ 'cumulative'    , False,   True ],
-        [ 'add_fmesh_card', True,    True ]
+#  (3) which 'get' function to use for the parameter
+param_guide = [ #parameter  #default #get function
+        [ 'photon_isotope', "TOTAL", config.get],
+        [ 'photon_cooling', 0,       config.get],
+        [ 'sampling'      , 'v',     config.get],
+        [ 'custom_ergbins', False,   config.getboolean],
+        [ 'photon_bias'   , False,   config.getboolean],
+        [ 'cumulative'    , False,   config.getboolean],
+        [ 'add_fmesh_card', True,    config.getboolean]
         ] 
 
 param_list = list()
@@ -57,9 +57,8 @@ param_list = list()
 for param in param_guide:
     try:
         # Try to read from r2s.cfg
-        param_list.append( config.get('r2s-params', param[0]) )
-        if param[2]:
-            param_list[-1] = bool(int(param_list[-1]))
+        # Note that param[2] is a function
+        param_list.append( param[2]('r2s-params', param[0]) )
     except ConfigParser.NoOptionError:
         # Use default
         param_list.append( param[1])
