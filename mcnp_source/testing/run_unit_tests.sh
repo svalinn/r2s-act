@@ -15,3 +15,4 @@ gfortran test_source.F90 -o test_source   mcnp_placeholder.o source.o -g
 rm *.o
 rm *.mod
 rm test_source
+rm source.F90
