@@ -30,11 +30,9 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", \
     form "phtn_src_group_###"
     Will read photon energy bin boundary values if the root set has the tag 
     PHTN_ERG (a list of floats)
-
     RECEIVES: The file (a moab mesh file) containing the mesh of interest.
-    Optional: An output file name for the 'gammas' file; do_alias=True will
-    generate the gammas_alias file with alias tables; do_bias=True will add any
-    values found on the PHTN_BIAS tag to the gammas file.
+    Optional: An output file name for the 'gammas' file; do_bias=True will add
+    any values found on the PHTN_BIAS tag to the gammas file.
     """
 
     try:
@@ -145,6 +143,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", \
         # We go through each energy group for the voxel and:
         # -make list of energy bin source strengths & group #s (ergproblist)
         # -sum up the total source strength (sourcetotal)
+        #
         # Note an important distinction depending on sampling approach:
         # -We account for voxel volume in voxel sampling
         # -We do not do this for uniform sampling, because it is already
@@ -167,7 +166,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", \
             bias = str(bias_tag[voxel]) + " "
         else: bias = ""
 
-        # Special case if there is no source strength
+        # Special case if there is no source strength: write line full of 0's
         if sourcetotal == 0:
             fw.write(" ".join( \
                     ["0"]*(numergbins + int(bool(have_bias_info))) ) \
@@ -179,10 +178,9 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", \
             bias = " " + str(bias_tag[voxel])
         else: bias = ""
 
-        # We write the alias table to one line, prepended by the source
-        #  strength of the voxel divided by the average source strength per
-        #  volume
-        # sourcetotal*vols[cnt]/norm can be used as the particle's weight
+        # Regular case:
+        # We write the list of properly normalized probabilities for the voxel
+        #  to a line.
         fw.write(" ".join(["{0:<12.5E}".format(x) for x in ergproblist]) + \
                 bias + "\n")
 
@@ -310,32 +308,14 @@ def main():
     parser.add_option("-o","--output",action="store",dest="output", \
             default="gammas",help="Option specifies the name of the 'gammas'" \
             "file. Default: %default")
-    # Other options
-    parser.add_option("-a","--alias",action="store_true",dest="alias", \
-            default=False,help="Generate the gammas file with an alias table " \
-            "of energy bins for each voxel. Default: %default \n\r" \
-            "Default file name changes to 'gammas_alias' " \
-            "\n\n" \
-            "Creates the file gammas with the photon energy bins for each \
-            voxel stored as alias tables. Reads directly from phtn_src file.\n\n \
-            Each voxel's line corresponds with an alias table of the form: \
-            [total source strength, p1, g1a, g1b, p2, g2a, g2b ... pN, gNa, gNb] \
-            Where each p#, g#a, g#b are the info for one bin in the alias table." 
-           )
+    #
    
     (options, args) = parser.parse_args()
-
-    # Check for combination of default filename, and alias mode
-    if options.alias and options.output == 'gammas':
-        # Use a different default file name and print a message about this
-        options.output = 'gammas_alias'
-        print "NOTE: Generated file will use name 'gammas_alias' instead " \
-            "of 'gammas'."
 
     # Create ScdMesh object, which also loads 'meshfile' into mesh.
     sm = ScdMesh.fromFile(args[0])
 
-    gen_gammas_file_from_h5m(sm, options.output, options.alias)
+    gen_gammas_file_from_h5m(sm, options.output)
 
     return 1
 
