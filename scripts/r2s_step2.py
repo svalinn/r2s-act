@@ -80,9 +80,14 @@ read_alara_phtn.read_to_h5m(phtn_src, smesh, isotope=opt_isotope, \
 print "Saving photon source information to '{0}'".format(datafile)
 smesh.imesh.save(datafile)
 
+fr = open(phtn_src, 'r')
+coolingstepstring = read_alara_phtn.get_cooling_step_name(opt_cooling, fr)[0]
+fr.close()
+
 print "Writing gammas file"
 write_gammas.gen_gammas_file_from_h5m(smesh, sampling=opt_sampling, \
-        do_bias=opt_bias, cumulative=opt_cumulative, cust_ergbins=opt_ergs)
+        do_bias=opt_bias, cumulative=opt_cumulative, cust_ergbins=opt_ergs, \
+        coolingstep=coolingstepstring, isotope=opt_isotope)
 
 # Create photon MCNP input file from neutron input if it doesn't exist already
 if mcnp_p_problem:
