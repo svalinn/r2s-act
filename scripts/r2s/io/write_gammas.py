@@ -12,14 +12,15 @@
 ######################################################################
 
 import os.path
+from datetime import datetime
 from optparse import OptionParser
 from itaps import iBase,iMesh,iMeshExtensions
 
 from r2s.scdmesh import ScdMesh, ScdMeshError
 
 
-def gen_gammas_file_from_h5m(sm, outfile="gammas", \
-        sampling='v', do_bias=False, cumulative=False, cust_ergbins=False):
+def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
+        do_bias=False, cumulative=False, cust_ergbins=False, **kwargs):
     """Generate gammas file using information from tags on a MOAB mesh.
     
     ACTION: Method reads tags with photon source strengths from an h5m
@@ -135,7 +136,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", \
     # The header of the gammas file is created in outfile, and the file writing
     #  stream is returned to fw
     fw = _gen_gammas_header(sm, outfile, sampling, myergbins, have_bias_info, \
-            cumulative)
+            cumulative, **kwargs)
 
     for cnt, voxel in enumerate(voxels):
         sourcetotal = 0
@@ -191,7 +192,8 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", \
     return 1
 
 
-def _gen_gammas_header(sm, outfile, sampling, ergbins, biasing, cumulative):
+def _gen_gammas_header(sm, outfile, sampling, ergbins, biasing, cumulative, \
+        **kwargs):
     """Open a stream to write the header information for a gammas file
     
     ACTION: Method writes the header lines for gammas file, and method
@@ -202,6 +204,16 @@ def _gen_gammas_header(sm, outfile, sampling, ergbins, biasing, cumulative):
     """
     
     fw = open(outfile, 'w')
+
+    # write metadata/comment line
+    fw.write("# File created: {0};".format(datetime.now().strftime("%D %H:%M")))
+    if 'title' in kwargs:
+        fw.write("Problem name: {0};".format(kwargs['title']))
+    if 'coolingstep' in kwargs:
+        fw.write(" Cooling time: {0};".format(kwargs['coolingstep']))
+    if 'isotope' in kwargs:
+        fw.write(" Source isotope: {0};".format(kwargs['isotope']))
+    fw.write("\n")
     
     # write number of intervals for x, y, z dimensions (1st line)
     extents = [sm.dims[3], sm.dims[4], sm.dims[5]]
