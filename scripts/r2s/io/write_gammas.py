@@ -198,9 +198,26 @@ def _gen_gammas_header(sm, outfile, sampling, ergbins, biasing, cumulative, \
     
     ACTION: Method writes the header lines for gammas file, and method
     is used by gen_gammas_file_from_h5m().
-    RECEIVES: sm is an scdmesh.ScdMesh object. ergbins is either a null string
-    or a list of energies. biasing is a boolean.
-    RETURNS: A file writing object, fw.
+    Receives
+    ---------
+    sm : scdmesh.ScdMesh object
+        MOAB mesh file
+    outfile : string
+        File name for the 'gammas' file. (Usually just 'gammas')
+    sampling : char
+        Character/flag corresponding with sampling type to be used. Options are:
+        'v' for voxel sampling; 'u' for uniform sampling;
+    ergbins : 
+        is either a null string or a list of energies. 
+    biasing : boolean
+        Flag for biasing is added if true.
+    cumulative : boolean
+        Flag for listing cumulative erg probabilities is added if true.
+
+    Returns
+    ---------
+    fw : stream
+        A file writing object
     """
     
     fw = open(outfile, 'w')
