@@ -28,17 +28,23 @@ class ScdMesh:
 
     def __init__(self, x_points, y_points, z_points, imesh=None, **kw):
         """Construct a ScdMesh from given x, y, and z coordinates.
-           The imesh parameter can be used to designate an iMesh instance
-           in which to place the mesh; if None, a new instance will be 
-           created.
 
-           The i,j,k extents of the structured mesh will be numbered from 0.
-
-           keyword arguments:
-           bdtag = if the BOX_DIMS tag has already been looked up, it may
-                   be passed thus
-           _scdset = an existing scdset to use; clients should use 
-                     fromEntSet() instead of using this parameter.
+        Parameters
+        ----------
+        x_points, y_points, z_points : list of floats
+            List of points.
+            The i,j,k extents of the structured mesh will be numbered from 0.
+        imesh : iMesh.Mesh object
+            Parameter can be used to designate an iMesh instance
+            in which to place the mesh; if None, a new instance will be 
+            created.
+        keyword arguments:
+            bdtag :
+                if the BOX_DIMS tag has already been looked up, it may
+                be passed thus
+            _scdset :
+                an existing scdset to use; clients should use 
+                fromEntSet() instead of using this parameter.
         """
         if imesh:
             self.imesh = imesh

@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+"""Module contains class ModMCNPforPhotons which automates most of the
+conversion from an MCNP neutron transport problem to a photon transport problem
+with the same geometry/materials.
+"""
+
 import re
 import string
 from optparse import OptionParser
@@ -17,8 +22,16 @@ class ModMCNPforPhotons(object):
     """
 
     def __init__(self, myInputFileName, dagmc=None):
-        """Init function for class ModMCNPforPhotons. Receives an MCNP input 
-        file.
+        """Init function for class ModMCNPforPhotons.
+        
+        Parameters
+        ----------
+        myInputFileName : string
+            MCNP input file.
+        dagmc : boolean
+            Whether to treat input as a DAGMCNP or regular MCNP input. By
+            default, this is automatically determined.
+
         """
         super(ModMCNPforPhotons, self).__init__()
 
@@ -32,6 +45,8 @@ class ModMCNPforPhotons(object):
     def read(self):
         """Read an MCNP input file and store its parts in the object.
 
+        Notes
+        ------
         We clean the input file of a bunch of useless blank lines
         and lines filled with asterisks...
 
@@ -78,7 +93,7 @@ class ModMCNPforPhotons(object):
 
 
     def convert(self):
-        """
+        """Convert the blocks in MCNP input from neutron to photon problem.
 
         """
 
@@ -93,9 +108,20 @@ class ModMCNPforPhotons(object):
     def mcnp_block_parser(self, fr, blockLines, commentLines):
         """Read lines from input file until an entire block has been read.
         
-        Method receives a file reader ('fr'), and reads lines
+        Method receives a file reader, and reads lines
         until a blank line is encountered (or end of file)
 
+        Parameters
+        ----------
+        fr : file reading stream
+            ...
+        blockLines : list
+            ...
+        commentLines : list
+            ...
+
+        Notes
+        -----
         Blank lines are tossed, and any comment lines beginning
         with c are tossed
 
@@ -127,9 +153,11 @@ class ModMCNPforPhotons(object):
     def change_block_1(self):
         """Modify contents of self.block1Lines for a photon problem.
         
-        ACTION: Method changes the importance cards to affect protons
+        Method changes the importance cards to affect photons
 
-        RETURNS: '1' when run successfully
+        Returns
+        -------
+        '1' when run successfully
         """
 
         cntimp = 0
@@ -170,8 +198,6 @@ class ModMCNPforPhotons(object):
     def change_block_3(self):
         """Modify contents of self.block3Lines for a photon problem.
         
-        Action
-        -------
         Method 
         - changes the mode card from 'mode n' to 'mode p'
         - remove phys:n
@@ -255,19 +281,19 @@ class ModMCNPforPhotons(object):
         
         Lines are appended to self.block3Lines.
 
-        Receives
-        ---------
-
-            A structured mesh object (scdmesh.py)
-
-        Requires 
-        ---------
-        Block 3 has been read into self.block3Lines; photon energies
-        have been tagged to 'sm.imesh.rootSet'.
+        Parameters
+        ----------
+        sm : scdmesh.ScdMesh object
+            A structured mesh object (scdmesh.py) with mesh divisions in XYZ.
 
         Returns
         --------
         1 if successful, 0 if an error occurs.
+
+        Notes
+        ---------
+        Requires that block 3 has been read into self.block3Lines, and photon 
+        energies have been tagged to 'sm.imesh.rootSet'.
         """
         
         # We get the coarse intervals and the number of steps in each interval
@@ -351,19 +377,24 @@ class ModMCNPforPhotons(object):
     def write_deck(self, outputFileName=""):
         """Create a new MCNP input file from the object's contents.
         
-        Action
-        --------
         Method writes the contents of self.block#Lines to a new file.
         File name is determined automatically if not supplied.
 
-        Requires
-        --------
-        read() has been called for the class object so that blockLines
-        and title are not empty.
+        Parameters
+        ----------
+        outputFileName : string
+            File path for created deck. If not specified, then the input file's
+            name is used, with an appened _p prior to any suffix (e.g. .inp).
 
         Returns
         --------
         N/A
+
+        Notes
+        ------
+        Requires that read() has been called for the class object so that
+        'blockLines' and 'title' are not empty.
+
         """
 
         if outputFileName == "":

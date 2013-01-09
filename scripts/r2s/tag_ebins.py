@@ -1,26 +1,36 @@
 #!/usr/bin/env python
 
-# Module contains the read_and_tag_phtn_ergs() and destroy_erg_bins_tag() 
-#  methods.  These are used for adding the photon energy group boundaries to a
-#  mesh; typically when the user does not want to use the default 42 groups.
+"""Module contains the read_and_tag_phtn_ergs() and destroy_erg_bins_tag() 
+methods.  These are used for adding the photon energy group boundaries to a
+mesh; The functions are typically used when the user does not want to use the
+default 42 group structure for photons.
+"""
 
 from optparse import OptionParser
 from itaps import iBase,iMesh,iMeshExtensions
 
 from r2s.scdmesh import ScdMesh
 
+
 def read_and_tag_phtn_ergs(fr, sm):
-    """ Method reads a list of energies and tags them to the root set.
+    """ Method reads a file with a list of energies and tags them to the root
+    set.
 
-    ACTION: Reads a single energy from each line of 'fr', creating a list
-    of these values. These values are tagged to the scdset of the 'sm'
-    mesh under the tag 'PHTN_ERGS'. Method destroys the 'PHTN_ERGS' tag if it
-    already exists.
+    Method replaces the 'PHTN_ERGS' tag if it already exists.
 
-    RECEIVES: 
-    -fr is a file stream listing one energy per line. It should have
-    n+1 entries where n is the number of energy groups. Low energy first!
-    -sm is a structured mesh object (scdmesh.ScdMesh) derived from MOAB mesh
+    Parameters
+    ----------
+    fr : readable file stream
+        a file stream listing one energy per line. It should have
+        n+1 entries where n is the number of energy groups. Low energy first!
+    sm : scdmesh.ScdMesh object
+        Structured mesh object to tag energies to.
+
+    Notes
+    -----
+    Reads a single energy from each line of 'fr', creating a list
+    of these values. These values are tagged to the scdset of 'sm'
+    with the tag handle 'PHTN_ERGS'. 
     """
 
     ergs = list()
@@ -54,7 +64,18 @@ def read_and_tag_phtn_ergs(fr, sm):
 
 
 def destroy_erg_bins_tag(sm):
-    """Method removes the 'PHTN_ERGS' tag from a MOAB mesh"""
+    """Method removes the 'PHTN_ERGS' tag from a MOAB mesh
+    
+    Parameters
+    ----------
+    sm : scdmesh.ScdMesh object
+        Structured mesh object with tags to be removed
+
+    Returns
+    -------
+    return code
+        1 if successful; 0 if failed.
+    """
 
     try:
         sm.imesh.destroyTag(mesh.imesh.getTagHandle("PHTN_ERGS"), force=True)
@@ -70,7 +91,6 @@ def main():
     usage of this module.
     REQUIRES: command line arguments to be passed - otherwise prints help
     information.
-    RECEIVES: N/A
     """
 
     usage = "usage: %prog ENERGY_FILE MESH_FILE [options] \n\n" \

@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+"""Module includes methods which find the lines in a 'phtn_src' file from ALARA
+that match a specified isotope and cooling time, and tags the photon source
+information to a structured mesh.
+"""
+
 from optparse import OptionParser
 from itaps import iBase,iMesh
 from r2s.scdmesh import ScdMesh, ScdMeshError
@@ -9,14 +14,25 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
         retag=False, totals=False):
     """Read in a phtn_src file and tag the contents to a structured mesh.
     
-    ACTION: Method reads in a phtn_src file line by line, looking for
-     a specific isotope at a specific cooling step.
-    Method tags the structured mesh ('sm') with the photon source information,
-     and then saves the mesh.
-    RECEIVES: input file (ALARA phtn_src style), structured mesh object to tag,
-     isotope identifier, cooling step number (0'th is 'shutdown')
-     OR cooling step name, whether to retag existing tags in mesh, whether to
-     tag the total photon source strength for each voxel
+    Method reads in a phtn_src file line by line, looking for
+    a specific isotope at a specific cooling step, and repeats for each voxel.
+    Method tags the structured mesh with the photon source information,
+    and then saves the mesh.
+
+    Parameters
+    ----------
+    inputfile : string
+        Path to an ALARA-style 'phtn_src' file
+    sm : scdmesh.ScdMesh
+        Structured mesh object to tag,
+    isotope : string
+        Isotope to read data for from 'phtn_src' file 
+    coolingstep : int or string
+        String cooling step name, or number for index (0'th is 'shutdown')
+    retag : boolean
+        Whether to retag existing tags in mesh
+    totals : boolean
+        Whether to tag the total photon source strength for each voxel
     """
     
     fr = open(inputfile, 'r')
@@ -143,10 +159,18 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
 def get_cooling_step_name(coolingstep, fr):
     """Method determines the user-specified cooling step name in a phtn_src file
 
-    ACTION: If coolingstep is a number, we search for the corresponding line in
+    If coolingstep is a number, we search for the corresponding line in
     the file stream 'fr', and determine the corresponding cooling step string.
-    RECEIVES: coolingstep is a number or string; fr is a file reader stream
-    RETURNS: A 2 value tuple: (the cooling step string name, the number of
+
+    Parameters
+    ----------
+    coolingstep : int or string
+        number for cooling step index or string for cooling step name
+    fr : readable file stream
+
+    Returns
+    -------
+    A 2 value tuple: (the cooling step string name, the number of
     photon energy bins used in the phtn_src file)
     """
     

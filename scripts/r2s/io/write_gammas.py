@@ -23,17 +23,33 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
         do_bias=False, cumulative=False, cust_ergbins=False, **kwargs):
     """Generate gammas file using information from tags on a MOAB mesh.
     
-    ACTION: Method reads tags with photon source strengths from an h5m
-    file and generates the gammas file for the modified KIT source.f90 routine.
-    To do this, we generate 'meshstrengths' for each voxel and write this
-    information to the gammas file, along with header information.
-    REQUIRES: the .h5m moab mesh must have photon source strength tags of the
-    form "phtn_src_group_###"
+    Method reads tags with photon source strengths from a structured mesh object
+    and generates the gammas file for the modified source.F90 routine.
+
+    Parameters
+    ----------
+    sm : scdmesh.ScdMesh
+        Structured mesh object to generate 'gammas' from.
+    outfile : string, optional
+        Output file name for the 'gammas' file
+    sampling : {'v', 'u'}, optional
+        Format the file file for voxel sampling ('v') or uniform sampling ('u')
+    do_bias : boolean, optional
+        Attempt to tag bias values for voxels
+    cumulative : boolean, optional
+        Use the cumulative format for listing energy PDFs of each voxel
+    cust_ergbins : boolean, optional
+        Attempt to use custom energy bins found on 'sm'
+    keyword arguments::
+        Currently valid: {'title', 'isotope', 'coolingstep'} 
+        These are passed to header creation code.
+
+    Notes
+    ------
+    Requires that the structured mesh have photon source strength tags of the
+    form 'phtn_src_group_###'.
     Will read photon energy bin boundary values if the root set has the tag 
-    PHTN_ERG (a list of floats)
-    RECEIVES: The file (a moab mesh file) containing the mesh of interest.
-    Optional: An output file name for the 'gammas' file; do_bias=True will add
-    any values found on the PHTN_BIAS tag to the gammas file.
+    'PHTN_ERG' (a list of floats).
     """
 
     try:
@@ -196,10 +212,11 @@ def _gen_gammas_header(sm, outfile, sampling, ergbins, biasing, cumulative, \
         **kwargs):
     """Open a stream to write the header information for a gammas file
     
-    ACTION: Method writes the header lines for gammas file, and method
+    Method writes the header lines for gammas file, and method
     is used by gen_gammas_file_from_h5m().
-    Receives
-    ---------
+
+    Parameters
+    ----------
     sm : scdmesh.ScdMesh object
         MOAB mesh file
     outfile : string
@@ -266,16 +283,24 @@ def _gen_gammas_header(sm, outfile, sampling, ergbins, biasing, cumulative, \
 
 
 def calc_volumes_list(sm):
-    """Create list of voxel volumes for a cartesian mesh
+    """Create a 1D list of the voxel volumes for a XYZ structured mesh
     
-    ACTION: Method creates a 1D list of voxel volumes
-    RECEIVES: sm, a scdmesh.ScdMesh object.
-    RETURNS: vols, a 1D list of voxel volumes in order 'xyz'
+    Parameters
+    ----------
+    sm : scdmesh.ScdMesh
+        A structured mesh object from which to calculate volumes.
+    Returns
+    -------
+    vols : list of floats
+        A 1D list of voxel volumes in order 'xyz'
 
-    NOTE: Voxel ordering follows meshtal file convention which is
-     -for x for y iterate z
-     -for x iterate y
-     -iterate x
+    Notes
+    -----
+    ::
+        Voxel ordering follows meshtal file convention which is
+         -for x for y iterate z
+         -for x iterate y
+         -iterate x
     """
     
     meshplanes = [ sm.getDivisions('x'),
@@ -311,7 +336,9 @@ def calc_volumes_list(sm):
 
 
 def _tag_sumvoxelstrengths(sm, val):
-    # Get the Tag object called PHTN_BIAS
+    """Stores total voxel source strength in tag 'PHTN_SRC_TOTAL'.
+    """
+    # Get the Tag handle called PHTN_BIAS
     try:
         tag = sm.imesh.createTag("PHTN_SRC_TOTAL",1,"d")
     except iBase.TagAlreadyExistsError:
