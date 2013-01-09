@@ -1,4 +1,5 @@
 # Ignore possible build & documentation
+docs/_build
 
 # Ignore various temp files
 *.pyc
