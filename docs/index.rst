@@ -11,7 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 1
 
-   README
+   r2s-userguide
    r2s/r2s
    r2s/r2s.io
 
