@@ -13,7 +13,7 @@ class ModMCNPforPhotons(object):
     """Class is used to convert a neutron problem in MCNP to a photon problem
 
     An MCNP input file is read in, and stored in 4 parts: title card, block 1,
-     block 2, and block 3.
+    block 2, and block 3.
     """
 
     def __init__(self, myInputFileName, dagmc=None):
@@ -34,7 +34,9 @@ class ModMCNPforPhotons(object):
 
         We clean the input file of a bunch of useless blank lines
         and lines filled with asterisks...
+
         Saved lines are written to file tempFileName
+        
         Blocks 1 and 2 are used to create a surface parser object
         """
 
@@ -92,9 +94,11 @@ class ModMCNPforPhotons(object):
         """Read lines from input file until an entire block has been read.
         
         Method receives a file reader ('fr'), and reads lines
-         until a blank line is encountered (or end of file)
+        until a blank line is encountered (or end of file)
+
         Blank lines are tossed, and any comment lines beginning
-         with c are tossed
+        with c are tossed
+
         Saved lines are added to a list and method returns this list.
         """
 
@@ -124,6 +128,7 @@ class ModMCNPforPhotons(object):
         """Modify contents of self.block1Lines for a photon problem.
         
         ACTION: Method changes the importance cards to affect protons
+
         RETURNS: '1' when run successfully
         """
 
@@ -165,12 +170,14 @@ class ModMCNPforPhotons(object):
     def change_block_3(self):
         """Modify contents of self.block3Lines for a photon problem.
         
-        ACTION: Method 
-        -changes the mode card from 'mode n' to 'mode p'
-        -remove phys:n
-        -change inp:n to inp:p
-        -comments out any source-definition cards.  These cards are:
-         sdef, si, sp, sb, sc, ds, kcode, ksrc
+        Action
+        -------
+        Method 
+        - changes the mode card from 'mode n' to 'mode p'
+        - remove phys:n
+        - change inp:n to inp:p
+        - comments out any source-definition cards.  These cards are:
+        sdef, si, sp, sb, sc, ds, kcode, ksrc
         """
         
         cntsrc = 0
@@ -246,11 +253,21 @@ class ModMCNPforPhotons(object):
     def add_fmesh_from_scdmesh(self, sm):
         """Geometry information is read to create a photon fmesh card.
         
-        ACTION: Lines are appended to self.block3Lines.
-        RECEIVES: A structured mesh object (scdmesh.py)
-        REQUIRES: Block 3 has been read into self.block3Lines; photon energies
-         have been tagged to 'sm.imesh.rootSet'.
-        RETURNS: 1 if successful, 0 if an error occurs.
+        Lines are appended to self.block3Lines.
+
+        Receives
+        ---------
+
+            A structured mesh object (scdmesh.py)
+
+        Requires 
+        ---------
+        Block 3 has been read into self.block3Lines; photon energies
+        have been tagged to 'sm.imesh.rootSet'.
+
+        Returns
+        --------
+        1 if successful, 0 if an error occurs.
         """
         
         # We get the coarse intervals and the number of steps in each interval
@@ -334,11 +351,19 @@ class ModMCNPforPhotons(object):
     def write_deck(self, outputFileName=""):
         """Create a new MCNP input file from the object's contents.
         
-        ACTION: Method writes the contents of self.block#Lines to a new file.
-            File name is determined automatically if not supplied.
-        REQUIRES: read() has been called for the class object so that blockLines
-            and title are not empty.
-        RETURNS: N/A
+        Action
+        --------
+        Method writes the contents of self.block#Lines to a new file.
+        File name is determined automatically if not supplied.
+
+        Requires
+        --------
+        read() has been called for the class object so that blockLines
+        and title are not empty.
+
+        Returns
+        --------
+        N/A
         """
 
         if outputFileName == "":
@@ -385,10 +410,10 @@ class ModMCNPforPhotons(object):
 def _is_dagmc(filename):
     """Use first non-title, non-comment line to determin if input is for DAGMCNP
 
-    The test to determine this has two cases:
+    The test to determine this has two cases::
     - First character of line is a number -> regular MCNP input
     - Otherwise, first character corresponds
-       with some data card... -> DAG MCNP input
+    with some data card... -> DAG MCNP input
     """
 
     fr = open(filename, 'r')
@@ -411,7 +436,10 @@ def _is_dagmc(filename):
 def _get_coarse_and_intervals(xdiv):
     """From list of mesh intervals get xmesh and xints for fmesh card
 
-    RETURNS: xCoarse and xSteps, which are lists of loats
+    Returns
+    --------
+    xCoarse, xSteps - list of floats
+        which are lists of floats ...
     """
     xCoarse = [xdiv[0]]
     xSteps = list()
@@ -437,8 +465,10 @@ def _get_coarse_and_intervals(xdiv):
 def main():
     """ACTION: Method defines an option parser and handles command-line
     usage of this module.
+
     REQUIRES: command line arguments to be passed - otherwise prints help
     information.
+
     RECEIVES: N/A
     """
 

@@ -11,7 +11,7 @@ class ScdMeshError(Exception):
 class ScdMesh:
     """A structured mesh in the spirit of MOAB's ScdMesh interface.
     
-    Public member variables:
+    Public member variables::
         
         self.imesh -- the iMesh instance in which this 
                       structured mesh resides
@@ -136,12 +136,14 @@ class ScdMesh:
 
         Specific slices can be specified with keyword arguments:
 
-        Keyword args:
+        Keyword args::
+
           x: specify one or more i-coordinates to iterate over.
           y: specify one or more j-coordinates to iterate over.
           z: specify one or more k-coordinates to iterate over.
 
-        Examples:
+        Examples::
+
           iterateHex(): equivalent to iMesh iterator over hexes in mesh
           iterateHex( 'xyz' ): iterate over entire mesh, with k-coordinates
                                changing fastest, i-coordinates least fast.

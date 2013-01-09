@@ -147,7 +147,7 @@ def get_cooling_step_name(coolingstep, fr):
     the file stream 'fr', and determine the corresponding cooling step string.
     RECEIVES: coolingstep is a number or string; fr is a file reader stream
     RETURNS: A 2 value tuple: (the cooling step string name, the number of
-               photon energy bins used in the phtn_src file)
+    photon energy bins used in the phtn_src file)
     """
     
     # ... if given a number, we take the nth line. Otherwise expect a ValueError

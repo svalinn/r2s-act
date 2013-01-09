@@ -16,9 +16,10 @@ def read_and_tag_phtn_ergs(fr, sm):
     of these values. These values are tagged to the scdset of the 'sm'
     mesh under the tag 'PHTN_ERGS'. Method destroys the 'PHTN_ERGS' tag if it
     already exists.
+
     RECEIVES: 
     -fr is a file stream listing one energy per line. It should have
-     n+1 entries where n is the number of energy groups. Low energy first!
+    n+1 entries where n is the number of energy groups. Low energy first!
     -sm is a structured mesh object (scdmesh.ScdMesh) derived from MOAB mesh
     """
 
