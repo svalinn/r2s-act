@@ -6,7 +6,7 @@
 Welcome to R2S-ACT's documentation!
 ===================================
 
-A full summary of the workflow is available.
+A full summary of the workflow is available. The top-level scripts described in the user guide should suffice for most R2S calculations.
 
 Contents:
 
