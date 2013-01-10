@@ -65,7 +65,7 @@ gh-pages:
 	cd ../ ; rm -rf scripts/r2s/* docs/*
 	cd ../ ; git add --all
 	# Commit and push gh-pages, and swithc back to master
-	git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push erelson gh-pages
+	git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages
 	git checkout master
 
 dirhtml:
