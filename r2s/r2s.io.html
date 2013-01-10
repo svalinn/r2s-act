@@ -29,32 +29,68 @@
     <link rel="up" title="r2s Package" href="r2s.html" />
     <link rel="prev" title="r2s Package" href="r2s.html" /> 
   </head>
-  <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="../np-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="r2s.html" title="r2s Package"
-             accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">R2S-ACT 0.1 documentation</a> &raquo;</li>
-          <li><a href="modules.html" >r2s</a> &raquo;</li>
-          <li><a href="r2s.html" accesskey="U">r2s Package</a> &raquo;</li> 
-      </ul>
-    </div>  
+  <body> 
+<div id="page-div" class="page">
+<div id="header"><a id="uwhome" href="http://www.wisc.edu"><img src="http://cnergdata.engr.wisc.edu/_static/images/wordmark.gif" alt="University of Wisconsin–Madison" width="260" height="11" /></a> <a id="crest" href="http://www.wisc.edu"><img src="http://cnergdata.engr.wisc.edu/_static/images/crest.png" alt="" width="70" height="106" /></a>
+    <h1 id="siteTitle"><a href="/"><span>u''</span></a></h1>
+    <div id="tagline"><span>u''</span></div>
+    <ul id="globalnav">
+      <li id="uwsearch"><a href="http://www.wisc.edu/search/">UW Search</a></li>
+      <li><a href="http://my.wisc.edu">My UW</a></li>
+      <li><a href="http://map.wisc.edu">Map</a></li>
+      <li id="last_tool"><a href="http://www.today.wisc.edu">Calendar</a></li>
+    </ul>
+    <form role="search" action="../search.html" method="get" id="cse-search-box">
+      <div>
+      <label class="screen-reader-text" for="q">Search for:</label>
+      <input type="text" id="q" name="q" value="Enter keywords here...." />
+      <input type="submit" id="sa" value="Search" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+      </div>
+    </form>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+</div>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
+    <div id="nav" class="main-menu-container">
+      <ul id="menu-main" class="sf-menu">
+        <li class="menu-item"><a href="../index.html">R2S-ACT 0.1 documentation</a></li>
+        <li class="menu-item" style="margin-right: 10px">
+          <a href="r2s.html" title="r2s Package"
+             accesskey="P">previous</a>
+          </li>
+        <li class="menu-item" >
+          <a href="../np-modindex.html" title="Python Module Index"
+             >modules</a>
+          </li>
+        <li class="menu-item" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a>
+          </li>
+        <li class="menu-item" >
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a>
+          </li>
+          <li class="menu-item"><a href="modules.html" >r2s</a></li>
+          <li class="menu-item"><a href="r2s.html" accesskey="U">r2s Package</a></li> 
+      </ul>
+    </div>
+  <div id="c_container"> 
+<div id="sidebar">
+ <div id="sidebar_section"> <ul>
+<li><a class="reference internal" href="#">io Package</a><ul>
+<li><a class="reference internal" href="#module-r2s.io.read_alara_phtn"><tt class="docutils literal"><span class="pre">read_alara_phtn</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-r2s.io.read_meshtal"><tt class="docutils literal"><span class="pre">read_meshtal</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-r2s.io.write_alara_fluxin"><tt class="docutils literal"><span class="pre">write_alara_fluxin</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-r2s.io.write_alara_geom"><tt class="docutils literal"><span class="pre">write_alara_geom</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-r2s.io.write_gammas"><tt class="docutils literal"><span class="pre">write_gammas</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+ </div>
+</div> 
+    <div id="content" class="inline-block">
+          <div class="post">
             
   <div class="section" id="io-package">
 <h1>io Package<a class="headerlink" href="#io-package" title="Permalink to this headline">¶</a></h1>
@@ -438,9 +474,9 @@ is ordered in the same order as the mixture tuples.</p>
 <blockquote>
 <div><p>A structured mesh object from which to calculate volumes.</p>
 </div></blockquote>
-<p><strong>Returns</strong> :</p>
-<p><strong>&#8212;&#8212;-</strong> :</p>
-<p><strong>vols</strong> : list of floats</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>vols</strong> : list of floats</p>
 <blockquote class="last">
 <div><p>A 1D list of voxel volumes in order &#8216;xyz&#8217;</p>
 </div></blockquote>
@@ -526,70 +562,17 @@ RECEIVES: N/A</p>
 
 
           </div>
-        </div>
       </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">io Package</a><ul>
-<li><a class="reference internal" href="#module-r2s.io.read_alara_phtn"><tt class="docutils literal"><span class="pre">read_alara_phtn</span></tt> Module</a></li>
-<li><a class="reference internal" href="#module-r2s.io.read_meshtal"><tt class="docutils literal"><span class="pre">read_meshtal</span></tt> Module</a></li>
-<li><a class="reference internal" href="#module-r2s.io.write_alara_fluxin"><tt class="docutils literal"><span class="pre">write_alara_fluxin</span></tt> Module</a></li>
-<li><a class="reference internal" href="#module-r2s.io.write_alara_geom"><tt class="docutils literal"><span class="pre">write_alara_geom</span></tt> Module</a></li>
-<li><a class="reference internal" href="#module-r2s.io.write_gammas"><tt class="docutils literal"><span class="pre">write_gammas</span></tt> Module</a></li>
-</ul>
-</li>
-</ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="r2s.html"
-                        title="previous chapter">r2s Package</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/r2s/r2s.io.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="../np-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="r2s.html" title="r2s Package"
-             >previous</a> |</li>
-        <li><a href="../index.html">R2S-ACT 0.1 documentation</a> &raquo;</li>
-          <li><a href="modules.html" >r2s</a> &raquo;</li>
-          <li><a href="r2s.html" >r2s Package</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer">
+    <div id="footer">
+      <p>
         &copy; Copyright 2013, CNERG.
+      </p>
+      <p>
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      </p>
     </div>
   </body>
 </html>
