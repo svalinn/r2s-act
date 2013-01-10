@@ -6,6 +6,8 @@
 Welcome to R2S-ACT's documentation!
 ===================================
 
+A full summary of the workflow is available.
+
 Contents:
 
 .. toctree::
