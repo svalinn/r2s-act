@@ -69,8 +69,8 @@ gh-pages:
 	# shopt -s extglob ; rm -rf !(.gitignore)
 	cd ../ ; git add --all
 	# Commit and push gh-pages, and swithc back to master
-	git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages
-	git checkout master
+	cd ../ ; git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages
+	cd ../ ; git checkout master
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
