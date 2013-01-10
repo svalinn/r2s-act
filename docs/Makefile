@@ -1,7 +1,8 @@
 # Makefile for Sphinx documentation
 #
 
-GH_PAGES_SOURCES = Makefile _themes _sphinxext index.rst conf.py rebuild.sh ../scripts/r2s r2s-userguide.rst
+#GH_PAGES_SOURCES = Makefile _themes _sphinxext index.rst conf.py rebuild.sh ../scripts/r2s r2s-userguide.rst
+GH_PAGES_SOURCES = docs/Makefile docs/_themes docs/_sphinxext docs/index.rst docs/conf.py docs/rebuild.sh docs/r2s-userguide.rst scripts/r2s/*.py scripts/r2s/io/*.py
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
@@ -53,16 +54,19 @@ gh-pages:
 	# Clean out _build from docs/
 	rm -rf _build 
 	# Clean out contents of _build/html/ from repo root.
-	rm -rf ../_sources ../_static ../r2s
-	git checkout master $(GH_PAGES_SOURCES)
-	git reset HEAD
-	#make html
-	./rebuild.sh # handles sphinx-apigen + make html
-	mv -fv _build/html/* ../
-	rm -rf $(GH_PAGES_SOURCES)
-	rm -rf _build r2s
+	cd ../ ; rm -rf _sources _static r2s
+	cd ../ ; git checkout master $(GH_PAGES_SOURCES)
+	cd ../ ; git reset HEAD
+	# make html ; we use 'cd ./' to refresh NFS since I was getting errors.
+	cd ./ ; ./rebuild.sh # handles sphinx-apigen + make html
+	cd ./ ; mv -fv _build/html/* ../
+	cd ../ ; rm -rf $(GH_PAGES_SOURCES)
+	cd ../ ; rm -rf doc/_build doc/r2s
 	# Note that cd ../ is required to be on the same line
-	cd ../ ; rm -rf scripts/r2s/* docs/*
+	cd ../ ; rm -rf scripts/r2s/*.py scripts/r2s/io/*.py
+	# rm -rf docs/*
+	cd ./ ; mv .gitignore ../stashed.gitignore ; rm -rf * ; mv ../stashed.gitignore .gitignore
+	# shopt -s extglob ; rm -rf !(.gitignore)
 	cd ../ ; git add --all
 	# Commit and push gh-pages, and swithc back to master
 	git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages
