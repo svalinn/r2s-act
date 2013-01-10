@@ -1,0 +1,7 @@
+r2s
+===
+
+.. toctree::
+   :maxdepth: 4
+
+   r2s

@@ -1,0 +1,839 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>University of Wisconsin Rigorous Two Step Activation Work Flow (UW-R2S) User Manual &mdash; R2S-ACT 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="R2S-ACT 0.1 documentation" href="index.html" />
+    <link rel="next" title="r2s Package" href="r2s/r2s.html" />
+    <link rel="prev" title="Welcome to R2S-ACT’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="r2s/r2s.html" title="r2s Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to R2S-ACT’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">R2S-ACT 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="university-of-wisconsin-rigorous-two-step-activation-work-flow-uw-r2s-user-manual">
+<h1><a class="toc-backref" href="#id1">University of Wisconsin Rigorous Two Step Activation Work Flow (UW-R2S) User Manual</a><a class="headerlink" href="#university-of-wisconsin-rigorous-two-step-activation-work-flow-uw-r2s-user-manual" title="Permalink to this headline">¶</a></h1>
+<div class="contents topic" id="table-of-contents">
+<p class="topic-title first">Table of Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#university-of-wisconsin-rigorous-two-step-activation-work-flow-uw-r2s-user-manual" id="id1">University of Wisconsin Rigorous Two Step Activation Work Flow (UW-R2S) User Manual</a><ul>
+<li><a class="reference internal" href="#introduction" id="id2">Introduction</a><ul>
+<li><a class="reference internal" href="#the-rigorous-two-step-r2s-method" id="id3">The Rigorous Two Step (R2S) Method</a></li>
+<li><a class="reference internal" href="#university-of-wisconsin-rigorous-two-step-activation-work-flow-uw-r2s" id="id4">University of Wisconsin Rigorous Two Step Activation Work Flow (UW-R2S)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#set-up-and-dependencies" id="id5">Set-up and Dependencies</a><ul>
+<li><a class="reference internal" href="#compiling-dag-mcnp5-with-uw-r2s-source-f90" id="id6">Compiling DAG-MCNP5 with UW-R2S source.F90</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#running-uw-r2s" id="id7">Running UW-R2S</a></li>
+<li><a class="reference internal" href="#r2s-step-1" id="id8">R2S Step 1</a><ul>
+<li><a class="reference internal" href="#r2s-setup-py" id="id9">r2s_setup.py</a></li>
+<li><a class="reference internal" href="#r2s-step1-py" id="id10">r2s_step1.py</a></li>
+<li><a class="reference internal" href="#scripts-run-by-r2s-step1-py" id="id11">Scripts run by r2s_step1.py</a><ul>
+<li><a class="reference internal" href="#read-meshtal-py" id="id12">read_meshtal.py:</a></li>
+<li><a class="reference internal" href="#write-alara-fluxin-py" id="id13">write_alara_fluxin.py</a></li>
+<li><a class="reference internal" href="#mmgrid-py" id="id14">mmgrid.py</a></li>
+<li><a class="reference internal" href="#write-alara-geom-py" id="id15">write_alara_geom.py</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#step-1-parameters" id="id16">Step 1 Parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#r2s-step-2" id="id17">R2S Step 2</a><ul>
+<li><a class="reference internal" href="#r2s-step2-py" id="id18">r2s_step2.py</a></li>
+<li><a class="reference internal" href="#scripts-run-by-r2s-step2-py" id="id19">Scripts run by r2s_step2.py</a><ul>
+<li><a class="reference internal" href="#read-alara-phtn-py" id="id20">read_alara_phtn.py</a></li>
+<li><a class="reference internal" href="#write-gammas-py" id="id21">write_gammas.py</a></li>
+<li><a class="reference internal" href="#mcnp-n2p-py" id="id22">mcnp_n2p.py</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#step-2-parameters" id="id23">Step 2 Parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#other-scripts-pertinent-to-the-r2s-work-flow" id="id24">Other Scripts Pertinent to the R2S work flow.</a><ul>
+<li><a class="reference internal" href="#mats2alara-py" id="id25">mats2ALARA.py</a></li>
+<li><a class="reference internal" href="#get-mesh-values-py" id="id26">get_mesh_values.py</a></li>
+<li><a class="reference internal" href="#tag-ebins-py" id="id27">tag_ebins.py</a></li>
+<li><a class="reference internal" href="#r2s-step2setup-py" id="id28">r2s_step2setup.py</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<hr class="docutils" />
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id2">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-rigorous-two-step-r2s-method">
+<h3><a class="toc-backref" href="#id3">The Rigorous Two Step (R2S) Method</a><a class="headerlink" href="#the-rigorous-two-step-r2s-method" title="Permalink to this headline">¶</a></h3>
+<p>The Rigorous Two Step (R2S) method is used to determine the photon fluxes that result from neutron activation of materials for a given geometry. The first step of this method is neutron transport over some geometry in order to calculate flux distributions in space and energy. Using this neutron flux distribution and the isotopic composition of each part of the geometry, material activation calculations can be done in order to calculate a distribution of photon source strengths in space and energy. The second step of R2S is doing a photon transport calculation on these decay photons, in order to determine a photon flux distribution in space and energy. The &#8220;two step&#8221; part of the name specifies that neutron and photon transport steps are done separately, as opposed to the Direct One Step (D1S) method which performs both transport calculations simultaneously.</p>
+</div>
+<div class="section" id="university-of-wisconsin-rigorous-two-step-activation-work-flow-uw-r2s">
+<h3><a class="toc-backref" href="#id4">University of Wisconsin Rigorous Two Step Activation Work Flow (UW-R2S)</a><a class="headerlink" href="#university-of-wisconsin-rigorous-two-step-activation-work-flow-uw-r2s" title="Permalink to this headline">¶</a></h3>
+<p>UW-R2S is composed of a series of scripts written in the Python programming language to facilitate R2S calculations in complex 3D geometries. The end product of UW-R2S is a single Cartesian MOAB mesh file with each voxel tagged with:</p>
+<ol class="arabic simple">
+<li>neutron fluxes and relative errors for every neutron energy group, total neutron flux (neutrons/cm^2/s)</li>
+<li>material fractions and relative errors for every material in the geometry</li>
+<li>photon source strengths for every photon energy group (photons/cm^2/s)</li>
+<li>total photon source strength over the entire geometry (photons/s)</li>
+<li>photon flux and/or dose for every photon energy group and relative errors, total flux and/or dose (photons/cm^2/s, any dose units)</li>
+</ol>
+<p>The backbone of UW-R2S is the physics codes used for transport and activation. The Direct Accelerated Geometry Monte Carlo (DAG-MC) version of MCNP5 (Los Alamos National Laboratory), known as DAG-MCNP5 (UW-Madison) is used for both neutron and photon transport. This allows for geometry and materials information to be specified using CAD software, namely CubIt (Sandia National Laboratory). For the photon transport step, a custom compiled version of DAG-MCNP5, with a custom source.F90, is used. Analytic and Laplacian Adaptive Radioactivity Analysis (ALARA), developed at UW-Madison, is used for material activation.</p>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="set-up-and-dependencies">
+<h2><a class="toc-backref" href="#id5">Set-up and Dependencies</a><a class="headerlink" href="#set-up-and-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>The UW-R2S code is available at <a class="reference external" href="https://github.com/svalinn/r2s-act">https://github.com/svalinn/r2s-act</a>.</p>
+<p>UW-R2S has numerous dependencies:</p>
+<ol class="arabic simple">
+<li>Python</li>
+<li>DAG-MCNP5 compiled with UW-R2S source.F90, from <a class="reference external" href="https://github.com/svalinn/DAGMC">https://github.com/svalinn/DAGMC</a></li>
+<li>CubIt, from RSICC, <a class="reference external" href="http://rsicc.ornl.gov/">http://rsicc.ornl.gov/</a></li>
+<li>ALARA, from <a class="reference external" href="https://github.com/svalinn/ALARA">https://github.com/svalinn/ALARA</a></li>
+<li>Mesh Oriented Data Base (MOAB), from svn.mcs.anl.gov/repos/ITAPS/MOAB/trunk</li>
+<li>PyTAPS, the Python interface for ITAPS, (Interoperable Technologies for Advanced Petascale Simulations), from <a class="reference external" href="http://pypi.python.org/pypi/PyTAPS/1.4">http://pypi.python.org/pypi/PyTAPS/1.4</a></li>
+</ol>
+<p>Aside from MCNP5 and CubIt, available from RSICC, all other codes are open source with well documented installation instructions.</p>
+<p>Although not a dependency, the visualization program VisIT (Lawrence Livermore National Laboratory) is useful for visualizing results. Executables are available at <a class="reference external" href="https://wci.llnl.gov/codes/visit/">https://wci.llnl.gov/codes/visit/</a>.</p>
+<div class="section" id="compiling-dag-mcnp5-with-uw-r2s-source-f90">
+<h3><a class="toc-backref" href="#id6">Compiling DAG-MCNP5 with UW-R2S source.F90</a><a class="headerlink" href="#compiling-dag-mcnp5-with-uw-r2s-source-f90" title="Permalink to this headline">¶</a></h3>
+<p>In MCNP5, fixed source information is typically specified with the SDEF card. However, the SDEF card is limited to 1000 distributions. Building DAG-MCNP5 against UW-R2S source.F90 allow for an unlimited number of distributions. This is necessary because in the UW-R2S work flow, every mesh point is a particle source and generally high resolution spacial and energy information is sought after. To use the UW-R2S source.F90 version, no source cards (SDEF, SI, SP, etc.) appears in the input file. Instead, this version reads in a file (<tt class="docutils literal"><span class="pre">gammas</span></tt>) that contain all of the source information. This file is automatically generated by the R2S work flow. Technically this version is only necessary for the photon transport step (and not the neutron transport step), however if the MCNP input includes a source definition, the problem run like normal. Thus the same executable can be used for bother regular, and R2S-ACT photon transport calculations. Instructions for compiling DAG-MCNP5 with UW-R2S source.F90 appear below.</p>
+<ol class="arabic simple">
+<li>Navigate to the <tt class="docutils literal"><span class="pre">trunk/Source/src</span></tt> folder of DAG-MCNP5.</li>
+<li>Delete the file <tt class="docutils literal"><span class="pre">source.F90</span></tt></li>
+<li>Create a soft link (named <tt class="docutils literal"><span class="pre">source.F90</span></tt>) to the file <tt class="docutils literal"><span class="pre">source_gamma_refactor.F90</span></tt>, found in the <tt class="docutils literal"><span class="pre">r2s-act/mcnp_source/</span></tt> folder.</li>
+<li>Build DAG-MCNP5 in the usual fashion.</li>
+</ol>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="running-uw-r2s">
+<h2><a class="toc-backref" href="#id7">Running UW-R2S</a><a class="headerlink" href="#running-uw-r2s" title="Permalink to this headline">¶</a></h2>
+<p>UW-R2S contains 2 wrapper scripts (r2s_step1.py, r2s_step2.py) that call all necessary scripts in the correct order. In some cases, users may want to run certain scripts individually. To do this, users should consult the R2S Step 1 and R2S Step 2 section of this manual for information about running these individual scripts. The work flow using the wrapper scripts is detailed below:</p>
+<p><strong>1. Create geometry.</strong> Using CubIt, create the geometry and specify materials by adding volumes to materials groups. Group names should be formatted like &#8220;mat_X_rhoY&#8221; where X is the material number and Y is either mass density (negative value) or atom density (positive volume). Instructions for doing this can be found in the DAG-MCNP5 user manual. Be sure to remember to imprint and merge all of the geometry. Once completed, export the geometry as a .sat file (Standard ACIS Text format) and when prompted specify an ACIS version of 1900 and &#8220;export attributes&#8221; option. Alternatively, if the geometry already exists in the form of an MCNP input file, MCNP2CAD can be used to convert the geometry information from the MCNP input file into a .sat file. If the geometry contains small features, users may need to specify a smaller tolerance for merging surfaces (using the -t flag).</p>
+<p>Once the .sat file exists, it can be converted to an .h5m file (binary format MOAB mesh file) using dagmc_preproc. This is not necessary, but it prevents DAG-MCNP5 from having to process the .sat file every time it is run. Using a .h5m file also allows for the use of of a DAG-MCNP5 version that is not build against CubIt. In either case, either DAG-MCNNP or dagmc_preproc creates a faceted representation of the geometry. Users can specify the maximum distance between the points in the geometry and the faceted representation on the geometry. This is known as the faceting tolerance. In dagmc_preproc, this is specified with the -f flag. In DAG-MCNP5 this can be specified on the command line by using ftol=faceting_tolerace (e.g. ftol=1E-4). In addtion, dagmc_preproc can also be used to specify a length tolerance using the -l flag. The length tolerance is the maximum length of a facet edge.</p>
+<p><strong>2. Create DAG-MCNP5 input file and run neutron transport calculation.</strong> Other than the geometry cards, the rest of the DAG-MCNP5 input file should be identical to that of a native MCNP input file. Make sure the material numbers in the input file match the numbers of the material groups in CubIt. DAG-MCNP5 input files must contain an FMESH4 tally over the geometry of interest for neutron activation. The output from this tally will appear in a MCNP <tt class="docutils literal"><span class="pre">meshtal</span></tt> output file, in units of neutrons/cm^2/source particle. This output needs to be converted to flux, by multiplying by the total neutron source strength  (referred to as the neutron normalization factor) which has units of source particles/time. The recommended way of doing this is to use and FM tally multiplier card  to specify the neutron normalization factor on the FMESH4 tally, which will result in a <tt class="docutils literal"><span class="pre">meshtal</span></tt> file with fluxes in the correct units. If this is not done, normalization can be done when fluxes are tagged to mesh using the <tt class="docutils literal"><span class="pre">read_meshtal.py</span></tt> script.</p>
+<p><strong>3. Run r2s_setup.py.</strong> This script creates two configuration files called <tt class="docutils literal"><span class="pre">r2s.cfg</span></tt> and <tt class="docutils literal"><span class="pre">alara_snippet</span></tt> in whatever folder the script is run from. It is best to run all subsequent scripts out of this folder.</p>
+<p><strong>4. Modify r2s.cfg to suit the problem.</strong> The configuration file allows the user to specify important parameters and also the names of files used by and created by <tt class="docutils literal"><span class="pre">r2s_step1.py</span></tt>, ALARA, and <tt class="docutils literal"><span class="pre">r2s_step2.py</span></tt>. The file <tt class="docutils literal"><span class="pre">r2s.cfg</span></tt> is printed with default file names and parameters and also some instructive annotations. Typically there is no reason to change the file names aside from personal preference. In order to better understand the parameters specified, users should consult the &#8220;Step 1 Parameters&#8221; and &#8220;Step 2 Parameters&#8221; portion of this file.</p>
+<p><strong>5. Create ALARA materials library.</strong> The script <tt class="docutils literal"><span class="pre">mats2ALARA.py</span></tt> can be used to convert MCNP materials definitions to ALARA materials definitions. However, generally speaking activation definitions should be much more detailed than transport definitions, as minor impurities can dominate activations. ALARA material libraries rely on isotope libraries. A script to write both MCNP and ALARA definitions for R2S style problems is currently in development.</p>
+<p><strong>6. Modify ALARA snippet.</strong> The ALARA snippet file contains all of the information needed to run ALARA, apart from the geometry and materials information. It is appended to the ALARA geometry/materials file produced by <tt class="docutils literal"><span class="pre">r2s_step1.py</span></tt> to create the full ALARA input file. Most of the entries in the default snipppet produced by <tt class="docutils literal"><span class="pre">r2s_setup.py</span></tt> need not be changed. However, every problem will have a different irradiation schedule so special attention should be taken to change this from the default irradiation schedule. The ALARA snippet file also specifies the isotope library, material library, and data libraries. These libaries, or links to them must be present in the folder that ALARA is run out of. The default activation and photon source libraries are both specified as &#8220;FENDL2&#8221; in the ALARA snippet. However, soft links to these files must be named <tt class="docutils literal"><span class="pre">FENDL2.bin</span></tt> and <tt class="docutils literal"><span class="pre">FENDL2.gam</span></tt> for the activation and photon source libraries, respectively.</p>
+<p><strong>7. Run r2s_step1.py.</strong> This script is a wrapper script that reads the meshtal, geometry, MCNP neutron input file, and <tt class="docutils literal"><span class="pre">alara_snippet</span></tt> file specified in <tt class="docutils literal"><span class="pre">r2s.cfg</span></tt> and outputs a structured mesh file tagged with neutron fluxes with relative errors, material fractions with relative errors, and a complete ALARA input file.</p>
+<p><strong>8. Run ALARA.</strong> ALARA reads in the geometry, material, and irradiation schedule information from the ALARA input file and outputs a file containing photon source strengths (phtn_src) for every voxel and energy group. In addition, ALARA can calculate isotopic inventories, decay heat, and more (see ALARA user manual), which is printed to standard output by default. This output can be piped to an output file. Assuming the ALARA snippet file was written correctly and appended the command for this step will be <tt class="docutils literal"><span class="pre">/path/to/ALARA/</span> <span class="pre">alara_geom</span> <span class="pre">&gt;</span> <span class="pre">output_file</span></tt>. Currently, ALARA does not print out phtn_src entries for entries of material &#8220;void.&#8221; This causes indexing problems in Step 2. To get around this, use SED or some text editor to replace &#8220;void&#8221; with &#8220;pseudo_void&#8221;  (or something similar). Then make an entry in the ALARA material library for &#8220;pseudo_void&#8221; and assign the density to be equal to zero. This produces output that is mathematically correct.</p>
+<p><strong>9. Run r2s_step2.py.</strong> Like <tt class="docutils literal"><span class="pre">r2s_step1.py</span></tt>, this script is a wrapper for several other scripts. This script takes an ALARA phtn_src file, tags the information onto the structured mesh file from Step 1 and creates a <tt class="docutils literal"><span class="pre">gammas</span></tt> file used to specify the photon source distribution for the gamma transport step. It also modifies the MCNP neutron input file to create an MCNP photon input file. However this file may need additional user attention before running DAG-MCNP5, especially if the photon tally region is different from the neutron tally region. Flux to dose conversion factors should be added if dose results are desired.</p>
+<p><strong>11. Run DAG-MCNP5, complied with UW-R2S source.F90.</strong> The custom compiled version of DAG-MCNP5 reads the <tt class="docutils literal"><span class="pre">gammas</span></tt> file (must be present within the same folder), and output as a meshtal file with photon fluxes and/or doses.</p>
+<p><strong>10. Run read_meshtal.py.</strong> Run this script with the -m flag in order tag photon fluxes and/or doses onto the mesh with the rest of the information on it. This script is run by <tt class="docutils literal"><span class="pre">r2s_step1.py</span></tt>, so more information about this script can be found in the &#8220;Scripts run by r2s_step1.py&#8221; section of this manual.</p>
+<p><strong>12. Visualize Results.</strong> To visualize results, stuctured mesh .h5m files must be first converted to .vtk viles. This can be done using the MOAB mbconvert tool (syntax: <tt class="docutils literal"><span class="pre">mbconvert</span> <span class="pre">&lt;mesh_file.h5m&gt;</span> <span class="pre">&lt;mesh_file.vtk&gt;</span></tt>). The best way of visualizing the results on the resulting .vtk file is using VisIT. Fluxes/doses are best viewed as &#8220;pseudo color&#8221; or &#8220;volume&#8221; plots. The geometry can be superimposed onto these plots. To do this, save the geometry as a .stl file in CubIt. Then open this file in VisIt and visualize it as a &#8220;mesh&#8221; plot. It is often useful to visualize results during intermediate steps of the work flow. For example it may be useful to visualize the neutron flux distribution and errors prior to continuing with the work flow.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="r2s-step-1">
+<h2><a class="toc-backref" href="#id8">R2S Step 1</a><a class="headerlink" href="#r2s-step-1" title="Permalink to this headline">¶</a></h2>
+<p>This section provides details on the Step 1 scripts, in chronological order of when they are run.</p>
+<div class="section" id="r2s-setup-py">
+<h3><a class="toc-backref" href="#id9">r2s_setup.py</a><a class="headerlink" href="#r2s-setup-py" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Purpose:</th><td class="field-body">The script creates two set-up files used in the R2S work flow: <tt class="docutils literal"><span class="pre">r2s.cfg</span></tt> and <tt class="docutils literal"><span class="pre">alara_snippet</span></tt>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Inputs:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Outputs:</th><td class="field-body"><tt class="docutils literal"><span class="pre">r2s.cfg</span></tt>, <tt class="docutils literal"><span class="pre">alara_snippet</span></tt>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Syntax:</th><td class="field-body"><tt class="docutils literal"><span class="pre">./r2s_setup.py</span></tt></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Path:</th><td class="field-body"><tt class="docutils literal"><span class="pre">r2s-act/scripts/r2s_setup.py</span></tt></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="r2s-step1-py">
+<h3><a class="toc-backref" href="#id10">r2s_step1.py</a><a class="headerlink" href="#r2s-step1-py" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Purpose:</th><td class="field-body">This script is a wrapper script that reads the meshtal, geometry, MCNP neutron input file, and alara_snippet file specified in <tt class="docutils literal"><span class="pre">r2s.cfg</span></tt> and outputs a complete ALARA input file and a structured mesh file tagged with neutron fluxes and materials.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Inputs:</th><td class="field-body"><tt class="docutils literal"><span class="pre">r2s.cfg</span></tt></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Outputs:</th><td class="field-body">ALARA input file, structured mesh with neutron fluxes and uncertainties, materials and uncertainties.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Syntax:</th><td class="field-body"><tt class="docutils literal"><span class="pre">./r2s_step1.py</span></tt></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Path:</th><td class="field-body"><tt class="docutils literal"><span class="pre">r2s-act/scripts/r2s_step1.py</span></tt></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="scripts-run-by-r2s-step1-py">
+<h3><a class="toc-backref" href="#id11">Scripts run by r2s_step1.py</a><a class="headerlink" href="#scripts-run-by-r2s-step1-py" title="Permalink to this headline">¶</a></h3>
+<p>This scripts are listed in chronological order of when they are run. Most of these scripts can be run with a -h flag for usage and command line options.</p>
+<div class="section" id="read-meshtal-py">
+<h4><a class="toc-backref" href="#id12">read_meshtal.py:</a><a class="headerlink" href="#read-meshtal-py" title="Permalink to this headline">¶</a></h4>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Purpose:</th><td class="field-body"><p class="first">This script reads in an MCNP meshtal file and creates a structured mesh tagged with the fluxes and errors for each energy group</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Inputs:</th><td class="field-body"><p class="first">MCNP meshtal file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Outputs:</th><td class="field-body"><p class="first">Structure mesh tagged with fluxes and errors</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Syntax:</th><td class="field-body"><p class="first"><tt class="docutils literal"><span class="pre">./read_meshtal.py</span> <span class="pre">&lt;meshtal</span> <span class="pre">file&gt;</span> <span class="pre">[options]</span></tt></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body"><table class="first docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></td>
+<td><p class="first last">show this help message and exit</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-o <var>MESH_OUTPUT</var></span></kbd></td>
+<td><p class="first last">Name of mesh output file, default=flux_mesh.h5m</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-n <var>NORM</var></span></kbd></td>
+<td><p class="first last">Normalization factor, default=1</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-m <var>MESH_FILE</var></span></kbd></td>
+<td><p class="first last">Preexisting mesh on which to tag fluxes</p>
+</td></tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Path:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">r2s-act/scripts/r2s/io/read_meshtal.py</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="write-alara-fluxin-py">
+<h4><a class="toc-backref" href="#id13">write_alara_fluxin.py</a><a class="headerlink" href="#write-alara-fluxin-py" title="Permalink to this headline">¶</a></h4>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Purpose:</th><td class="field-body"><p class="first">This script reads the neutron fluxes off a structured mesh file (created by <tt class="docutils literal"><span class="pre">read_meshtal.py</span></tt>) and prints an <tt class="docutils literal"><span class="pre">ALARA_fluxin</span></tt> file.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Inputs:</th><td class="field-body"><p class="first">Structured mesh</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Outputs:</th><td class="field-body"><p class="first">ALARA fluxin file</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Syntax:</th><td class="field-body"><p class="first"><tt class="docutils literal"><span class="pre">./write_alara_fluxin.py</span> <span class="pre">&lt;structured</span> <span class="pre">mesh&gt;</span> <span class="pre">[options]</span></tt></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body"><table class="first docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-b</span></kbd></td>
+<td><p class="first last">Print to ALARA fluxin in fluxes in  decreasing energy.
+Default=False</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-o <var>FLUXIN_NAME</var></span></kbd></td>
+<td><p class="first last">Name of ALARA fluxin output file, default=ALARAflux.in</p>
+</td></tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Path:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">r2s-act/scripts/r2s/io/write_alara_fluxin.py</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="mmgrid-py">
+<h4><a class="toc-backref" href="#id14">mmgrid.py</a><a class="headerlink" href="#mmgrid-py" title="Permalink to this headline">¶</a></h4>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Purpose:</th><td class="field-body"><p class="first">This script is used calculate average material definitions for each mesh voxel. Most geometries do not conform to the Cartesian mesh dictated by MCNP fmesh4 tallies. Voxels that contain multiple volumes are likely to contain multiple materials, so the ALARA materials assigned to these voxels must be a mixture of materials from the MCNP files. This script uses Monte Carlo ray-tracing to determine the volume fractions of each material in each voxel and then writes corresponding ALARA geometry and materials entries, and tags mesh with the material  definitions. The first required argument should be a DagMC-loadable geometry.  The optional second argument must be a file with a single structured mesh.  In the absence of the second argument, mmgrid will attempt to infer the shape of the DagMC geometry and create a structured grid to match it, with NDVIS divisions on each side.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Inputs:</th><td class="field-body"><p class="first">geometry file (.sat or .h5m), structured mesh file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Outputs:</th><td class="field-body"><p class="first">ALARA geometery and materials entries</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Syntax:</th><td class="field-body"><p class="first"><tt class="docutils literal"><span class="pre">mmgrid.py</span> <span class="pre">[options]</span> <span class="pre">geometry_file</span> <span class="pre">[structured_mesh_file]</span></tt></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body"><table class="first docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></td>
+<td><p class="first last">help message and exit</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-n <var>NUMRAYS</var></span></kbd></td>
+<td><p class="first last">Set N. N^2 rays fired per row.  Default N=20</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-g</span>, <span class="option">--grid</span></kbd></td>
+<td><p class="first last">Use grid of rays instead of randomly selected starting points</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-o <var>Output_file</var></span></kbd></td>
+<td><p class="first last">Output file name, default=mmgrid_output.h5m</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-q</span>, <span class="option">--quiet</span></kbd></td>
+<td><p class="first last">Suppress non-error output from mmgrid</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-d <var>NDIVS</var></span></kbd></td>
+<td><p class="first last">Number of mesh divisions to use when inferring mesh size, default=10</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-a <var>GEOM_FILE</var></span></kbd></td>
+<td><p class="first last">Write alara geom to specified file name</p>
+</td></tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Path:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">r2s-act/scripts/r2s/mmgrid.py</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="write-alara-geom-py">
+<h4><a class="toc-backref" href="#id15">write_alara_geom.py</a><a class="headerlink" href="#write-alara-geom-py" title="Permalink to this headline">¶</a></h4>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Purpose:</th><td class="field-body">This script takes the structured mesh with materials from <tt class="docutils literal"><span class="pre">mmgrid.py</span></tt> and creates a file (alara_geom) with ALARA geometry and materials entries.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Inputs:</th><td class="field-body">Structured mesh tagged with materials entries</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Outputs:</th><td class="field-body">alara_geom, a file with ALARA geometry and materials</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Syntax:</th><td class="field-body"><tt class="docutils literal"><span class="pre">./write_alara_geom.py</span></tt></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Path:</th><td class="field-body"><tt class="docutils literal"><span class="pre">r2s-act/scripts/r2s/io/write_alara_geom.py</span></tt></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="step-1-parameters">
+<h3><a class="toc-backref" href="#id16">Step 1 Parameters</a><a class="headerlink" href="#step-1-parameters" title="Permalink to this headline">¶</a></h3>
+<p>These settings can be modified in a problem&#8217;s <tt class="docutils literal"><span class="pre">r2s.cfg</span></tt> file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">mmgrid_rays:</th><td class="field-body">The number of rays per mesh row to fire during Monte Carlo generation of the macromaterial grid. Raising this number will reduce material errors, but also increase the runtime of r2s_step1.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">step2setup:</th><td class="field-body">If step2setup is 1, runs the <tt class="docutils literal"><span class="pre">r2s_step2setup.py</span></tt> script at the end of <tt class="docutils literal"><span class="pre">r2s_step1.py</span></tt>.  <tt class="docutils literal"><span class="pre">r2s_step2setup.py</span></tt> creates folders for all cooling steps and isotopes specified.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="r2s-step-2">
+<h2><a class="toc-backref" href="#id17">R2S Step 2</a><a class="headerlink" href="#r2s-step-2" title="Permalink to this headline">¶</a></h2>
+<p>This section provides details on the Step 2 scripts, in chronological order of when they are run.</p>
+<div class="section" id="r2s-step2-py">
+<h3><a class="toc-backref" href="#id18">r2s_step2.py</a><a class="headerlink" href="#r2s-step2-py" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Purpose:</th><td class="field-body">This script takes the phtn_src file produced by ALARA and tags the source strengths onto the structured mesh. It also creates the &#8216;gammas&#8217; file and converts the MCNP neutron input file to a photon input file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Inputs:</th><td class="field-body">structured mesh from Step 1, pthn_src file, MCNP neutron input file</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Outputs:</th><td class="field-body">structured mesh with source strengths, gammas file, MCNP photon input file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Syntax:</th><td class="field-body"><tt class="docutils literal"><span class="pre">./r2s_step2.py</span></tt></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Path:</th><td class="field-body"><tt class="docutils literal"><span class="pre">r2s-act/scripts/r2s_step2.py</span></tt></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="scripts-run-by-r2s-step2-py">
+<h3><a class="toc-backref" href="#id19">Scripts run by r2s_step2.py</a><a class="headerlink" href="#scripts-run-by-r2s-step2-py" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="read-alara-phtn-py">
+<h4><a class="toc-backref" href="#id20">read_alara_phtn.py</a><a class="headerlink" href="#read-alara-phtn-py" title="Permalink to this headline">¶</a></h4>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Purpose:</th><td class="field-body"><p class="first">The script reads an ALARA phtn_src file and writes the source strengths to the structured mesh specified by the -p option.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Inputs:</th><td class="field-body"><p class="first">ALARA pthn_src, structured mesh from Step 1</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Outputs:</th><td class="field-body"><p class="first">structured mesh tagged with source strengths</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Syntax:</th><td class="field-body"><p class="first"><tt class="docutils literal"><span class="pre">./read_alara_phtn.py</span> <span class="pre">[options]</span> <span class="pre">arg</span></tt></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body"><table class="first docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-p <var>PHTNSRCFILE</var></span></kbd></td>
+<td><p class="first last">The photon source strengths are read from FILENAME.</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-m <var>MESHFILE</var></span></kbd></td>
+<td><p class="first last">File to write source information to, or file name for saving a modified mesh.</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-i <var>ISOTOPE</var></span></kbd></td>
+<td><p class="first last">The isotope string identifier or &#8216;TOTAL&#8217;. Default: TOTAL</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-c <var>COOLINGSTEP</var></span></kbd></td>
+<td><p class="first last">The cooling step number or string identifier. (0 is first cooling step)  Default: 0</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-r</span>, <span class="option">--retag</span></kbd></td>
+<td><p class="first last">Option enables retagging of .h5m meshes. Default: False</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-t</span>, <span class="option">--totals</span></kbd></td>
+<td><p class="first last">Option enables adding the total photon source strength for all energy groups as a tag for each voxel. Default: False</p>
+</td></tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Path:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">r2s-act/scripts/r2s/io/read_alara_phtn.py</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="write-gammas-py">
+<h4><a class="toc-backref" href="#id21">write_gammas.py</a><a class="headerlink" href="#write-gammas-py" title="Permalink to this headline">¶</a></h4>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Purpose:</th><td class="field-body"><p class="first">This script reads a structured mesh tagged with photon sources strengths and generates a gammas file for use as a source distribution file for photon transport.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Inputs:</th><td class="field-body"><p class="first">structured mesh file with photon source strengths</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Outputs:</th><td class="field-body"><p class="first">gammas file</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Syntax:</th><td class="field-body"><p class="first"><tt class="docutils literal"><span class="pre">write_gammas.py</span> <span class="pre">input-h5m-file</span> <span class="pre">[options]</span></tt></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body"><table class="first docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-h</span></kbd></td>
+<td><p class="first last">Show message and exit</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-o <var>OUTPUT</var></span></kbd></td>
+<td><p class="first last">Option specifies the name of the &#8216;gammas&#8217;file. Default: gammas</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-a</span></kbd></td>
+<td><p class="first last">Generate the gammas file with an alias table of energy bins for each voxel. Default: False. Default file name changes to &#8216;gammas_alias.&#8217; Creates the file gammas with the photon energy bins for each voxel stored as alias tables. Reads directly from phtn_src file. Each voxel&#8217;s line corresponds with an alias table of the form: [total source strength, p1, g1a, g1b, p2, g2a, g2b ... pN, gNa, gNb] Where each p#, g#a, g#b are the info for one bin in the alias table.</p>
+</td></tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Path:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">r2s-act/scripts/r2s/io/write_gammas.py</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="mcnp-n2p-py">
+<h4><a class="toc-backref" href="#id22">mcnp_n2p.py</a><a class="headerlink" href="#mcnp-n2p-py" title="Permalink to this headline">¶</a></h4>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Purpose:</th><td class="field-body"><p class="first">This script reads an MCNP neutron input file and writes a corresponding photon input file.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Inputs:</th><td class="field-body"><p class="first">MNCP neutron input file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Outputs:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Syntax:</th><td class="field-body"><p class="first"><tt class="docutils literal"><span class="pre">mcnp_n2p.py</span> <span class="pre">INPUTFILE</span> <span class="pre">[options]</span></tt></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body"><table class="first docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-h</span></kbd></td>
+<td><p class="first last">Show help message and exit</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-o <var>OUTPUT</var></span></kbd></td>
+<td><p class="first last">File name to write modified MCNP input to. Default is to append input file name with &#8216;_p&#8217;.</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-d</span></kbd></td>
+<td><p class="first last">Add flag to parse file like a DAG-MCNP5 file (which has only title card and block 3 cards). Default: False</p>
+</td></tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Path:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">/r2s-act/scripts/r2s/mcnp_n2p.py</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="step-2-parameters">
+<h3><a class="toc-backref" href="#id23">Step 2 Parameters</a><a class="headerlink" href="#step-2-parameters" title="Permalink to this headline">¶</a></h3>
+<p>These settings can be modified in a problem&#8217;s <tt class="docutils literal"><span class="pre">r2s.cfg</span></tt> file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">photon_isotope:</th><td class="field-body">Specify what isotope should be considered for activation (for reading phtn_src file). The default is all isotopes, TOTAL.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">photon_cooling:</th><td class="field-body">The cooling step to read from <cite>phtn_src</cite> file. Numeric or string identifiers matching those in the ALARA input can be used. Numbering starts with 0 for &#8220;shutdown&#8221;, and follows the order listed in the ALARA input.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">sampling:</th><td class="field-body">determines the sampling method used. For uniform sampling, specify &#8220;u&#8221;; for voxel sampling specify &#8220;v&#8221; (default). Voxel sampling is probably preferable for most cases, and is required if source biasing is being used.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">photon_bias:</th><td class="field-body">0 for false, 1 for true. If true, the gammas file will try to include voxel bias values from the mesh (stored as PHTN_BIAS tag). Currently requires <strong>sampling</strong> to be &#8220;v&#8221;. (Note that bias values are tagged to the mesh using a script like <tt class="docutils literal"><span class="pre">tag_bias_example.py</span></tt>)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">custom_ergbins:</th><td class="field-body">0 for false, 1 for true. If <strong>custom_ergbins</strong> is 1, custom energy bins will be looked for on the mesh, and included in gammas file if found. (default: false; default 42 group structure is used)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">cumulative:</th><td class="field-body">0 for false, 1 for true. <strong>cumulative</strong> determines the format for listing energy bin probabilities for each voxel in gammas file. Default is 0 (false), which is corresponds with sequential bins, and is preferred.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="other-scripts-pertinent-to-the-r2s-work-flow">
+<h2><a class="toc-backref" href="#id24">Other Scripts Pertinent to the R2S work flow.</a><a class="headerlink" href="#other-scripts-pertinent-to-the-r2s-work-flow" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="mats2alara-py">
+<h3><a class="toc-backref" href="#id25">mats2ALARA.py</a><a class="headerlink" href="#mats2alara-py" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Purpose:</th><td class="field-body"><p class="first">This script reads an MCNP input file and prints out ALARA materials definitions for all the materials specified within it. The user must manually define the densities for each material [g/cm^3] by replacing all instances of &lt;rho&gt; in the resulting file. Material defintions must be formatted so that the material number (e.g. m1, m2) and each isotope occupy separate lines.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Inputs:</th><td class="field-body"><p class="first">MCNP input file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Outputs:</th><td class="field-body"><p class="first">ALARA materials definitions</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Syntax:</th><td class="field-body"><p class="first"><tt class="docutils literal"><span class="pre">./mats2ALARA.py</span> <span class="pre">&lt;mcnp_input_file&gt;</span></tt></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body"><table class="first docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></td>
+<td><p class="first last">show this help message and exit</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-o <var>OUTPUT</var></span></kbd></td>
+<td><p class="first last">Name of materials output file, default=matlib.out</p>
+</td></tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Path:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">r2s-act/scripts/tools/mats2ALARA.py</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="get-mesh-values-py">
+<h3><a class="toc-backref" href="#id26">get_mesh_values.py</a><a class="headerlink" href="#get-mesh-values-py" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Purpose:</th><td class="field-body"><p class="first">This script is used to print the value of a tag on a structured mesh. The script will automatically search for a tag in the for tag_name+_error. If it exists, the error value will be appended to the answer: value (plus/minus) error</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Inputs:</th><td class="field-body"><p class="first">Structured mesh</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Outputs:</th><td class="field-body"><p class="first">value with error to standard output</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Syntax:</th><td class="field-body"><p class="first"><tt class="docutils literal"><span class="pre">./get_value.py</span> <span class="pre">&lt;structured_mesh&gt;</span> <span class="pre">&lt;x_value&gt;</span> <span class="pre">&lt;y_value&gt;</span> <span class="pre">&lt;z_value&gt;</span> <span class="pre">&lt;tag_name&gt;</span></tt></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body"><table class="first docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></td>
+<td><p class="first last">show help message and exit</p>
+</td></tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Path:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">r2s-act/scripts/tools/mats2ALARA.py</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="tag-ebins-py">
+<h3><a class="toc-backref" href="#id27">tag_ebins.py</a><a class="headerlink" href="#tag-ebins-py" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Purpose:</th><td class="field-body">If custom energy groups are desired for activation and photon transport, a separate file listing the energy bins boundaries (one per line) can be provided to this script. Otherwise, the default 42 group structure will be used.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Inputs:</th><td class="field-body">Step 1 mesh, energy file: a list of the energy bins for each photon energy group, with a single energy per line</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Outputs:</th><td class="field-body">None (tags the .h5m mesh)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Syntax:</th><td class="field-body"><tt class="docutils literal"><span class="pre">./tag_ebins.py</span> <span class="pre">&lt;energy_file&gt;</span> <span class="pre">&lt;mesh_file&gt;</span> <span class="pre">[options]</span></tt></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Path:</th><td class="field-body"><tt class="docutils literal"><span class="pre">r2s-act/scripts/r2s/tag_ebins.py</span></tt></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="r2s-step2setup-py">
+<h3><a class="toc-backref" href="#id28">r2s_step2setup.py</a><a class="headerlink" href="#r2s-step2setup-py" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Purpose:</th><td class="field-body">For each combination of cooling step and isotope listed in the <tt class="docutils literal"><span class="pre">r2s.cfg</span></tt> file, this script creates new folders with copies of <tt class="docutils literal"><span class="pre">r2s.cfg</span></tt>, the MCNP inputs, and the .h5m mesh file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Inputs:</th><td class="field-body">Looks for <tt class="docutils literal"><span class="pre">r2s.cfg</span></tt> file</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Outputs:</th><td class="field-body">Creates directories containing files</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Syntax:</th><td class="field-body"><tt class="docutils literal"><span class="pre">./r2s_step2setup.py</span></tt></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Path:</th><td class="field-body"><tt class="docutils literal"><span class="pre">r2s-act/scripts/r2s_step2setup.py</span></tt></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p>Fin.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">University of Wisconsin Rigorous Two Step Activation Work Flow (UW-R2S) User Manual</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#the-rigorous-two-step-r2s-method">The Rigorous Two Step (R2S) Method</a></li>
+<li><a class="reference internal" href="#university-of-wisconsin-rigorous-two-step-activation-work-flow-uw-r2s">University of Wisconsin Rigorous Two Step Activation Work Flow (UW-R2S)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#set-up-and-dependencies">Set-up and Dependencies</a><ul>
+<li><a class="reference internal" href="#compiling-dag-mcnp5-with-uw-r2s-source-f90">Compiling DAG-MCNP5 with UW-R2S source.F90</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#running-uw-r2s">Running UW-R2S</a></li>
+<li><a class="reference internal" href="#r2s-step-1">R2S Step 1</a><ul>
+<li><a class="reference internal" href="#r2s-setup-py">r2s_setup.py</a></li>
+<li><a class="reference internal" href="#r2s-step1-py">r2s_step1.py</a></li>
+<li><a class="reference internal" href="#scripts-run-by-r2s-step1-py">Scripts run by r2s_step1.py</a><ul>
+<li><a class="reference internal" href="#read-meshtal-py">read_meshtal.py:</a></li>
+<li><a class="reference internal" href="#write-alara-fluxin-py">write_alara_fluxin.py</a></li>
+<li><a class="reference internal" href="#mmgrid-py">mmgrid.py</a></li>
+<li><a class="reference internal" href="#write-alara-geom-py">write_alara_geom.py</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#step-1-parameters">Step 1 Parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#r2s-step-2">R2S Step 2</a><ul>
+<li><a class="reference internal" href="#r2s-step2-py">r2s_step2.py</a></li>
+<li><a class="reference internal" href="#scripts-run-by-r2s-step2-py">Scripts run by r2s_step2.py</a><ul>
+<li><a class="reference internal" href="#read-alara-phtn-py">read_alara_phtn.py</a></li>
+<li><a class="reference internal" href="#write-gammas-py">write_gammas.py</a></li>
+<li><a class="reference internal" href="#mcnp-n2p-py">mcnp_n2p.py</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#step-2-parameters">Step 2 Parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#other-scripts-pertinent-to-the-r2s-work-flow">Other Scripts Pertinent to the R2S work flow.</a><ul>
+<li><a class="reference internal" href="#mats2alara-py">mats2ALARA.py</a></li>
+<li><a class="reference internal" href="#get-mesh-values-py">get_mesh_values.py</a></li>
+<li><a class="reference internal" href="#tag-ebins-py">tag_ebins.py</a></li>
+<li><a class="reference internal" href="#r2s-step2setup-py">r2s_step2setup.py</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to R2S-ACT&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="r2s/r2s.html"
+                        title="next chapter">r2s Package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/r2s-userguide.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="r2s/r2s.html" title="r2s Package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to R2S-ACT’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">R2S-ACT 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, CNERG.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
