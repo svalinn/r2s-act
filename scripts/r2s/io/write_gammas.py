@@ -289,6 +289,7 @@ def calc_volumes_list(sm):
     ----------
     sm : scdmesh.ScdMesh
         A structured mesh object from which to calculate volumes.
+
     Returns
     -------
     vols : list of floats
