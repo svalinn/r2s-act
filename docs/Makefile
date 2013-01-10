@@ -1,7 +1,7 @@
 # Makefile for Sphinx documentation
 #
 
-GH_PAGES_SOURCES = Makefile r2s _themes _sphinxext index.rst
+GH_PAGES_SOURCES = Makefile _themes _sphinxext index.rst conf.py rebuild.sh ../scripts/r2s
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
@@ -50,14 +50,21 @@ html:
 
 gh-pages:
 	git checkout gh-pages
-	rm -rf build _sources _static
+	# Clean out _build from docs/
+	rm -rf _build 
+	# Clean out contents of _build/html/ from repo root.
+	rm -rf ../_sources ../_static ../r2s
 	git checkout autodoctry $(GH_PAGES_SOURCES)
 	git reset HEAD
-	make html
-	mv -fv build/html/* ./
-	rm -rf $(GH_PAGES_SOURCES) build
+	#make html
+	./rebuild.sh # handles make html
+	mv -fv _build/html/* ../
+	rm -rf $(GH_PAGES_SOURCES) _build r2s
+	cd ../
+	rm -rf scripts/ #docs
 	git add -A
-	git ci -m "Generated gh-pages for `git log autodoctry -1 --pretty=short --abbrev-commit`" && git push erelson gh-pages ; git checkout autodoctry
+	git commit -m "Generated gh-pages for `git log autodoctry -1 --pretty=short --abbrev-commit`"  ; git checkout autodoctry
+#	git ci -m "Generated gh-pages for `git log autodoctry -1 --pretty=short --abbrev-commit`" && git push erelson gh-pages ; git checkout autodoctry
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
