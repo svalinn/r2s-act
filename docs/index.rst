@@ -6,6 +6,8 @@
 Welcome to R2S-ACT's documentation!
 ===================================
 
+A full summary of the workflow is available.
+
 Contents:
 
 .. toctree::
@@ -13,6 +15,8 @@ Contents:
 
    r2s-userguide
 
+
+For developers, the low level scripts are directly accessible within scripts/r2s/.  Documentation from within the code is also given below.
 
 Internal code documentation:
 
