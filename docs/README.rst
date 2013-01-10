@@ -5,6 +5,7 @@ This folder is where sphinx documentation of the r2s-act code is managed.
 To rebuild documentation, run `rebuild.sh`
 
 A few notes:
+
 - sphinx-apidoc grabs the docstrings from scripts in r2s/ and r2s/io/
 - numpydoc is used, which enables docstring formatting with section headings
   - valid section headings are Parameters, Returns, Notes, See Also, Examples, References

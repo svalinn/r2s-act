@@ -21,6 +21,7 @@ Internal code documentation:
 
    r2s/r2s
    r2s/r2s.io
+   r2s/modules
 
 
 Indices and tables
