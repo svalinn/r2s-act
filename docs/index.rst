@@ -12,6 +12,13 @@ Contents:
    :maxdepth: 1
 
    r2s-userguide
+
+
+Internal code documentation:
+
+.. toctree::
+   :maxdepth: 1
+
    r2s/r2s
    r2s/r2s.io
 

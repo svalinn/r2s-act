@@ -1,6 +1,8 @@
 # Makefile for Sphinx documentation
 #
 
+GH_PAGES_SOURCES = Makefile r2s _themes _sphinxext index.rst
+
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
@@ -45,6 +47,17 @@ html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+
+gh-pages:
+	git checkout gh-pages
+	rm -rf build _sources _static
+	git checkout autodoctry $(GH_PAGES_SOURCES)
+	git reset HEAD
+	make html
+	mv -fv build/html/* ./
+	rm -rf $(GH_PAGES_SOURCES) build
+	git add -A
+	git ci -m "Generated gh-pages for `git log autodoctry -1 --pretty=short --abbrev-commit`" && git push erelson gh-pages ; git checkout autodoctry
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml

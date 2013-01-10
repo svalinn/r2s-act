@@ -9,5 +9,6 @@ A few notes:
 - numpydoc is used, which enables docstring formatting with section headings
   - valid section headings are Parameters, Returns, Notes, See Also, Examples, References
   - For further guidance on the proper doc-string format, see: https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt#method-docstrings
+- Using the 'build and push to gh-pages and return to branch' approach from here: http://blog.nikhilism.com/2012/08/automatic-github-pages-generation-from.html
 
 

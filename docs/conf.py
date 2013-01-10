@@ -91,9 +91,9 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.: http://sphinx-doc.org/theming.html
-# html_theme = 'default'
+html_theme = 'default'
 # html_theme = 'agogo'
-html_theme = 'uwtheme'
+# html_theme = 'uwtheme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -246,3 +246,12 @@ texinfo_documents = [
 # autodoc paths for R2S. TBD if relative paths are ok for final setup...
 sys.path.insert(0, '../scripts/r2s/')
 sys.path.insert(0, '../scripts/')
+
+def skip(app, what, name, obj, skip, options):
+    if name == "__init__":
+        return False
+    return skip
+
+def setup(app):
+    app.connect("autodoc-skip-member", skip)
+
