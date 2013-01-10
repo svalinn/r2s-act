@@ -85,7 +85,7 @@
 <li><a class="reference internal" href="#">r2s Package</a><ul>
 <li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">r2s</span></tt> Package</a></li>
 <li><a class="reference internal" href="#module-r2s.mcnp_n2p"><tt class="docutils literal"><span class="pre">mcnp_n2p</span></tt> Module</a></li>
-<li><a class="reference internal" href="#mmgrid-module"><tt class="docutils literal"><span class="pre">mmgrid</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-r2s.mmgrid"><tt class="docutils literal"><span class="pre">mmgrid</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-r2s.scdmesh"><tt class="docutils literal"><span class="pre">scdmesh</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-r2s.tag_ebins"><tt class="docutils literal"><span class="pre">tag_ebins</span></tt> Module</a></li>
 <li><a class="reference internal" href="#subpackages">Subpackages</a><ul>
@@ -290,8 +290,83 @@ information.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="mmgrid-module">
-<h2><tt class="xref py py-mod docutils literal"><span class="pre">mmgrid</span></tt> Module<a class="headerlink" href="#mmgrid-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-r2s.mmgrid">
+<span id="mmgrid-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">mmgrid</span></tt> Module<a class="headerlink" href="#module-r2s.mmgrid" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="r2s.mmgrid.get_mat_id">
+<tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">get_mat_id</tt><big>(</big><em>materials</em>, <em>volume_id</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.get_mat_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="r2s.mmgrid.load_geom">
+<tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">load_geom</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.load_geom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load geometry from the given file into dagmc</p>
+<p>This is provided as a convenience so client code doesn&#8217;t need to invoke pydagmc.</p>
+<p>Note that DagMC can only have one set of geometry loaded per program invocation.
+This means that this function should only be called once, and the resulting 
+geometry will become globally visible to all clients of mmgrid.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mmgrid.main">
+<tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">main</tt><big>(</big><em>arguments=None</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="r2s.mmgrid.mmGrid">
+<em class="property">class </em><tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">mmGrid</tt><big>(</big><em>scdmesh</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object representing a macromaterial grid</p>
+<dl class="method">
+<dt id="r2s.mmgrid.mmGrid.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>scdmesh</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a grid based on a given structured mesh</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.mmgrid.mmGrid.createTags">
+<tt class="descname">createTags</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid.createTags" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="r2s.mmgrid.mmGrid.fromDagGeom">
+<em class="property">classmethod </em><tt class="descname">fromDagGeom</tt><big>(</big><em>ndiv=10</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid.fromDagGeom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a grid based on the geometry currently loaded in DagMC</p>
+<p>Creates an equally spaced grid with ndiv divisions per side, set
+within the full DagMC geometry.  This constructor requires that
+DagMC has geometry loaded with a rectangular graveyard volume</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.mmgrid.mmGrid.generate">
+<tt class="descname">generate</tt><big>(</big><em>N</em>, <em>use_grid=False</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid.generate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample the DagMC geometry and store the results on this grid.</p>
+<p>N is the number of samples to take per voxel per dimension</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.mmgrid.mmGrid.writeFile">
+<tt class="descname">writeFile</tt><big>(</big><em>filename</em>, <em>alara_geom_file=None</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid.writeFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="r2s.mmgrid.mmGridError">
+<em class="property">exception </em><tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">mmGridError</tt><a class="headerlink" href="#r2s.mmgrid.mmGridError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mmgrid.pairwise">
+<tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">pairwise</tt><big>(</big><em>l</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.pairwise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generator: given a sequence x, yield (x[0],x[1]), (x[1],x[2]), ...</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mmgrid.prepare_materials">
+<tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">prepare_materials</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mmgrid.prepare_materials" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 <div class="section" id="module-r2s.scdmesh">
 <span id="scdmesh-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">scdmesh</span></tt> Module<a class="headerlink" href="#module-r2s.scdmesh" title="Permalink to this headline">¶</a></h2>
