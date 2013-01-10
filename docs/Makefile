@@ -62,7 +62,7 @@ gh-pages:
 	rm -rf $(GH_PAGES_SOURCES)
 	rm -rf _build r2s
 	# Note that cd ../ is required to be on the same line
-	cd ../ ; rm -rf scripts/ docs/*
+	cd ../ ; rm -rf scripts/r2s/* docs/*
 	cd ../ ; git add --all
 	# Commit and push gh-pages, and swithc back to master
 	git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push erelson gh-pages
