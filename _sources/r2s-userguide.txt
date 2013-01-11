@@ -23,9 +23,9 @@ UW-R2S is composed of a series of scripts written in the Python programming lang
 
 1. neutron fluxes and relative errors for every neutron energy group, total neutron flux (neutrons/cm^2/s)
 2. material fractions and relative errors for every material in the geometry
-3. photon source strengths for every photon energy group (photons/cm^2/s)
+3. photon source strengths for every photon energy group (photons/cm^3/s)
 4. total photon source strength over the entire geometry (photons/s)
-5. photon flux and/or dose for every photon energy group and relative errors, total flux and/or dose (photons/cm^2/s, any dose units)
+5. photon flux and/or dose for every photon energy group and relative errors, total flux and/or dose (photons/cm^3/s, any dose units)
 
 The backbone of UW-R2S is the physics codes used for transport and activation. The Direct Accelerated Geometry Monte Carlo (DAG-MC) version of MCNP5 (Los Alamos National Laboratory), known as DAG-MCNP5 (UW-Madison) is used for both neutron and photon transport. This allows for geometry and materials information to be specified using CAD software, namely CubIt (Sandia National Laboratory). For the photon transport step, a custom compiled version of DAG-MCNP5, with a custom source.F90, is used. Analytic and Laplacian Adaptive Radioactivity Analysis (ALARA), developed at UW-Madison, is used for material activation.
 
@@ -38,16 +38,22 @@ The UW-R2S code is available at https://github.com/svalinn/r2s-act.
 
 UW-R2S has numerous dependencies:
 
-1. Python
-2. DAG-MCNP5 compiled with UW-R2S source.F90, from https://github.com/svalinn/DAGMC
+1. Python 2.6+
+2. DAG-MCNP5 compiled with UW-R2S `mcnp_source/source_gamma.F90`, from https://github.com/svalinn/DAGMC
 3. CubIt, from RSICC, http://rsicc.ornl.gov/
 4. ALARA, from https://github.com/svalinn/ALARA
 5. Mesh Oriented Data Base (MOAB), from svn.mcs.anl.gov/repos/ITAPS/MOAB/trunk
 6. PyTAPS, the Python interface for ITAPS, (Interoperable Technologies for Advanced Petascale Simulations), from http://pypi.python.org/pypi/PyTAPS/1.4
+7. PyNE, *Python for Nuclear Engineering*, from http://pynesim.org/
+   (Has its own dependencies listed at https://github.com/pyne/pyne)
 
 Aside from MCNP5 and CubIt, available from RSICC, all other codes are open source with well documented installation instructions.
 
-Although not a dependency, the visualization program VisIT (Lawrence Livermore National Laboratory) is useful for visualizing results. Executables are available at https://wci.llnl.gov/codes/visit/.
+The user guide and other documentation is available at http://svalinn.github.com/r2s-act/ .
+Building the documentation requires Sphinx, from http://sphinx-doc.org
+
+Although not a dependency, the visualization program VisIT (Lawrence Livermore National Laboratory) is useful for visualizing results data stored on MOAB meshes in the .vtk format.
+Executables are available at https://wci.llnl.gov/codes/visit/.
 
 _______________________________________________________________________________
 Compiling DAG-MCNP5 with UW-R2S source.F90

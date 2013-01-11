@@ -26,7 +26,6 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="R2S-ACT 0.1 documentation" href="index.html" />
-    <link rel="next" title="r2s Package" href="r2s/r2s.html" />
     <link rel="prev" title="Welcome to R2S-ACT’s documentation!" href="index.html" /> 
   </head>
   <body> 
@@ -58,18 +57,6 @@
         <li class="menu-item" style="margin-right: 10px">
           <a href="index.html" title="Welcome to R2S-ACT’s documentation!"
              accesskey="P">previous</a>
-          </li>
-        <li class="menu-item" >
-          <a href="r2s/r2s.html" title="r2s Package"
-             accesskey="N">next</a>
-          </li>
-        <li class="menu-item" >
-          <a href="np-modindex.html" title="Python Module Index"
-             >modules</a>
-          </li>
-        <li class="menu-item" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a>
           </li>
         <li class="menu-item" >
           <a href="genindex.html" title="General Index"
@@ -194,9 +181,9 @@
 <ol class="arabic simple">
 <li>neutron fluxes and relative errors for every neutron energy group, total neutron flux (neutrons/cm^2/s)</li>
 <li>material fractions and relative errors for every material in the geometry</li>
-<li>photon source strengths for every photon energy group (photons/cm^2/s)</li>
+<li>photon source strengths for every photon energy group (photons/cm^3/s)</li>
 <li>total photon source strength over the entire geometry (photons/s)</li>
-<li>photon flux and/or dose for every photon energy group and relative errors, total flux and/or dose (photons/cm^2/s, any dose units)</li>
+<li>photon flux and/or dose for every photon energy group and relative errors, total flux and/or dose (photons/cm^3/s, any dose units)</li>
 </ol>
 <p>The backbone of UW-R2S is the physics codes used for transport and activation. The Direct Accelerated Geometry Monte Carlo (DAG-MC) version of MCNP5 (Los Alamos National Laboratory), known as DAG-MCNP5 (UW-Madison) is used for both neutron and photon transport. This allows for geometry and materials information to be specified using CAD software, namely CubIt (Sandia National Laboratory). For the photon transport step, a custom compiled version of DAG-MCNP5, with a custom source.F90, is used. Analytic and Laplacian Adaptive Radioactivity Analysis (ALARA), developed at UW-Madison, is used for material activation.</p>
 </div>
@@ -207,15 +194,20 @@
 <p>The UW-R2S code is available at <a class="reference external" href="https://github.com/svalinn/r2s-act">https://github.com/svalinn/r2s-act</a>.</p>
 <p>UW-R2S has numerous dependencies:</p>
 <ol class="arabic simple">
-<li>Python</li>
-<li>DAG-MCNP5 compiled with UW-R2S source.F90, from <a class="reference external" href="https://github.com/svalinn/DAGMC">https://github.com/svalinn/DAGMC</a></li>
+<li>Python 2.6+</li>
+<li>DAG-MCNP5 compiled with UW-R2S <cite>mcnp_source/source_gamma.F90</cite>, from <a class="reference external" href="https://github.com/svalinn/DAGMC">https://github.com/svalinn/DAGMC</a></li>
 <li>CubIt, from RSICC, <a class="reference external" href="http://rsicc.ornl.gov/">http://rsicc.ornl.gov/</a></li>
 <li>ALARA, from <a class="reference external" href="https://github.com/svalinn/ALARA">https://github.com/svalinn/ALARA</a></li>
 <li>Mesh Oriented Data Base (MOAB), from svn.mcs.anl.gov/repos/ITAPS/MOAB/trunk</li>
 <li>PyTAPS, the Python interface for ITAPS, (Interoperable Technologies for Advanced Petascale Simulations), from <a class="reference external" href="http://pypi.python.org/pypi/PyTAPS/1.4">http://pypi.python.org/pypi/PyTAPS/1.4</a></li>
+<li>PyNE, <em>Python for Nuclear Engineering</em>, from <a class="reference external" href="http://pynesim.org/">http://pynesim.org/</a>
+(Has its own dependencies listed at <a class="reference external" href="https://github.com/pyne/pyne">https://github.com/pyne/pyne</a>)</li>
 </ol>
 <p>Aside from MCNP5 and CubIt, available from RSICC, all other codes are open source with well documented installation instructions.</p>
-<p>Although not a dependency, the visualization program VisIT (Lawrence Livermore National Laboratory) is useful for visualizing results. Executables are available at <a class="reference external" href="https://wci.llnl.gov/codes/visit/">https://wci.llnl.gov/codes/visit/</a>.</p>
+<p>The user guide and other documentation is available at <a class="reference external" href="http://svalinn.github.com/r2s-act/">http://svalinn.github.com/r2s-act/</a> .
+Building the documentation requires Sphinx, from <a class="reference external" href="http://sphinx-doc.org">http://sphinx-doc.org</a></p>
+<p>Although not a dependency, the visualization program VisIT (Lawrence Livermore National Laboratory) is useful for visualizing results data stored on MOAB meshes in the .vtk format.
+Executables are available at <a class="reference external" href="https://wci.llnl.gov/codes/visit/">https://wci.llnl.gov/codes/visit/</a>.</p>
 <div class="section" id="compiling-dag-mcnp5-with-uw-r2s-source-f90">
 <h3><a class="toc-backref" href="#id6">Compiling DAG-MCNP5 with UW-R2S source.F90</a><a class="headerlink" href="#compiling-dag-mcnp5-with-uw-r2s-source-f90" title="Permalink to this headline">¶</a></h3>
 <p>In MCNP5, fixed source information is typically specified with the SDEF card. However, the SDEF card is limited to 1000 distributions. Building DAG-MCNP5 against UW-R2S source.F90 allow for an unlimited number of distributions. This is necessary because in the UW-R2S work flow, every mesh point is a particle source and generally high resolution spacial and energy information is sought after. To use the UW-R2S source.F90 version, no source cards (SDEF, SI, SP, etc.) appears in the input file. Instead, this version reads in a file (<tt class="docutils literal"><span class="pre">gammas</span></tt>) that contain all of the source information. This file is automatically generated by the R2S work flow. Technically this version is only necessary for the photon transport step (and not the neutron transport step), however if the MCNP input includes a source definition, the problem run like normal. Thus the same executable can be used for bother regular, and R2S-ACT photon transport calculations. Instructions for compiling DAG-MCNP5 with UW-R2S source.F90 appear below.</p>
