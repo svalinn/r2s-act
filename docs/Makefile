@@ -66,6 +66,7 @@ gh-pages:
 	cd ../ ; rm -rf scripts/r2s/*.py scripts/r2s/io/*.py
 	# rm -rf docs/*
 	cd ../docs ; mv .gitignore ../stashed.gitignore ; rm -rf * ; mv ../stashed.gitignore .gitignore
+	cd ../ ; echo nojekyll > .nojekyll
 	cd ../ ; git add --all
 	# Commit and push gh-pages, and switch back to master
 	cd ../ ; git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages
