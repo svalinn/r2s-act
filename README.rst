@@ -20,7 +20,7 @@ UW-R2S has numerous dependencies:
 2. DAG-MCNP5 compiled with UW-R2S `mcnp_source/source_gamma.F90`, from https://github.com/svalinn/DAGMC
 3. CubIt, from RSICC, http://rsicc.ornl.gov/
 4. ALARA, from https://github.com/svalinn/ALARA
-5. Mesh Oriented Data Base (MOAB), from svn.mcs.anl.gov/repos/ITAPS/MOAB/trunk
+5. Mesh Oriented Data Base (MOAB), from http://svn.mcs.anl.gov/repos/ITAPS/MOAB/trunk
 6. PyTAPS, the Python interface for ITAPS, (Interoperable Technologies for Advanced Petascale Simulations), from http://pypi.python.org/pypi/PyTAPS/1.4
 7. PyNE, *Python for Nuclear Engineering*, from http://pynesim.org/
    (Has its own dependencies listed at https://github.com/pyne/pyne)
