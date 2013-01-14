@@ -136,15 +136,15 @@ photon_mcnp_input = mcnp_p.inp
 mmgrid_rays = 10
 
 # If 
-# If gen_mmgrid is 1, ray tracing is performed to generate the macromaterials
+# If gen_mmgrid is True, ray tracing is performed to generate the macromaterials
 #  grid during r2s_step1.py. If the macromaterial grid already exists, set this
-#  parameter to 0 (False) to avoid re-running the ray tracing.
-gen_mmgrid = 1
+#  parameter to False to avoid re-running the ray tracing.
+gen_mmgrid = True
 
-# If step2setup is 1, runs the r2s_step2setup.py script at the end of 
+# If step2setup is True, runs the r2s_step2setup.py script at the end of 
 #  r2s_step1.py.  r2s_step2setup.py creates folders for all cooling steps
 #  and isotopes specified
-step2setup = 0
+step2setup = False
 
 #-------------------------------------------------------------------------------
 # Step 2 Parameters
@@ -157,15 +157,15 @@ step2setup = 0
 #  other numbers correspond with cooling times listed in your ALARA input.
 # -sampling determines the sampling method used:
 #   u for uniform sampling; v for voxel sampling (default)
-# -if photon_bias is 1 (true), the gammas file will try to include voxel
+# -if photon_bias is True, the gammas file will try to include voxel
 #  bias values from the mesh (stored as PHTN_BIAS tag). Currently requires
 #  photon_by_voxel to be 1.
-# -if custom_ergbins is 1 (true), custom energy bins will be looked for on
+# -if custom_ergbins is True, custom energy bins will be looked for on
 #   the mesh, and included in gammas file if found. 
-#   (Default: false; 42 grps used)
+#   (Default: False; 42 grps used)
 # -cumulative determines the format for listing voxels in gammas file.
-#   Default is zero (false), which is preferred.
-# -add_fmesh_card adds an fmesh tally with mesh information to the MCNP
+#   Default is False, which is preferred.
+# -add_fmesh_card adds an FMESH tally with mesh information to the MCNP
 #   photon input file that is created. Mesh information is taken from 
 #   step1_datafile.
 # Note: photon_isotope and photon_cooling can have multiple, comma 
@@ -173,11 +173,11 @@ step2setup = 0
 photon_isotope = TOTAL
 photon_cooling = 0
 sampling = v
-# Next four use 0 for false, 1 for true; See above.
-photon_bias = 0
-custom_ergbins = 0
-cumulative = 0
-add_fmesh_card = 1
+# Next four are boolean values; see above.
+photon_bias = False
+custom_ergbins = False
+cumulative = False
+add_fmesh_card = True
 
 
 ###############################################################################
