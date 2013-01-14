@@ -1,13 +1,14 @@
-from mats2ALARA import mats_to_alara
+from tools import mats2ALARA
 from nose.tools import assert_equal
 import os
 
+inp = 'mcnp_inp.txt'
 output = 'alara_matlib.txt'
 
 if output in os.listdir('.'):
     os.remove(output)
 
-mats_to_alara(input, output)
+mats2ALARA.mats_to_alara(inp, output)
 
 with open(output) as f:
     written = f.read()
@@ -29,7 +30,7 @@ expected =(
 '# mat number: 2\n'
 '# source:  internet\n'
 '# comments:  Here are comments the comments continue here are more even more\n'
-' water 1.00215818409 2\n'
+' water 1.00215363272 2\n'
 '     h 1.1190E-01 1\n'
 '     o 8.8810E-01 8\n')
 

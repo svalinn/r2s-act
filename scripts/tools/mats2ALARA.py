@@ -15,10 +15,13 @@ from pyne.material import Material
 from pyne.material import MultiMaterial
 from pyne.mcnp import read_mcnp_inp
 
-def mats_to_alara(input, output):
-    """This function reads in MCNP inp file and prints out an ALARA matlib"""
+def mats_to_alara(inp, output):
+    """This function reads in MCNP inp file and prints out an ALARA matlib.
+    """
+    if output in os.listdir('.'):
+        os.remove(opts.output)
 
-    mats = read_mcnp_inp(input)
+    mats = read_mcnp_inp(inp)
     mat_count = 0  # number material objects
     multi_count = 0 # number of mulimaterial objects
     for mat in mats :
@@ -37,11 +40,8 @@ def mats_to_alara(input, output):
 def main(arguments=None):
     parser = OptionParser(usage='%prog <mcnp_inp_file> [options]')
     parser.add_option('-o', dest='output', default='matlib.out',\
-        help='Name of materials output file, default=%default')
+        help='Name of ALARA matlib output file, default=%default')
     (opts, args) = parser.parse_args(arguments)
-
-    if opts.output in os.listdir('.'):
-        os.remove(opts.output)
 
     mats_to_alara(args[0], opts.output)
 
