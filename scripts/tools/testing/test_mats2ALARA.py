@@ -32,7 +32,10 @@ expected =(
 '# comments:  Here are comments the comments continue here are more even more\n'
 ' water 1.00215363272 2\n'
 '     h 1.1190E-01 1\n'
-'     o 8.8810E-01 8\n')
+'     o 8.8810E-01 8\n'
+'pseudo_void 0 1\n'
+'he 1 2'
+)
 
 assert_equal(written, expected)
 os.remove(output)

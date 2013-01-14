@@ -32,6 +32,10 @@ def mats_to_alara(inp, output):
             for submat in mat._mats:
                 submat.write_alara(output)
                 multi_count += 1
+    #print out pseudovoid entry
+    with open(output, 'a') as f:
+        f.write('pseudo_void 0 1\nhe 1 2')
+    
 
     print '{0} single density mats and {1} multi-density mats printed'\
         .format(mat_count, multi_count)
@@ -51,3 +55,4 @@ if __name__ == '__main__':
         sys.arv.append('-h')
 
     main()
+
