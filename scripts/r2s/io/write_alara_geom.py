@@ -80,7 +80,7 @@ def write_mixtures( mixtures, mat_tags, name_dict, output_file ):
                 material_name = name_dict[material_name]
             output_file.write('\tmaterial\t{0}\t1\t{1}\n'.format(material_name,m))
         output_file.write('end\n\n')
-    output_file.write('mixture pseudo_void\n\tmaterial\tpseudo_void\t1\t1\nend')
+    output_file.write('mixture pseudo_void\n\tmaterial\tpseudo_void\t1\t1\nend\n')
 
 def write_mat_loading( scdmesh, mat_tags, mixtures, output_file):
     """Write the mat_loading information to the ALARA geometry output"""
