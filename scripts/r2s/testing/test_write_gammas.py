@@ -103,6 +103,10 @@ class TestWriteGammas_Correct(unittest.TestCase):
         fw1 = open(myoutfile, 'r')
         fw2 = open(mygammas, 'r')
    
+        # skip single metadata header line
+        line1 = fw1.readline()
+        line2 = fw2.readline()
+        # compare rest of file
         for line1, line2 in itertools.izip_longest(fw1, fw2):
             self.assertEqual(line1, line2)
 
