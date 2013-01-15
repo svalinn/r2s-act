@@ -1,4 +1,3 @@
-###################################################################################
 University of Wisconsin Rigorous Two Step Activation Work Flow (UW-R2S) User Manual
 ###################################################################################
 
@@ -297,7 +296,10 @@ _______________________________________________________________________________
 mats2ALARA.py
 _______________________________________________________________________________
 
-:Purpose: This script reads an MCNP input file and prints out ALARA materials definitions for all the materials specified within it. The user must manually define the densities for each material [g/cm^3] by replacing all instances of <rho> in the resulting file. Material defintions must be formatted so that the material number (e.g. m1, m2) and each isotope occupy separate lines.
+:Purpose: This script reads an MCNP input file and prints out an ALARA matlib file. Material definitions are taken from material cards and densities are taken from cell cards. If a material appears in multiple cells with different densities an ALARA material definition will be printed for each density.
+:Other Instructions: This script also reads metadata that can be specified in the MCNP input file and prints this same metadata to the ALARA matlib file. This metadata must appear in the lines directly above the material definition in the form "C X:Y" or "c X:Y" where X is "name", "source", or "comments", and Y is the corresponding metadata. The "name" and "source" metadata must appear on a single line. The "comment" metadata can span any arbitrary number of lines, each new line starting with "C" or "c". Any or all of the 3 metadata flags can be used, but there must be no blank lines between metadata lines (i.e. no lines that contain only "C" or "c").
+    In the resulting matlib file metadata will be in the form "# X:Y". In additional entry will appear in the form "mat number: X" where X is the material number in the MCNP input. The name of the material in the matlib is the same as the "name" metadata. For materials with multiple densities, if "name" is present every material will have the same name. For this reason it is not advisable to specify "name" metadata for multidensity materials. If the "name" metadata does not appear, the material will be named in the form "matX_rho-Y" where X is the MCNP material number and Y is the mass density associated with the material. Note that even when atom density is specifed in the cell card the mass density is printed.
+:Usage: This script relies on the PyNE materials class and its methods. The MCNP inp is read into a PyNE material. Metadata is stored in the attrs.
 :Inputs: MCNP input file
 :Outputs: ALARA materials definitions
 :Syntax: ``./mats2ALARA.py <mcnp_input_file>``
