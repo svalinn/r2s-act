@@ -1,19 +1,22 @@
+############
+# See README.rst in docs/
+############
+
 # Makefile for Sphinx documentation
 #
 
-#GH_PAGES_SOURCES = Makefile _themes _sphinxext index.rst conf.py rebuild.sh ../scripts/r2s r2s-userguide.rst
-GH_PAGES_SOURCES = docs/Makefile docs/_themes docs/_sphinxext docs/index.rst docs/conf.py docs/rebuild.sh docs/r2s-userguide.rst scripts/r2s/*.py scripts/r2s/io/*.py
+GH_PAGES_SOURCES = Makefile docs/_themes docs/_sphinxext docs/index.rst docs/conf.py docs/rebuild.sh docs/r2s-userguide.rst scripts/r2s/*.py scripts/r2s/io/*.py
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
-BUILDDIR      = _build
+BUILDDIR      = docs/_build
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
-ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) docs/
 # the i18n builder cannot share the environment and doctrees with the others
 I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
@@ -52,25 +55,23 @@ html:
 gh-pages:
 	git checkout gh-pages
 	# Clean out _build from docs/
-	rm -rf _build 
+	rm -rf docs/_build 
 	# Clean out contents of _build/html/ from repo root.
-	cd ../ ; rm -rf _sources _static r2s
-	cd ../ ; git checkout master $(GH_PAGES_SOURCES)
-	cd ../ ; git reset HEAD
-	# make html ; we use 'cd ./' to refresh NFS since I was getting errors.
-	cd ../docs ; ./rebuild.sh # handles sphinx-apigen + make html
-	cd ../docs ; mv -fv _build/html/* ../
-	cd ../ ; rm -rf $(GH_PAGES_SOURCES)
-	cd ../ ; rm -rf doc/_build doc/r2s
-	# Note that cd ../ is required to be on the same line
-	cd ../ ; rm -rf scripts/r2s/*.py scripts/r2s/io/*.py
-	# rm -rf docs/*
-	cd ../docs ; mv .gitignore ../stashed.gitignore ; rm -rf * ; mv ../stashed.gitignore .gitignore
-	cd ../ ; echo nojekyll > .nojekyll
-	cd ../ ; git add --all
+	rm -rf _sources _static r2s
+	git checkout master $(GH_PAGES_SOURCES)
+	git reset HEAD
+	./docs/rebuild.sh # handles sphinx-apigen + make html
+	mv -fv docs/_build/html/* .
+	rm -rf $(GH_PAGES_SOURCES)
+	rm -rf doc/_build doc/r2s
+	rm -rf scripts/r2s/*.py scripts/r2s/io/*.py
+	# Empty docs directory but preserve .gitignore
+	mv docs/.gitignore stashed.gitignore ; rm -rf docs/* ; mv stashed.gitignore docs/.gitignore
+	echo nojekyll > .nojekyll
+	git add --all
 	# Commit and push gh-pages, and switch back to master
-	cd ../ ; git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages
-	cd ../ ; git checkout master
+	git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages
+	git checkout master
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
