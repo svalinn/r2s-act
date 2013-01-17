@@ -10,8 +10,9 @@ from time import gmtime, strftime
 from shutil import copy
 from r2s_setup import get_input_file
 
+
 def load_configs(cfgfile):
-    """
+    """Read needed information from .cfg file.
     """
     config = ConfigParser.SafeConfigParser()
     config.read(cfgfile)
@@ -35,12 +36,16 @@ def load_configs(cfgfile):
         sys.exit("ERROR: 'r2s-params' section required in your config file " \
                 "({0})".format(cfgfile))
 
-    return (mcnp_p_problem, mcnp_n_problem, datafile, phtn_src, opt_isotope, \
+    return (mcnp_n_problem, mcnp_p_problem, datafile, phtn_src, opt_isotope, \
             opt_cooling)
 
 
 def gen_iso_cool_lists(opt_isotope, opt_cooling, phtn_src):
-    """
+    """Create list of isotope and cooling step combinations and foldernames.
+
+    Notes
+    -----
+    Checks phtn_src file if numeric cooling step values are given.
     """
     #defaults
     iso_list = ['TOTAL']
@@ -99,6 +104,20 @@ def make_folders(iso_list, cool_list):
 
 def create_new_files(path_list, datafile, cfgfile, mcnp_n_problem, mcnp_p_problem, phtn_src):
     """
+    Parameters
+    ----------
+    path_list : List of lists
+        Each sub list is: [filepath string, isotope string, cooling time string]
+    datafile : string
+        Path to .h5m structured mesh file.
+    cfgfile : string
+        Path to r2s.cfg config file.
+    mcnp_n_problem : string
+        Path to MCNP input for neutron transport
+    mcnp_p_problem : string
+        Path to MCNP input for photon transport
+    phtn_src : string
+        Path to 'phtn_src' file.
     """
     thisdir = os.curdir
 
@@ -110,12 +129,12 @@ def create_new_files(path_list, datafile, cfgfile, mcnp_n_problem, mcnp_p_proble
         copy(os.path.join(thisdir, datafile), folder)
 
         oldfile = os.path.join(thisdir, cfgfile)
-        newfile = os.path.join(folder, cfgfile )
+        newfile = os.path.join(thisdir, folder, os.path.basename(cfgfile))
 
         _copy_and_mod_r2scfg(oldfile, newfile, iso, time, mcnp_n_problem, phtn_src)
 
-        oldfile = os.path.join(thisdir, mcnp_p_problem)
-        newfile = os.path.join(folder, mcnp_p_problem)
+        oldfile = os.path.join(thisdir, os.path.basename(mcnp_p_problem))
+        newfile = os.path.join(thisdir, folder, os.path.basename(mcnp_p_problem))
         _copy_and_mod_mcnpinp(oldfile, newfile, iso, time)
 
 
@@ -152,6 +171,16 @@ def _copy_and_mod_r2scfg(oldfile, newfile, iso, time, mcnp_n_problem, phtn_src):
 def _copy_and_mod_mcnpinp(oldfile, newfile, iso, time):
     """Copy mcnp photon transport input to each directory
     TBD: Modify title card?
+
+    Parameters
+    oldfile : string
+        Path to MCNP input for photon transport
+    newfile : string
+        Path to new copy of MCNP input for photon transport
+    iso : string
+        Isotope name
+    time : string
+        Cooling time string
     """
     try:
         with open(oldfile, 'r') as source:
@@ -193,7 +222,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         cfgfile = sys.argv[1]
 
-    (mcnp_p_problem, mcnp_n_problem, datafile, phtn_src, opt_isotope, \
+    (mcnp_n_problem, mcnp_p_problem, datafile, phtn_src, opt_isotope, \
             opt_cooling) = load_configs(cfgfile)
 
     iso_list, cool_list = gen_iso_cool_lists(opt_isotope, opt_cooling, phtn_src)
