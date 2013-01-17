@@ -14,16 +14,16 @@ meshfile = os.path.join(thisdir, "h5m_files/matFracsSCD3x3x3_tagged.h5m")
 outfile = os.path.join(thisdir, "gammas_test")
 
 # .h5m files for generating different gammas files
-meshfile_g = os.path.join(thisdir,"files_test_write_gammas/example_with_bias.h5m")
+meshfile_g = os.path.join(thisdir, "files_test_write_gammas/example_with_bias.h5m")
 # gammas files for comparing test result with expected result
-gammas1 = os.path.join(thisdir,"files_test_write_gammas/gammas_uni_seq")
-gammas2 = os.path.join(thisdir,"files_test_write_gammas/gammas_uni_seq_bias")
-gammas3 = os.path.join(thisdir,"files_test_write_gammas/gammas_uni_cum")
-gammas4 = os.path.join(thisdir,"files_test_write_gammas/gammas_uni_cum_bias")
-gammas5 = os.path.join(thisdir,"files_test_write_gammas/gammas_voxel_seq")
-gammas6 = os.path.join(thisdir,"files_test_write_gammas/gammas_voxel_seq_bias")
-gammas7 = os.path.join(thisdir,"files_test_write_gammas/gammas_voxel_cum")
-gammas8 = os.path.join(thisdir,"files_test_write_gammas/gammas_voxel_cum_bias")
+gammas1 = os.path.join(thisdir, "files_test_write_gammas/gammas_uni_seq")
+gammas2 = os.path.join(thisdir, "files_test_write_gammas/gammas_uni_seq_bias")
+gammas3 = os.path.join(thisdir, "files_test_write_gammas/gammas_uni_cum")
+gammas4 = os.path.join(thisdir, "files_test_write_gammas/gammas_uni_cum_bias")
+gammas5 = os.path.join(thisdir, "files_test_write_gammas/gammas_voxel_seq")
+gammas6 = os.path.join(thisdir, "files_test_write_gammas/gammas_voxel_seq_bias")
+gammas7 = os.path.join(thisdir, "files_test_write_gammas/gammas_voxel_cum")
+gammas8 = os.path.join(thisdir, "files_test_write_gammas/gammas_voxel_cum_bias")
 
 totalsfile = os.path.join(os.getcwd(), "phtn_src_totals")
 
@@ -34,8 +34,7 @@ class TestCalcVolumes(unittest.TestCase):
         self.sm = ScdMesh.fromFile(filename)
 
     def test_calc_volumes_list_1(self):
-        """
-        Checks that calc_volumes_list works for 3x3x3 mesh with equal voxel sizing.
+        """Checks that calc_volumes_list works for 3x3x3 mesh with equal voxel sizing.
         """
         volumes = [48,40, 60,50, 60,50, \
                 48,40, 60,50, 60,50, \
@@ -99,7 +98,8 @@ class TestWriteGammas_Correct(unittest.TestCase):
         os.system("rm " + totalsfile)
 
     def compare_gammas(self, myoutfile, mygammas):
-        # Method does comparisons of two files.
+        """Method does comparisons of two files.
+        """
         fw1 = open(myoutfile, 'r')
         fw2 = open(mygammas, 'r')
    

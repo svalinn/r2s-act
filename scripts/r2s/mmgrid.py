@@ -189,6 +189,7 @@ class mmGrid:
         xyz: start position of ray
         uvw: direction of ray
         divs: The structured grid divisions along this dimension.
+        samples: 2D array of zeros used to store ray info
         """
         first_vol = self.first_vol
         if not first_vol or not dagmc.point_in_volume(first_vol,xyz,uvw):
