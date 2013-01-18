@@ -43,7 +43,7 @@ On a CAE system, one should be able to use the mcnp5p links for running problems
 
 Alternately, to use one of these in a custom compile of MCNP/DAG-MCNP, one can check out the DAG-MCNP source, and then link the files in the repository to the ``DAG-MCNP/5.1.51/trunk/Source/src`` folder like this:
 
-``ln -s *path to mcnp_source folder*/source_gamma.F90 source.F90``
+        ln -s *path to mcnp_source folder*/source_gamma.F90 source.F90
 
 (or you could copy the file to that folder, but it won't get updated when changes happen in the repository)
 
@@ -54,15 +54,15 @@ Since we are using some custom code, the .o files are in the way... use 'clean' 
 
 1:
 
-``»» ../scripts/build_dagmc clean``
+        »» ../scripts/build_dagmc clean
 
-``«« error messages``
+        «« error messages
 
 2:
 
-``»» ../scripts/build_dagmc``
+        »» ../scripts/build_dagmc
 
-``«« Success!``
+        «« Success!
 
 You can now call the ``mcnp5`` executable that was created in ``Source/src``.
 
@@ -70,7 +70,7 @@ If you make further modifications to the same ``source.F90``, you can usually re
 
 You can make it easy to call my using an ``alias`` command in your ``.bashrc file``, e.g., for CNERG users:
 
-``alias mcnp5p='$HOME/DAG-MCNP/5.1.51/trunk/Source/src/mcnp5'``
+        alias mcnp5p='$HOME/DAG-MCNP/5.1.51/trunk/Source/src/mcnp5'
 
 CNERG custom executables
 ---------------------------
