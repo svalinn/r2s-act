@@ -1,6 +1,7 @@
 # Ignore possible build & documentation
 docs/_build
 docs/r2s
+scripts/r2s/mcnp
 
 # Ignore various temp files
 *.pyc
