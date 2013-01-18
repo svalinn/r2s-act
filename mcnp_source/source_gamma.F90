@@ -1,67 +1,82 @@
 !+ $Id: source.F90,v 1.1 2004/03/20 00:31:52 jsweezy Exp $
 ! Copyright LANL/UC/DOE - see file COPYRIGHT_INFO
 
+! Summary
+! -------
 ! Adapted from source routine (source_gamma_meshtal2.F90) provided by 
-!  Dieter Leichtle from KIT.
+! Dieter Leichtle from KIT.
 ! Changes have been made by Eric Relson with UW-Madison/CNERG goals in mind.
 ! 
 ! This source file implements photon source sampling on a cartesian mesh.
 ! Two photon position sampling methods are avaiable: 
-!             (1) voxel sampling and (2) uniform sampling
-!
+! 
+! (1) voxel sampling
+! (2) uniform sampling
+! 
 ! Subroutine source reads in the file 'gammas' from the directory
-!  that MCNP is being run in.  The gammas file has two parts - a header and
-!  a listing of information for each voxel.
-!
-! HEADER:
+! that MCNP is being run in.  The gammas file has two parts - a header and
+! a listing of information for each voxel.
+! 
+! Header
+! -------
 ! The header starts with 5 lines containing the following information:
-! 1: Number of intervals for x, y, z
-! 2: Mesh coordinates for x direction
-! 3: Mesh coordinates for y direction
-! 4: Mesh coordinates for z direction
-! 5: List of activated materials; use of this info requires the m parameter.
+! 
+! (1) Number of intervals for x, y, z
+! (2) Mesh coordinates for x direction
+! (3) Mesh coordinates for y direction
+! (4) Mesh coordinates for z direction
+! (5) List of activated materials; use of this info requires the m parameter.
+! 
 ! These are optionally followed by a parameters line (line 6). This line begins 
-!  with a 'p', and single character parameters, separated by spaces, follow.
+! with a 'p', and single character parameters, separated by spaces, follow.
 ! The currently supported parameters are (order does not matter):
-! u: enable uniform sampling
-! v: enable voxel sampling
-! m: enable source position rejection based on activated materials
-! e: read in custom list of energy bin boundaries
-! d: enable debug output to file source_debug. Dumps xxx,yyy,zzz,wgt every 10k
-!       particles
-! c: treat bins for each voxel as cumulative
-! b: flag indicating bias values are used; only valid with voxel sampling
-!
-! An example parameter line: p u d m e
+! 
+! * u: enable uniform sampling
+! * v: enable voxel sampling
+! * m: enable source position rejection based on activated materials
+! * e: read in custom list of energy bin boundaries
+! * d: enable debug output to file source_debug. Dumps xxx,yyy,zzz,wgt every 10k
+!   particles
+! * c: treat bins for each voxel as cumulative
+! * b: flag indicating bias values are used; only valid with voxel sampling
+! 
+! An example parameter line: `p u d m e`
+! 
 ! If the parameters line is not present, the default is to set u, m, c as True.
 ! If 'e' parameter exists, line 7 lists custom energy group boundaries, space
-!  delimited. This line start with the integer number of groups. The default
-!  energy bins are a 42 group structure.
+! delimited. This line start with the integer number of groups. The default
+! energy bins are a 42 group structure.
 ! All subsequent lines are for voxels.
 ! 
-! VOXEL LINES:
+! Voxel lines
+! -------------
 ! Two formats are supported, cumulative bins, or non-cumulative bins. In both
-!  cases, lines list bin values from low energy to high energy, delimited by
-!  spaces.
-! Note that the normalization for voxel and uniform sampling is different, and 
-!  will result in differing gammas files. In general, for voxel sampling,
-!  normalization is based on the average source strength in photons/voxel/s; 
-!  For uniform sampling, we want average source strength in phtons/cm3/s.
-! As an exercise to verify that the gammas files are being generated correctly,
-!  do a test problem and verify that you get the same average energy per source
-!  particle in all test cases, and that all uniform sampling test cases have a
-!  weight of 1.0 per source particle. (See the summary table in MCNP output)
-! Note that correct normalization also depends on whether
-!  material rejection is being used.
-! In either case, the last bin can be followed by a bias value for the voxel.
-!  An arbitrary range of bias values can be used since the source routine does
-!  the necessary re-normalization for voxel sampling.
+! cases, lines list bin values from low energy to high energy, delimited by
+! spaces.
 ! 
-! Other notes:
+! Note that the normalization for voxel and uniform sampling is different, and 
+! will result in differing gammas files. In general, for voxel sampling,
+! normalization is based on the average source strength in photons/voxel/s; 
+! For uniform sampling, we want average source strength in phtons/cm3/s.
+! 
+! As an exercise to verify that the gammas files are being generated correctly,
+! do a test problem and verify that you get the same average energy per source
+! particle in all test cases, and that all uniform sampling test cases have a
+! weight of 1.0 per source particle. (See the summary table in MCNP output)
+! 
+! Note that correct normalization also depends on whether
+! material rejection is being used.
+! 
+! In either case, the last bin can be followed by a bias value for the voxel.
+! An arbitrary range of bias values can be used since the source routine does
+! the necessary re-normalization for voxel sampling.
+! 
+! Other notes
+! --------------
 ! Voxel sampling and energy sampling use a sampling technique referred to as
-!  'alias discrete' or 'alias table' sampling.  This provides efficiency
-!  benefits over 'direct discrete' sampling. Creation of the alias tables uses
-!  the heap sort algorithm.
+! 'alias discrete' or 'alias table' sampling.  This provides efficiency
+! benefits over 'direct discrete' sampling. Creation of the alias tables uses
+! the heap sort algorithm.
 
 module source_data
 ! Variables used/shared by most of the subroutines in this file.
@@ -111,7 +126,7 @@ end module source_data
 
 
 subroutine source_setup
-  ! subroutine handles parsing of the 'gammas' file and related initializations
+! subroutine handles parsing of the 'gammas' file and related initializations
   use source_data
    
  
@@ -219,10 +234,13 @@ end subroutine source_setup
 
 subroutine read_header (myunit)
 ! Read in first 5 lines of gammas file
+! 
 ! These lines contain the x,y,z mesh intervals
-!  and the list of active materials
+! and the list of active materials
+! 
 ! Also skips over any comment lines (beginning with # character) at start of
-!  file.
+! file.
+! 
   use source_data
         
         integer,intent(IN) :: myunit
@@ -274,8 +292,10 @@ end subroutine read_header
 
 subroutine read_params (myunit)
 ! Read in the parameters line, if there is one.
+! 
 ! Line should start with a 'p' and have single characters
-!  that are space delimited.
+! that are space delimited.
+! 
 ! Set various parameters to 1 (true) if they exist.
   use source_data
 
@@ -375,12 +395,15 @@ end subroutine read_custom_ergs
 
 
 subroutine source
-  ! adapted from dummy source.F90 file.
-  ! if nsr=0, subroutine source must be furnished by the user.
-  ! at entrance, a random set of uuu,vvv,www has been defined.  the
-  ! following variables must be defined within the subroutine:
-  ! xxx,yyy,zzz,icl,jsu,erg,wgt,tme and possibly ipt,uuu,vvv,www.
-  ! subroutine srcdx may also be needed.
+! Manages sampling of photons on mesh
+! 
+! adapted from dummy source.F90 file.
+! 
+! if nsr=0, subroutine source must be furnished by the user.
+! at entrance, a random set of uuu,vvv,www has been defined.  the
+! following variables must be defined within the subroutine:
+! xxx,yyy,zzz,icl,jsu,erg,wgt,tme and possibly ipt,uuu,vvv,www.
+! subroutine srcdx may also be needed.
   use mcnp_debug
   use mcnp_random
   use source_data
@@ -560,6 +583,7 @@ end subroutine voxel_sample
 
 subroutine sample_within_voxel
 ! Samples within the extents of a voxel
+! 
 ! ii, jj, kk are presumed to have been already determined.
   use source_data
  
@@ -628,6 +652,7 @@ end subroutine sample_erg
 subroutine gen_erg_alias_table (len, ergsList, myErgPairs, &
                                         myErgPairsProbabilities)
 ! Create alias table for energy bins of a single voxel
+! 
 ! len is the length of ergsList
 ! ergsList values must total 1!
   use source_data
@@ -704,18 +729,22 @@ subroutine gen_voxel_alias_table
 end subroutine gen_voxel_alias_table
 
 
-subroutine gen_alias_table(bins, pairs, probs_list, len)
+subroutine gen_alias_table (bins, pairs, probs_list, len)
+! Subroutine generates an alias table
+! 
 ! note that bins is a list of pairs of the form (probability,value)
-!  The sum of the probabilities in bins must be 1.
+! The sum of the probabilities in bins must be 1.
 ! We implement the alias table creation algorithm described by Vose (1991).
-! For reference:
-! Vose:      Code:
-! p_j        bins(j,1)
-! large_l    ind_large(l)
-! small_s    ind_small(s)
-! prob_j     probs_list(j)
-! 'bin' j    pairs(j,1)
-! alias_j    pairs(j,2)
+! For reference::
+! 
+!   Vose:      Code:
+!   p_j        bins(j,1)
+!   large_l    ind_large(l)
+!   small_s    ind_small(s)
+!   prob_j     probs_list(j)
+!   'bin' j    pairs(j,1)
+!   alias_j    pairs(j,2)
+! 
   use mcnp_global
    
         ! subroutine argument variables
