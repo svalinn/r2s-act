@@ -2,6 +2,8 @@ docs/ folder readme
 ==================
 This folder is where documentation of the r2s-act code is managed and built using Sphinx.
 
+**The actual documentation is located at** http://svalinn.github.com/r2s-act
+
 To rebuild documentation, make sure you are on the `master` branch.
 Run `make gh-pages` in the base level of the repository (not in `docs/`).
 This will automatically switch to `gh-pages`,
