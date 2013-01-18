@@ -7,6 +7,8 @@ scripts/r2s/mcnp
 *.pyc
 .*.swp
 *~
+*.o
+*.mod
 
 # Ignore mcnp output files
 out?
