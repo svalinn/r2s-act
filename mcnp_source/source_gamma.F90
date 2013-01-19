@@ -126,7 +126,8 @@ end module source_data
 
 
 subroutine source_setup
-! subroutine handles parsing of the 'gammas' file and related initializations
+! Subroutine handles parsing of the 'gammas' file and related initializations
+! 
   use source_data
    
  
@@ -233,9 +234,16 @@ end subroutine source_setup
 
 
 subroutine read_header (myunit)
-! Read in first 5 lines of gammas file
+! Read in first 5 lines of gammas file, as well as comment lines
 ! 
-! These lines contain the x,y,z mesh intervals
+! Parameters
+! ----------
+! myunit : int
+!     Unit number for an opened file (i.e. file 'gammas')
+! 
+! Notes
+! -----
+! First 5 non-comment  lines contain the x,y,z mesh intervals
 ! and the list of active materials
 ! 
 ! Also skips over any comment lines (beginning with # character) at start of
@@ -293,6 +301,13 @@ end subroutine read_header
 subroutine read_params (myunit)
 ! Read in the parameters line, if there is one.
 ! 
+! Parameters
+! ----------
+! myunit : int
+!     Unit number for an opened file (i.e. file 'gammas')
+! 
+! Notes
+! -----
 ! Line should start with a 'p' and have single characters
 ! that are space delimited.
 ! 
@@ -381,6 +396,15 @@ end subroutine read_params
 
 subroutine read_custom_ergs (myunit)
 ! Read line from gammas file to get a custom set of energy bins
+
+! Parameters
+! ----------
+! myunit : int
+!     Unit number for an opened file (i.e. file 'gammas')
+! 
+! Notes
+! ------
+! N/A
   use source_data
         
         integer,intent(IN) :: myunit
@@ -395,10 +419,12 @@ end subroutine read_custom_ergs
 
 
 subroutine source
-! Manages sampling of photons on mesh
+! Subroutine manages sampling of photons on mesh
 ! 
-! adapted from dummy source.F90 file.
+! Adapted from dummy source.F90 file.
 ! 
+! Notes
+! -----
 ! if nsr=0, subroutine source must be furnished by the user.
 ! at entrance, a random set of uuu,vvv,www has been defined.  the
 ! following variables must be defined within the subroutine:
@@ -549,6 +575,7 @@ end subroutine source
 
 subroutine voxel_sample
 ! Sample photon position from alias table of voxels.
+! 
   use source_data
 
         real(dknd) :: rand
@@ -584,6 +611,8 @@ end subroutine voxel_sample
 subroutine sample_within_voxel
 ! Samples within the extents of a voxel
 ! 
+! Notes
+! -----
 ! ii, jj, kk are presumed to have been already determined.
   use source_data
  
@@ -622,6 +651,22 @@ end subroutine uniform_sample
 
 subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, pairsList)
 ! Sample the alias table of energy bins for the selected voxel. 
+! 
+! Parameters
+! ----------
+! myerg : float (OUT)
+!     Sampled energy is stored in this variable
+! myvoxel : int
+!     Index of sampled voxel
+! n_grp : int
+!     Number of energy groups
+! n_vox : int
+!     Length of next two arrays
+! probList : list of lists of floats
+!     List of alias pair probabilities for energy PDF, for each voxel
+! pairsList : list of lists of [int, int] pairs
+!     Bin and alias indices for energy group, for each voxel
+
   use source_data
         real(dknd),intent(OUT) :: myerg
         integer,intent(IN) :: myvoxel, n_grp, n_vox
@@ -653,8 +698,17 @@ subroutine gen_erg_alias_table (len, ergsList, myErgPairs, &
                                         myErgPairsProbabilities)
 ! Create alias table for energy bins of a single voxel
 ! 
-! len is the length of ergsList
-! ergsList values must total 1!
+! Parameters
+! ----------
+! len : int
+!     length of ergsList
+! ergsList : list of floats
+!     ergsList values must total 1!
+! myErgPairs : list of [int, int] (OUT)
+!     The generated pairs of bin and alias indices for the energy PDF
+! myErgPairsProbabilities : list of floats (OUT)
+!     List of probabilities for first bin in each alias pair.
+! 
   use source_data
    
         integer,intent(IN) :: len
@@ -681,6 +735,12 @@ end subroutine gen_erg_alias_table
 ! Generate Alias Table of Voxels
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 subroutine gen_voxel_alias_table
+! Generate alias table for voxels in the problem
+! 
+! Notes
+! -----
+! The resulting alias table is stored in lists `pairs` and `pairsProbabilities`.
+! 
 ! tot_list does not have to be normalized prior to calling this subroutine
   use source_data
    
@@ -715,8 +775,6 @@ subroutine gen_voxel_alias_table
         if (bias.eq.1) then
           do i=1,n_mesh_cells
             bins(i,1) = bins(i,1) * bias_list(i) / bias_probability_sum
-            !spectrum(i,2) = bias_probability_sum / spectrum(i,2)
-            ! !!! spectrum(i,2) value is now a weight, rather than a probabilty
             bias_list(i) = bias_probability_sum / bias_list(i)
             !!! bias_list(i) value is now a weight, rather than a probabilty
           enddo
@@ -732,8 +790,22 @@ end subroutine gen_voxel_alias_table
 subroutine gen_alias_table (bins, pairs, probs_list, len)
 ! Subroutine generates an alias table
 ! 
+! Parameters
+! ----------
+! bins : list of [int, float] pairs (INOUT)
+!     PDF's bin indices and absolute probabilities.
+! pairs : list of [int, int] pairs (OUT)
+!     Filled with pairs of bin and alias indices.
+! probs_list : list of floats (OUT)
+!     List of probabilities for first bin in each alias pair.
+! len : int
+!     Number of bins in the alias table
+! 
+! Notes
+! -----
 ! note that bins is a list of pairs of the form (probability,value)
 ! The sum of the probabilities in bins must be 1.
+! 
 ! We implement the alias table creation algorithm described by Vose (1991).
 ! For reference::
 ! 
@@ -748,9 +820,9 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
   use mcnp_global
    
         ! subroutine argument variables
-        real(dknd),dimension(1:len,1:2),intent(inout) :: bins
-        integer(i4knd),dimension(1:len,1:2), intent(out) :: pairs
-        real(dknd),dimension(1:len), intent(out) :: probs_list
+        real(dknd),dimension(1:len,1:2),intent(INOUT) :: bins
+        integer(i4knd),dimension(1:len,1:2), intent(OUT) :: pairs
+        real(dknd),dimension(1:len), intent(OUT) :: probs_list
         integer, intent(in) :: len
 
         ! internal variables
@@ -829,8 +901,9 @@ end subroutine gen_alias_table
 
 
 subroutine print_debug
-! subroutine stores debug info in an array, and write the array to a file
-!  after every 10000 particles.
+! Subroutine stores debug info in an array, and write the array to a file
+! after every 10000 particles.
+! 
   use source_data
 
         ! Array storing debug information
