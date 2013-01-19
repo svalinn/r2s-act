@@ -48,6 +48,11 @@ UW-R2S has numerous dependencies:
 
 Aside from MCNP5 and CubIt, available from RSICC, all other codes are open source with well documented installation instructions.
 
+You will need to add the `r2s-act/scripts` directory to the PYTHONPATH variable.
+In unix, this can be done by modifying the .bashrc file, adding the following line::
+
+    export PYTHONPATH=*install_directory*/r2s-act/scripts/:$PYTHONPATH
+
 The user guide and other documentation is available at http://svalinn.github.com/r2s-act/ .
 Building the documentation requires Sphinx, from http://sphinx-doc.org
 
