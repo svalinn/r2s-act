@@ -5,6 +5,7 @@ import os.path
 from tempfile import NamedTemporaryFile as NTF
 from tempfile import mkdtemp
 from shutil import rmtree
+import ConfigParser
 import contextlib
 
 import r2s_step2 as s2
@@ -19,15 +20,63 @@ class TestLoadConfig(unittest.TestCase):
         pass
 
     def test_load_config_files(self):
+        """Simulate a .cfg file and check that file names are read correctly.
         """
-        """
-        pass
+        with contextlib.nested(
+                NTF(prefix='data_',dir=os.curdir),
+                NTF(prefix='cfg_', dir=os.curdir),
+                NTF(prefix='phtn_', dir=os.curdir)) as \
+                (dataNTF, cfgNTF, phtnNTF):
+            # Create placeholder for r2s.cfg file
+            cfgNTF.write("[r2s-files]\n" \
+                    "neutron_mcnp_input = mcnp_n\n" \
+                    "photon_mcnp_input = mcnp_p\n" \
+                    "step1_datafile = {0}\n" \
+                    "alara_phtn_src = {1}\n".format(dataNTF.name, phtnNTF.name)
+                    )
+            cfgNTF.seek(0) # Goes to beginning
+
+            config = ConfigParser.SafeConfigParser()
+            config.read(cfgNTF.name)
+
+            datafile, phtn_src, mcnp_n, mcnp_p = \
+                    s2.load_config_files(config)
+
+            # Check for correctness
+            self.assertEqual(mcnp_n, 'mcnp_n')
+            self.assertEqual(mcnp_p, 'mcnp_p')
+            self.assertEqual(datafile, dataNTF.name)
+            self.assertEqual(phtn_src, phtnNTF.name)
 
     def test_load_config_params(self):
+        """Simulate a .cfg file and check that parameters are read correctly.
         """
-        """
-        pass
+        with NTF() as myNTF:
+            # Create placeholder for r2s.cfg file
+            myNTF.write("[r2s-params]\n" \
+                    "photon_isotope = u235\n" \
+                    "photon_cooling = shutdown\n" \
+                    "sampling = u\n" \
+                    "custom_ergbins = True\n" \
+                    "photon_bias = True\n" \
+                    "cumulative = True\n" \
+                    "add_fmesh_card = False\n"
+                    )
+            myNTF.seek(0) # Goes to beginning
 
+            config = ConfigParser.SafeConfigParser()
+            config.read(myNTF.name)
+
+            (opt_isotope, opt_cooling, opt_sampling, opt_ergs, opt_bias, opt_cumulative, opt_phtnfmesh) = \
+                    s2.load_config_params(config)
+            # Check for correctness
+            self.assertEqual(opt_isotope, 'u235')
+            self.assertEqual(opt_cooling, 'shutdown')
+            self.assertEqual(opt_sampling, 'u')
+            self.assertTrue(opt_ergs)
+            self.assertTrue(opt_bias)
+            self.assertTrue(opt_cumulative)
+            self.assertFalse(opt_phtnfmesh)
 
 
 class TestHandlePhtnData(unittest.TestCase):
