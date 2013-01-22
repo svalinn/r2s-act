@@ -97,7 +97,7 @@ def load_config_params(config):
 ###########################
 # Do step 2
 def handle_phtn_data(datafile, phtn_src, opt_isotope, opt_cooling,  \
-        opt_sampling, opt_bias, opt_cumulative, cust_ergbins):
+        opt_sampling, opt_bias, opt_cumulative, cust_ergbins, gammas="gammas"):
     """Loads phtn_src data, tags this to mesh, and generates 'gammas' file.
 
     Parameters
@@ -120,6 +120,8 @@ def handle_phtn_data(datafile, phtn_src, opt_isotope, opt_cooling,  \
     cust_ergbins : boolean
         If true, look for custom energy bins on the mesh and include them in
         'gammas'
+    gammas : string (optional)
+        File name for 'gammas' file. Defaults to 'gammas'.
 
     Returns
     -------
@@ -145,10 +147,10 @@ def handle_phtn_data(datafile, phtn_src, opt_isotope, opt_cooling,  \
             coolingstepstring = opt_cooling
 
     print "Writing gammas file"
-    write_gammas.gen_gammas_file_from_h5m(smesh, sampling=opt_sampling, \
-            do_bias=opt_bias, cumulative=opt_cumulative, \
-            cust_ergbins=opt_ergs, coolingstep=coolingstepstring, \
-            isotope=opt_isotope)
+    write_gammas.gen_gammas_file_from_h5m(smesh, outfile=gammas, \
+            sampling=opt_sampling, do_bias=opt_bias, \
+            cumulative=opt_cumulative, cust_ergbins=cust_ergbins, \
+            coolingstep=coolingstepstring, isotope=opt_isotope)
 
     return smesh
 
