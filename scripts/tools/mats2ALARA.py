@@ -19,7 +19,7 @@ def mats_to_alara(inp, output):
     """This function reads in MCNP inp file and prints out an ALARA matlib.
     """
     if output in os.listdir('.'):
-        os.remove(opts.output)
+        os.remove(output)
 
     mats = read_mcnp_inp(inp)
     mat_count = 0  # number material objects
