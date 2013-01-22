@@ -172,6 +172,11 @@ def get_cooling_step_name(coolingstep, fr):
     -------
     A 2 value tuple: (the cooling step string name, the number of
     photon energy bins used in the phtn_src file)
+
+    Notes
+    -----
+    If `coolingstep` is not an integer, the calling function must catch a
+    ValueError.
     """
     
     # ... if given a number, we take the nth line. Otherwise expect a ValueError

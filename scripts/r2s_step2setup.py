@@ -13,6 +13,16 @@ from r2s_setup import get_input_file
 
 def load_configs(cfgfile):
     """Read needed information from .cfg file.
+
+    Parameters
+    ----------
+    cfgfile - string
+        File path to an r2s.cfg file
+
+    Returns
+    -------
+    A list of the following values taken from the .cfg file:
+    mcnp_n_problem, mcnp_p_problem, datafile, phtn_src, opt_isotope, opt_cooling
     """
     config = ConfigParser.SafeConfigParser()
     config.read(cfgfile)
@@ -26,15 +36,13 @@ def load_configs(cfgfile):
         datafile = config.get('r2s-files','step1_datafile')
         phtn_src = config.get('r2s-files', 'alara_phtn_src')
     else:
-        sys.exit("ERROR: 'r2s-files' section required in your config file " \
-                "({0})".format(cfgfile))
+        raise Exception("'r2s-files' section required in your config file.")
 
     if config.has_section('r2s-params'):
         opt_isotope = config.get('r2s-params','photon_isotope')
         opt_cooling = config.get('r2s-params','photon_cooling')
     else:
-        sys.exit("ERROR: 'r2s-params' section required in your config file " \
-                "({0})".format(cfgfile))
+        raise Exception("'r2s-params' section required in your config file.")
 
     return (mcnp_n_problem, mcnp_p_problem, datafile, phtn_src, opt_isotope, \
             opt_cooling)
@@ -43,9 +51,25 @@ def load_configs(cfgfile):
 def gen_iso_cool_lists(opt_isotope, opt_cooling, phtn_src):
     """Create list of isotope and cooling step combinations and foldernames.
 
+    Parameters
+    ----------
+    opt_isotope : string
+        The isotope identifier as listed in phtn_src file
+    opt_cooling : int or string
+        The cooling step, either as a numeric index (from 0) or a string
+        identifier as listed in phtn_src file
+
+    Returns
+    -------
+    iso_list : list of strings
+        List of the isotope strings
+    cool_list : list of strings
+        List of the cooling step strings
+
     Notes
     -----
-    Checks phtn_src file if numeric cooling step values are given.
+    Checks phtn_src file if numeric cooling step values are given and grabs the
+    corresponding string values.
     """
     #defaults
     iso_list = ['TOTAL']
@@ -83,6 +107,13 @@ def make_folders(iso_list, cool_list):
     
     Example naming: mn-56_1_d or TOTAL_5_h
 
+    Parameters
+    ----------
+    iso_list : list of strings
+        List of the isotope strings
+    cool_list : list of strings
+        List of the cooling step strings
+
     Returns
     -------
     path_list : list of strings
@@ -102,22 +133,25 @@ def make_folders(iso_list, cool_list):
 
     return path_list
 
+
 def create_new_files(path_list, datafile, cfgfile, mcnp_n_problem, mcnp_p_problem, phtn_src):
-    """
+    """Creates files for step 2 calculation for each combination of cooling time
+    and isotope.
+
     Parameters
     ----------
-    path_list : List of lists
+    path_list : List of lists of strings
         Each sub list is: [filepath string, isotope string, cooling time string]
     datafile : string
-        Path to .h5m structured mesh file.
+        Path to .h5m structured mesh file
     cfgfile : string
-        Path to r2s.cfg config file.
+        Path to r2s.cfg config file
     mcnp_n_problem : string
         Path to MCNP input for neutron transport
     mcnp_p_problem : string
         Path to MCNP input for photon transport
     phtn_src : string
-        Path to 'phtn_src' file.
+        Path to phtn_src file
     """
     thisdir = os.curdir
 
@@ -140,6 +174,21 @@ def create_new_files(path_list, datafile, cfgfile, mcnp_n_problem, mcnp_p_proble
 
 def _copy_and_mod_r2scfg(oldfile, newfile, iso, time, mcnp_n_problem, phtn_src):
     """Open r2s.cfg and copy contents with replacements to the new r2s.cfg
+ 
+    Parameters
+    ----------
+    oldfile : string
+        Path to existing r2s.cfg file
+    newfile : string
+        Path to new copy of r2s.cfg file
+    iso : string
+        Isotope name
+    time : string
+        Cooling time string
+    mcnp_n_problem : string
+        Path to existing MCNP input for neutron transport
+    phtn_src : string
+        Path to phtn_src file output by ALARA
     """
     with open(oldfile, 'r') as source:
         with open(newfile, 'w') as target:
@@ -170,9 +219,11 @@ def _copy_and_mod_r2scfg(oldfile, newfile, iso, time, mcnp_n_problem, phtn_src):
 
 def _copy_and_mod_mcnpinp(oldfile, newfile, iso, time):
     """Copy mcnp photon transport input to each directory
+
     TBD: Modify title card?
 
     Parameters
+    ----------
     oldfile : string
         Path to MCNP input for photon transport
     newfile : string
@@ -210,9 +261,9 @@ def _copy_and_mod_mcnpinp(oldfile, newfile, iso, time):
                 "".format(oldfile)
 
 
-# Create shell script in parent directory to run all r2s_step2.py cases.
 def gen_run_script(path_list):
-    """ """
+    """TODO: Create shell script in parent directory to run all r2s_step2 cases
+    """
     pass
 
 
@@ -222,11 +273,16 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         cfgfile = sys.argv[1]
 
-    (mcnp_n_problem, mcnp_p_problem, datafile, phtn_src, opt_isotope, \
-            opt_cooling) = load_configs(cfgfile)
+    try:
+        (mcnp_n_problem, mcnp_p_problem, datafile, phtn_src, opt_isotope, \
+                opt_cooling) = load_configs(cfgfile)
+        iso_list, cool_list = gen_iso_cool_lists(opt_isotope, opt_cooling, \
+                phtn_src)
+        path_list = make_folders(iso_list, cool_list)
+        create_new_files(path_list, datafile, cfgfile, mcnp_n_problem, \
+                mcnp_p_problem, phtn_src)
+        gen_run_script(path_list)
 
-    iso_list, cool_list = gen_iso_cool_lists(opt_isotope, opt_cooling, phtn_src)
-    path_list = make_folders(iso_list, cool_list)
-    create_new_files(path_list, datafile, cfgfile, mcnp_n_problem, \
-            mcnp_p_problem, phtn_src)
-    gen_run_script(path_list)
+    except Exception as e:
+        print "ERROR: {0}\n(in r2s.cfg file {1})".format( e, \
+                os.path.abspath(cfgfile) )

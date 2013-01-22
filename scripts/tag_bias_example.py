@@ -10,20 +10,31 @@ from r2s.scdmesh import ScdMesh, ScdMeshError
 from r2s_setup import get_input_file
 from r2s_setup import FileMissingError
 
+
 #####################################################################
 # Note, skip beyond this method for setting up the biasing
 #
 def calc_centers_list(scd):
     """Create list of voxel centroids for a structured cartesian mesh
     
-    ACTION: Method creates a 1D list of voxel centroids in form [x,y,z]
-    RECEIVES: scd, a scdmesh.ScdMesh object.
-    RETURNS: centers, a 1D list of voxel volumes in order 'xyz'
+    Method creates a 1D list of voxel centroids in form [x,y,z]
+    
+    Parameters
+    ----------
+    scd : cdMesh object.
 
-    NOTE: Voxel ordering follows meshtal file convention which is
-     -for x for y iterate z
-     -for x iterate y
-     -iterate x
+    Returns
+    -------
+    centers : list
+        a 1D list of voxel volumes in order 'xyz'
+
+    Notes
+    -----
+    Voxel ordering follows meshtal file convention which is:
+
+    - for x for y iterate z
+    - for x iterate y
+    - iterate x
     """
     
     meshplanes = [ scd.getDivisions('x'),
