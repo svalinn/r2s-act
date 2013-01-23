@@ -217,11 +217,18 @@ flux flux_1     alara_fluxin  1.0    0     default
 # Specify the irradiation schedule using "schedule" and "pulsehistory"
 # Syntax is found in the ALARA user manual
 schedule    total
-    .85 y   flux_1  pulse    0  s
+    .85 y   flux_1  pulse_once    0  s
 end
 
-pulsehistory    pulse
-    5   .15 y
+# A pulse history is applied to each flux in the schedule. Pulse syntax is:
+#  pulsehistory    pulse_name
+#       num_pulses   delay_between_pulses
+#  end
+pulsehistory    pulse_once
+    1   0.0 y
+end
+pulsehistory    pulse_thrice_wait_some
+    3   0.1 y
 end
 
 # Specify desired ALARA output (e.g. constituant, specific activity).
