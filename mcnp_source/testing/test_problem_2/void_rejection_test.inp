@@ -1,0 +1,22 @@
+Test problem; see README.rst
+c Cells
+c Box with hole
+100  1 -1  -10  20  imp:p=1
+c Hole in box (void)
+101  0     -10 -20  imp:p=1
+c Outside problem
+102  0      10      imp:p=0
+
+c Surfaces
+c box
+10 rpp  -10 10  -10 10  -10 10
+c cylinder
+20 cz    5
+
+c Data cards
+m1 8016 1
+c
+nps 1e4
+c
+mode p
+c

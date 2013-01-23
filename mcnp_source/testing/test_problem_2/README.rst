@@ -1,4 +1,4 @@
-This test problem is used to verify that voxel sampling resamples a voxel when particles are started in a void.  This is done with a single voxel with a central cylindrical void.
+This test problem is used to verify that uniform sampling resamples a voxel when particles are started in a void.  This is done with a single voxel with a central cylindrical void.
 
 To run the test problem::
 
