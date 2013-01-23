@@ -262,10 +262,26 @@ def _copy_and_mod_mcnpinp(oldfile, newfile, iso, time):
 
 
 def gen_run_script(path_list):
-    """TODO: Create shell script in parent directory to run all r2s_step2 cases
+    """Create shell script in parent directory to run all r2s_step2 cases
+    
+    Parameters
+    ----------
+    path_list : list of strings
+        List of the file paths of the created folders.
     """
-    pass
+    
+    thisdir = os.curdir
+    scriptdir = os.path.dirname(os.path.abspath(__file__))
+    scriptpath = os.path.join(scriptdir + "r2s_step2.py")
+    with open(os.path.join(thisdir, "r2s_run_all_step2.py"), 'w') as fw:
+        fw.write("#! /usr/env/bin python\n\n")
+        for path in path_list:
+            fw.write("cd {0}\n".format(path))
+            fw.write(scriptpath + '\n')
+            fw.write("cd ..\n")
 
+    os.system("chmod +x {0}".format( \
+            os.path.join(thisdir, "r2s_run_all_step2.py")))
 
 if __name__ == "__main__":
     
