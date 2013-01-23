@@ -532,8 +532,18 @@ subroutine source
               goto 544 ! Position is ok; particle starts in activated material
             endif
           enddo
+        ! void rejection with voxel sampling
         elseif (samp_vox.eq.1) then
-          if (nmt(mat(icl)).eq.0) then
+          if (mat(icl).eq.0) then
+            ! particle rejected... resample within the voxel
+            call sample_within_voxel
+            goto 555
+          else
+            goto 544
+          endif
+        ! void rejection with uniform sampling
+        elseif (samp_uni.eq.1) then
+          if (mat(icl).eq.0) then
             ! particle rejected... resample within the voxel
             call sample_within_voxel
             goto 555
@@ -633,7 +643,7 @@ subroutine uniform_sample
         yyy = j_bins(1)+rang()*(j_bins(j_ints+1)-j_bins(1))
         zzz = k_bins(1)+rang()*(k_bins(k_ints+1)-k_bins(1))
 
-        ! Identify corresponding voxel
+        ! Identify corresponding voxel (sets ii, jj, kk)
         do ii=1,i_ints
           if (i_bins(ii).le.xxx.and.xxx.lt.i_bins(ii+1)) exit
         enddo
