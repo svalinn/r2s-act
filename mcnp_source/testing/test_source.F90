@@ -161,14 +161,21 @@ subroutine test_read_params
           else 
             exit
           endif
+          ! Test: 'p u r'
+          call read_params(50)
+          if (samp_uni.eq.1.and.resample.eq.1) then
+            cnt = cnt + 1
+          else 
+            exit
+          endif
           exit
 
         enddo
 
         CLOSE(50)
 
-        if (cnt.lt.12) then
-          write(*,*) "ERROR - test_read_params test #", i
+        if (cnt.lt.13) then
+          write(*,*) "ERROR - test_read_params completed tests:", i, "/ 13"
         else 
           write(*,*) "test_read_params: successfully tested parameters parsing"
         endif
