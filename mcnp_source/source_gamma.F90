@@ -85,7 +85,8 @@ module source_data
         character*30 :: gammas_file = 'gammas'
         integer(i8knd) :: ikffl = 0 ! = local record of history #
         ! Parameters - these are toggled by gammas
-        integer :: bias, samp_vox, samp_uni, debug, ergs, mat_rej, cumulative
+        integer :: bias, samp_vox, samp_uni, debug, ergs, &
+             mat_rej, cumulative, resample, uni_resamp_all
         ! Position sampling variables
         integer :: voxel, n_source_cells
         real(dknd),dimension(:),allocatable :: tot_list
@@ -105,22 +106,21 @@ module source_data
         ! Energy bins alias table variables
         real(dknd),dimension(:,:),allocatable :: ergPairsProbabilities
         integer(i4knd),dimension(:,:,:),allocatable :: ergPairs
-        integer :: ii,kk,jj
         ! Debug output variables
         integer(i8knd) :: npart_write = 0 ! = counter for debug output
         ! Other variables
         integer :: stat
+        integer :: ii, kk, jj
         integer :: i_ints, j_ints, k_ints, n_mesh_cells, n_active_mat
         real,dimension(:),allocatable :: i_bins, j_bins, k_bins
         integer,dimension(100) :: active_mat
         character*3000 :: line ! needed for reading active_mat from gammas
         ! Saved variables will be unchanged next time source is called
-        !save spectrum,i_ints,j_ints,k_ints,n_active_mat,n_ener_grps, &
-        save i_ints, j_ints, k_ints, n_active_mat, n_ener_grps, &
-             i_bins, j_bins, k_bins, active_mat, my_ener_phot, ikffl, pairs, &
-             pairsProbabilities, n_mesh_cells, bias, bias_probability_sum, &
-             ergPairsProbabilities, ergPairs, tot_list, bias_list, &
-             ii, kk, jj, voxel
+        ! save i_ints, j_ints, k_ints, n_active_mat, n_ener_grps, &
+        !      i_bins, j_bins, k_bins, active_mat, my_ener_phot, ikffl, pairs, &
+        !      pairsProbabilities, n_mesh_cells, bias, bias_probability_sum, &
+        !      ergPairsProbabilities, ergPairs, tot_list, bias_list, &
+        !      ii, kk, jj, voxel
        
 end module source_data
 
@@ -321,7 +321,8 @@ subroutine read_params (myunit)
 
         ! Initialize parameters to defaults.
         ! Defaults are chosen such that gammas format specified by Leichtle
-        !  will be read correctly without a parameters line.
+        !  will hopefully be read correctly without a parameters line.
+        !  (untested)
         bias = 0
         samp_vox = 1
         samp_uni = 0
@@ -329,6 +330,8 @@ subroutine read_params (myunit)
         ergs = 0
         mat_rej = 1
         cumulative = 1
+        resample = 0
+        uni_resamp_all = 0
 
         ! Read enough characters to fill paramline
         read(myunit,'(A)') paramline
@@ -381,6 +384,13 @@ subroutine read_params (myunit)
           CASE ('c')
             write(*,*) "Enabled reading of cumulative energy bins."
             cumulative = 1
+          CASE ('r')
+            write(*,*) "Enabled resampling for void and/or material rejection."
+            resample = 1
+          CASE ('a')
+            write(*,*) "Uniform sampling will resample entire problem if" // &
+              "void is hit"
+            uni_resamp_all = 1
           CASE DEFAULT
             write(*,*) " "
             write(*,*) "Invalid parameter!: ", letters(i)
@@ -526,7 +536,12 @@ subroutine source
 !----------------------------------------------------------------------------
 
 543     continue
-        if (mat_rej.eq.1) then
+        ! Rejection and resampling conditions
+        !
+        if (resample.eq.0) then
+          goto 544 ! Always accept position when resampling is disabled.
+        ! rejection of non-void materials is enabled...
+        elseif (mat_rej.eq.1) then
           do i=1,n_active_mat
             if (nmt(mat(icl)).eq.active_mat(i)) then
               goto 544 ! Position is ok; particle starts in activated material
@@ -544,9 +559,13 @@ subroutine source
         ! void rejection with uniform sampling
         elseif (samp_uni.eq.1) then
           if (mat(icl).eq.0) then
-            ! particle rejected... resample within the voxel
-            call sample_within_voxel
-            goto 555
+            if (uni_resamp_all.eq.0) then
+              ! particle rejected... resample within the voxel and recheck
+              call sample_within_voxel
+              goto 555
+            else
+              goto 10 ! sample anew
+            endif
           else
             goto 544
           endif
@@ -554,7 +573,7 @@ subroutine source
           goto 544 ! skip material rejection
         endif
 
-        goto 10 ! particle rejected... sample anew.
+        goto 10 ! particle rejected... sample anew
   
 544     continue
 
