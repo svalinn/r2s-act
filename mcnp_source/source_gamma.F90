@@ -115,12 +115,6 @@ module source_data
         real,dimension(:),allocatable :: i_bins, j_bins, k_bins
         integer,dimension(100) :: active_mat
         character*3000 :: line ! needed for reading active_mat from gammas
-        ! Saved variables will be unchanged next time source is called
-        ! save i_ints, j_ints, k_ints, n_active_mat, n_ener_grps, &
-        !      i_bins, j_bins, k_bins, active_mat, my_ener_phot, ikffl, pairs, &
-        !      pairsProbabilities, n_mesh_cells, bias, bias_probability_sum, &
-        !      ergPairsProbabilities, ergPairs, tot_list, bias_list, &
-        !      ii, kk, jj, voxel
        
 end module source_data
 
