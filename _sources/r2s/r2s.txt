@@ -47,4 +47,5 @@ Subpackages
 .. toctree::
 
     r2s.io
+    r2s.mcnp
 

@@ -1,0 +1,11 @@
+mcnp Package
+============
+
+:mod:`source_gamma_doc` Module
+------------------------------
+
+.. automodule:: r2s.mcnp.source_gamma_doc
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

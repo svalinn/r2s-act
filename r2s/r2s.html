@@ -65,6 +65,14 @@
              accesskey="N">next</a>
           </li>
         <li class="menu-item" >
+          <a href="../np-modindex.html" title="Python Module Index"
+             >modules</a>
+          </li>
+        <li class="menu-item" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a>
+          </li>
+        <li class="menu-item" >
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a>
           </li>
@@ -76,10 +84,10 @@
  <div id="sidebar_section"> <ul>
 <li><a class="reference internal" href="#">r2s Package</a><ul>
 <li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">r2s</span></tt> Package</a></li>
-<li><a class="reference internal" href="#mcnp-n2p-module"><tt class="docutils literal"><span class="pre">mcnp_n2p</span></tt> Module</a></li>
-<li><a class="reference internal" href="#mmgrid-module"><tt class="docutils literal"><span class="pre">mmgrid</span></tt> Module</a></li>
-<li><a class="reference internal" href="#scdmesh-module"><tt class="docutils literal"><span class="pre">scdmesh</span></tt> Module</a></li>
-<li><a class="reference internal" href="#tag-ebins-module"><tt class="docutils literal"><span class="pre">tag_ebins</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-r2s.mcnp_n2p"><tt class="docutils literal"><span class="pre">mcnp_n2p</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-r2s.mmgrid"><tt class="docutils literal"><span class="pre">mmgrid</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-r2s.scdmesh"><tt class="docutils literal"><span class="pre">scdmesh</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-r2s.tag_ebins"><tt class="docutils literal"><span class="pre">tag_ebins</span></tt> Module</a></li>
 <li><a class="reference internal" href="#subpackages">Subpackages</a><ul>
 </ul>
 </li>
@@ -95,29 +103,522 @@
 <h1>r2s Package<a class="headerlink" href="#r2s-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="id1">
 <h2><tt class="xref py py-mod docutils literal"><span class="pre">r2s</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-r2s.__init__"></span><p>The r2s package contains various accessory scripts, as well as the r2s.io
+package which handles interfacing with various file formats.</p>
 </div>
-<div class="section" id="mcnp-n2p-module">
-<h2><tt class="xref py py-mod docutils literal"><span class="pre">mcnp_n2p</span></tt> Module<a class="headerlink" href="#mcnp-n2p-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-r2s.mcnp_n2p">
+<span id="mcnp-n2p-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">mcnp_n2p</span></tt> Module<a class="headerlink" href="#module-r2s.mcnp_n2p" title="Permalink to this headline">¶</a></h2>
+<p>Module contains class ModMCNPforPhotons which automates most of the
+conversion from an MCNP neutron transport problem to a photon transport problem
+with the same geometry/materials.</p>
+<dl class="class">
+<dt id="r2s.mcnp_n2p.ModMCNPforPhotons">
+<em class="property">class </em><tt class="descclassname">r2s.mcnp_n2p.</tt><tt class="descname">ModMCNPforPhotons</tt><big>(</big><em>myInputFileName</em>, <em>dagmc=None</em><big>)</big><a class="headerlink" href="#r2s.mcnp_n2p.ModMCNPforPhotons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Class is used to convert a neutron problem in MCNP to a photon problem</p>
+<p>An MCNP input file is read in, and stored in 4 parts: title card, block 1,
+block 2, and block 3.</p>
+<dl class="method">
+<dt id="r2s.mcnp_n2p.ModMCNPforPhotons.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>myInputFileName</em>, <em>dagmc=None</em><big>)</big><a class="headerlink" href="#r2s.mcnp_n2p.ModMCNPforPhotons.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Init function for class ModMCNPforPhotons.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>myInputFileName</strong> : string</p>
+<blockquote>
+<div><p>MCNP input file.</p>
+</div></blockquote>
+<p><strong>dagmc</strong> : boolean</p>
+<blockquote class="last">
+<div><p>Whether to treat input as a DAGMCNP or regular MCNP input. By
+default, this is automatically determined.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.mcnp_n2p.ModMCNPforPhotons.add_fmesh_from_scdmesh">
+<tt class="descname">add_fmesh_from_scdmesh</tt><big>(</big><em>sm</em><big>)</big><a class="headerlink" href="#r2s.mcnp_n2p.ModMCNPforPhotons.add_fmesh_from_scdmesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Geometry information is read to create a photon fmesh card.</p>
+<p>Lines are appended to self.block3Lines.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>sm</strong> : scdmesh.ScdMesh object</p>
+<blockquote>
+<div><p>A structured mesh object (scdmesh.py) with mesh divisions in XYZ.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first last"><strong>1 if successful, 0 if an error occurs.</strong> :</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Requires that block 3 has been read into self.block3Lines, and photon 
+energies have been tagged to &#8216;sm.imesh.rootSet&#8217;.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.mcnp_n2p.ModMCNPforPhotons.change_block_1">
+<tt class="descname">change_block_1</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp_n2p.ModMCNPforPhotons.change_block_1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modify contents of self.block1Lines for a photon problem.</p>
+<p>Method changes the importance cards to affect photons</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><strong>&#8216;1&#8217; when run successfully</strong> :</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.mcnp_n2p.ModMCNPforPhotons.change_block_2">
+<tt class="descname">change_block_2</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp_n2p.ModMCNPforPhotons.change_block_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modify contents of self.block2Lines for a photon problem (N/A).</p>
+<p>Block 2 of MCNP input doesn&#8217;t depend on particle type
+Thus nothing is done.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.mcnp_n2p.ModMCNPforPhotons.change_block_3">
+<tt class="descname">change_block_3</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp_n2p.ModMCNPforPhotons.change_block_3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modify contents of self.block3Lines for a photon problem.</p>
+<p>Method 
+- changes the mode card from &#8216;mode n&#8217; to &#8216;mode p&#8217;
+- remove phys:n
+- change inp:n to inp:p
+- comments out any source-definition cards.  These cards are:
+sdef, si, sp, sb, sc, ds, kcode, ksrc</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.mcnp_n2p.ModMCNPforPhotons.convert">
+<tt class="descname">convert</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp_n2p.ModMCNPforPhotons.convert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the blocks in MCNP input from neutron to photon problem.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.mcnp_n2p.ModMCNPforPhotons.mcnp_block_parser">
+<tt class="descname">mcnp_block_parser</tt><big>(</big><em>fr</em>, <em>blockLines</em>, <em>commentLines</em><big>)</big><a class="headerlink" href="#r2s.mcnp_n2p.ModMCNPforPhotons.mcnp_block_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read lines from input file until an entire block has been read.</p>
+<p>Method receives a file reader, and reads lines
+until a blank line is encountered (or end of file)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>fr</strong> : file reading stream</p>
+<blockquote>
+<div><p>...</p>
+</div></blockquote>
+<p><strong>blockLines</strong> : list</p>
+<blockquote>
+<div><p>...</p>
+</div></blockquote>
+<p><strong>commentLines</strong> : list</p>
+<blockquote class="last">
+<div><p>...</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Blank lines are tossed, and any comment lines beginning
+with c are tossed</p>
+<p>Saved lines are added to a list and method returns this list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.mcnp_n2p.ModMCNPforPhotons.read">
+<tt class="descname">read</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp_n2p.ModMCNPforPhotons.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read an MCNP input file and store its parts in the object.</p>
+<p class="rubric">Notes</p>
+<p>We clean the input file of a bunch of useless blank lines
+and lines filled with asterisks...</p>
+<p>Saved lines are written to file tempFileName</p>
+<p>Blocks 1 and 2 are used to create a surface parser object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.mcnp_n2p.ModMCNPforPhotons.write_deck">
+<tt class="descname">write_deck</tt><big>(</big><em>outputFileName=''</em><big>)</big><a class="headerlink" href="#r2s.mcnp_n2p.ModMCNPforPhotons.write_deck" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new MCNP input file from the object&#8217;s contents.</p>
+<p>Method writes the contents of self.block#Lines to a new file.
+File name is determined automatically if not supplied.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>outputFileName</strong> : string</p>
+<blockquote>
+<div><p>File path for created deck. If not specified, then the input file&#8217;s
+name is used, with an appened _p prior to any suffix (e.g. .inp).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first last"><strong>N/A</strong> :</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Requires that read() has been called for the class object so that
+&#8216;blockLines&#8217; and &#8216;title&#8217; are not empty.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mcnp_n2p.main">
+<tt class="descclassname">r2s.mcnp_n2p.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp_n2p.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>ACTION: Method defines an option parser and handles command-line
+usage of this module.</p>
+<p>REQUIRES: command line arguments to be passed - otherwise prints help
+information.</p>
+<p>RECEIVES: N/A</p>
+</dd></dl>
+
 </div>
-<div class="section" id="mmgrid-module">
-<h2><tt class="xref py py-mod docutils literal"><span class="pre">mmgrid</span></tt> Module<a class="headerlink" href="#mmgrid-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-r2s.mmgrid">
+<span id="mmgrid-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">mmgrid</span></tt> Module<a class="headerlink" href="#module-r2s.mmgrid" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="r2s.mmgrid.get_mat_id">
+<tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">get_mat_id</tt><big>(</big><em>materials</em>, <em>volume_id</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.get_mat_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="r2s.mmgrid.load_geom">
+<tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">load_geom</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.load_geom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load geometry from the given file into dagmc</p>
+<p>This is provided as a convenience so client code doesn&#8217;t need to invoke pydagmc.</p>
+<p>Note that DagMC can only have one set of geometry loaded per program invocation.
+This means that this function should only be called once, and the resulting 
+geometry will become globally visible to all clients of mmgrid.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mmgrid.main">
+<tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">main</tt><big>(</big><em>arguments=None</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="r2s.mmgrid.mmGrid">
+<em class="property">class </em><tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">mmGrid</tt><big>(</big><em>scdmesh</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object representing a macromaterial grid</p>
+<dl class="method">
+<dt id="r2s.mmgrid.mmGrid.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>scdmesh</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a grid based on a given structured mesh</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.mmgrid.mmGrid.createTags">
+<tt class="descname">createTags</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid.createTags" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="r2s.mmgrid.mmGrid.fromDagGeom">
+<em class="property">classmethod </em><tt class="descname">fromDagGeom</tt><big>(</big><em>ndiv=10</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid.fromDagGeom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a grid based on the geometry currently loaded in DagMC</p>
+<p>Creates an equally spaced grid with ndiv divisions per side, set
+within the full DagMC geometry.  This constructor requires that
+DagMC has geometry loaded with a rectangular graveyard volume</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.mmgrid.mmGrid.generate">
+<tt class="descname">generate</tt><big>(</big><em>N</em>, <em>use_grid=False</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid.generate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample the DagMC geometry and store the results on this grid.</p>
+<p>N is the number of samples to take per voxel per dimension</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.mmgrid.mmGrid.writeFile">
+<tt class="descname">writeFile</tt><big>(</big><em>filename</em>, <em>alara_geom_file=None</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid.writeFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="r2s.mmgrid.mmGridError">
+<em class="property">exception </em><tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">mmGridError</tt><a class="headerlink" href="#r2s.mmgrid.mmGridError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mmgrid.pairwise">
+<tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">pairwise</tt><big>(</big><em>l</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.pairwise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generator: given a sequence x, yield (x[0],x[1]), (x[1],x[2]), ...</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mmgrid.prepare_materials">
+<tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">prepare_materials</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mmgrid.prepare_materials" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
-<div class="section" id="scdmesh-module">
-<h2><tt class="xref py py-mod docutils literal"><span class="pre">scdmesh</span></tt> Module<a class="headerlink" href="#scdmesh-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-r2s.scdmesh">
+<span id="scdmesh-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">scdmesh</span></tt> Module<a class="headerlink" href="#module-r2s.scdmesh" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="r2s.scdmesh.ScdMesh">
+<em class="property">class </em><tt class="descclassname">r2s.scdmesh.</tt><tt class="descname">ScdMesh</tt><big>(</big><em>x_points</em>, <em>y_points</em>, <em>z_points</em>, <em>imesh=None</em>, <em>**kw</em><big>)</big><a class="headerlink" href="#r2s.scdmesh.ScdMesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>A structured mesh in the spirit of MOAB&#8217;s ScdMesh interface.</p>
+<p>Public member variables:</p>
+<div class="highlight-python"><pre>self.imesh -- the iMesh instance in which this 
+              structured mesh resides
+self.dims -- A namedtuple indicating the minimum and maximum
+             (i,j,k) coordinates of this structured mesh.</pre>
 </div>
-<div class="section" id="tag-ebins-module">
-<h2><tt class="xref py py-mod docutils literal"><span class="pre">tag_ebins</span></tt> Module<a class="headerlink" href="#tag-ebins-module" title="Permalink to this headline">¶</a></h2>
+<dl class="method">
+<dt id="r2s.scdmesh.ScdMesh.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>x_points</em>, <em>y_points</em>, <em>z_points</em>, <em>imesh=None</em>, <em>**kw</em><big>)</big><a class="headerlink" href="#r2s.scdmesh.ScdMesh.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a ScdMesh from given x, y, and z coordinates.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>x_points, y_points, z_points</strong> : list of floats</p>
+<blockquote>
+<div><p>List of points.
+The i,j,k extents of the structured mesh will be numbered from 0.</p>
+</div></blockquote>
+<p><strong>imesh</strong> : iMesh.Mesh object</p>
+<blockquote>
+<div><p>Parameter can be used to designate an iMesh instance
+in which to place the mesh; if None, a new instance will be 
+created.</p>
+</div></blockquote>
+<p><strong>keyword arguments:</strong> :</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>bdtag :</dt>
+<dd><p class="first last">if the BOX_DIMS tag has already been looked up, it may
+be passed thus</p>
+</dd>
+<dt>_scdset :</dt>
+<dd><p class="first last">an existing scdset to use; clients should use 
+fromEntSet() instead of using this parameter.</p>
+</dd>
+</dl>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="r2s.scdmesh.ScdMesh.extents_tuple">
+<tt class="descname">extents_tuple</tt><a class="headerlink" href="#r2s.scdmesh.ScdMesh.extents_tuple" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">extents</span></tt></p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="r2s.scdmesh.ScdMesh.fromEntSet">
+<em class="property">classmethod </em><tt class="descname">fromEntSet</tt><big>(</big><em>imesh</em>, <em>eset</em><big>)</big><a class="headerlink" href="#r2s.scdmesh.ScdMesh.fromEntSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor function: create a ScdMesh from an existing entity set</p>
+<p>The eset parameter must be a structured mesh set with the BOX_DIMS
+tag set on it.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="r2s.scdmesh.ScdMesh.fromFile">
+<em class="property">classmethod </em><tt class="descname">fromFile</tt><big>(</big><em>filename</em>, <em>imesh=None</em><big>)</big><a class="headerlink" href="#r2s.scdmesh.ScdMesh.fromFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load structured meshes from a file</p>
+<p>Returns one strutured mesh if the file contains one mesh, or a list if
+the file contains multiple meshes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.scdmesh.ScdMesh.getDivisions">
+<tt class="descname">getDivisions</tt><big>(</big><em>dim</em><big>)</big><a class="headerlink" href="#r2s.scdmesh.ScdMesh.getDivisions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the mesh divisions on a given dimension</p>
+<p>Given a dimension &#8216;x&#8217;, &#8216;y&#8217;, or &#8216;z&#8217;, return a list of the mesh vertices
+along that dimension</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.scdmesh.ScdMesh.getHex">
+<tt class="descname">getHex</tt><big>(</big><em>i</em>, <em>j</em>, <em>k</em><big>)</big><a class="headerlink" href="#r2s.scdmesh.ScdMesh.getHex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the (i,j,k)&#8217;th hexahedron in the mesh</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.scdmesh.ScdMesh.getHexVolume">
+<tt class="descname">getHexVolume</tt><big>(</big><em>i</em>, <em>j</em>, <em>k</em><big>)</big><a class="headerlink" href="#r2s.scdmesh.ScdMesh.getHexVolume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the volume of the (i,j,k)&#8217;th hexahedron in the mesh</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.scdmesh.ScdMesh.getVtx">
+<tt class="descname">getVtx</tt><big>(</big><em>i</em>, <em>j</em>, <em>k</em><big>)</big><a class="headerlink" href="#r2s.scdmesh.ScdMesh.getVtx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the (i,j,k)&#8217;th vertex in the mesh</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.scdmesh.ScdMesh.iterateHex">
+<tt class="descname">iterateHex</tt><big>(</big><em>order='zyx'</em>, <em>**kw</em><big>)</big><a class="headerlink" href="#r2s.scdmesh.ScdMesh.iterateHex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an iterator over the hexahedra of the mesh</p>
+<p>The order argument specifies the iteration order.  It must be a string
+of 1-3 letters from the set (x,y,z).  The rightmost letter is the axis
+along which the iteration will advance the most quickly.  Thus &#8216;zyx&#8217; &#8211;
+x coordinates changing fastest, z coordinates changing least fast&#8211; is
+the default, and is identical to the order that would be given by the
+scdset.iterate() function.</p>
+<p>When a dimension is absent from the order, iteration will proceed over
+only the column in the mesh that has the lowest corresonding (i/j/k)
+coordinate.  Thus, with order &#8216;xy,&#8217; iteration proceeds over the i/j
+plane of the structured mesh with the smallest k coordinate.</p>
+<p>Specific slices can be specified with keyword arguments:</p>
+<p>Keyword args:</p>
+<div class="highlight-python"><pre>x: specify one or more i-coordinates to iterate over.
+y: specify one or more j-coordinates to iterate over.
+z: specify one or more k-coordinates to iterate over.</pre>
+</div>
+<p>Examples:</p>
+<div class="highlight-python"><pre>iterateHex(): equivalent to iMesh iterator over hexes in mesh
+iterateHex( 'xyz' ): iterate over entire mesh, with k-coordinates
+                     changing fastest, i-coordinates least fast.
+iterateHex( 'yz', x=3 ): Iterate over the j-k plane of the mesh
+                         whose i-coordinate is 3, with k values
+                         changing fastest.
+iterateHex( 'z' ): Iterate over k-coordinates, with i=dims.imin
+                   and j=dims.jmin
+iterateHex( 'yxz', y=(3,4) ): Iterate over all hexes with
+                              j-coordinate = 3 or 4.  k-coordinate
+                              values change fastest, j-values least
+                              fast.</pre>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.scdmesh.ScdMesh.iterateHexVolumes">
+<tt class="descname">iterateHexVolumes</tt><big>(</big><em>order='zyx'</em>, <em>**kw</em><big>)</big><a class="headerlink" href="#r2s.scdmesh.ScdMesh.iterateHexVolumes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an iterator over the volumes of the mesh hexahedra</p>
+<p>See iterateHex() for an explanation of the order argument and the
+available keyword arguments.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.scdmesh.ScdMesh.iterateVtx">
+<tt class="descname">iterateVtx</tt><big>(</big><em>order='zyx'</em>, <em>**kw</em><big>)</big><a class="headerlink" href="#r2s.scdmesh.ScdMesh.iterateVtx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an iterator over the vertices of the mesh</p>
+<p>See iterateHex() for an explanation of the order argument and the
+available keyword arguments.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="r2s.scdmesh.ScdMeshError">
+<em class="property">exception </em><tt class="descclassname">r2s.scdmesh.</tt><tt class="descname">ScdMeshError</tt><a class="headerlink" href="#r2s.scdmesh.ScdMeshError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-r2s.tag_ebins">
+<span id="tag-ebins-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">tag_ebins</span></tt> Module<a class="headerlink" href="#module-r2s.tag_ebins" title="Permalink to this headline">¶</a></h2>
+<p>Module contains the read_and_tag_phtn_ergs() and destroy_erg_bins_tag() 
+methods.  These are used for adding the photon energy group boundaries to a
+mesh; The functions are typically used when the user does not want to use the
+default 42 group structure for photons.</p>
+<dl class="function">
+<dt id="r2s.tag_ebins.destroy_erg_bins_tag">
+<tt class="descclassname">r2s.tag_ebins.</tt><tt class="descname">destroy_erg_bins_tag</tt><big>(</big><em>sm</em><big>)</big><a class="headerlink" href="#r2s.tag_ebins.destroy_erg_bins_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method removes the &#8216;PHTN_ERGS&#8217; tag from a MOAB mesh</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>sm</strong> : scdmesh.ScdMesh object</p>
+<blockquote>
+<div><p>Structured mesh object with tags to be removed</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>return code</strong> :</p>
+<blockquote class="last">
+<div><p>1 if successful; 0 if failed.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.tag_ebins.main">
+<tt class="descclassname">r2s.tag_ebins.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.tag_ebins.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>ACTION: Method defines an option parser and handles command-line
+usage of this module.
+REQUIRES: command line arguments to be passed - otherwise prints help
+information.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.tag_ebins.read_and_tag_phtn_ergs">
+<tt class="descclassname">r2s.tag_ebins.</tt><tt class="descname">read_and_tag_phtn_ergs</tt><big>(</big><em>fr</em>, <em>sm</em><big>)</big><a class="headerlink" href="#r2s.tag_ebins.read_and_tag_phtn_ergs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method reads a file with a list of energies and tags them to the root
+set.</p>
+<p>Method replaces the &#8216;PHTN_ERGS&#8217; tag if it already exists.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>fr</strong> : readable file stream</p>
+<blockquote>
+<div><p>a file stream listing one energy per line. It should have
+n+1 entries where n is the number of energy groups. Low energy first!</p>
+</div></blockquote>
+<p><strong>sm</strong> : scdmesh.ScdMesh object</p>
+<blockquote class="last">
+<div><p>Structured mesh object to tag energies to.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Reads a single energy from each line of &#8216;fr&#8217;, creating a list
+of these values. These values are tagged to the scdset of &#8216;sm&#8217;
+with the tag handle &#8216;PHTN_ERGS&#8217;.</p>
+</dd></dl>
+
 </div>
 <div class="section" id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="r2s.io.html">io Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="r2s.io.html#read-alara-phtn-module"><tt class="docutils literal"><span class="pre">read_alara_phtn</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="r2s.io.html#read-meshtal-module"><tt class="docutils literal"><span class="pre">read_meshtal</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="r2s.io.html#write-alara-fluxin-module"><tt class="docutils literal"><span class="pre">write_alara_fluxin</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="r2s.io.html#write-alara-geom-module"><tt class="docutils literal"><span class="pre">write_alara_geom</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="r2s.io.html#write-gammas-module"><tt class="docutils literal"><span class="pre">write_gammas</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="r2s.io.html#module-r2s.io.read_alara_phtn"><tt class="docutils literal"><span class="pre">read_alara_phtn</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="r2s.io.html#module-r2s.io.read_meshtal"><tt class="docutils literal"><span class="pre">read_meshtal</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="r2s.io.html#module-r2s.io.write_alara_fluxin"><tt class="docutils literal"><span class="pre">write_alara_fluxin</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="r2s.io.html#module-r2s.io.write_alara_geom"><tt class="docutils literal"><span class="pre">write_alara_geom</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="r2s.io.html#module-r2s.io.write_gammas"><tt class="docutils literal"><span class="pre">write_gammas</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="r2s.mcnp.html">mcnp Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="r2s.mcnp.html#module-r2s.mcnp.source_gamma_doc"><tt class="docutils literal"><span class="pre">source_gamma_doc</span></tt> Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="r2s.mcnp.html#mcnp-source-source-gamma-f90">mcnp_source/source_gamma.F90</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="r2s.mcnp.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="r2s.mcnp.html#header">Header</a></li>
+<li class="toctree-l4"><a class="reference internal" href="r2s.mcnp.html#voxel-lines">Voxel lines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="r2s.mcnp.html#other-notes">Other notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -136,7 +637,7 @@
         &copy; Copyright 2013, CNERG.
       </p>
       <p>
-      Last updated on Jan 15, 2013.
+      Last updated on Jan 24, 2013.
       </p>
       <p>
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
