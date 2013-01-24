@@ -47,10 +47,6 @@ except FileMissingError:
     os.system('mcnp2cad -o {0} {1}'.format(filename,mcnp_file))
     mcnp_geom = get_input_file('mcnp_geom')
 
-gen_mmgrid = True
-if config.has_option('r2s-params','gen_mmgrid'):
-    gen_mmgrid = config.getboolean('r2s-params', 'gen_mmgrid')
-
 try:
     alara_snippet = get_input_file('alara_snippet')
 except FileMissingError:
@@ -68,6 +64,30 @@ datafile = config.get('r2s-files','step1_datafile')
 fluxin = config.get('r2s-files','alara_fluxin')
 alara_geom = config.get('r2s-files','alara_geom')
 alara_matdict = get_material_dict()
+
+# Read parameters
+
+# This list stores (1) parameter names as listed in r2s.cfg; 
+# (2) their defaults; (3) which 'get' function to use for the parameter
+param_guide = [ #parameter  #default #get function
+        [ 'gen_mmgrid', True, config.getboolean],
+        [ 'mmgrid_rays', 10, config.getint],
+        [ 'step2setup', False, config.getboolean]
+        ]
+
+param_list = list()
+
+for param in param_guide:
+    try:
+        # Try to read from r2s.cfg
+        # Note that param[2] is a function
+        param_list.append( param[2]('r2s-params', param[0]) )
+    except ConfigParser.NoOptionError:
+        # Use default
+        param_list.append( param[1])
+
+(gen_mmgrid, mmgrid_rays, opt_step2setup) = param_list
+
 
 
 ###########################
@@ -95,14 +115,6 @@ mmgrid.load_geom(mcnp_geom)
 
 # Do ray tracing to create macromaterials, if enabled.
 if gen_mmgrid:
-    mmgrid_rays = 10
-    if config.has_section('r2s-params') and config.has_option( \
-            'r2s-params','mmgrid_rays'):
-        mmgrid_rays = int(config.get('r2s-params','mmgrid_rays'))
-    else:
-        print "No 'mmgrid_rays' parameter in the 'r2s-params' section, " \
-                "using default."
-
     print "Will use {0} rays per mesh row".format(mmgrid_rays)
 
     grid = mmgrid.mmGrid( smesh )
