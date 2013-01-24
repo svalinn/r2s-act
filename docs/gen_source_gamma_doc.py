@@ -73,7 +73,7 @@ def gen_method(line, fr, fw):
     """Parse a subroutine and create python method
     """
     name = line.split()[1]
-    print '  gen for method...', name
+    print '  generated definition for method...', name
 
     while line.strip()[-1] == '&':
         if line[0] in comchar:
@@ -86,7 +86,7 @@ def gen_method(line, fr, fw):
     comments = list()
 
     line = fr.readline()
-    while line.strip()[0] in comchar:
+    while line.strip() and line.strip()[0] in comchar:
         comments.append(line)
         line = fr.readline()
 

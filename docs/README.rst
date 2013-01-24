@@ -9,12 +9,13 @@ Run `make gh-pages` in the base level of the repository (not in `docs/`).
 This will automatically switch to `gh-pages`,
 pull the latest documentation source from `master`, rebuild, and push to Github.
 
-To rebuild documentation without updating Github, run `docs/rebuild.sh` in top level of the repo. (`make html` doesn't grab docstrings)
+To rebuild documentation without updating Github, run `make html` in top level of the repo. This can be re-run as errors.  The created files can be deleted with `make clean`, but git will ignore the files regardless.
 
 A few other notes:
 
 - Some extensions for sphinx (numpydoc in particular) are used. These are stored in `docs/_sphinxext`
 - sphinx-apidoc grabs the docstrings from scripts in r2s/ and r2s/io/
+  - the `docs/rebuild.sh` script handles the calls to sphinx-apidoc
 - numpydoc is used, which enables docstring formatting with section headings
   - valid section headings are Parameters, Returns, Notes, See Also, Examples, References
   - For further guidance on the proper doc-string format, see:
@@ -26,5 +27,5 @@ A few other notes:
   - Since the documentation location varies, and we are using sphinx-apidoc
     various changes were made to the Makefile. Future additions may require
     some trial and error...
-
+- docstrings for Fortran code are created with the `docs/gen_source_gamma_doc.py` script, which creates a fake Python script which sphinx-apidoc grabs docstrings from.
 
