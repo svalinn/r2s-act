@@ -116,8 +116,14 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
     print "The total photon source strength of the model is {0:03e} photons/s. " \
             "This is stored in the PHTN_SRC_TOTAL tag".format(sumvoxelstrengths)
 
-    # This is command line call is useful for tracking sumvoxelstrengths
-    os.system("echo {0:03e} >> phtn_src_totals".format(sumvoxelstrengths))
+    # Create 'phtn_src_totals' file with label of cooling time and isotope
+    problemstring = ""
+    if 'coolingstep' in kwargs:
+        problemstring += " Cooling time: {0}".format(kwargs['coolingstep'])
+    if 'isotope' in kwargs:
+        problemstring += " Source isotope: {0}".format(kwargs['isotope'])
+    os.system("echo {0:03e} {1} >> phtn_src_total".format(sumvoxelstrengths, \
+            problemstring))
     
     # norm is the average volumetric source strength (phtns/s/cm3)
     try:

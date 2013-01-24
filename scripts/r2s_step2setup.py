@@ -272,16 +272,24 @@ def gen_run_script(path_list):
     
     thisdir = os.curdir
     scriptdir = os.path.dirname(os.path.abspath(__file__))
-    scriptpath = os.path.join(scriptdir + "r2s_step2.py")
-    with open(os.path.join(thisdir, "r2s_run_all_step2.py"), 'w') as fw:
-        fw.write("#! /usr/env/bin python\n\n")
+    scriptpath = os.path.join(scriptdir, "r2s_step2.py")
+    with open(os.path.join(thisdir, "r2s_run_all_step2.sh"), 'w') as fw:
+        #fw.write("#! /usr/env/bin python\n\n")
+        fw.write("rm phtn_src_totals\n")
         for path in path_list:
             fw.write("cd {0}\n".format(path))
+            fw.write("rm phtn_src_total\n")
             fw.write(scriptpath + '\n')
+            fw.write("cat phtn_src_total >> ../phtn_src_totals\n")
             fw.write("cd ..\n")
+        
+        fw.write("echo Total photon strength in problem [phtn/s]:\n")
+        fw.write("echo Note: these numbers are also in file 'phtn_src_totals'\n")
+        fw.write("cat phtn_src_totals\n")
 
     os.system("chmod +x {0}".format( \
-            os.path.join(thisdir, "r2s_run_all_step2.py")))
+            os.path.join(thisdir, "r2s_run_all_step2.sh")))
+
 
 if __name__ == "__main__":
     
@@ -297,7 +305,7 @@ if __name__ == "__main__":
         path_list = make_folders(iso_list, cool_list)
         create_new_files(path_list, datafile, cfgfile, mcnp_n_problem, \
                 mcnp_p_problem, phtn_src)
-        gen_run_script(path_list)
+        gen_run_script([x[0] for x in path_list])
 
     except Exception as e:
         print "ERROR: {0}\n(in r2s.cfg file {1})".format( e, \
