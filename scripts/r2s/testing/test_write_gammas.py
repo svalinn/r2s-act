@@ -162,7 +162,7 @@ class TestWriteGammas_Correct(unittest.TestCase):
         write_gammas.gen_gammas_file_from_h5m(self.sm, outfile, cumulative=True)
         self.compare_gammas(outfile, gammas7)
     
-    def test_vow_cum_bias(self):
+    def test_vox_cum_bias(self):
         """Verify gammas file for voxel sampling with cumulative bins and biasing"""
         self.meshfile = meshfile_g
         self.sm = ScdMesh.fromFile(self.meshfile)
