@@ -7,6 +7,7 @@ from r2s.io import write_gammas
 from r2s.scdmesh import ScdMesh, ScdMeshError
 from itaps import iMesh, iBase
 
+
 thisdir = os.path.dirname(__file__)
 inputfile = os.path.join(thisdir, "sb3_phtn_src")
 meshfile_orig = os.path.join(thisdir, "h5m_files/matFracsSCD3x3x3.h5m")
@@ -26,6 +27,7 @@ gammas7 = os.path.join(thisdir, "files_test_write_gammas/gammas_voxel_cum")
 gammas8 = os.path.join(thisdir, "files_test_write_gammas/gammas_voxel_cum_bias")
 
 totalsfile = os.path.join(os.getcwd(), "phtn_src_totals")
+
 
 class TestCalcVolumes(unittest.TestCase):
 
@@ -88,7 +90,9 @@ class TestWriteGammas_Runs(unittest.TestCase):
 
 class TestWriteGammas_Correct(unittest.TestCase):
     # Tests in this class are done with 1x3x1 geometry. Resulting gammas files
-    #  are compared for discrepancies.
+    #  are compared for discrepancies.  These tests are focused on getting the
+    #  non-header contents correct.  (e.g. we do not test all of the individual
+    #  parameters)
 
     def setUp(self):
         pass
@@ -98,7 +102,7 @@ class TestWriteGammas_Correct(unittest.TestCase):
         os.system("rm " + totalsfile)
 
     def compare_gammas(self, myoutfile, mygammas):
-        """Method does comparisons of two files.
+        """Method does comparisons of two 'gammas' files.
         """
         fw1 = open(myoutfile, 'r')
         fw2 = open(mygammas, 'r')

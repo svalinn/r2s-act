@@ -20,7 +20,8 @@ from r2s.scdmesh import ScdMesh, ScdMeshError
 
 
 def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
-        do_bias=False, cumulative=False, cust_ergbins=False, **kwargs):
+        do_bias=False, cumulative=False, cust_ergbins=False, \
+        resample=False, uni_resamp_all=False, **kwargs):
     """Generate gammas file using information from tags on a MOAB mesh.
     
     Method reads tags with photon source strengths from a structured mesh object
@@ -40,6 +41,14 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
         Use the cumulative format for listing energy PDFs of each voxel
     cust_ergbins : boolean, optional
         Attempt to use custom energy bins found on 'sm'
+    resample : boolean, optional
+        If true, 'r' flag is added to gammas, and resampling of particles 
+        starting in void regions of voxels is enabled.
+    uni_resamp_all : boolean, optional
+        If true, 'a' flag is added to gammas, and particles starting in void
+        regions of voxels, during uniform sampling, are resampled over the
+        entire problem, rather than resampling just the voxel.  This has the
+        potential to result in an unfair game.
     keyword arguments::
         Currently valid: {'title', 'isotope', 'coolingstep'} 
         These are passed to header creation code.
@@ -152,7 +161,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
     # The header of the gammas file is created in outfile, and the file writing
     #  stream is returned to fw
     fw = _gen_gammas_header(sm, outfile, sampling, myergbins, have_bias_info, \
-            cumulative, **kwargs)
+            cumulative, resample, uni_resamp_all, **kwargs)
 
     for cnt, voxel in enumerate(voxels):
         sourcetotal = 0
@@ -209,7 +218,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
 
 
 def _gen_gammas_header(sm, outfile, sampling, ergbins, biasing, cumulative, \
-        **kwargs):
+        resample, uni_resamp_all, **kwargs):
     """Open a stream to write the header information for a gammas file
     
     Method writes the header lines for gammas file, and method
@@ -230,6 +239,14 @@ def _gen_gammas_header(sm, outfile, sampling, ergbins, biasing, cumulative, \
         Flag for biasing is added if true.
     cumulative : boolean
         Flag for listing cumulative erg probabilities is added if true.
+    resample : boolean
+        If true, 'r' flag is added to gammas, and resampling of particles 
+        starting in void regions of voxels is enabled.
+    uni_resamp_all : boolean
+        If true, 'a' flag is added to gammas, and particles starting in void
+        regions of voxels, during uniform sampling, are resampled over the
+        entire problem, rather than resampling just the voxel.  This has the
+        potential to result in an unfair game.
 
     Returns
     ---------
@@ -270,6 +287,8 @@ def _gen_gammas_header(sm, outfile, sampling, ergbins, biasing, cumulative, \
     #paramline = paramline + "d " # enable source debug
     #paramline = paramline + "m "
     if cumulative: paramline = paramline + "c "
+    if resample: paramline = paramline + "r "
+    if uni_resamp_all: paramline = paramline + "a "
     fw.write(paramline + "\n")
 
     # If storing the energy bins information, write line 6
@@ -287,7 +306,7 @@ def calc_volumes_list(sm):
     
     Parameters
     ----------
-    sm : scdmesh.ScdMesh
+    sm : ScdMesh object
         A structured mesh object from which to calculate volumes.
 
     Returns
@@ -326,9 +345,7 @@ def calc_volumes_list(sm):
             for cntz, z in enumerate(meshplanes[2][1:]):
                 # Calc volume here
                 vols[nydiv*nzdiv*cntx + nzdiv*cnty + cntz] = \
-                        (x - oldx) * \
-                        (y - oldy) * \
-                        (z - oldz)
+                        (x - oldx) * (y - oldy) * (z - oldz)
                 oldz = z
             oldy = y
         oldx = x
@@ -377,7 +394,6 @@ def main():
     return 1
 
 
-# Handles module being called as a script.
 if __name__=='__main__':
     main()
 

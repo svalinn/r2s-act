@@ -10,6 +10,7 @@ import contextlib
 
 import r2s_step2 as s2
 
+
 class TestLoadConfigFiles(unittest.TestCase):
     #
 
@@ -77,7 +78,7 @@ class TestLoadConfigParams(unittest.TestCase):
             config = ConfigParser.SafeConfigParser()
             config.read(myNTF.name)
 
-            (opt_isotope, opt_cooling, opt_sampling, opt_ergs, opt_bias, opt_cumulative, opt_phtnfmesh) = \
+            (opt_isotope, opt_cooling, opt_sampling, opt_ergs, opt_bias, opt_cumulative, opt_phtnfmesh, resample, uni_resamp_all) = \
                     s2.load_config_params(config)
             # Check for correctness
             self.assertEqual(opt_isotope, 'u235')
@@ -87,6 +88,8 @@ class TestLoadConfigParams(unittest.TestCase):
             self.assertTrue(opt_bias)
             self.assertTrue(opt_cumulative)
             self.assertFalse(opt_phtnfmesh)
+            self.assertFalse(resample)
+            self.assertFalse(uni_resamp_all)
 
     def test_load_config_params_badisotope(self):
         """Simulate a .cfg file and check that multiple isotopes in r2s.cfg
@@ -155,21 +158,24 @@ class TestHandlePhtnData(unittest.TestCase):
         """
         with NTF() as gammaNTF:
             s2.handle_phtn_data(self.meshfile_new, self.phtnfile, 'TOTAL', 
-                    'shutdown', 'v', False, False, False, gammas=gammaNTF.name)
+                    'shutdown', 'v', False, False, False, False, False,
+                    gammas=gammaNTF.name)
 
     def test_handle_phtn_data_string_cooling2(self):
         """Tests handling of phtn_src file with string cooling step
         """
         with NTF() as gammaNTF:
             s2.handle_phtn_data(self.meshfile_new, self.phtnfile, 'TOTAL', 
-                    '1 d', 'v', False, False, False, gammas=gammaNTF.name)
+                    '1 d', 'v', False, False, False, False, False,
+                    gammas=gammaNTF.name)
 
     def test_handle_phtn_data_integer_cooling(self):
         """Tests handling of phtn_src file with numeric cooling step
         """
         with NTF() as gammaNTF:
             s2.handle_phtn_data(self.meshfile_new, self.phtnfile, 'TOTAL', '1',
-                    'v', False, False, False, gammas=gammaNTF.name)
+                    'v', False, False, False, False, False,
+                    gammas=gammaNTF.name)
 
 
 class TestGenMCNPP(unittest.TestCase):

@@ -53,7 +53,7 @@ def load_config_params(config):
     -------
     A list of the following values taken from the .cfg file:
     opt_isotope, opt_cooling, opt_sampling, opt_ergs, opt_bias, 
-    opt_cumulative, opt_phtnfmesh
+    opt_cumulative, opt_phtnfmesh, resampling, uni_resamp_all
     """
 
     # This list stores (1) parameter names as listed in r2s.cfg; 
@@ -65,7 +65,9 @@ def load_config_params(config):
             [ 'custom_ergbins', False,   config.getboolean],
             [ 'photon_bias'   , False,   config.getboolean],
             [ 'cumulative'    , False,   config.getboolean],
-            [ 'add_fmesh_card', True,    config.getboolean]
+            [ 'add_fmesh_card', True,    config.getboolean],
+            [ 'resampling'    , False,   config.getboolean],
+            [ 'uni_resamp_all', False,   config.getboolean]
             ] 
 
     param_list = list()
@@ -80,7 +82,8 @@ def load_config_params(config):
             param_list.append( param[1])
 
     (opt_isotope, opt_cooling, opt_sampling, opt_ergs, opt_bias, \
-            opt_cumulative, opt_phtnfmesh) = param_list
+            opt_cumulative, opt_phtnfmesh, resampling, uni_resamp_all \
+            ) = param_list
 
     # Check for multiple comma delimited values; raise error if this is found
     if len(opt_isotope.split(",")) != 1:
@@ -91,13 +94,14 @@ def load_config_params(config):
         raise Exception ("r2s.cfg entry 'photon_cooling' contains " \
                 "multiple values. r2s_step2.py only uses a single value.")
 
-    return (opt_isotope, opt_cooling, opt_sampling, opt_ergs, opt_bias, opt_cumulative, opt_phtnfmesh)
+    return (opt_isotope, opt_cooling, opt_sampling, opt_ergs, opt_bias, opt_cumulative, opt_phtnfmesh, resampling, uni_resamp_all)
 
 
 ###########################
 # Do step 2
 def handle_phtn_data(datafile, phtn_src, opt_isotope, opt_cooling,  \
-        opt_sampling, opt_bias, opt_cumulative, cust_ergbins, gammas="gammas"):
+        opt_sampling, opt_bias, opt_cumulative, cust_ergbins, 
+        resample, uni_resamp_all, gammas="gammas"):
     """Loads phtn_src data, tags this to mesh, and generates 'gammas' file.
 
     Parameters
@@ -120,6 +124,14 @@ def handle_phtn_data(datafile, phtn_src, opt_isotope, opt_cooling,  \
     cust_ergbins : boolean
         If true, look for custom energy bins on the mesh and include them in
         'gammas'
+    resample : boolean
+        If true, 'r' flag is added to gammas, and resampling of particles 
+        starting in void regions of voxels is enabled.
+    uni_resamp_all : boolean
+        If true, 'a' flag is added to gammas, and particles starting in void
+        regions of voxels, during uniform sampling, are resampled over the
+        entire problem, rather than resampling just the voxel.  This has the
+        potential to result in an unfair game.
     gammas : string (optional)
         File name for 'gammas' file. Defaults to 'gammas'.
 
@@ -150,7 +162,8 @@ def handle_phtn_data(datafile, phtn_src, opt_isotope, opt_cooling,  \
     write_gammas.gen_gammas_file_from_h5m(smesh, outfile=gammas, \
             sampling=opt_sampling, do_bias=opt_bias, \
             cumulative=opt_cumulative, cust_ergbins=cust_ergbins, \
-            coolingstep=coolingstepstring, isotope=opt_isotope)
+            coolingstep=coolingstepstring, isotope=opt_isotope, \
+            resample=resample, uni_resamp_all=uni_resamp_all)
 
     return smesh
 
@@ -206,10 +219,11 @@ if __name__ == "__main__":
     try:
         (datafile, phtn_src, mcnp_n_problem, mcnp_p_problem) = load_config_files(config)
 
-        (opt_isotope, opt_cooling, opt_sampling, opt_ergs, opt_bias, opt_cumulative, opt_phtnfmesh) = load_config_params(config)
+        (opt_isotope, opt_cooling, opt_sampling, opt_ergs, opt_bias, opt_cumulative, opt_phtnfmesh, resampling, uni_resamp_all) = load_config_params(config)
 
         smesh = handle_phtn_data(datafile, phtn_src, opt_isotope, opt_cooling, \
-                opt_sampling, opt_bias, opt_cumulative, opt_ergs)
+                opt_sampling, opt_bias, opt_cumulative, opt_ergs, resampling, \
+                uni_resamp_all)
 
         gen_mcnp_p(smesh, mcnp_p_problem, mcnp_n_problem, opt_phtnfmesh)
 
