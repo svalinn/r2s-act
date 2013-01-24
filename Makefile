@@ -5,7 +5,7 @@
 # Makefile for Sphinx documentation
 #
 
-GH_PAGES_SOURCES = Makefile docs/_themes docs/_sphinxext docs/index.rst docs/conf.py docs/rebuild.sh docs/r2s-userguide.rst scripts/r2s/*.py scripts/r2s/io/*.py
+GH_PAGES_SOURCES = Makefile docs/_themes docs/_sphinxext docs/index.rst docs/conf.py docs/rebuild.sh docs/r2s-userguide.rst scripts/r2s/*.py scripts/r2s/io/*.py docs/gen_source_gamma_doc.py mcnp_source/*.F90
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
@@ -68,13 +68,36 @@ gh-pages:
 	mv -fv docs/_build/html/* .
 	rm -rf $(GH_PAGES_SOURCES)
 	rm -rf doc/_build doc/r2s
-	rm -rf scripts/r2s/*.py scripts/r2s/io/*.py
+	rm -rf scripts/r2s/*.py scripts/r2s/io/*.py mcnp_source/*.F90
 	# Empty docs directory but preserve .gitignore
 	mv docs/.gitignore stashed.gitignore ; rm -rf docs/* ; mv stashed.gitignore docs/.gitignore
 	echo nojekyll > .nojekyll
 	git add --all
 	# Commit and push gh-pages, and switch back to master
 	git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages
+	git checkout master
+
+gh-preview:
+	git checkout gh-pages
+	# Clean out _build from docs/
+	rm -rf docs/_build 
+	# Clean out contents of _build/html/ from repo root.
+	rm -rf _sources _static r2s
+	git checkout master $(GH_PAGES_SOURCES)
+	git reset HEAD
+	$(SPHINXAPIDOC)
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	mv -fv docs/_build/html/* .
+	rm -rf $(GH_PAGES_SOURCES)
+	rm -rf doc/_build doc/r2s
+	rm -rf scripts/r2s/*.py scripts/r2s/io/*.py mcnp_source/*.F90
+	# Empty docs directory but preserve .gitignore
+	mv docs/.gitignore stashed.gitignore ; rm -rf docs/* ; mv stashed.gitignore docs/.gitignore
+
+gh-revert:
+	git checkout gh-pages
+	git checkout -f --
+	rm -rf $(GH_PAGES_SOURCES) build
 	git checkout master
 
 dirhtml:
