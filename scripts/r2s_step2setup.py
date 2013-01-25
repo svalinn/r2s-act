@@ -11,6 +11,9 @@ from shutil import copy
 from r2s_setup import get_input_file
 
 
+class R2S_CFG_Error(Exception):
+    pass
+
 def load_configs(cfgfile):
     """Read needed information from .cfg file.
 
@@ -36,13 +39,13 @@ def load_configs(cfgfile):
         datafile = config.get('r2s-files','step1_datafile')
         phtn_src = config.get('r2s-files', 'alara_phtn_src')
     else:
-        raise Exception("'r2s-files' section required in your config file.")
+        raise R2S_CFG_Error("'r2s-files' section required in your config file.")
 
     if config.has_section('r2s-params'):
         opt_isotope = config.get('r2s-params','photon_isotope')
         opt_cooling = config.get('r2s-params','photon_cooling')
     else:
-        raise Exception("'r2s-params' section required in your config file.")
+        raise R2S_CFG_Error("'r2s-params' section required in your config file.")
 
     return (mcnp_n_problem, mcnp_p_problem, datafile, phtn_src, opt_isotope, \
             opt_cooling)
@@ -73,31 +76,59 @@ def gen_iso_cool_lists(opt_isotope, opt_cooling, phtn_src):
     """
     #defaults
     iso_list = ['TOTAL']
-    cool_list = ['shutdown', '1 d']
+    cool_list = ['shutdown']
 
     # Parse isotopes
     iso_list = [x.strip() for x in opt_isotope.split(',')]
-    print "Isotopes found:", iso_list
+    print "Isotopes given:", iso_list
     # Parse cooling times
     cool_list = [x.strip() for x in opt_cooling.split(',')]
-    print "Cooling times found:", cool_list
+    print "Cooling times given:", cool_list
 
-    # 
-    list_cool_needed = list()
+    # If given list of integers, get the cooling steps from phtn_src file
     try:
         list_cool_needed = [int(time) for time in cool_list]
-        # If given list of integers, get the cooling steps from phtn_src file
         list_cool_needed.sort()
         with open(phtn_src, 'r') as fr:
             linecnt = -1
+            isotope = ""
+            firstisotope = ""
             for list_idx, time_idx in enumerate(list_cool_needed):
                 while linecnt < time_idx:
                     line = fr.readline()
+                    if linecnt == -1:
+                        firstisotope = line.split("\t")[0].strip()
+                    isotope = line.split("\t")[0].strip()
+                    if isotope != firstisotope:
+                        raise R2S_CFG_Error("Fewer than {0} cooling steps are in " \
+                                "{1}".format(time_idx, phtn_src))
                     linecnt += 1
                 # replace integers in cool_list with cooling step names
                 cool_list[list_idx] = (line.split("\t")[1]).strip()
     except ValueError:
-        pass # We assume all entries are valid strings for cooling times
+        if isinstance(cool_list[0], basestring):
+            # Get all cooling steps in phtn_src
+            with open(phtn_src, 'r') as fr:
+                lineparts = fr.readline().split("\t")
+                all_cool_list = list()
+                isotope = lineparts[0]
+                while isotope == lineparts[0]:
+                    all_cool_list.append(lineparts[1].strip())
+                    lineparts = fr.readline().split("\t")
+                
+            # If opt_cooling starts off with 'all'
+            if cool_list[0].lower() == 'all':
+                cool_list = all_cool_list
+                print "In {0}, 'all' cooling times corresponds with: ".format( \
+                        phtn_src) + ", ".join(cool_list)
+            else:  # Else check that all supplied cooling times are valid
+                for cooling_time in cool_list:
+                    if cooling_time not in all_cool_list:
+                        raise R2S_CFG_Error("Cooling time {0} is not found in {1}" \
+                                "".format(cooling_time, phtn_src))
+        else:
+            raise R2S_CFG_Error("'photon_cooling' in r2s.cfg file appears to " \
+                    "have a mix of strings and integer values.")
 
     return iso_list, cool_list
 

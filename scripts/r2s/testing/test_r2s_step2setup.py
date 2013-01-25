@@ -8,6 +8,7 @@ from shutil import rmtree
 import contextlib
 
 import r2s_step2setup as s2s
+from r2s_step2setup import R2S_CFG_Error
 
 
 class TestLoadConfigs(unittest.TestCase):
@@ -49,31 +50,50 @@ class TestLoadConfigs(unittest.TestCase):
 class TestGenIsoCoolLists(unittest.TestCase):
 
     def setUp(self):
-        pass
+        self.NTFcontents = ("a\tshutdown\n" \
+                    "a\t1_d\n" \
+                    "a\t2 w\n" \
+                    "a\t99 y\n" \
+                    "a\twhoops\n" \
+                    "a\ttoo far\n" \
+                    "b\t1_d\n"
+                    )
     
     def tearDown(self):
         pass
 
-    def test_gen_iso_cool_lists(self):
+    def test_gen_iso_cool_lists1(self):
         """Test parsing of non-numeric entries in isotopes and cooling input.
         Varied spacing is intentional.
         """
         isolistraw = "a, b, c,d"
-        coollistraw = "x, y,z,1 z"
+        coollistraw = "1,2,   3, 4"#"x, y,z,1 z"
         
-        isolist, coollist = s2s.gen_iso_cool_lists(isolistraw, coollistraw, "")
+        # Create placeholder for phtn_src file
+        with NTF() as myNTF: 
+            myNTF.write(self.NTFcontents)
+            myNTF.seek(0) # Goes to beginning
+            isolist, coollist = s2s.gen_iso_cool_lists(isolistraw, \
+                coollistraw, myNTF.name)
+
         self.assertEqual(isolist, ["a", "b", "c", "d"])
-        self.assertEqual(coollist, ["x", "y", "z", "1 z"])
+        self.assertEqual(coollist, ["1_d", "2 w", "99 y", "whoops"])
 
     def test_gen_iso_cool_lists2(self):
-        """Test parsing of leading numeric entries cooling input being treated as strings.
+        """Test that string cooling steps are correctly accepted
         """
         isolistraw = "a, b, c,d"
-        coollistraw = "1, 2, 3, 1 z"
+        coollistraw = "1_d, 99 y"
         
-        isolist, coollist = s2s.gen_iso_cool_lists(isolistraw, coollistraw, "")
+        # Create placeholder for phtn_src file
+        with NTF() as myNTF: 
+            myNTF.write(self.NTFcontents)
+            myNTF.seek(0) # Goes to beginning
+            isolist, coollist = s2s.gen_iso_cool_lists(isolistraw, \
+                coollistraw, myNTF.name)
+
         self.assertEqual(isolist, ["a", "b", "c", "d"])
-        self.assertEqual(coollist, ["1", "2", "3", "1 z"])
+        self.assertEqual(coollist, ["1_d", "99 y"])
 
     def test_gen_iso_cool_lists3(self):
         """Test getting string cooling times from phtn_src file.
@@ -83,20 +103,13 @@ class TestGenIsoCoolLists(unittest.TestCase):
 
         # Create placeholder for phtn_src file
         with NTF() as myNTF: 
-            myNTF.write("a\tshutdown\n" \
-                    "a\t1_d\n" \
-                    "a\t2 w\n" \
-                    "a\t99 y\n" \
-                    "a\twhoops\n" \
-                    "a\ttoo far\n" \
-                    )
+            myNTF.write(self.NTFcontents)
             myNTF.seek(0) # Goes to beginning
             isolist, coollist = s2s.gen_iso_cool_lists(isolistraw, \
                 coollistraw, myNTF.name)
 
         self.assertEqual(isolist, ["a", "b", "c", "d"])
         self.assertEqual(coollist, ["shutdown", "1_d", "2 w", "99 y"])
-
 
     def test_gen_iso_cool_lists4(self):
         """Test getting string cooling times from phtn_src file w/out of order cooling numbers.
@@ -106,19 +119,56 @@ class TestGenIsoCoolLists(unittest.TestCase):
 
         # Create placeholder for phtn_src file
         with NTF() as myNTF:
-            myNTF.write("a\tshutdown\n" \
-                    "a\t1_d\n" \
-                    "a\t2 w\n" \
-                    "a\t99 y\n" \
-                    "a\twhoops\n" \
-                    "a\ttoo far\n" \
-                    )
+            myNTF.write(self.NTFcontents)
             myNTF.seek(0) # Goes to beginning
             isolist, coollist = s2s.gen_iso_cool_lists(isolistraw, \
                 coollistraw, myNTF.name)
 
         self.assertEqual(isolist, ["a", "b", "c", "d"])
         self.assertEqual(coollist, ["shutdown", "1_d", "2 w", "99 y"])
+
+    def test_gen_iso_cool_lists5(self):
+        """Tests that exception is raised when cooling indices go too high.
+        """
+        isolistraw = "a, b, c,d"
+        coollistraw = "1, 2, 3, 14"
+        
+        # Create placeholder for phtn_src file
+        with NTF() as myNTF: 
+            myNTF.write(self.NTFcontents)
+            myNTF.seek(0) # Goes to beginning
+            self.assertRaises(R2S_CFG_Error, s2s.gen_iso_cool_lists, \
+                    isolistraw, coollistraw, myNTF.name)
+
+    def test_gen_iso_cool_lists6(self):
+        """Test that exception is raised if cooling steps not found in phnt_src
+        """
+        isolistraw = "a, b, c,d"
+        coollistraw = "1_d, 99_y, never"
+        
+        # Create placeholder for phtn_src file
+        with NTF() as myNTF: 
+            myNTF.write(self.NTFcontents)
+            myNTF.seek(0) # Goes to beginning
+            self.assertRaises(R2S_CFG_Error, s2s.gen_iso_cool_lists, \
+                    isolistraw, coollistraw, myNTF.name)
+
+    def test_gen_iso_cool_lists7(self):
+        """Test that 'all' results in all cooling steps being grabbed.
+        """
+        isolistraw = "a, b, c, d"
+        coollistraw = "all"
+
+        # Create placeholder for phtn_src file
+        with NTF() as myNTF: 
+            myNTF.write(self.NTFcontents)
+            myNTF.seek(0) # Goes to beginning
+            isolist, coollist = s2s.gen_iso_cool_lists(isolistraw, \
+                coollistraw, myNTF.name)
+
+        self.assertEqual(isolist, ["a", "b", "c", "d"])
+        self.assertEqual(coollist, ["shutdown", "1_d", "2 w", "99 y", \
+                "whoops", "too far"])
 
 
 class TestMakeFolders(unittest.TestCase):
