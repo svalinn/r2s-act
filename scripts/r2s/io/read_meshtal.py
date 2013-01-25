@@ -134,7 +134,7 @@ def find_mesh_bounds(meshtal,tally_line) :
 
     Parameters
     ----------
-    meshtal : string
+    meshtal : stringf
         File path to meshtal file.
     tally_line : int
         Line number in file where tally begins
