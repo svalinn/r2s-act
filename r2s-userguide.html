@@ -64,14 +64,6 @@
              accesskey="N">next</a>
           </li>
         <li class="menu-item" >
-          <a href="np-modindex.html" title="Python Module Index"
-             >modules</a>
-          </li>
-        <li class="menu-item" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a>
-          </li>
-        <li class="menu-item" >
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a>
           </li> 
@@ -697,7 +689,7 @@ Default=False</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name" colspan="2">Other Instructions:</th></tr>
-<tr><td>&nbsp;</td><td class="field-body"><p class="first">This script also reads metadata that can be specified in the MCNP input file and prints this same metadata to the ALARA matlib file. This metadata must appear in the lines directly above the material definition in the form &#8220;C X:Y&#8221; or &#8220;c X:Y&#8221; where X is &#8220;name&#8221;, &#8220;source&#8221;, or &#8220;comments&#8221;, and Y is the corresponding metadata. The &#8220;name&#8221; and &#8220;source&#8221; metadata must appear on a single line. The &#8220;comment&#8221; metadata can span any arbitrary number of lines, each new line starting with &#8220;C&#8221; or &#8220;c&#8221;. Any or all of the 3 metadata flags can be used, but there must be no blank lines between metadata lines (i.e. no lines that contain only &#8220;C&#8221; or &#8220;c&#8221;).
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first">This script also reads metadata that can be specified in the MCNP input file and prints this same metadata to the ALARA matlib file. This metadata must appear in the lines directly above the material definition in the form &#8220;C X:Y&#8221; or &#8220;c X:Y&#8221; where X is &#8220;name&#8221;, &#8220;source&#8221;, or &#8220;comments&#8221;, and Y is the corresponding metadata. The &#8220;name&#8221; and &#8220;source&#8221; metadata must appear on a single line. The &#8220;comment&#8221; metadata can span any arbitrary number of lines, each new line starting with &#8220;C&#8221; or &#8220;c&#8221;. Any or all of the 3 metadata flags can be used, but there must be no blank lines between metadata lines (i.e. no lines that contain only &#8220;C&#8221; or &#8220;c&#8221;).
 In the resulting matlib file metadata will be in the form &#8220;# X:Y&#8221;. In additional entry will appear in the form &#8220;mat number: X&#8221; where X is the material number in the MCNP input. The name of the material in the matlib is the same as the &#8220;name&#8221; metadata. For materials with multiple densities, if &#8220;name&#8221; is present every material will have the same name. For this reason it is not advisable to specify &#8220;name&#8221; metadata for multidensity materials. If the &#8220;name&#8221; metadata does not appear, the material will be named in the form &#8220;matX_rho-Y&#8221; where X is the MCNP material number and Y is the mass density associated with the material. Note that even when atom density is specifed in the cell card the mass density is printed.</p>
 </td>
 </tr>
@@ -829,7 +821,7 @@ In the resulting matlib file metadata will be in the form &#8220;# X:Y&#8221;. I
         &copy; Copyright 2013, CNERG.
       </p>
       <p>
-      Last updated on Jan 24, 2013.
+      Last updated on Jan 25, 2013.
       </p>
       <p>
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
