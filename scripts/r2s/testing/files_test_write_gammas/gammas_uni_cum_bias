@@ -1,4 +1,8 @@
-# File created: 01/14/13 12:52; Cooling time: shutdown; Source isotope: TOTAL;
+# File created: 01/25/13 14:11; Cooling time: shutdown; Source isotope: TOTAL;
+# WARNING: the following parameters should not be changed manually
+# since they depend/affect the format of this file:
+# Don't add/remove: p, u, v, c
+# Special case: the bias flag (b) can be removed, but not added
 1 3 1
 -8.0 8.0
 -20.0 -5.0 5.0 20.0

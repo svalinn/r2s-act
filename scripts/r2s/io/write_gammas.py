@@ -271,6 +271,12 @@ def _gen_gammas_header(sm, outfile, sampling, ergbins, biasing, cumulative, \
     if 'isotope' in kwargs:
         fw.write(" Source isotope: {0};".format(kwargs['isotope']))
     fw.write("\n")
+
+    # write warning comment regarding changing parameters
+    fw.write("# WARNING: the following parameters should not be changed " \
+            "manually\n# since they depend/affect the format of this file:\n" \
+            "# Don't add/remove: p, u, v, c\n" \
+            "# Special case: the bias flag (b) can be removed, but not added\n")
     
     # write number of intervals for x, y, z dimensions (1st line)
     extents = [sm.dims[3], sm.dims[4], sm.dims[5]]
