@@ -5,7 +5,7 @@
 # Makefile for Sphinx documentation
 #
 
-GH_PAGES_SOURCES = Makefile docs/_themes docs/_sphinxext docs/index.rst docs/conf.py docs/rebuild.sh docs/r2s-userguide.rst scripts/r2s/*.py scripts/r2s/io/*.py docs/gen_source_gamma_doc.py mcnp_source/*.F90
+GH_PAGES_SOURCES = docs/_themes docs/_sphinxext docs/index.rst docs/conf.py docs/rebuild.sh docs/r2s-userguide.rst scripts/r2s/*.py scripts/r2s/io/*.py docs/gen_source_gamma_doc.py mcnp_source/*.F90
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
@@ -27,6 +27,7 @@ help:
 	@echo "Please use \`make <target>' where <target> is one of"
 	@echo "  html       to make standalone HTML files via sphinx + sphinx-apidoc"
 	@echo "  gh-pages   to make standalone HTML files and push these to gh-pages branch on GitHub."
+	@echo "  gh-preview to make standalone HTML files in gh-pages branch, but not push to GitHub."
 	@echo "  dirhtml    to make HTML files named index.html in directories"
 	@echo "  singlehtml to make a single large HTML file"
 	@echo "  pickle     to make pickle files"
