@@ -21,7 +21,7 @@ ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) doc
 # the i18n builder cannot share the environment and doctrees with the others
 I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-.PHONY: help gh-pages clean html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest gettext
+.PHONY: help gh-pages gh-preview clean html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest gettext
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -93,12 +93,7 @@ gh-preview:
 	rm -rf scripts/r2s/*.py scripts/r2s/io/*.py mcnp_source/*.F90
 	# Empty docs directory but preserve .gitignore
 	mv docs/.gitignore stashed.gitignore ; rm -rf docs/* ; mv stashed.gitignore docs/.gitignore
-
-gh-revert:
-	git checkout gh-pages
-	git checkout -f --
-	rm -rf $(GH_PAGES_SOURCES) build
-	git checkout master
+	echo nojekyll > .nojekyll
 
 dirhtml:
 	$(SPHINXAPIDOC)
