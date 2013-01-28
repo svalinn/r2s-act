@@ -1,6 +1,14 @@
 mcnp Package
 ============
 
+:mod:`mcnp` Package
+-------------------
+
+.. automodule:: r2s.mcnp
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`source_gamma_doc` Module
 ------------------------------
 
