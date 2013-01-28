@@ -636,7 +636,8 @@ subroutine sample_within_voxel
 ! 
 ! Notes
 ! -----
-! ii, jj, kk are presumed to have been already determined.
+! ii, jj, kk are presumed to have been already determined, and have values
+! in the range [1, i_ints/j_ints/k_ints].
   use source_data
  
 !       Sample random spot within the voxel
@@ -667,7 +668,12 @@ subroutine uniform_sample
           if (k_bins(kk).le.zzz.and.zzz.lt.k_bins(kk+1)) exit
         enddo
 
-        voxel = (kk-1)+(jj-1)*k_ints+(ii-1)*j_ints*k_ints+1
+        ! ii, jj, kk are shifted into the range [1, i_ints/j_ints/k_ints].
+        ii = ii - 1
+        jj = jj - 1
+        kk = kk - 1
+
+        voxel = (kk)+(jj)*k_ints+(ii)*j_ints*k_ints + 1
 
 end subroutine uniform_sample
 
