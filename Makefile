@@ -11,6 +11,7 @@ GH_PAGES_SOURCES = docs/_themes docs/_sphinxext docs/index.rst docs/conf.py docs
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 SPHINXAPIDOC  = docs/rebuild.sh
+SPHINXAPIDOCCLEAN = rm scripts/r2s/mcnp/*
 PAPER         =
 BUILDDIR      = docs/_build
 
@@ -49,10 +50,12 @@ help:
 
 clean:
 	-rm -rf $(BUILDDIR)/*
+	rm scripts/r2s/mcnp/*
 
 html:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	$(SPHINXAPIDOCCLEAN)
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
@@ -66,6 +69,7 @@ gh-pages:
 	git reset HEAD
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	$(SPHINXAPIDOCCLEAN)
 	mv -fv docs/_build/html/* .
 	rm -rf $(GH_PAGES_SOURCES)
 	rm -rf doc/_build doc/r2s
@@ -88,6 +92,7 @@ gh-preview:
 	git reset HEAD
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	$(SPHINXAPIDOCCLEAN)
 	mv -fv docs/_build/html/* .
 	rm -rf $(GH_PAGES_SOURCES)
 	rm -rf doc/_build doc/r2s
@@ -99,30 +104,35 @@ gh-preview:
 dirhtml:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
+	$(SPHINXAPIDOCCLEAN)
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/dirhtml."
 
 singlehtml:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b singlehtml $(ALLSPHINXOPTS) $(BUILDDIR)/singlehtml
+	$(SPHINXAPIDOCCLEAN)
 	@echo
 	@echo "Build finished. The HTML page is in $(BUILDDIR)/singlehtml."
 
 pickle:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b pickle $(ALLSPHINXOPTS) $(BUILDDIR)/pickle
+	$(SPHINXAPIDOCCLEAN)
 	@echo
 	@echo "Build finished; now you can process the pickle files."
 
 json:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b json $(ALLSPHINXOPTS) $(BUILDDIR)/json
+	$(SPHINXAPIDOCCLEAN)
 	@echo
 	@echo "Build finished; now you can process the JSON files."
 
 htmlhelp:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b htmlhelp $(ALLSPHINXOPTS) $(BUILDDIR)/htmlhelp
+	$(SPHINXAPIDOCCLEAN)
 	@echo
 	@echo "Build finished; now you can run HTML Help Workshop with the" \
 	      ".hhp project file in $(BUILDDIR)/htmlhelp."
@@ -130,6 +140,7 @@ htmlhelp:
 qthelp:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b qthelp $(ALLSPHINXOPTS) $(BUILDDIR)/qthelp
+	$(SPHINXAPIDOCCLEAN)
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
@@ -140,6 +151,7 @@ qthelp:
 devhelp:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b devhelp $(ALLSPHINXOPTS) $(BUILDDIR)/devhelp
+	$(SPHINXAPIDOCCLEAN)
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
@@ -150,12 +162,14 @@ devhelp:
 epub:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b epub $(ALLSPHINXOPTS) $(BUILDDIR)/epub
+	$(SPHINXAPIDOCCLEAN)
 	@echo
 	@echo "Build finished. The epub file is in $(BUILDDIR)/epub."
 
 latex:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
+	$(SPHINXAPIDOCCLEAN)
 	@echo
 	@echo "Build finished; the LaTeX files are in $(BUILDDIR)/latex."
 	@echo "Run \`make' in that directory to run these through (pdf)latex" \
@@ -164,6 +178,7 @@ latex:
 latexpdf:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
+	$(SPHINXAPIDOCCLEAN)
 	@echo "Running LaTeX files through pdflatex..."
 	$(MAKE) -C $(BUILDDIR)/latex all-pdf
 	@echo "pdflatex finished; the PDF files are in $(BUILDDIR)/latex."
@@ -171,18 +186,21 @@ latexpdf:
 text:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b text $(ALLSPHINXOPTS) $(BUILDDIR)/text
+	$(SPHINXAPIDOCCLEAN)
 	@echo
 	@echo "Build finished. The text files are in $(BUILDDIR)/text."
 
 man:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b man $(ALLSPHINXOPTS) $(BUILDDIR)/man
+	$(SPHINXAPIDOCCLEAN)
 	@echo
 	@echo "Build finished. The manual pages are in $(BUILDDIR)/man."
 
 texinfo:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b texinfo $(ALLSPHINXOPTS) $(BUILDDIR)/texinfo
+	$(SPHINXAPIDOCCLEAN)
 	@echo
 	@echo "Build finished. The Texinfo files are in $(BUILDDIR)/texinfo."
 	@echo "Run \`make' in that directory to run these through makeinfo" \
@@ -191,6 +209,7 @@ texinfo:
 info:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b texinfo $(ALLSPHINXOPTS) $(BUILDDIR)/texinfo
+	$(SPHINXAPIDOCCLEAN)
 	@echo "Running Texinfo files through makeinfo..."
 	make -C $(BUILDDIR)/texinfo info
 	@echo "makeinfo finished; the Info files are in $(BUILDDIR)/texinfo."
@@ -198,18 +217,21 @@ info:
 gettext:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b gettext $(I18NSPHINXOPTS) $(BUILDDIR)/locale
+	$(SPHINXAPIDOCCLEAN)
 	@echo
 	@echo "Build finished. The message catalogs are in $(BUILDDIR)/locale."
 
 changes:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b changes $(ALLSPHINXOPTS) $(BUILDDIR)/changes
+	$(SPHINXAPIDOCCLEAN)
 	@echo
 	@echo "The overview file is in $(BUILDDIR)/changes."
 
 linkcheck:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b linkcheck $(ALLSPHINXOPTS) $(BUILDDIR)/linkcheck
+	$(SPHINXAPIDOCCLEAN)
 	@echo
 	@echo "Link check complete; look for any errors in the above output " \
 	      "or in $(BUILDDIR)/linkcheck/output.txt."
@@ -217,5 +239,6 @@ linkcheck:
 doctest:
 	$(SPHINXAPIDOC)
 	$(SPHINXBUILD) -b doctest $(ALLSPHINXOPTS) $(BUILDDIR)/doctest
+	$(SPHINXAPIDOCCLEAN)
 	@echo "Testing of doctests in the sources finished, look at the " \
 	      "results in $(BUILDDIR)/doctest/output.txt."
