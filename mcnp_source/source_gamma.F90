@@ -1,9 +1,10 @@
 !+ $Id: source.F90,v 1.1 2004/03/20 00:31:52 jsweezy Exp $
 ! Copyright LANL/UC/DOE - see file COPYRIGHT_INFO
 
+! 
 ! Summary
-! -------
-! Adapted from source routine (source_gamma_meshtal2.F90) provided by 
+! =======
+! Adapted from source routine (`source_gamma_meshtal2.F90`) provided by 
 ! Dieter Leichtle from KIT.
 ! Changes have been made by Eric Relson with UW-Madison/CNERG goals in mind.
 ! 
@@ -13,32 +14,39 @@
 ! (1) voxel sampling
 ! (2) uniform sampling
 ! 
-! Subroutine source reads in the file 'gammas' from the directory
-! that MCNP is being run in.  The gammas file has two parts - a header and
+! Subroutine source reads in the file `gammas` from the directory
+! that MCNP is being run in.  The `gammas` file has two parts - a header and
 ! a listing of information for each voxel.
 ! 
-! Header
-! -------
-! The header starts with 5 lines containing the following information:
+! Header lines
+! ------------
+! The header section can be preceded by any number of comment line starting with
+! the # character.
 ! 
-! (1) Number of intervals for x, y, z
-! (2) Mesh coordinates for x direction
-! (3) Mesh coordinates for y direction
-! (4) Mesh coordinates for z direction
-! (5) List of activated materials; use of this info requires the m parameter.
+! The header lines are 5 lines containing the following information:
+! 
+! 1. Number of intervals for x, y, z
+! 2. Mesh coordinates for x direction
+! 3. Mesh coordinates for y direction
+! 4. Mesh coordinates for z direction
+! 5. List of activated materials; use of this info requires the m parameter
 ! 
 ! These are optionally followed by a parameters line (line 6). This line begins 
 ! with a 'p', and single character parameters, separated by spaces, follow.
 ! The currently supported parameters are (order does not matter):
 ! 
-! * u: enable uniform sampling
-! * v: enable voxel sampling
-! * m: enable source position rejection based on activated materials
-! * e: read in custom list of energy bin boundaries
-! * d: enable debug output to file source_debug. Dumps xxx,yyy,zzz,wgt every 10k
-!   particles
-! * c: treat bins for each voxel as cumulative
-! * b: flag indicating bias values are used; only valid with voxel sampling
+! * u: Enable uniform sampling.
+! * v: Enable voxel sampling.
+! * m: Enable source position rejection based on activated materials.
+! * e: Read in custom list of energy bin boundaries.
+! * d: Enable debug output to file source_debug. Dumps xxx,yyy,zzz,wgt every 10k
+!   particles.
+! * c: Treat bins for each voxel as cumulative.
+! * b: Flag indicating bias values are used; only valid with voxel sampling.
+! * r: Particles starting in a void are resampled (within the same voxel).
+! * a: Resample entire particle when a particle would start in void. Requires
+!   u and r to be enabled. Can give incorrect results due to playing an
+!   unfair game.
 ! 
 ! An example parameter line: `p u d m e`
 ! 
