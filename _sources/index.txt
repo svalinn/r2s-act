@@ -25,6 +25,7 @@ Internal code documentation:
 
    r2s/r2s
    r2s/r2s.io
+   r2s/r2s.mcnp
    r2s/modules
 
 

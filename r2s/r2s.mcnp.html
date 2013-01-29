@@ -81,9 +81,9 @@
 <li><a class="reference internal" href="#">mcnp Package</a><ul>
 <li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">mcnp</span></tt> Package</a></li>
 <li><a class="reference internal" href="#module-r2s.mcnp.source_gamma_doc"><tt class="docutils literal"><span class="pre">source_gamma_doc</span></tt> Module</a><ul>
-<li><a class="reference internal" href="#mcnp-source-source-gamma-f90">mcnp_source/source_gamma.F90</a><ul>
-<li><a class="reference internal" href="#summary">Summary</a></li>
-<li><a class="reference internal" href="#header">Header</a></li>
+<li><a class="reference internal" href="#mcnp-source-source-gamma-f90">mcnp_source/source_gamma.F90</a></li>
+<li><a class="reference internal" href="#summary">Summary</a><ul>
+<li><a class="reference internal" href="#header-lines">Header lines</a></li>
 <li><a class="reference internal" href="#voxel-lines">Voxel lines</a></li>
 <li><a class="reference internal" href="#other-notes">Other notes</a></li>
 </ul>
@@ -107,9 +107,10 @@
 <span id="source-gamma-doc-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">source_gamma_doc</span></tt> Module<a class="headerlink" href="#module-r2s.mcnp.source_gamma_doc" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="mcnp-source-source-gamma-f90">
 <h3>mcnp_source/source_gamma.F90<a class="headerlink" href="#mcnp-source-source-gamma-f90" title="Permalink to this headline">¶</a></h3>
+</div>
 <div class="section" id="summary">
-<h4>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h4>
-<p>Adapted from source routine (source_gamma_meshtal2.F90) provided by 
+<h3>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h3>
+<p>Adapted from source routine (<cite>source_gamma_meshtal2.F90</cite>) provided by 
 Dieter Leichtle from KIT.
 Changes have been made by Eric Relson with UW-Madison/CNERG goals in mind.</p>
 <p>This source file implements photon source sampling on a cartesian mesh.
@@ -118,32 +119,37 @@ Two photon position sampling methods are avaiable:</p>
 <li>voxel sampling</li>
 <li>uniform sampling</li>
 </ol>
-<p>Subroutine source reads in the file &#8216;gammas&#8217; from the directory
-that MCNP is being run in.  The gammas file has two parts - a header and
+<p>Subroutine source reads in the file <cite>gammas</cite> from the directory
+that MCNP is being run in.  The <cite>gammas</cite> file has two parts - a header and
 a listing of information for each voxel.</p>
-</div>
-<div class="section" id="header">
-<h4>Header<a class="headerlink" href="#header" title="Permalink to this headline">¶</a></h4>
-<p>The header starts with 5 lines containing the following information:</p>
+<div class="section" id="header-lines">
+<h4>Header lines<a class="headerlink" href="#header-lines" title="Permalink to this headline">¶</a></h4>
+<p>The header section can be preceded by any number of comment line starting with
+the # character.</p>
+<p>The header lines are 5 lines containing the following information:</p>
 <ol class="arabic simple">
 <li>Number of intervals for x, y, z</li>
 <li>Mesh coordinates for x direction</li>
 <li>Mesh coordinates for y direction</li>
 <li>Mesh coordinates for z direction</li>
-<li>List of activated materials; use of this info requires the m parameter.</li>
+<li>List of activated materials; use of this info requires the m parameter</li>
 </ol>
 <p>These are optionally followed by a parameters line (line 6). This line begins 
 with a &#8216;p&#8217;, and single character parameters, separated by spaces, follow.
 The currently supported parameters are (order does not matter):</p>
 <ul class="simple">
-<li>u: enable uniform sampling</li>
-<li>v: enable voxel sampling</li>
-<li>m: enable source position rejection based on activated materials</li>
-<li>e: read in custom list of energy bin boundaries</li>
-<li>d: enable debug output to file source_debug. Dumps xxx,yyy,zzz,wgt every 10k
-particles</li>
-<li>c: treat bins for each voxel as cumulative</li>
-<li>b: flag indicating bias values are used; only valid with voxel sampling</li>
+<li>u: Enable uniform sampling.</li>
+<li>v: Enable voxel sampling.</li>
+<li>m: Enable source position rejection based on activated materials.</li>
+<li>e: Read in custom list of energy bin boundaries.</li>
+<li>d: Enable debug output to file source_debug. Dumps xxx,yyy,zzz,wgt every 10k
+particles.</li>
+<li>c: Treat bins for each voxel as cumulative.</li>
+<li>b: Flag indicating bias values are used; only valid with voxel sampling.</li>
+<li>r: Particles starting in a void are resampled (within the same voxel).</li>
+<li>a: Resample entire particle when a particle would start in void. Requires
+u and r to be enabled. Can give incorrect results due to playing an
+unfair game.</li>
 </ul>
 <p>An example parameter line: <cite>p u d m e</cite></p>
 <p>If the parameters line is not present, the default is to set u, m, c as True.
@@ -411,7 +417,7 @@ subroutine srcdx may also be needed.</p>
         &copy; Copyright 2013, CNERG.
       </p>
       <p>
-      Last updated on Jan 28, 2013.
+      Last updated on Jan 29, 2013.
       </p>
       <p>
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
