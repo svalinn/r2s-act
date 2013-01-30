@@ -13,7 +13,7 @@ scripts/r2s/mcnp
 # Ignore mcnp output files
 out?
 runtp?
-como?
+comou?
 source_debug
 
 # Ignore binary files
