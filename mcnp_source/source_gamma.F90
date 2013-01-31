@@ -123,6 +123,25 @@ module source_data
         real,dimension(:),allocatable :: i_bins, j_bins, k_bins
         integer,dimension(100) :: active_mat
         character*3000 :: line ! needed for reading active_mat from gammas
+
+  contains 
+
+        integer function getUnit()
+           implicit none
+           integer :: unit
+           logical :: isOpen
+
+           integer, parameter :: MIN_UNIT_NUMBER = 50
+           integer, parameter :: MAX_UNIT_NUMBER = 99
+
+           do unit = MIN_UNIT_NUMBER, MAX_UNIT_NUMBER
+              inquire(unit = unit, opened = isOpen)
+              if (.not. isOpen) then
+                 getUnit = unit
+                 return
+              end if
+           end do
+        end function getUnit
        
 end module source_data
 
@@ -133,19 +152,21 @@ subroutine source_setup
   use source_data
    
  
-        CLOSE(50)
-        OPEN(unit=50,form='formatted',file=gammas_file)
+        integer :: unitnum, statusnum
+
+        unitnum = getUnit()
+        OPEN(unit=unitnum,form='formatted',file=gammas_file)
 
         ! Read first 5 lines of gammas
-        call read_header(50)
+        call read_header(unitnum)
 
         ! Look for parameters line, and read parameters if found.
-        call read_params(50)
+        call read_params(unitnum)
 
         ! If ergs flag was found, we call read_custom_ergs.  Otherwise 
         !  we use default energies.
         if (ergs.eq.1) then
-          call read_custom_ergs(50)
+          call read_custom_ergs(unitnum)
           write(*,*) "The following custom energy bins are being used:"
           do i=1,n_ener_grps
             write(*,'(2es11.3)') my_ener_phot(i), my_ener_phot(i+1)
@@ -168,7 +189,7 @@ subroutine source_setup
         ! reading in source strength and alias table for each voxel 
         i = 1 ! i keeps track of # of voxel entries
         do
-          read(50,*,iostat=stat) (spectrum(i,j), j=1,bias + n_ener_grps)
+          read(unitnum,*,iostat=stat) (spectrum(i,j), j=1,bias + n_ener_grps)
           if (stat.ne.0) then
             i = i - 1
             exit ! exit the do loop
@@ -181,7 +202,7 @@ subroutine source_setup
         if (i.ne.n_mesh_cells) write(*,*) 'ERROR: ', i, ' voxels found in ' // &
                         'gammas file. ', n_mesh_cells, ' expected.'
 
-        CLOSE(50)
+        CLOSE(unitnum)
         WRITE(*,*) 'Reading gammas file completed!'
 
         ALLOCATE(ergPairs(1:n_mesh_cells, 1:n_ener_grps, 1:2))
@@ -228,8 +249,10 @@ subroutine source_setup
 
         ! Create new debug output file if debugging is enabled.
         if (debug.eq.1) then
-          OPEN(UNIT=57, FILE="source_debug", ACCESS="APPEND", STATUS="REPLACE")
-          CLOSE(57)
+          unitnum = getUnit()
+          OPEN(unit=unitnum, file="source_debug", access="APPEND", &
+                        status="REPLACE")
+          CLOSE(unitnum)
         endif
 
 end subroutine source_setup
@@ -943,6 +966,8 @@ subroutine print_debug
 ! 
   use source_data
 
+        !
+        integer :: unitdebug, statusdebug
         ! Array storing debug information
         real(dknd),dimension(1:10000,1:4) :: source_debug_array
         save source_debug_array
@@ -958,12 +983,13 @@ subroutine print_debug
         if (npart_write.eq.10000) then
   
           write(*,*) 'writing to source debug file.'
-          OPEN(UNIT=57, FILE="source_debug", ACCESS="APPEND")!, STATUS="REPLACE")
+          unitdebug = getUnit()
+          OPEN(unit=unitdebug, file="source_debug", access="APPEND")
           do i=1,10000
             write(57,*) source_debug_array(i,1:4)
           enddo
           
-          CLOSE(57)
+          CLOSE(unitdebug)
           npart_write = 0
         endif
 

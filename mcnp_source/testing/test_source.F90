@@ -8,6 +8,7 @@ module tests_mod
 ! Module contains all tests
         use mcnp_global
         use source_data
+        integer :: testunitnum
 
 contains 
 
@@ -19,9 +20,10 @@ subroutine test_read_custom_ergs
         real(dknd),dimension(1:43) :: test_ener_phot
         real(dknd) :: a, b
 
-        OPEN(unit=50, form='formatted', file='test_ergs_list.txt')
-        call read_custom_ergs(50)
-        CLOSE(50)
+        testunitnum = getUnit()
+        OPEN(unit=testunitnum, form='formatted', file='test_ergs_list.txt')
+        call read_custom_ergs(testunitnum)
+        CLOSE(testunitnum)
 
         test_ener_phot = (/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
             0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
@@ -47,10 +49,11 @@ end subroutine test_read_custom_ergs
 subroutine test_read_header
 ! Reads in multiple sets of 5 header lines from 'test_header.txt'.
 ! Tests that active_mat array is properly created
-        OPEN(unit=50, form='formatted', file='test_header.txt')
+        testunitnum = getUnit()
+        OPEN(unit=testunitnum, form='formatted', file='test_header.txt')
 
         ! Test 1: 5 entries in materials line; verify rest of array is zeros
-        call read_header(50)
+        call read_header(testunitnum)
         if (active_mat(6).ne.0.or.active_mat(100).ne.0) then
           write(*,*) "ERROR - test_read_header test #1"
           return
@@ -63,13 +66,13 @@ subroutine test_read_header
         deallocate(k_bins)
 
         ! Test 2: 105 entries in materials line; read first 100
-        call read_header(50)
+        call read_header(testunitnum)
         if (active_mat(6).ne.1.or.active_mat(100).ne.5) then
           write(*,*) "ERROR - test_read_header test #2"
           return
         endif
 
-        CLOSE(50)
+        CLOSE(testunitnum)
 
         write(*,*) "test_read_header: successfully tested"
 
@@ -81,88 +84,90 @@ subroutine test_read_params
 !  'test_params.txt'.
         
         integer :: cnt = 1
-        OPEN(unit=50, form='formatted', file='test_params.txt')
+
+        testunitnum = getUnit()
+        OPEN(unit=testunitnum, form='formatted', file='test_params.txt')
 
         do ! assertions
           ! Test: 'p u v'
-          call read_params(50)
+          call read_params(testunitnum)
           if (bias.eq.0.and.samp_uni.eq.0.and.samp_vox.eq.1) then
             cnt = cnt + 1
           else 
             exit
           endif
           ! Test: 'p'
-          call read_params(50)
+          call read_params(testunitnum)
           if (samp_vox.eq.0.and.mat_rej.eq.0.and.cumulative.eq.0) then
             cnt = cnt + 1
           else 
             exit
           endif
           ! Test: 'p v u b'
-          call read_params(50)
+          call read_params(testunitnum)
           if (samp_vox.eq.0.and.samp_uni.eq.1.and.bias.eq.0) then
             cnt = cnt + 1
           else 
             exit
           endif
           ! Test: 'p b'
-          call read_params(50)
+          call read_params(testunitnum)
           if (bias.eq.1) then
             cnt = cnt + 1
           else 
             exit
           endif
           ! Test: 'p d'
-          call read_params(50)
+          call read_params(testunitnum)
           if (debug.eq.1) then
             cnt = cnt + 1
           else 
             exit
           endif
           ! Test: 'p e'
-          call read_params(50)
+          call read_params(testunitnum)
           if (ergs.eq.1) then
             cnt = cnt + 1
           else 
             exit
           endif
           ! Test: 'p m'
-          call read_params(50)
+          call read_params(testunitnum)
           if (mat_rej.eq.1) then
             cnt = cnt + 1
           else 
             exit
           endif
           ! Test: 'p c'
-          call read_params(50)
+          call read_params(testunitnum)
           if (cumulative.eq.1) then
             cnt = cnt + 1
           else 
             exit
           endif
           ! Test: 'p v'
-          call read_params(50)
+          call read_params(testunitnum)
           if (samp_vox.eq.1) then
             cnt = cnt + 1
           else 
             exit
           endif
           ! Test: 'p u'
-          call read_params(50)
+          call read_params(testunitnum)
           if (samp_uni.eq.1) then
             cnt = cnt + 1
           else 
             exit
           endif
           ! Test: 'p b u'
-          call read_params(50)
+          call read_params(testunitnum)
           if (samp_uni.eq.1.and.bias.eq.0) then
             cnt = cnt + 1
           else 
             exit
           endif
           ! Test: 'p u r'
-          call read_params(50)
+          call read_params(testunitnum)
           if (samp_uni.eq.1.and.resample.eq.1) then
             cnt = cnt + 1
           else 
@@ -172,7 +177,7 @@ subroutine test_read_params
 
         enddo
 
-        CLOSE(50)
+        CLOSE(testunitnum)
 
         if (cnt.lt.13) then
           write(*,*) "ERROR - test_read_params completed tests:", i, "/ 13"
@@ -284,9 +289,10 @@ subroutine test_uniform_sample
         deallocate(j_bins)
         deallocate(k_bins)
 
-        OPEN(unit=50, form='formatted', file='test_header.txt')
+        testunitnum = getUnit()
+        OPEN(unit=testunitnum, form='formatted', file='test_header.txt')
 
-        call read_header(50)
+        call read_header(testunitnum)
         
         do i=1,10000
           call uniform_sample
