@@ -67,8 +67,10 @@
 ! normalization is based on the average source strength in photons/voxel/s; 
 ! For uniform sampling, we want average source strength in phtons/cm3/s.
 ! 
-! As an exercise to verify that the gammas files are being generated correctly,
-! do a test problem and verify that you get the same average energy per source
+! If the R2S-ACT workflow is not being used to generate the gammas file,
+! one should verify that the gammas files are being generated correctly.
+! To do this, use a simple test problem to verify that you get the same 
+! average energy per source
 ! particle in all test cases, and that all uniform sampling test cases have a
 ! weight of 1.0 per source particle. (See the summary table in MCNP output)
 ! 
@@ -82,9 +84,9 @@
 ! Other notes
 ! --------------
 ! Voxel sampling and energy sampling use a sampling technique referred to as
-! 'alias discrete' or 'alias table' sampling.  This provides efficiency
-! benefits over 'direct discrete' sampling. Creation of the alias tables uses
-! the heap sort algorithm.
+! 'alias discrete' or 'alias' sampling.  This provides efficiency benefits
+! over 'direct discrete' sampling of PDFs. Creation of the alias tables uses
+! the algorithm described by Vose (1991).
 
 module source_data
 ! Variables used/shared by most of the subroutines in this file.
@@ -127,6 +129,8 @@ module source_data
   contains 
 
         integer function getUnit()
+        ! Get an unused unit number to assign to a file being opened
+        ! via https://modelingguru.nasa.gov/docs/DOC-2052
            implicit none
            integer :: unit
            logical :: isOpen
