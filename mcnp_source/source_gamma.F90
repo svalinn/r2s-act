@@ -904,8 +904,8 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
 ! 
 ! Parameters
 ! ----------
-! bins : list of [int, float] pairs (INOUT)
-!     PDF's bin indices and absolute probabilities.
+! bins : list of [float, int ] pairs (INOUT)
+!     PDF's absolute probabilities and bin indices.
 ! pairs : list of [int, int] pairs (OUT)
 !     Filled with pairs of bin and alias indices.
 ! probs_list : list of floats (OUT)
