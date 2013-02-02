@@ -580,7 +580,7 @@ subroutine source
         elseif (samp_vox.eq.1) then
           if (mat(icl).eq.0) then
             ! particle rejected... resample within the voxel
-            call sample_within_voxel
+            call sample_hexahedra
             goto 555
           else
             goto 544
@@ -590,7 +590,7 @@ subroutine source
           if (mat(icl).eq.0) then
             if (uni_resamp_all.eq.0) then
               ! particle rejected... resample within the voxel and recheck
-              call sample_within_voxel
+              call sample_hexahedra
               goto 555
             else
               goto 10 ! sample anew
@@ -661,26 +661,9 @@ subroutine voxel_sample
         
         voxel = voxel + 1
         
-        call sample_within_voxel
+        call sample_hexahedra
         
 end subroutine voxel_sample
-
-
-subroutine sample_within_voxel
-! Samples within the extents of a voxel
-! 
-! Notes
-! -----
-! ii, jj, kk are presumed to have been already determined, and have values
-! in the range [1, i_ints/j_ints/k_ints].
-  use source_data
- 
-!       Sample random spot within the voxel
-        xxx = i_bins(ii+1)+rang()*(i_bins(ii+2)-i_bins(ii+1))
-        yyy = j_bins(jj+1)+rang()*(j_bins(jj+2)-j_bins(jj+1))
-        zzz = k_bins(kk+1)+rang()*(k_bins(kk+2)-k_bins(kk+1))
-
-end subroutine sample_within_voxel
 
 
 subroutine uniform_sample
@@ -711,6 +694,71 @@ subroutine uniform_sample
         voxel = (kk)+(jj)*k_ints+(ii)*j_ints*k_ints + 1
 
 end subroutine uniform_sample
+
+
+subroutine sample_hexahedra
+! Samples within the extents of a voxel
+! 
+! Notes
+! -----
+! ii, jj, kk are presumed to have been already determined, and have values
+! in the range [1, i_ints/j_ints/k_ints].
+  use source_data
+ 
+!       Sample random spot within the voxel
+        xxx = i_bins(ii+1)+rang()*(i_bins(ii+2)-i_bins(ii+1))
+        yyy = j_bins(jj+1)+rang()*(j_bins(jj+2)-j_bins(jj+1))
+        zzz = k_bins(kk+1)+rang()*(k_bins(kk+2)-k_bins(kk+1))
+
+end subroutine sample_hexahedra
+
+
+subroutine sample_tetrahedra(p1x,p2x,p3x,p4x,p1y,p2y,p3y,p4y,p1z,p2z,p3z,p4z)
+! This subroutine receives the four points of a tetrahedron and sets
+! xxx, yyy, zzz, to values corresponding to a uniformly sampled point
+! within the tetrahedron.
+! 
+! Parameters
+! -----------
+! The x y z coordinates of four points for a tetrahedron
+! 
+! Notes
+! ------
+! The algorithm used is that described by Rocchini & Cignoni (2001)
+! 
+  use source_data
+
+      real(dknd), intent(IN) :: p1x, p2x, p3x, p4x, p1y, p2y, p3y, p4y, &
+                p1z, p2z, p3z, p4z
+
+      real(dknd) :: ss, tt, uu, temp
+
+      ss = rang()
+      tt = rang()
+      uu = rang()
+
+      if ((ss+tt).gt.1._rknd) then
+        ss = 1._rknd - ss
+        tt = 1._rknd - tt
+      endif
+
+      if ((ss+tt+uu).gt.1._rknd) then
+        if ((tt+uu).gt.1._rknd) then
+          temp = tt
+          tt = 1 - uu
+          uu = 1._rknd - temp - ss
+        else
+          temp = ss
+          ss = 1._rknd - uu - tt
+          uu = temp + tt + uu - 1._rknd
+        endif
+      endif
+
+      xxx = p1x + (p2x-p1x)*ss + (p3x-p1x)*tt + (p4x-p1x)*uu
+      yyy = p1y + (p2y-p1y)*ss + (p3y-p1y)*tt + (p4y-p1y)*uu
+      zzz = p1z + (p2z-p1z)*ss + (p3z-p1z)*tt + (p4z-p1z)*uu
+
+end subroutine sample_tetrahedra
 
 
 subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, pairsList)
