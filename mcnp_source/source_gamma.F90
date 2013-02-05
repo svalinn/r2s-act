@@ -99,23 +99,23 @@ module source_data
              mat_rej, cumulative, resample, uni_resamp_all
         ! Position sampling variables
         integer :: voxel, n_source_cells
-        real(dknd),dimension(:),allocatable :: tot_list
+        real(dknd), dimension(:), allocatable :: tot_list
         ! Voxel alias table variables
         real(dknd) :: sourceSum, n_inv, norm
-        real(dknd),dimension(:,:), allocatable :: bins
-        real(dknd),dimension(:),allocatable :: pairsProbabilities
-        integer(i4knd),dimension(:,:), allocatable :: pairs
+        real(dknd), dimension(:,:), allocatable :: bins
+        real(dknd), dimension(:), allocatable :: pairsProbabilities
+        integer(i4knd), dimension(:,:), allocatable :: pairs
         integer :: alias_bin
         ! Biasing variables
         real(dknd) :: bias_probability_sum
-        real(dknd),dimension(:),allocatable :: bias_list
+        real(dknd), dimension(:), allocatable :: bias_list
         ! Energy bins variables
-        real(dknd),dimension(:,:), allocatable :: spectrum
-        real(dknd),dimension(:),allocatable :: my_ener_phot
+        real(dknd), dimension(:,:), allocatable :: spectrum
+        real(dknd), dimension(:), allocatable :: my_ener_phot
         integer :: n_ener_grps
         ! Energy bins alias table variables
-        real(dknd),dimension(:,:),allocatable :: ergPairsProbabilities
-        integer(i4knd),dimension(:,:,:),allocatable :: ergPairs
+        real(dknd), dimension(:,:), allocatable :: ergPairsProbabilities
+        integer(i4knd), dimension(:,:,:), allocatable :: ergPairs
         ! Debug output variables
         integer(i8knd) :: npart_write = 0 ! = counter for debug output
         ! Other variables
@@ -123,8 +123,8 @@ module source_data
         integer :: ii, kk, jj  ! current voxel's indices on structured mesh
         integer :: ic, ib, ih  ! for binary search
         integer :: i_ints, j_ints, k_ints, n_mesh_cells, n_active_mat
-        real,dimension(:),allocatable :: i_bins, j_bins, k_bins
-        integer,dimension(100) :: active_mat
+        real, dimension(:), allocatable :: i_bins, j_bins, k_bins
+        integer, dimension(100) :: active_mat
         character*3000 :: line ! needed for reading active_mat from gammas
 
   contains 
@@ -281,7 +281,7 @@ subroutine read_header (myunit)
 ! 
   use source_data
         
-        integer,intent(IN) :: myunit
+        integer, intent(IN) :: myunit
         character :: letter
         character*30 :: commentline
 
@@ -344,9 +344,9 @@ subroutine read_params (myunit)
 ! Set various parameters to 1 (true) if they exist.
   use source_data
 
-        integer,intent(IN) :: myunit
+        integer, intent(IN) :: myunit
 
-        character,dimension(1:30) :: letters
+        character, dimension(1:30) :: letters
         character*30 :: paramline
 
         ! Initialize parameters to defaults.
@@ -447,7 +447,7 @@ subroutine read_custom_ergs (myunit)
 ! N/A
   use source_data
         
-        integer,intent(IN) :: myunit
+        integer, intent(IN) :: myunit
 
         read(myunit,*) n_ener_grps ! reads an integer for # of grps
         backspace(myunit) ! bit of a hack since read(myunit,*,advance='NO') is invalid Fortran
@@ -820,10 +820,10 @@ subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, pairsList)
 !     Bin and alias indices for energy group, for each voxel
 
   use source_data
-        real(dknd),intent(OUT) :: myerg
-        integer,intent(IN) :: myvoxel, n_grp, n_vox
-        real(dknd),dimension(1:n_vox,1:n_grp), intent(IN) :: probList
-        integer(i4knd),dimension(1:n_vox,1:n_grp,1:2),intent(IN) :: pairsList
+        real(dknd), intent(OUT) :: myerg
+        integer, intent(IN) :: myvoxel, n_grp, n_vox
+        real(dknd), dimension(1:n_vox,1:n_grp), intent(IN) :: probList
+        integer(i4knd), dimension(1:n_vox,1:n_grp,1:2), intent(IN) :: pairsList
 
         real(dknd) :: rand
     
@@ -863,13 +863,13 @@ subroutine gen_erg_alias_table (len, ergsList, myErgPairs, &
 ! 
   use source_data
    
-        integer,intent(IN) :: len
-        real(dknd),dimension(1:len),intent(IN) :: ergsList
-        integer(i4knd),dimension(1:len,1:2),intent(OUT) :: myErgPairs
-        real(dknd),dimension(1:len), intent(OUT) :: myErgPairsProbabilities
+        integer, intent(IN) :: len
+        real(dknd), dimension(1:len), intent(IN) :: ergsList
+        integer(i4knd), dimension(1:len,1:2), intent(OUT) :: myErgPairs
+        real(dknd), dimension(1:len), intent(OUT) :: myErgPairsProbabilities
 
         integer :: i
-        real(dknd),dimension(1:len,1:2) :: mybins
+        real(dknd), dimension(1:len,1:2) :: mybins
 
         ! Create pairs of probabilities and erg bin indices
         do i=1,len
@@ -972,14 +972,14 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
   use mcnp_global
    
         ! subroutine argument variables
-        real(dknd),dimension(1:len,1:2),intent(INOUT) :: bins
-        integer(i4knd),dimension(1:len,1:2), intent(OUT) :: pairs
-        real(dknd),dimension(1:len), intent(OUT) :: probs_list
+        real(dknd), dimension(1:len,1:2), intent(INOUT) :: bins
+        integer(i4knd), dimension(1:len,1:2), intent(OUT) :: pairs
+        real(dknd), dimension(1:len), intent(OUT) :: probs_list
         integer, intent(in) :: len
 
         ! internal variables
         integer :: largecnt, j,k,s,l
-        integer,dimension(:),allocatable :: ind_small, ind_large
+        integer, dimension(:), allocatable :: ind_small, ind_large
         real(dknd) :: n_inv 
 
         n_inv = 1._dknd / len
@@ -1061,7 +1061,7 @@ subroutine print_debug
         !
         integer :: unitdebug, statusdebug
         ! Array storing debug information
-        real(dknd),dimension(1:10000,1:4) :: source_debug_array
+        real(dknd), dimension(1:10000,1:4) :: source_debug_array
         save source_debug_array
  
         ! Save information for debugging where source particles are started.
