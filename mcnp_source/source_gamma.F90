@@ -120,7 +120,8 @@ module source_data
         integer(i8knd) :: npart_write = 0 ! = counter for debug output
         ! Other variables
         integer :: stat
-        integer :: ii, kk, jj
+        integer :: ii, kk, jj  ! current voxel's indices on structured mesh
+        integer :: ic, ib, ih  ! for binary search
         integer :: i_ints, j_ints, k_ints, n_mesh_cells, n_active_mat
         real,dimension(:),allocatable :: i_bins, j_bins, k_bins
         integer,dimension(100) :: active_mat
@@ -417,7 +418,7 @@ subroutine read_params (myunit)
             write(*,*) "Enabled resampling for void and/or material rejection."
             resample = 1
           CASE ('a')
-            write(*,*) "Uniform sampling will resample entire problem if" // &
+            write(*,*) "Uniform sampling will resample entire problem if " // &
               "void is hit"
             uni_resamp_all = 1
           CASE DEFAULT
@@ -690,10 +691,49 @@ subroutine uniform_sample
         ii = ii - 1
         jj = jj - 1
         kk = kk - 1
+        ii = binary_search(xxx, 1, i_ints+1, i_bins)
+        jj = binary_search(yyy, 1, j_ints+1, j_bins)
+        kk = binary_search(zzz, 1, k_ints+1, k_bins)
 
         voxel = (kk)+(jj)*k_ints+(ii)*j_ints*k_ints + 1
 
 end subroutine uniform_sample
+
+
+integer function binary_search(pos, len, table)
+! Performs binary search and returns the integer indice for searched table.
+! 
+! Parameters
+! ----------
+! pos : float
+!     Search value/key
+! len : integer
+!     Number of bins in `table`
+! table : list of floats
+!     Sorted 1D list to be searched
+! 
+! Notes
+! -----
+! Copied from algorithm used elsewhere in MCNP code.
+  use source_data
+        real(dknd), intent(IN) :: pos
+        integer, intent (IN) :: len
+        real(dknd), intent(IN), dimension(1:len) :: table
+
+        ic = 1
+        ib = len + 1
+        do
+           if( ib-ic==1 )  exit
+           ih = (ic+ib)/2
+           if( pos>=i_bins(ih) ) then
+              ic = ih
+           else
+              ib = ih
+           endif
+        enddo
+        binary_search = ic
+
+end function binary_search
 
 
 subroutine sample_hexahedra
