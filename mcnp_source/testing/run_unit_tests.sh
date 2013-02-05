@@ -2,11 +2,11 @@
 python hide_source.py ../source_gamma.F90
 
 # Generate the .o files..
-gfortran -c mcnp_placeholder.F90 -g
-gfortran -c source.F90 -g
+gfortran -c mcnp_placeholder.F90 -fbounds-check -g -pedantic
+gfortran -c source.F90 -fbounds-check -g -pedantic
 
 # compile!
-gfortran test_source.F90 -o test_source   mcnp_placeholder.o source.o -g
+gfortran test_source.F90 -o test_source   mcnp_placeholder.o source.o -fbounds-check -g -pedantic
 
 # run unit tests
 ./test_source
