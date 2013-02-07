@@ -92,6 +92,8 @@ module source_data
 ! Variables used/shared by most of the subroutines in this file.
   use mcnp_global
    
+        implicit none
+
         character*30 :: gammas_file = 'gammas'
         integer(i8knd) :: ikffl = 0 ! = local record of history #
         ! Parameters - these are toggled by gammas
@@ -121,7 +123,7 @@ module source_data
         ! Other variables
         integer :: stat
         integer :: ii, kk, jj  ! current voxel's indices on structured mesh
-        integer :: ic, ib, ih  ! for binary search
+        integer :: ic_s, ib_s, ih_s  ! for binary search
         integer :: i_ints, j_ints, k_ints, n_mesh_cells, n_active_mat
         real, dimension(:), allocatable :: i_bins, j_bins, k_bins
         integer, dimension(100) :: active_mat
@@ -155,9 +157,10 @@ subroutine source_setup
 ! Subroutine handles parsing of the 'gammas' file and related initializations
 ! 
   use source_data
+  implicit none
    
  
-        integer :: unitnum, statusnum
+        integer :: unitnum, statusnum, i, j
 
         unitnum = getUnit()
         OPEN(unit=unitnum,form='formatted',file=gammas_file)
@@ -280,8 +283,10 @@ subroutine read_header (myunit)
 ! file.
 ! 
   use source_data
+  implicit none
         
         integer, intent(IN) :: myunit
+        integer :: i
         character :: letter
         character*30 :: commentline
 
@@ -343,9 +348,11 @@ subroutine read_params (myunit)
 ! 
 ! Set various parameters to 1 (true) if they exist.
   use source_data
+  implicit none
 
         integer, intent(IN) :: myunit
 
+        integer :: i
         character, dimension(1:30) :: letters
         character*30 :: paramline
 
@@ -446,13 +453,15 @@ subroutine read_custom_ergs (myunit)
 ! ------
 ! N/A
   use source_data
+  implicit none
         
         integer, intent(IN) :: myunit
+        integer :: i
 
         read(myunit,*) n_ener_grps ! reads an integer for # of grps
         backspace(myunit) ! bit of a hack since read(myunit,*,advance='NO') is invalid Fortran
         ALLOCATE(my_ener_phot(1:n_ener_grps+1))
-        read(myunit,*,end=888) n_erg_grps, (my_ener_phot(i),i=1,n_ener_grps+1)
+        read(myunit,*,end=888) n_ener_grps, (my_ener_phot(i),i=1,n_ener_grps+1)
 888     continue
 
 end subroutine read_custom_ergs
@@ -473,6 +482,9 @@ subroutine source
   use mcnp_debug
   use mcnp_random
   use source_data
+  implicit none
+
+        integer :: i, j, m, icl_tmp
    
 !------------------------------------------------------------------------------
 !     In the first history (ikffl) read 'gammas' file. ikffl under MPI works ?
@@ -636,6 +648,7 @@ subroutine voxel_sample
 ! Sample photon position from alias table of voxels.
 ! 
   use source_data
+  implicit none
 
         real(dknd) :: rand
 
@@ -670,32 +683,21 @@ end subroutine voxel_sample
 subroutine uniform_sample
 ! Uniformly sample photon position in the entire volume of the mesh tally.
   use source_data
+  implicit none
+        integer :: binary_search
 
         ! Choose position
         xxx = i_bins(1)+rang()*(i_bins(i_ints+1)-i_bins(1))
         yyy = j_bins(1)+rang()*(j_bins(j_ints+1)-j_bins(1))
         zzz = k_bins(1)+rang()*(k_bins(k_ints+1)-k_bins(1))
 
-        ! Identify corresponding voxel (sets ii, jj, kk)
-        do ii=1,i_ints
-          if (i_bins(ii).le.xxx.and.xxx.lt.i_bins(ii+1)) exit
-        enddo
-        do jj=1,j_ints
-          if (j_bins(jj).le.yyy.and.yyy.lt.j_bins(jj+1)) exit
-        enddo
-        do kk=1,k_ints
-          if (k_bins(kk).le.zzz.and.zzz.lt.k_bins(kk+1)) exit
-        enddo
+        ! binary search of mesh planes
+        ! ii, jj, kk are shifted into the range [0, i_ints/j_ints/k_ints].
+        ii = binary_search(xxx, i_ints+1, i_bins) - 1
+        jj = binary_search(yyy, j_ints+1, j_bins) - 1
+        kk = binary_search(zzz, k_ints+1, k_bins) - 1
 
-        ! ii, jj, kk are shifted into the range [1, i_ints/j_ints/k_ints].
-        ii = ii - 1
-        jj = jj - 1
-        kk = kk - 1
-        ii = binary_search(xxx, 1, i_ints+1, i_bins)
-        jj = binary_search(yyy, 1, j_ints+1, j_bins)
-        kk = binary_search(zzz, 1, k_ints+1, k_bins)
-
-        voxel = (kk)+(jj)*k_ints+(ii)*j_ints*k_ints + 1
+        voxel = (kk) + (jj)*k_ints + (ii)*j_ints*k_ints + 1
 
 end subroutine uniform_sample
 
@@ -716,22 +718,25 @@ integer function binary_search(pos, len, table)
 ! -----
 ! Copied from algorithm used elsewhere in MCNP code.
   use source_data
+  implicit none
         real(dknd), intent(IN) :: pos
         integer, intent (IN) :: len
         real(dknd), intent(IN), dimension(1:len) :: table
 
-        ic = 1
-        ib = len + 1
+        ic_s = 1
+        ib_s = len
         do
-           if( ib-ic==1 )  exit
-           ih = (ic+ib)/2
-           if( pos>=i_bins(ih) ) then
-              ic = ih
+           if( ib_s-ic_s==1 .or. ib_s.eq.ic_s)  exit
+           ih_s = (ic_s+ib_s)/2
+           if( pos>=table(ih_s) ) then
+              ic_s = ih_s
            else
-              ib = ih
+              ib_s = ih_s
            endif
         enddo
-        binary_search = ic
+
+        binary_search = ic_s
+        return
 
 end function binary_search
 
@@ -744,11 +749,12 @@ subroutine sample_hexahedra
 ! ii, jj, kk are presumed to have been already determined, and have values
 ! in the range [1, i_ints/j_ints/k_ints].
   use source_data
+  implicit none
  
 !       Sample random spot within the voxel
-        xxx = i_bins(ii+1)+rang()*(i_bins(ii+2)-i_bins(ii+1))
-        yyy = j_bins(jj+1)+rang()*(j_bins(jj+2)-j_bins(jj+1))
-        zzz = k_bins(kk+1)+rang()*(k_bins(kk+2)-k_bins(kk+1))
+        xxx = i_bins(ii+1) + rang() * (i_bins(ii+2) - i_bins(ii+1))
+        yyy = j_bins(jj+1) + rang() * (j_bins(jj+2) - j_bins(jj+1))
+        zzz = k_bins(kk+1) + rang() * (k_bins(kk+2) - k_bins(kk+1))
 
 end subroutine sample_hexahedra
 
@@ -767,6 +773,7 @@ subroutine sample_tetrahedra(p1x,p2x,p3x,p4x,p1y,p2y,p3y,p4y,p1z,p2z,p3z,p4z)
 ! The algorithm used is that described by Rocchini & Cignoni (2001)
 ! 
   use source_data
+  implicit none
 
       real(dknd), intent(IN) :: p1x, p2x, p3x, p4x, p1y, p2y, p3y, p4y, &
                 p1z, p2z, p3z, p4z
@@ -820,11 +827,13 @@ subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, pairsList)
 !     Bin and alias indices for energy group, for each voxel
 
   use source_data
+  implicit none
         real(dknd), intent(OUT) :: myerg
         integer, intent(IN) :: myvoxel, n_grp, n_vox
         real(dknd), dimension(1:n_vox,1:n_grp), intent(IN) :: probList
         integer(i4knd), dimension(1:n_vox,1:n_grp,1:2), intent(IN) :: pairsList
 
+        integer :: j
         real(dknd) :: rand
     
         ! Sampling the alias table
@@ -862,6 +871,7 @@ subroutine gen_erg_alias_table (len, ergsList, myErgPairs, &
 !     List of probabilities for first bin in each alias pair.
 ! 
   use source_data
+  implicit none
    
         integer, intent(IN) :: len
         real(dknd), dimension(1:len), intent(IN) :: ergsList
@@ -895,6 +905,9 @@ subroutine gen_voxel_alias_table
 ! 
 ! tot_list does not have to be normalized prior to calling this subroutine
   use source_data
+  implicit none
+
+        integer :: i
    
         ! Note that the first entry for each voxel in 'gammas' is
         ! a relative probability of that voxel being the source location.
@@ -1057,9 +1070,10 @@ subroutine print_debug
 ! after every 10000 particles.
 ! 
   use source_data
+  implicit none
 
         !
-        integer :: unitdebug, statusdebug
+        integer :: unitdebug, statusdebug, i
         ! Array storing debug information
         real(dknd), dimension(1:10000,1:4) :: source_debug_array
         save source_debug_array
@@ -1078,7 +1092,7 @@ subroutine print_debug
           unitdebug = getUnit()
           OPEN(unit=unitdebug, file="source_debug", access="APPEND")
           do i=1,10000
-            write(57,*) source_debug_array(i,1:4)
+            write(unitdebug,*) source_debug_array(i,1:4)
           enddo
           
           CLOSE(unitdebug)
