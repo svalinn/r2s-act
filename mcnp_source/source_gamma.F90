@@ -163,7 +163,7 @@ subroutine source_setup
         integer :: unitnum, statusnum, i, j
 
         unitnum = getUnit()
-        OPEN(unit=unitnum,form='formatted',file=gammas_file)
+        OPEN(unit=unitnum, form='formatted',/file=gammas_file)
 
         ! Read first 5 lines of gammas
         call read_header(unitnum)
@@ -258,8 +258,8 @@ subroutine source_setup
         ! Create new debug output file if debugging is enabled.
         if (debug.eq.1) then
           unitnum = getUnit()
-          OPEN(unit=unitnum, file="source_debug", access="APPEND", &
-                        status="REPLACE")
+          OPEN(unit=unitnum, file="source_debug", position='append', &
+                        status='replace')
           CLOSE(unitnum)
         endif
 
@@ -733,16 +733,15 @@ integer function binary_search(pos, len, table)
            else
               ib_s = ih_s
            endif
-        enddo
-
+        enddo 
+        
         binary_search = ic_s
-        return
 
 end function binary_search
 
 
 subroutine sample_hexahedra
-! Samples within the extents of a voxel
+! Uniformly samples within the extents of a hexahedral voxel
 ! 
 ! Notes
 ! -----
@@ -751,7 +750,7 @@ subroutine sample_hexahedra
   use source_data
   implicit none
  
-!       Sample random spot within the voxel
+!       Sample random point within the voxel
         xxx = i_bins(ii+1) + rang() * (i_bins(ii+2) - i_bins(ii+1))
         yyy = j_bins(jj+1) + rang() * (j_bins(jj+2) - j_bins(jj+1))
         zzz = k_bins(kk+1) + rang() * (k_bins(kk+2) - k_bins(kk+1))
@@ -1090,7 +1089,7 @@ subroutine print_debug
   
           write(*,*) 'writing to source debug file.'
           unitdebug = getUnit()
-          OPEN(unit=unitdebug, file="source_debug", access="APPEND")
+          OPEN(unit=unitdebug, file="source_debug", position='append')
           do i=1,10000
             write(unitdebug,*) source_debug_array(i,1:4)
           enddo
