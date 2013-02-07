@@ -104,9 +104,9 @@ module source_data
         real(dknd), dimension(:), allocatable :: tot_list
         ! Voxel alias table variables
         real(dknd) :: sourceSum, n_inv, norm
-        real(dknd), dimension(:,:), allocatable :: bins
+        real(dknd), dimension(:), allocatable :: bins
         real(dknd), dimension(:), allocatable :: pairsProbabilities
-        integer(i4knd), dimension(:,:), allocatable :: pairs
+        integer(i4knd), dimension(:), allocatable :: pairs
         integer :: alias_bin
         ! Biasing variables
         real(dknd) :: bias_probability_sum
@@ -117,7 +117,7 @@ module source_data
         integer :: n_ener_grps
         ! Energy bins alias table variables
         real(dknd), dimension(:,:), allocatable :: ergPairsProbabilities
-        integer(i4knd), dimension(:,:,:), allocatable :: ergPairs
+        integer(i4knd), dimension(:,:), allocatable :: ergPairs
         ! Debug output variables
         integer(i8knd) :: npart_write = 0 ! = counter for debug output
         ! Other variables
@@ -163,7 +163,7 @@ subroutine source_setup
         integer :: unitnum, statusnum, i, j
 
         unitnum = getUnit()
-        OPEN(unit=unitnum, form='formatted',/file=gammas_file)
+        OPEN(unit=unitnum, form='formatted', file=gammas_file)
 
         ! Read first 5 lines of gammas
         call read_header(unitnum)
@@ -213,7 +213,7 @@ subroutine source_setup
         CLOSE(unitnum)
         WRITE(*,*) 'Reading gammas file completed!'
 
-        ALLOCATE(ergPairs(1:n_mesh_cells, 1:n_ener_grps, 1:2))
+        ALLOCATE(ergPairs(1:n_mesh_cells, 1:n_ener_grps))
         ALLOCATE(ergPairsProbabilities(1:n_mesh_cells, 1:n_ener_grps))
 
         ! Create bins list.  Depending on if cumulative probabilities
@@ -227,7 +227,7 @@ subroutine source_setup
             enddo
             spectrum(i,1) = spectrum(i,1) / tot_list(i)
             call gen_erg_alias_table (n_ener_grps, spectrum(i,1:n_ener_grps), &
-                        ergPairs(i,1:n_ener_grps,1:2), &
+                        ergPairs(i,1:n_ener_grps), &
                         ergPairsProbabilities(i,1:n_ener_grps))
           enddo
         else
@@ -237,7 +237,7 @@ subroutine source_setup
               spectrum(i,j) = spectrum(i,j) / tot_list(i)
             enddo
             call gen_erg_alias_table (n_ener_grps, spectrum(i,1:n_ener_grps), &
-                        ergPairs(i,1:n_ener_grps,1:2), &
+                        ergPairs(i,1:n_ener_grps), &
                         ergPairsProbabilities(i,1:n_ener_grps))
           enddo
         endif
@@ -656,9 +656,9 @@ subroutine voxel_sample
         rand = rang() * n_mesh_cells
         alias_bin = INT(rand) + 1
         if ((rand+(1._dknd-alias_bin)).lt.pairsProbabilities(alias_bin)) then
-          voxel = pairs(alias_bin,1)
+          voxel = alias_bin
         else
-          voxel = pairs(alias_bin,2)
+          voxel = pairs(alias_bin)
         endif
         
         ! Bad condition checking; Indicates problem with alias table creation.
@@ -822,7 +822,7 @@ subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, pairsList)
 !     Length of next two arrays
 ! probList : list of lists of floats
 !     List of alias pair probabilities for energy PDF, for each voxel
-! pairsList : list of lists of [int, int] pairs
+! pairsList : list of lists of integers
 !     Bin and alias indices for energy group, for each voxel
 
   use source_data
@@ -830,7 +830,7 @@ subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, pairsList)
         real(dknd), intent(OUT) :: myerg
         integer, intent(IN) :: myvoxel, n_grp, n_vox
         real(dknd), dimension(1:n_vox,1:n_grp), intent(IN) :: probList
-        integer(i4knd), dimension(1:n_vox,1:n_grp,1:2), intent(IN) :: pairsList
+        integer(i4knd), dimension(1:n_vox,1:n_grp), intent(IN) :: pairsList
 
         integer :: j
         real(dknd) :: rand
@@ -839,9 +839,9 @@ subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, pairsList)
         rand = rang() * n_grp
         alias_bin = INT(rand) + 1
         if ((rand + (1._dknd - alias_bin)).lt.probList(myvoxel,alias_bin)) then
-          j = pairsList(myvoxel,alias_bin,1)
+          j = alias_bin
         else
-          j = pairsList(myvoxel,alias_bin,2)
+          j = pairsList(myvoxel,alias_bin)
         endif
 
         ! Bad condition checking; Indicates problem with alias table creation.
@@ -864,8 +864,8 @@ subroutine gen_erg_alias_table (len, ergsList, myErgPairs, &
 !     length of ergsList
 ! ergsList : list of floats
 !     ergsList values must total 1!
-! myErgPairs : list of [int, int] (OUT)
-!     The generated pairs of bin and alias indices for the energy PDF
+! myErgPairs : list of integers (OUT)
+!     The generated alias indices for the energy PDF
 ! myErgPairsProbabilities : list of floats (OUT)
 !     List of probabilities for first bin in each alias pair.
 ! 
@@ -874,19 +874,18 @@ subroutine gen_erg_alias_table (len, ergsList, myErgPairs, &
    
         integer, intent(IN) :: len
         real(dknd), dimension(1:len), intent(IN) :: ergsList
-        integer(i4knd), dimension(1:len,1:2), intent(OUT) :: myErgPairs
+        integer(i4knd), dimension(1:len), intent(OUT) :: myErgPairs
         real(dknd), dimension(1:len), intent(OUT) :: myErgPairsProbabilities
 
         integer :: i
-        real(dknd), dimension(1:len,1:2) :: mybins
+        real(dknd), dimension(1:len) :: mybins
 
         ! Create pairs of probabilities and erg bin indices
         do i=1,len
-          mybins(i,1) = ergsList(i)
-          mybins(i,2) = i
+          mybins(i) = ergsList(i)
         enddo
 
-        call gen_alias_table(mybins, myErgPairs(1:len,1:2), &
+        call gen_alias_table(mybins, myErgPairs(1:len), &
                   myErgPairsProbabilities(1:len), len)
 
 end subroutine gen_erg_alias_table
@@ -915,22 +914,21 @@ subroutine gen_voxel_alias_table
         sourceSum = sum(tot_list)
         write(*,*) "sourceSum:", sourceSum 
 
-        ALLOCATE(bins(1:n_mesh_cells,1:2))
-        ALLOCATE(pairs(1:n_mesh_cells, 1:2))
+        ALLOCATE(bins(1:n_mesh_cells))
+        ALLOCATE(pairs(1:n_mesh_cells))
         ALLOCATE(pairsProbabilities(1:n_mesh_cells))
 
         ! make the unsorted list of bins
         bias_probability_sum = 0
         do i=1,n_mesh_cells
           ! the average bin(i,1) value assigned is n_inv
-          bins(i,1) = tot_list(i) / sourceSum
-          bins(i,2) = i
+          bins(i) = tot_list(i) / sourceSum
 
           ! if biasing being done, get the quantity: sum(p_i*b_i)
           !  where for bin i, p_i is bin probability, b_i is bin bias
           if (bias.eq.1) then
             bias_probability_sum = & 
-                              bias_probability_sum + bins(i,1) * bias_list(i)
+                              bias_probability_sum + bins(i) * bias_list(i)
           endif
         enddo
 
@@ -938,7 +936,7 @@ subroutine gen_voxel_alias_table
         !  and then update the bias values so that they are now particle wgt
         if (bias.eq.1) then
           do i=1,n_mesh_cells
-            bins(i,1) = bins(i,1) * bias_list(i) / bias_probability_sum
+            bins(i) = bins(i) * bias_list(i) / bias_probability_sum
             bias_list(i) = bias_probability_sum / bias_list(i)
             !!! bias_list(i) value is now a weight, rather than a probabilty
           enddo
@@ -956,10 +954,10 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
 ! 
 ! Parameters
 ! ----------
-! bins : list of [float, int ] pairs (INOUT)
+! bins : list of floats (INOUT)
 !     PDF's absolute probabilities and bin indices.
-! pairs : list of [int, int] pairs (OUT)
-!     Filled with pairs of bin and alias indices.
+! pairs : list of integers (OUT)
+!     Filled with alias indices.
 ! probs_list : list of floats (OUT)
 !     List of probabilities for first bin in each alias pair.
 ! len : int
@@ -967,25 +965,25 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
 ! 
 ! Notes
 ! -----
-! note that bins is a list of pairs of the form (probability,value)
+! `bins` is a list of pairs of the form (probability,value)
 ! The sum of the probabilities in bins must be 1.
 ! 
 ! We implement the alias table creation algorithm described by Vose (1991).
 ! For reference::
 ! 
 !   Vose:      Code:
-!   p_j        bins(j,1)
+!   p_j        bins(j)
 !   large_l    ind_large(l)
 !   small_s    ind_small(s)
 !   prob_j     probs_list(j)
-!   'bin' j    pairs(j,1)
-!   alias_j    pairs(j,2)
+!   'bin' j    j
+!   alias_j    pairs(j)
 ! 
   use mcnp_global
    
         ! subroutine argument variables
-        real(dknd), dimension(1:len,1:2), intent(INOUT) :: bins
-        integer(i4knd), dimension(1:len,1:2), intent(OUT) :: pairs
+        real(dknd), dimension(1:len), intent(INOUT) :: bins
+        integer(i4knd), dimension(1:len), intent(OUT) :: pairs
         real(dknd), dimension(1:len), intent(OUT) :: probs_list
         integer, intent(in) :: len
 
@@ -999,7 +997,7 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
         ! Determine number of 'large' and 'small' bins
         largecnt = 0        
         do j=1,len
-          if ( bins(j,1).gt.n_inv ) then
+          if ( bins(j).gt.n_inv ) then
             largecnt = largecnt + 1
           endif
         enddo
@@ -1011,7 +1009,7 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
         l = 1
         s = 1
         do j=1,len
-          if ( bins(j,1).gt.n_inv ) then
+          if ( bins(j).gt.n_inv ) then
             ind_large(l) = j
             l = l + 1
           else
@@ -1026,14 +1024,13 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
           j = ind_small(s)
           l = l - 1
           k = ind_large(l)
-          pairs(j,1) = bins(j,2)
-          pairs(j,2) = bins(k,2) ! The alias bin
-          probs_list(j) = bins(j,1) * len
+          pairs(j) = k ! The alias bin
+          probs_list(j) = bins(j) * len
 
           ! decrement the bin used as the alias
-          bins(k,1) = bins(k,1) + (bins(j,1) - n_inv)
+          bins(k) = bins(k) + (bins(j) - n_inv)
 
-          if ( bins(k,1).gt.n_inv ) then
+          if ( bins(k).gt.n_inv ) then
             ind_large(l) = k ! Redundant??
             l = l + 1
           else
@@ -1046,8 +1043,7 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
         do while (s.gt.1)
           s = s - 1
           j = ind_small(s)
-          pairs(j,1) = bins(j,2)
-          pairs(j,2) = -1 ! should never be used
+          pairs(j) = -1 ! should never be used
           probs_list(ind_small(s)) = 1._dknd
         enddo
 
@@ -1056,8 +1052,7 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
         do while (l.gt.1)
           l = l - 1
           k = ind_large(l)
-          pairs(k,1) = bins(k,2)
-          pairs(k,2) = -1 ! should never be used
+          pairs(k) = -1 ! should never be used
           probs_list(ind_large(l)) = 1._dknd
         enddo
 
