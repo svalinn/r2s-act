@@ -105,8 +105,8 @@ module source_data
         ! Voxel alias table variables
         real(dknd) :: sourceSum, n_inv, norm
         real(dknd), dimension(:), allocatable :: bins
-        real(dknd), dimension(:), allocatable :: pairsProbabilities
-        integer(i4knd), dimension(:), allocatable :: pairs
+        real(dknd), dimension(:), allocatable :: binsProbabilities
+        integer(i4knd), dimension(:), allocatable :: aliases
         integer :: alias_bin
         ! Biasing variables
         real(dknd) :: bias_probability_sum
@@ -116,8 +116,8 @@ module source_data
         real(dknd), dimension(:), allocatable :: my_ener_phot
         integer :: n_ener_grps
         ! Energy bins alias table variables
-        real(dknd), dimension(:,:), allocatable :: ergPairsProbabilities
-        integer(i4knd), dimension(:,:), allocatable :: ergPairs
+        real(dknd), dimension(:,:), allocatable :: ergBinsProbabilities
+        integer(i4knd), dimension(:,:), allocatable :: ergAliases
         ! Debug output variables
         integer(i8knd) :: npart_write = 0 ! = counter for debug output
         ! Other variables
@@ -213,8 +213,8 @@ subroutine source_setup
         CLOSE(unitnum)
         WRITE(*,*) 'Reading gammas file completed!'
 
-        ALLOCATE(ergPairs(1:n_mesh_cells, 1:n_ener_grps))
-        ALLOCATE(ergPairsProbabilities(1:n_mesh_cells, 1:n_ener_grps))
+        ALLOCATE(ergAliases(1:n_mesh_cells, 1:n_ener_grps))
+        ALLOCATE(ergBinsProbabilities(1:n_mesh_cells, 1:n_ener_grps))
 
         ! Create bins list.  Depending on if cumulative probabilities
         !  were supplied, convert to individual bin probabilities so that
@@ -227,8 +227,8 @@ subroutine source_setup
             enddo
             spectrum(i,1) = spectrum(i,1) / tot_list(i)
             call gen_erg_alias_table (n_ener_grps, spectrum(i,1:n_ener_grps), &
-                        ergPairs(i,1:n_ener_grps), &
-                        ergPairsProbabilities(i,1:n_ener_grps))
+                        ergAliases(i,1:n_ener_grps), &
+                        ergBinsProbabilities(i,1:n_ener_grps))
           enddo
         else
           do i=1,n_mesh_cells
@@ -237,8 +237,8 @@ subroutine source_setup
               spectrum(i,j) = spectrum(i,j) / tot_list(i)
             enddo
             call gen_erg_alias_table (n_ener_grps, spectrum(i,1:n_ener_grps), &
-                        ergPairs(i,1:n_ener_grps), &
-                        ergPairsProbabilities(i,1:n_ener_grps))
+                        ergAliases(i,1:n_ener_grps), &
+                        ergBinsProbabilities(i,1:n_ener_grps))
           enddo
         endif
 
@@ -621,7 +621,7 @@ subroutine source
 
         ! Determine photon energy
         call sample_erg (erg, voxel, n_ener_grps, n_mesh_cells, &
-                        ergPairsProbabilities, ergPairs)
+                        ergBinsProbabilities, ergAliases)
 
         ! Determine weight.
         if (samp_vox.eq.1) then
@@ -655,10 +655,10 @@ subroutine voxel_sample
         ! Sampling the alias table
         rand = rang() * n_mesh_cells
         alias_bin = INT(rand) + 1
-        if ((rand+(1._dknd-alias_bin)).lt.pairsProbabilities(alias_bin)) then
+        if ((rand+(1._dknd-alias_bin)).lt.binsProbabilities(alias_bin)) then
           voxel = alias_bin
         else
-          voxel = pairs(alias_bin)
+          voxel = aliases(alias_bin)
         endif
         
         ! Bad condition checking; Indicates problem with alias table creation.
@@ -807,7 +807,7 @@ subroutine sample_tetrahedra(p1x,p2x,p3x,p4x,p1y,p2y,p3y,p4y,p1z,p2z,p3z,p4z)
 end subroutine sample_tetrahedra
 
 
-subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, pairsList)
+subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, aliasesList)
 ! Sample the alias table of energy bins for the selected voxel. 
 ! 
 ! Parameters
@@ -821,16 +821,16 @@ subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, pairsList)
 ! n_vox : int
 !     Length of next two arrays
 ! probList : list of lists of floats
-!     List of alias pair probabilities for energy PDF, for each voxel
-! pairsList : list of lists of integers
-!     Bin and alias indices for energy group, for each voxel
+!     List of bin probabilities for energy PDF, for each voxel
+! aliasesList : list of lists of integers
+!     Alias indices for energy group, for each voxel
 
   use source_data
   implicit none
         real(dknd), intent(OUT) :: myerg
         integer, intent(IN) :: myvoxel, n_grp, n_vox
         real(dknd), dimension(1:n_vox,1:n_grp), intent(IN) :: probList
-        integer(i4knd), dimension(1:n_vox,1:n_grp), intent(IN) :: pairsList
+        integer(i4knd), dimension(1:n_vox,1:n_grp), intent(IN) :: aliasesList
 
         integer :: j
         real(dknd) :: rand
@@ -841,7 +841,7 @@ subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, pairsList)
         if ((rand + (1._dknd - alias_bin)).lt.probList(myvoxel,alias_bin)) then
           j = alias_bin
         else
-          j = pairsList(myvoxel,alias_bin)
+          j = aliasesList(myvoxel,alias_bin)
         endif
 
         ! Bad condition checking; Indicates problem with alias table creation.
@@ -854,8 +854,8 @@ subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, pairsList)
 end subroutine sample_erg
 
 
-subroutine gen_erg_alias_table (len, ergsList, myErgPairs, &
-                                        myErgPairsProbabilities)
+subroutine gen_erg_alias_table (len, ergsList, myErgAliases, &
+                                        myErgBinsProbabilities)
 ! Create alias table for energy bins of a single voxel
 ! 
 ! Parameters
@@ -864,18 +864,18 @@ subroutine gen_erg_alias_table (len, ergsList, myErgPairs, &
 !     length of ergsList
 ! ergsList : list of floats
 !     ergsList values must total 1!
-! myErgPairs : list of integers (OUT)
+! myErgAliases : list of integers (OUT)
 !     The generated alias indices for the energy PDF
-! myErgPairsProbabilities : list of floats (OUT)
-!     List of probabilities for first bin in each alias pair.
+! myErgBinsProbabilities : list of floats (OUT)
+!     List of probabilities for each bin/alias pair.
 ! 
   use source_data
   implicit none
    
         integer, intent(IN) :: len
         real(dknd), dimension(1:len), intent(IN) :: ergsList
-        integer(i4knd), dimension(1:len), intent(OUT) :: myErgPairs
-        real(dknd), dimension(1:len), intent(OUT) :: myErgPairsProbabilities
+        integer(i4knd), dimension(1:len), intent(OUT) :: myErgAliases
+        real(dknd), dimension(1:len), intent(OUT) :: myErgBinsProbabilities
 
         integer :: i
         real(dknd), dimension(1:len) :: mybins
@@ -885,8 +885,8 @@ subroutine gen_erg_alias_table (len, ergsList, myErgPairs, &
           mybins(i) = ergsList(i)
         enddo
 
-        call gen_alias_table(mybins, myErgPairs(1:len), &
-                  myErgPairsProbabilities(1:len), len)
+        call gen_alias_table(mybins, myErgAliases(1:len), &
+                  myErgBinsProbabilities(1:len), len)
 
 end subroutine gen_erg_alias_table
 
@@ -899,7 +899,7 @@ subroutine gen_voxel_alias_table
 ! 
 ! Notes
 ! -----
-! The resulting alias table is stored in lists `pairs` and `pairsProbabilities`.
+! The resulting alias table is stored in lists `aliases` and `binsProbabilities`.
 ! 
 ! tot_list does not have to be normalized prior to calling this subroutine
   use source_data
@@ -915,8 +915,8 @@ subroutine gen_voxel_alias_table
         write(*,*) "sourceSum:", sourceSum 
 
         ALLOCATE(bins(1:n_mesh_cells))
-        ALLOCATE(pairs(1:n_mesh_cells))
-        ALLOCATE(pairsProbabilities(1:n_mesh_cells))
+        ALLOCATE(aliases(1:n_mesh_cells))
+        ALLOCATE(binsProbabilities(1:n_mesh_cells))
 
         ! make the unsorted list of bins
         bias_probability_sum = 0
@@ -942,30 +942,29 @@ subroutine gen_voxel_alias_table
           enddo
         endif
 
-        call gen_alias_table(bins, pairs, pairsProbabilities, n_mesh_cells)
+        call gen_alias_table(bins, aliases, binsProbabilities, n_mesh_cells)
 
         write(*,*) 'Alias table of source voxels generated!'
 
 end subroutine gen_voxel_alias_table
 
 
-subroutine gen_alias_table (bins, pairs, probs_list, len)
+subroutine gen_alias_table (bins, aliases, probs_list, len)
 ! Subroutine generates an alias table
 ! 
 ! Parameters
 ! ----------
 ! bins : list of floats (INOUT)
-!     PDF's absolute probabilities and bin indices.
-! pairs : list of integers (OUT)
+!     PDF's absolute probabilities
+! aliases : list of integers (OUT)
 !     Filled with alias indices.
 ! probs_list : list of floats (OUT)
-!     List of probabilities for first bin in each alias pair.
+!     List of probabilities for each bin/alias pair.
 ! len : int
 !     Number of bins in the alias table
 ! 
 ! Notes
 ! -----
-! `bins` is a list of pairs of the form (probability,value)
 ! The sum of the probabilities in bins must be 1.
 ! 
 ! We implement the alias table creation algorithm described by Vose (1991).
@@ -977,13 +976,13 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
 !   small_s    ind_small(s)
 !   prob_j     probs_list(j)
 !   'bin' j    j
-!   alias_j    pairs(j)
+!   alias_j    aliases(j)
 ! 
   use mcnp_global
    
         ! subroutine argument variables
         real(dknd), dimension(1:len), intent(INOUT) :: bins
-        integer(i4knd), dimension(1:len), intent(OUT) :: pairs
+        integer(i4knd), dimension(1:len), intent(OUT) :: aliases
         real(dknd), dimension(1:len), intent(OUT) :: probs_list
         integer, intent(in) :: len
 
@@ -1018,13 +1017,13 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
           endif
         enddo
 
-        ! Fill out pairs and prob_list
+        ! Fill out aliases and prob_list
         do while (s.gt.1.and.l.gt.1)
           s = s - 1
           j = ind_small(s)
           l = l - 1
           k = ind_large(l)
-          pairs(j) = k ! The alias bin
+          aliases(j) = k ! The alias bin
           probs_list(j) = bins(j) * len
 
           ! decrement the bin used as the alias
@@ -1043,7 +1042,7 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
         do while (s.gt.1)
           s = s - 1
           j = ind_small(s)
-          pairs(j) = -1 ! should never be used
+          aliases(j) = -1 ! should never be used
           probs_list(ind_small(s)) = 1._dknd
         enddo
 
@@ -1052,7 +1051,7 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
         do while (l.gt.1)
           l = l - 1
           k = ind_large(l)
-          pairs(k) = -1 ! should never be used
+          aliases(k) = -1 ! should never be used
           probs_list(ind_large(l)) = 1._dknd
         enddo
 
