@@ -25,8 +25,8 @@ class mmGridHelperTest( unittest.TestCase) :
         self.assertRaises( StopIteration, gen.next )
 
         f = mmgrid._linspace_square( 2 )
-        gen = f( 0, 3, -1, 2 )
-        check = itertools.product( (1,2), (0,1) )
+        gen = f( 0.0, 2.0, -2.0, 2.0 )
+        check = itertools.product( (0.5,1.5), (-1.0,1.0) )
         for x,y in itertools.izip_longest( gen, check ):
             self.assertEqual(x, y)
 
