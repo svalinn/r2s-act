@@ -60,10 +60,15 @@ def get_mat_id(materials, volume_id):
 def _linspace_square( n ):
     """Return a callable that creates an evenly spaced grid in the given quad"""
     def points_inside(a0, a1, b0, b1):
-        # linspace includes the start point, which we do not want
-        # so ask for one extra point and drop the zeroth result
-        aspace = np.linspace(a0, a1, n+1, endpoint=False)[1:]
-        bspace = np.linspace(b0, b1, n+1, endpoint=False)[1:]
+        # We want our points to start/end a half-interval from edges, so we do
+        #  some math.
+        # np.linspace() includes the start and end points.
+        a0x = a0 + (a1-a0) / (2.0*n)
+        a1x = a1 - (a1-a0) / (2.0*n)
+        b0x = b0 + (b1-b0) / (2.0*n)
+        b1x = b1 - (b1-b0) / (2.0*n)
+        aspace = np.linspace(a0x, a1x, n)
+        bspace = np.linspace(b0x, b1x, n)
         return itertools.product(aspace,bspace)
     return points_inside
 
