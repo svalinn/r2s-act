@@ -1,0 +1,11 @@
+.*.swp
+*~
+
+test_speed
+test_correct
+source_points
+method*/test_speed
+
+# Fortran stuff
+*.o
+*.mod

@@ -1,9 +1,10 @@
 !+ $Id: source.F90,v 1.1 2004/03/20 00:31:52 jsweezy Exp $
 ! Copyright LANL/UC/DOE - see file COPYRIGHT_INFO
 
+! 
 ! Summary
-! -------
-! Adapted from source routine (source_gamma_meshtal2.F90) provided by 
+! =======
+! Adapted from source routine (`source_gamma_meshtal2.F90`) provided by 
 ! Dieter Leichtle from KIT.
 ! Changes have been made by Eric Relson with UW-Madison/CNERG goals in mind.
 ! 
@@ -13,32 +14,39 @@
 ! (1) voxel sampling
 ! (2) uniform sampling
 ! 
-! Subroutine source reads in the file 'gammas' from the directory
-! that MCNP is being run in.  The gammas file has two parts - a header and
+! Subroutine source reads in the file `gammas` from the directory
+! that MCNP is being run in.  The `gammas` file has two parts - a header and
 ! a listing of information for each voxel.
 ! 
-! Header
-! -------
-! The header starts with 5 lines containing the following information:
+! Header lines
+! ------------
+! The header section can be preceded by any number of comment line starting with
+! the # character.
 ! 
-! (1) Number of intervals for x, y, z
-! (2) Mesh coordinates for x direction
-! (3) Mesh coordinates for y direction
-! (4) Mesh coordinates for z direction
-! (5) List of activated materials; use of this info requires the m parameter.
+! The header lines are 5 lines containing the following information:
+! 
+! 1. Number of intervals for x, y, z
+! 2. Mesh coordinates for x direction
+! 3. Mesh coordinates for y direction
+! 4. Mesh coordinates for z direction
+! 5. List of activated materials; use of this info requires the m parameter
 ! 
 ! These are optionally followed by a parameters line (line 6). This line begins 
 ! with a 'p', and single character parameters, separated by spaces, follow.
 ! The currently supported parameters are (order does not matter):
 ! 
-! * u: enable uniform sampling
-! * v: enable voxel sampling
-! * m: enable source position rejection based on activated materials
-! * e: read in custom list of energy bin boundaries
-! * d: enable debug output to file source_debug. Dumps xxx,yyy,zzz,wgt every 10k
-!   particles
-! * c: treat bins for each voxel as cumulative
-! * b: flag indicating bias values are used; only valid with voxel sampling
+! * u: Enable uniform sampling.
+! * v: Enable voxel sampling.
+! * m: Enable source position rejection based on activated materials.
+! * e: Read in custom list of energy bin boundaries.
+! * d: Enable debug output to file source_debug. Dumps xxx,yyy,zzz,wgt every 10k
+!   particles.
+! * c: Treat bins for each voxel as cumulative.
+! * b: Flag indicating bias values are used; only valid with voxel sampling.
+! * r: Particles starting in a void are resampled (within the same voxel).
+! * a: Resample entire particle when a particle would start in void. Requires
+!   u and r to be enabled. Can give incorrect results due to playing an
+!   unfair game.
 ! 
 ! An example parameter line: `p u d m e`
 ! 
@@ -59,8 +67,10 @@
 ! normalization is based on the average source strength in photons/voxel/s; 
 ! For uniform sampling, we want average source strength in phtons/cm3/s.
 ! 
-! As an exercise to verify that the gammas files are being generated correctly,
-! do a test problem and verify that you get the same average energy per source
+! If the R2S-ACT workflow is not being used to generate the gammas file,
+! one should verify that the gammas files are being generated correctly.
+! To do this, use a simple test problem to verify that you get the same 
+! average energy per source
 ! particle in all test cases, and that all uniform sampling test cases have a
 ! weight of 1.0 per source particle. (See the summary table in MCNP output)
 ! 
@@ -74,14 +84,16 @@
 ! Other notes
 ! --------------
 ! Voxel sampling and energy sampling use a sampling technique referred to as
-! 'alias discrete' or 'alias table' sampling.  This provides efficiency
-! benefits over 'direct discrete' sampling. Creation of the alias tables uses
-! the heap sort algorithm.
+! 'alias discrete' or 'alias' sampling.  This provides efficiency benefits
+! over 'direct discrete' sampling of PDFs. Creation of the alias tables uses
+! the algorithm described by Vose (1991).
 
 module source_data
 ! Variables used/shared by most of the subroutines in this file.
   use mcnp_global
    
+        implicit none
+
         character*30 :: gammas_file = 'gammas'
         integer(i8knd) :: ikffl = 0 ! = local record of history #
         ! Parameters - these are toggled by gammas
@@ -89,32 +101,54 @@ module source_data
              mat_rej, cumulative, resample, uni_resamp_all
         ! Position sampling variables
         integer :: voxel, n_source_cells
-        real(dknd),dimension(:),allocatable :: tot_list
+        real(dknd), dimension(:), allocatable :: tot_list
         ! Voxel alias table variables
         real(dknd) :: sourceSum, n_inv, norm
-        real(dknd),dimension(:,:), allocatable :: bins
-        real(dknd),dimension(:),allocatable :: pairsProbabilities
-        integer(i4knd),dimension(:,:), allocatable :: pairs
+        real(dknd), dimension(:), allocatable :: bins
+        real(dknd), dimension(:), allocatable :: binsProbabilities
+        integer(i4knd), dimension(:), allocatable :: aliases
         integer :: alias_bin
         ! Biasing variables
         real(dknd) :: bias_probability_sum
-        real(dknd),dimension(:),allocatable :: bias_list
+        real(dknd), dimension(:), allocatable :: bias_list
         ! Energy bins variables
-        real(dknd),dimension(:,:), allocatable :: spectrum
-        real(dknd),dimension(:),allocatable :: my_ener_phot
+        real(dknd), dimension(:,:), allocatable :: spectrum
+        real(dknd), dimension(:), allocatable :: my_ener_phot
         integer :: n_ener_grps
         ! Energy bins alias table variables
-        real(dknd),dimension(:,:),allocatable :: ergPairsProbabilities
-        integer(i4knd),dimension(:,:,:),allocatable :: ergPairs
+        real(dknd), dimension(:,:), allocatable :: ergBinsProbabilities
+        integer(i4knd), dimension(:,:), allocatable :: ergAliases
         ! Debug output variables
         integer(i8knd) :: npart_write = 0 ! = counter for debug output
         ! Other variables
         integer :: stat
-        integer :: ii, kk, jj
+        integer :: ii, kk, jj  ! current voxel's indices on structured mesh
+        integer :: ic_s, ib_s, ih_s  ! for binary search
         integer :: i_ints, j_ints, k_ints, n_mesh_cells, n_active_mat
-        real,dimension(:),allocatable :: i_bins, j_bins, k_bins
-        integer,dimension(100) :: active_mat
+        real, dimension(:), allocatable :: i_bins, j_bins, k_bins
+        integer, dimension(100) :: active_mat
         character*3000 :: line ! needed for reading active_mat from gammas
+
+  contains 
+
+        integer function getUnit()
+        ! Get an unused unit number to assign to a file being opened
+        ! via https://modelingguru.nasa.gov/docs/DOC-2052
+           implicit none
+           integer :: unit
+           logical :: isOpen
+
+           integer, parameter :: MIN_UNIT_NUMBER = 50
+           integer, parameter :: MAX_UNIT_NUMBER = 99
+
+           do unit = MIN_UNIT_NUMBER, MAX_UNIT_NUMBER
+              inquire(unit = unit, opened = isOpen)
+              if (.not. isOpen) then
+                 getUnit = unit
+                 return
+              end if
+           end do
+        end function getUnit
        
 end module source_data
 
@@ -123,21 +157,24 @@ subroutine source_setup
 ! Subroutine handles parsing of the 'gammas' file and related initializations
 ! 
   use source_data
+  implicit none
    
  
-        CLOSE(50)
-        OPEN(unit=50,form='formatted',file=gammas_file)
+        integer :: unitnum, statusnum, i, j
+
+        unitnum = getUnit()
+        OPEN(unit=unitnum, form='formatted', file=gammas_file)
 
         ! Read first 5 lines of gammas
-        call read_header(50)
+        call read_header(unitnum)
 
         ! Look for parameters line, and read parameters if found.
-        call read_params(50)
+        call read_params(unitnum)
 
         ! If ergs flag was found, we call read_custom_ergs.  Otherwise 
         !  we use default energies.
         if (ergs.eq.1) then
-          call read_custom_ergs(50)
+          call read_custom_ergs(unitnum)
           write(*,*) "The following custom energy bins are being used:"
           do i=1,n_ener_grps
             write(*,'(2es11.3)') my_ener_phot(i), my_ener_phot(i+1)
@@ -160,7 +197,7 @@ subroutine source_setup
         ! reading in source strength and alias table for each voxel 
         i = 1 ! i keeps track of # of voxel entries
         do
-          read(50,*,iostat=stat) (spectrum(i,j), j=1,bias + n_ener_grps)
+          read(unitnum,*,iostat=stat) (spectrum(i,j), j=1,bias + n_ener_grps)
           if (stat.ne.0) then
             i = i - 1
             exit ! exit the do loop
@@ -173,11 +210,11 @@ subroutine source_setup
         if (i.ne.n_mesh_cells) write(*,*) 'ERROR: ', i, ' voxels found in ' // &
                         'gammas file. ', n_mesh_cells, ' expected.'
 
-        CLOSE(50)
+        CLOSE(unitnum)
         WRITE(*,*) 'Reading gammas file completed!'
 
-        ALLOCATE(ergPairs(1:n_mesh_cells, 1:n_ener_grps, 1:2))
-        ALLOCATE(ergPairsProbabilities(1:n_mesh_cells, 1:n_ener_grps))
+        ALLOCATE(ergAliases(1:n_mesh_cells, 1:n_ener_grps))
+        ALLOCATE(ergBinsProbabilities(1:n_mesh_cells, 1:n_ener_grps))
 
         ! Create bins list.  Depending on if cumulative probabilities
         !  were supplied, convert to individual bin probabilities so that
@@ -190,8 +227,8 @@ subroutine source_setup
             enddo
             spectrum(i,1) = spectrum(i,1) / tot_list(i)
             call gen_erg_alias_table (n_ener_grps, spectrum(i,1:n_ener_grps), &
-                        ergPairs(i,1:n_ener_grps,1:2), &
-                        ergPairsProbabilities(i,1:n_ener_grps))
+                        ergAliases(i,1:n_ener_grps), &
+                        ergBinsProbabilities(i,1:n_ener_grps))
           enddo
         else
           do i=1,n_mesh_cells
@@ -200,8 +237,8 @@ subroutine source_setup
               spectrum(i,j) = spectrum(i,j) / tot_list(i)
             enddo
             call gen_erg_alias_table (n_ener_grps, spectrum(i,1:n_ener_grps), &
-                        ergPairs(i,1:n_ener_grps,1:2), &
-                        ergPairsProbabilities(i,1:n_ener_grps))
+                        ergAliases(i,1:n_ener_grps), &
+                        ergBinsProbabilities(i,1:n_ener_grps))
           enddo
         endif
 
@@ -220,8 +257,10 @@ subroutine source_setup
 
         ! Create new debug output file if debugging is enabled.
         if (debug.eq.1) then
-          OPEN(UNIT=57, FILE="source_debug", ACCESS="APPEND", STATUS="REPLACE")
-          CLOSE(57)
+          unitnum = getUnit()
+          OPEN(unit=unitnum, file="source_debug", position='append', &
+                        status='replace')
+          CLOSE(unitnum)
         endif
 
 end subroutine source_setup
@@ -244,8 +283,10 @@ subroutine read_header (myunit)
 ! file.
 ! 
   use source_data
+  implicit none
         
-        integer,intent(IN) :: myunit
+        integer, intent(IN) :: myunit
+        integer :: i
         character :: letter
         character*30 :: commentline
 
@@ -307,10 +348,12 @@ subroutine read_params (myunit)
 ! 
 ! Set various parameters to 1 (true) if they exist.
   use source_data
+  implicit none
 
-        integer,intent(IN) :: myunit
+        integer, intent(IN) :: myunit
 
-        character,dimension(1:30) :: letters
+        integer :: i
+        character, dimension(1:30) :: letters
         character*30 :: paramline
 
         ! Initialize parameters to defaults.
@@ -382,7 +425,7 @@ subroutine read_params (myunit)
             write(*,*) "Enabled resampling for void and/or material rejection."
             resample = 1
           CASE ('a')
-            write(*,*) "Uniform sampling will resample entire problem if" // &
+            write(*,*) "Uniform sampling will resample entire problem if " // &
               "void is hit"
             uni_resamp_all = 1
           CASE DEFAULT
@@ -410,13 +453,15 @@ subroutine read_custom_ergs (myunit)
 ! ------
 ! N/A
   use source_data
+  implicit none
         
-        integer,intent(IN) :: myunit
+        integer, intent(IN) :: myunit
+        integer :: i
 
         read(myunit,*) n_ener_grps ! reads an integer for # of grps
         backspace(myunit) ! bit of a hack since read(myunit,*,advance='NO') is invalid Fortran
         ALLOCATE(my_ener_phot(1:n_ener_grps+1))
-        read(myunit,*,end=888) n_erg_grps, (my_ener_phot(i),i=1,n_ener_grps+1)
+        read(myunit,*,end=888) n_ener_grps, (my_ener_phot(i),i=1,n_ener_grps+1)
 888     continue
 
 end subroutine read_custom_ergs
@@ -437,6 +482,9 @@ subroutine source
   use mcnp_debug
   use mcnp_random
   use source_data
+  implicit none
+
+        integer :: i, j, m, icl_tmp
    
 !------------------------------------------------------------------------------
 !     In the first history (ikffl) read 'gammas' file. ikffl under MPI works ?
@@ -545,7 +593,7 @@ subroutine source
         elseif (samp_vox.eq.1) then
           if (mat(icl).eq.0) then
             ! particle rejected... resample within the voxel
-            call sample_within_voxel
+            call sample_hexahedra
             goto 555
           else
             goto 544
@@ -555,7 +603,7 @@ subroutine source
           if (mat(icl).eq.0) then
             if (uni_resamp_all.eq.0) then
               ! particle rejected... resample within the voxel and recheck
-              call sample_within_voxel
+              call sample_hexahedra
               goto 555
             else
               goto 10 ! sample anew
@@ -573,7 +621,7 @@ subroutine source
 
         ! Determine photon energy
         call sample_erg (erg, voxel, n_ener_grps, n_mesh_cells, &
-                        ergPairsProbabilities, ergPairs)
+                        ergBinsProbabilities, ergAliases)
 
         ! Determine weight.
         if (samp_vox.eq.1) then
@@ -600,16 +648,17 @@ subroutine voxel_sample
 ! Sample photon position from alias table of voxels.
 ! 
   use source_data
+  implicit none
 
         real(dknd) :: rand
 
         ! Sampling the alias table
         rand = rang() * n_mesh_cells
         alias_bin = INT(rand) + 1
-        if ((rand+(1._dknd-alias_bin)).lt.pairsProbabilities(alias_bin)) then
-          voxel = pairs(alias_bin,1)
+        if ((rand+(1._dknd-alias_bin)).lt.binsProbabilities(alias_bin)) then
+          voxel = alias_bin
         else
-          voxel = pairs(alias_bin,2)
+          voxel = aliases(alias_bin)
         endif
         
         ! Bad condition checking; Indicates problem with alias table creation.
@@ -626,53 +675,139 @@ subroutine voxel_sample
         
         voxel = voxel + 1
         
-        call sample_within_voxel
+        call sample_hexahedra
         
 end subroutine voxel_sample
-
-
-subroutine sample_within_voxel
-! Samples within the extents of a voxel
-! 
-! Notes
-! -----
-! ii, jj, kk are presumed to have been already determined.
-  use source_data
- 
-!       Sample random spot within the voxel
-        xxx = i_bins(ii+1)+rang()*(i_bins(ii+2)-i_bins(ii+1))
-        yyy = j_bins(jj+1)+rang()*(j_bins(jj+2)-j_bins(jj+1))
-        zzz = k_bins(kk+1)+rang()*(k_bins(kk+2)-k_bins(kk+1))
-
-end subroutine sample_within_voxel
 
 
 subroutine uniform_sample
 ! Uniformly sample photon position in the entire volume of the mesh tally.
   use source_data
+  implicit none
+        integer :: binary_search
 
         ! Choose position
         xxx = i_bins(1)+rang()*(i_bins(i_ints+1)-i_bins(1))
         yyy = j_bins(1)+rang()*(j_bins(j_ints+1)-j_bins(1))
         zzz = k_bins(1)+rang()*(k_bins(k_ints+1)-k_bins(1))
 
-        ! Identify corresponding voxel (sets ii, jj, kk)
-        do ii=1,i_ints
-          if (i_bins(ii).le.xxx.and.xxx.lt.i_bins(ii+1)) exit
-        enddo
-        do jj=1,j_ints
-          if (j_bins(jj).le.yyy.and.yyy.lt.j_bins(jj+1)) exit
-        enddo
-        do kk=1,k_ints
-          if (k_bins(kk).le.zzz.and.zzz.lt.k_bins(kk+1)) exit
-        enddo
+        ! binary search of mesh planes
+        ! ii, jj, kk are shifted into the range [0, i_ints/j_ints/k_ints].
+        ii = binary_search(xxx, i_ints+1, i_bins) - 1
+        jj = binary_search(yyy, j_ints+1, j_bins) - 1
+        kk = binary_search(zzz, k_ints+1, k_bins) - 1
 
-        voxel = (kk-1)+(jj-1)*k_ints+(ii-1)*j_ints*k_ints+1
+        voxel = (kk) + (jj)*k_ints + (ii)*j_ints*k_ints + 1
 
 end subroutine uniform_sample
 
 
-subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, pairsList)
+integer function binary_search(pos, len, table)
+! Performs binary search and returns the integer indice for searched table.
+! 
+! Parameters
+! ----------
+! pos : float
+!     Search value/key
+! len : integer
+!     Number of bins in `table`
+! table : list of floats
+!     Sorted 1D list to be searched
+! 
+! Notes
+! -----
+! Copied from algorithm used elsewhere in MCNP code.
+  use source_data
+  implicit none
+        real(dknd), intent(IN) :: pos
+        integer, intent (IN) :: len
+        real(dknd), intent(IN), dimension(1:len) :: table
+
+        ic_s = 1
+        ib_s = len
+        do
+           if( ib_s-ic_s==1 .or. ib_s.eq.ic_s)  exit
+           ih_s = (ic_s+ib_s)/2
+           if( pos>=table(ih_s) ) then
+              ic_s = ih_s
+           else
+              ib_s = ih_s
+           endif
+        enddo 
+        
+        binary_search = ic_s
+
+end function binary_search
+
+
+subroutine sample_hexahedra
+! Uniformly samples within the extents of a hexahedral voxel
+! 
+! Notes
+! -----
+! ii, jj, kk are presumed to have been already determined, and have values
+! in the range [1, i_ints/j_ints/k_ints].
+  use source_data
+  implicit none
+ 
+!       Sample random point within the voxel
+        xxx = i_bins(ii+1) + rang() * (i_bins(ii+2) - i_bins(ii+1))
+        yyy = j_bins(jj+1) + rang() * (j_bins(jj+2) - j_bins(jj+1))
+        zzz = k_bins(kk+1) + rang() * (k_bins(kk+2) - k_bins(kk+1))
+
+end subroutine sample_hexahedra
+
+
+subroutine sample_tetrahedra(p1x,p2x,p3x,p4x,p1y,p2y,p3y,p4y,p1z,p2z,p3z,p4z)
+! This subroutine receives the four points of a tetrahedron and sets
+! xxx, yyy, zzz, to values corresponding to a uniformly sampled point
+! within the tetrahedron.
+! 
+! Parameters
+! -----------
+! The x y z coordinates of four points for a tetrahedron
+! 
+! Notes
+! ------
+! The algorithm used is that described by Rocchini & Cignoni (2001)
+! 
+  use source_data
+  implicit none
+
+      real(dknd), intent(IN) :: p1x, p2x, p3x, p4x, p1y, p2y, p3y, p4y, &
+                p1z, p2z, p3z, p4z
+
+      real(dknd) :: ss, tt, uu, temp
+
+      ss = rang()
+      tt = rang()
+      uu = rang()
+
+      if ((ss+tt).gt.1._rknd) then
+        ss = 1._rknd - ss
+        tt = 1._rknd - tt
+      endif
+
+      if ((ss+tt+uu).gt.1._rknd) then
+        if ((tt+uu).gt.1._rknd) then
+          temp = tt
+          tt = 1 - uu
+          uu = 1._rknd - temp - ss
+        else
+          temp = ss
+          ss = 1._rknd - uu - tt
+          uu = temp + tt + uu - 1._rknd
+        endif
+      endif
+
+      xxx = p1x + (p2x-p1x)*ss + (p3x-p1x)*tt + (p4x-p1x)*uu
+      yyy = p1y + (p2y-p1y)*ss + (p3y-p1y)*tt + (p4y-p1y)*uu
+      zzz = p1z + (p2z-p1z)*ss + (p3z-p1z)*tt + (p4z-p1z)*uu
+
+end subroutine sample_tetrahedra
+
+
+subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, aliasesList)
 ! Sample the alias table of energy bins for the selected voxel. 
 ! 
 ! Parameters
@@ -686,25 +821,27 @@ subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, pairsList)
 ! n_vox : int
 !     Length of next two arrays
 ! probList : list of lists of floats
-!     List of alias pair probabilities for energy PDF, for each voxel
-! pairsList : list of lists of [int, int] pairs
-!     Bin and alias indices for energy group, for each voxel
+!     List of bin probabilities for energy PDF, for each voxel
+! aliasesList : list of lists of integers
+!     Alias indices for energy group, for each voxel
 
   use source_data
-        real(dknd),intent(OUT) :: myerg
-        integer,intent(IN) :: myvoxel, n_grp, n_vox
-        real(dknd),dimension(1:n_vox,1:n_grp), intent(IN) :: probList
-        integer(i4knd),dimension(1:n_vox,1:n_grp,1:2),intent(IN) :: pairsList
+  implicit none
+        real(dknd), intent(OUT) :: myerg
+        integer, intent(IN) :: myvoxel, n_grp, n_vox
+        real(dknd), dimension(1:n_vox,1:n_grp), intent(IN) :: probList
+        integer(i4knd), dimension(1:n_vox,1:n_grp), intent(IN) :: aliasesList
 
+        integer :: j
         real(dknd) :: rand
     
         ! Sampling the alias table
         rand = rang() * n_grp
         alias_bin = INT(rand) + 1
         if ((rand + (1._dknd - alias_bin)).lt.probList(myvoxel,alias_bin)) then
-          j = pairsList(myvoxel,alias_bin,1)
+          j = alias_bin
         else
-          j = pairsList(myvoxel,alias_bin,2)
+          j = aliasesList(myvoxel,alias_bin)
         endif
 
         ! Bad condition checking; Indicates problem with alias table creation.
@@ -717,8 +854,8 @@ subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, pairsList)
 end subroutine sample_erg
 
 
-subroutine gen_erg_alias_table (len, ergsList, myErgPairs, &
-                                        myErgPairsProbabilities)
+subroutine gen_erg_alias_table (len, ergsList, myErgAliases, &
+                                        myErgBinsProbabilities)
 ! Create alias table for energy bins of a single voxel
 ! 
 ! Parameters
@@ -727,29 +864,29 @@ subroutine gen_erg_alias_table (len, ergsList, myErgPairs, &
 !     length of ergsList
 ! ergsList : list of floats
 !     ergsList values must total 1!
-! myErgPairs : list of [int, int] (OUT)
-!     The generated pairs of bin and alias indices for the energy PDF
-! myErgPairsProbabilities : list of floats (OUT)
-!     List of probabilities for first bin in each alias pair.
+! myErgAliases : list of integers (OUT)
+!     The generated alias indices for the energy PDF
+! myErgBinsProbabilities : list of floats (OUT)
+!     List of probabilities for each bin/alias pair.
 ! 
   use source_data
+  implicit none
    
-        integer,intent(IN) :: len
-        real(dknd),dimension(1:len),intent(IN) :: ergsList
-        integer(i4knd),dimension(1:len,1:2),intent(OUT) :: myErgPairs
-        real(dknd),dimension(1:len), intent(OUT) :: myErgPairsProbabilities
+        integer, intent(IN) :: len
+        real(dknd), dimension(1:len), intent(IN) :: ergsList
+        integer(i4knd), dimension(1:len), intent(OUT) :: myErgAliases
+        real(dknd), dimension(1:len), intent(OUT) :: myErgBinsProbabilities
 
         integer :: i
-        real(dknd),dimension(1:len,1:2) :: mybins
+        real(dknd), dimension(1:len) :: mybins
 
         ! Create pairs of probabilities and erg bin indices
         do i=1,len
-          mybins(i,1) = ergsList(i)
-          mybins(i,2) = i
+          mybins(i) = ergsList(i)
         enddo
 
-        call gen_alias_table(mybins, myErgPairs(1:len,1:2), &
-                  myErgPairsProbabilities(1:len), len)
+        call gen_alias_table(mybins, myErgAliases(1:len), &
+                  myErgBinsProbabilities(1:len), len)
 
 end subroutine gen_erg_alias_table
 
@@ -762,10 +899,13 @@ subroutine gen_voxel_alias_table
 ! 
 ! Notes
 ! -----
-! The resulting alias table is stored in lists `pairs` and `pairsProbabilities`.
+! The resulting alias table is stored in lists `aliases` and `binsProbabilities`.
 ! 
 ! tot_list does not have to be normalized prior to calling this subroutine
   use source_data
+  implicit none
+
+        integer :: i
    
         ! Note that the first entry for each voxel in 'gammas' is
         ! a relative probability of that voxel being the source location.
@@ -774,22 +914,21 @@ subroutine gen_voxel_alias_table
         sourceSum = sum(tot_list)
         write(*,*) "sourceSum:", sourceSum 
 
-        ALLOCATE(bins(1:n_mesh_cells,1:2))
-        ALLOCATE(pairs(1:n_mesh_cells, 1:2))
-        ALLOCATE(pairsProbabilities(1:n_mesh_cells))
+        ALLOCATE(bins(1:n_mesh_cells))
+        ALLOCATE(aliases(1:n_mesh_cells))
+        ALLOCATE(binsProbabilities(1:n_mesh_cells))
 
         ! make the unsorted list of bins
         bias_probability_sum = 0
         do i=1,n_mesh_cells
           ! the average bin(i,1) value assigned is n_inv
-          bins(i,1) = tot_list(i) / sourceSum
-          bins(i,2) = i
+          bins(i) = tot_list(i) / sourceSum
 
           ! if biasing being done, get the quantity: sum(p_i*b_i)
           !  where for bin i, p_i is bin probability, b_i is bin bias
           if (bias.eq.1) then
             bias_probability_sum = & 
-                              bias_probability_sum + bins(i,1) * bias_list(i)
+                              bias_probability_sum + bins(i) * bias_list(i)
           endif
         enddo
 
@@ -797,60 +936,59 @@ subroutine gen_voxel_alias_table
         !  and then update the bias values so that they are now particle wgt
         if (bias.eq.1) then
           do i=1,n_mesh_cells
-            bins(i,1) = bins(i,1) * bias_list(i) / bias_probability_sum
+            bins(i) = bins(i) * bias_list(i) / bias_probability_sum
             bias_list(i) = bias_probability_sum / bias_list(i)
             !!! bias_list(i) value is now a weight, rather than a probabilty
           enddo
         endif
 
-        call gen_alias_table(bins, pairs, pairsProbabilities, n_mesh_cells)
+        call gen_alias_table(bins, aliases, binsProbabilities, n_mesh_cells)
 
         write(*,*) 'Alias table of source voxels generated!'
 
 end subroutine gen_voxel_alias_table
 
 
-subroutine gen_alias_table (bins, pairs, probs_list, len)
+subroutine gen_alias_table (bins, aliases, probs_list, len)
 ! Subroutine generates an alias table
 ! 
 ! Parameters
 ! ----------
-! bins : list of [int, float] pairs (INOUT)
-!     PDF's bin indices and absolute probabilities.
-! pairs : list of [int, int] pairs (OUT)
-!     Filled with pairs of bin and alias indices.
+! bins : list of floats (INOUT)
+!     PDF's absolute probabilities
+! aliases : list of integers (OUT)
+!     Filled with alias indices.
 ! probs_list : list of floats (OUT)
-!     List of probabilities for first bin in each alias pair.
+!     List of probabilities for each bin/alias pair.
 ! len : int
 !     Number of bins in the alias table
 ! 
 ! Notes
 ! -----
-! note that bins is a list of pairs of the form (probability,value)
 ! The sum of the probabilities in bins must be 1.
 ! 
 ! We implement the alias table creation algorithm described by Vose (1991).
 ! For reference::
 ! 
 !   Vose:      Code:
-!   p_j        bins(j,1)
+!   p_j        bins(j)
 !   large_l    ind_large(l)
 !   small_s    ind_small(s)
 !   prob_j     probs_list(j)
-!   'bin' j    pairs(j,1)
-!   alias_j    pairs(j,2)
+!   'bin' j    j
+!   alias_j    aliases(j)
 ! 
   use mcnp_global
    
         ! subroutine argument variables
-        real(dknd),dimension(1:len,1:2),intent(INOUT) :: bins
-        integer(i4knd),dimension(1:len,1:2), intent(OUT) :: pairs
-        real(dknd),dimension(1:len), intent(OUT) :: probs_list
+        real(dknd), dimension(1:len), intent(INOUT) :: bins
+        integer(i4knd), dimension(1:len), intent(OUT) :: aliases
+        real(dknd), dimension(1:len), intent(OUT) :: probs_list
         integer, intent(in) :: len
 
         ! internal variables
         integer :: largecnt, j,k,s,l
-        integer,dimension(:),allocatable :: ind_small, ind_large
+        integer, dimension(:), allocatable :: ind_small, ind_large
         real(dknd) :: n_inv 
 
         n_inv = 1._dknd / len
@@ -858,7 +996,7 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
         ! Determine number of 'large' and 'small' bins
         largecnt = 0        
         do j=1,len
-          if ( bins(j,1).gt.n_inv ) then
+          if ( bins(j).gt.n_inv ) then
             largecnt = largecnt + 1
           endif
         enddo
@@ -870,7 +1008,7 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
         l = 1
         s = 1
         do j=1,len
-          if ( bins(j,1).gt.n_inv ) then
+          if ( bins(j).gt.n_inv ) then
             ind_large(l) = j
             l = l + 1
           else
@@ -879,20 +1017,19 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
           endif
         enddo
 
-        ! Fill out pairs and prob_list
+        ! Fill out aliases and prob_list
         do while (s.gt.1.and.l.gt.1)
           s = s - 1
           j = ind_small(s)
           l = l - 1
           k = ind_large(l)
-          pairs(j,1) = bins(j,2)
-          pairs(j,2) = bins(k,2) ! The alias bin
-          probs_list(j) = bins(j,1) * len
+          aliases(j) = k ! The alias bin
+          probs_list(j) = bins(j) * len
 
           ! decrement the bin used as the alias
-          bins(k,1) = bins(k,1) + (bins(j,1) - n_inv)
+          bins(k) = bins(k) + (bins(j) - n_inv)
 
-          if ( bins(k,1).gt.n_inv ) then
+          if ( bins(k).gt.n_inv ) then
             ind_large(l) = k ! Redundant??
             l = l + 1
           else
@@ -905,8 +1042,7 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
         do while (s.gt.1)
           s = s - 1
           j = ind_small(s)
-          pairs(j,1) = bins(j,2)
-          pairs(j,2) = -1 ! should never be used
+          aliases(j) = -1 ! should never be used
           probs_list(ind_small(s)) = 1._dknd
         enddo
 
@@ -915,8 +1051,7 @@ subroutine gen_alias_table (bins, pairs, probs_list, len)
         do while (l.gt.1)
           l = l - 1
           k = ind_large(l)
-          pairs(k,1) = bins(k,2)
-          pairs(k,2) = -1 ! should never be used
+          aliases(k) = -1 ! should never be used
           probs_list(ind_large(l)) = 1._dknd
         enddo
 
@@ -928,9 +1063,12 @@ subroutine print_debug
 ! after every 10000 particles.
 ! 
   use source_data
+  implicit none
 
+        !
+        integer :: unitdebug, statusdebug, i
         ! Array storing debug information
-        real(dknd),dimension(1:10000,1:4) :: source_debug_array
+        real(dknd), dimension(1:10000,1:4) :: source_debug_array
         save source_debug_array
  
         ! Save information for debugging where source particles are started.
@@ -944,12 +1082,13 @@ subroutine print_debug
         if (npart_write.eq.10000) then
   
           write(*,*) 'writing to source debug file.'
-          OPEN(UNIT=57, FILE="source_debug", ACCESS="APPEND")!, STATUS="REPLACE")
+          unitdebug = getUnit()
+          OPEN(unit=unitdebug, file="source_debug", position='append')
           do i=1,10000
-            write(57,*) source_debug_array(i,1:4)
+            write(unitdebug,*) source_debug_array(i,1:4)
           enddo
           
-          CLOSE(57)
+          CLOSE(unitdebug)
           npart_write = 0
         endif
 
