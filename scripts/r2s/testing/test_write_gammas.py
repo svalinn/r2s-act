@@ -26,7 +26,7 @@ gammas6 = os.path.join(thisdir, "files_test_write_gammas/gammas_voxel_seq_bias")
 gammas7 = os.path.join(thisdir, "files_test_write_gammas/gammas_voxel_cum")
 gammas8 = os.path.join(thisdir, "files_test_write_gammas/gammas_voxel_cum_bias")
 
-totalsfile = os.path.join(os.getcwd(), "phtn_src_totals")
+totalsfile = os.path.join(os.getcwd(), "phtn_src_total")
 
 
 class TestCalcVolumes(unittest.TestCase):
