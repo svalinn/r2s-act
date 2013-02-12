@@ -18,7 +18,7 @@ program findadjacency
     integer vert_uses, i
     integer ioffsets
 
-    iMesh_Instance :: mesh
+    iMesh_Instance mesh
     IBASE_HANDLE_T rpents, rpverts, rpallverts, ipoffsets
     IBASE_HANDLE_T ents, verts, allverts
     pointer (rpents, ents(0:*))
@@ -40,14 +40,17 @@ program findadjacency
     CHECK("Problems getting root set")
 
     call iMesh_load(%VAL(mesh), %VAL(root_set), &
-         "../MeshFiles/125hex.vtk", "", ierr)
+         "bllitenb9culeftTotheat.vtk", "", ierr)
+         !"125hex.vtk", "", ierr)
     CHECK("Load failed")
 
     ! get all 3d elements
     ents_alloc = 0
     call iMesh_getEntities(%VAL(mesh), %VAL(root_set), %VAL(iBase_REGION), &
-         %VAL(iMesh_ALL_TOPOLOGIES), rpents, ents_alloc, ents_size, &
+         %VAL(iMesh_TETRAHEDRON), rpents, ents_alloc, ents_size, &
          ierr)
+         !%VAL(iMesh_ALL_TOPOLOGIES), rpents, ents_alloc, ents_size, &
+         !ierr)
     CHECK("Couldn't get entities")
 
     vert_uses = 0
@@ -86,6 +89,7 @@ program findadjacency
        write(*,'("Sizes didn''t agree!")')
     else 
        write(*,'("Sizes did agree!")')
+       write(*,*) allverts_size
     endif
 
     call iMesh_dtor(%VAL(mesh), ierr)
