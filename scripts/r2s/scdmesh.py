@@ -262,6 +262,7 @@ def _scdIterSetup(dims, order, **kw):
             all([a in 'xyz' for a in order])):
         raise ScdMeshError('Invalid iteration order: ' + str(order))
 
+    # process kw for validity
     spec = {}
     for idx, d in enumerate('xyz'):
         if d in kw:
@@ -269,8 +270,9 @@ def _scdIterSetup(dims, order, **kw):
             if not isinstance(spec[d], Iterable):
                 spec[d] = [spec[d]]
             if not all(x in range(dims[idx], dims[idx + 3])
-                       for x in spec[d]):
-                raise ScdMeshError('Invalid iterator kwarg: {0}={1}'.format(d,spec[d]))
+                    for x in spec[d]):
+                raise ScdMeshError( \
+                        'Invalid iterator kwarg: {0}={1}'.format(d, spec[d]))
             if d not in order and len(spec[d]) > 1:
                 raise ScdMeshError('Cannot iterate over' + str(spec[d]) +
                                    'without a proper iteration order')
@@ -278,12 +280,14 @@ def _scdIterSetup(dims, order, **kw):
             order = d + order
             spec[d] = spec.get(d, [dims[idx]])
 
+    # get indices and ordmap
     indices = []
     for L in order:
         idx = 'xyz'.find(L)
         indices.append(spec.get(L, xrange(dims[idx], dims[idx + 3])))
 
     ordmap = ['zyx'.find(L) for L in order]
+
     return indices, ordmap
 
 
