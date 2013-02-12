@@ -1,0 +1,14 @@
+#This comment line should be ignored by the tests with no problem.
+# Same with this second line.
+1 1 1
+-1 1
+-1 1
+-1 1
+1 2 3 4 5
+#Another comment line, seen by the second test in test_read_header.
+1 1 1
+-1 1
+-1 1
+-1 1
+1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 
+
