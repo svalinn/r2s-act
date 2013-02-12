@@ -161,6 +161,7 @@ def find_mesh_bounds(meshtal,tally_line) :
     divs=[]
     for x in (0,1,2) :
         divs.append(linecache.getline(meshtal, count + x).split()[2:])
+
     divs.append(linecache.getline(meshtal, count+3).split()[3:])
     
     print '\tMeshtal has dimensions ({0},{1},{2}) with {3} energy bin(s)'\
@@ -201,10 +202,10 @@ def tag_fluxes(meshtal, meshtal_type, m, spatial_points, \
     
     for e_group in range(1, e_bins +1) : 
         # Create tags if they do not already exist
-        if e_group != e_bins: # tag name for each E bin
+        if e_group != e_bins or e_bins == 1: # tag name for each E bin
             flux_str = '{0}_group_{1:03d}'.format(meshtal_type, e_group)
             error_str = '{0}_group_{1:03d}_error'.format(meshtal_type, e_group)
-        elif e_group == e_bins or e_bins == 1: # tag name for totals group
+        elif e_group == e_bins : # tag name for totals group
             flux_str = meshtal_type + '_group_total'
             error_str = meshtal_type+'_group_total_error'
 
@@ -254,13 +255,13 @@ def read_meshtal( filename, tally_line, norm=1.0, **kw ):
     #Getting relevant information from meshtal header
     meshtal_type = find_meshtal_type( filename, tally_line )
     m = find_first_line( filename, tally_line )
-    x_bounds, y_bounds, z_bounds, e_bounds = find_mesh_bounds( filename, tally_line )
+    x_bounds, y_bounds, z_bounds, e_groups = find_mesh_bounds( filename, tally_line )
  
     #Calculating pertainent information from meshtal header and input
     spatial_points = (len(x_bounds)-1)*(len(y_bounds)-1)*(len(z_bounds)-1)
-    if len(e_bounds) > 2 :
-        e_bins = len(e_bounds) #dont substract 1; cancels with totals bin
-    elif len(e_bounds) == 2 : #for 1 energy bin, meshtal doesn't have TOTALS group
+    if len(e_groups) > 2 :
+        e_bins = len(e_groups) #dont substract 1; cancels with totals bin
+    elif len(e_groups) == 2 : #for 1 energy bin, meshtal doesn't have TOTALS group
         e_bins = 1 
     sm = ScdMesh(x_bounds, y_bounds, z_bounds)
 
@@ -269,6 +270,11 @@ def read_meshtal( filename, tally_line, norm=1.0, **kw ):
         if dims != sm.dims:
             raise ScdMeshError('Incorrect dimension in preexisting structured mesh')
         sm = kw['smesh']
+
+    #Tagging structured mesh with e_groups (at root level)
+    # The tag will only have the upper bound, the 0.000 lower bound will not appear
+    tag_e_bin = sm.imesh.createTag("e_groups", len(e_groups) - 1, float)
+    tag_e_bin[sm.imesh.rootSet] = e_groups[1:]
 
     #Tagging structured mesh
     tag_fluxes(filename, meshtal_type, m, spatial_points,

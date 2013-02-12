@@ -41,10 +41,12 @@ def cartesian(wwinp, output, particle):
     # Then create a root level tag with energy the energy bounds.
     e_bins = []
     line_num = z_last_line + 1
+
     while len(e_bins) < num_e_bins:
         e_bins += \
             [float(x) for x in linecache.getline(wwinp, line_num).split()]
         line_num += 1
+    
     ww_first_line = line_num
 
     # tag structured mesh with WW values
@@ -117,7 +119,7 @@ def tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nf, output, particle):
             ww_data += \
                 [float(x) for x in linecache.getline(wwinp, line_num).split()]
             line_num += 1
-
+        
         tag_ww[voxels] = ww_data # tag data to voxels
 
     # save particle type to rootset

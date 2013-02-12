@@ -83,7 +83,7 @@ def magic_wwinp(flux_mesh, ww_mesh='None', total_bool=False, null_value=0):
             ww_mesh.imesh.createTag(group_name, 1, float)   
 
         # create energy bounds
-        tag_e_groups = ww_mesh.imesh.createTag("e_groups", len(e_groups) + 1, float)
+        tag_e_groups = ww_mesh.imesh.createTag("e_groups", len(e_groups), float)
         tag_e_groups[ww_mesh.imesh.rootSet] = \
             flux_mesh.imesh.getTagHandle("e_groups")[flux_mesh.imesh.rootSet]  
 
@@ -111,12 +111,12 @@ def magic_wwinp(flux_mesh, ww_mesh='None', total_bool=False, null_value=0):
                 '{0}_group_{1}'.format(particle, e_group))[flux_voxel]
             error = flux_mesh.imesh.getTagHandle(\
                  '{0}_group_{1}_error'.format(particle, e_group))[flux_voxel]
-            if ww_bool == False or 0 < error < 0.1:
+            if (ww_bool == False and error != 0.0) or 0.0 < error < 0.1:
             #if 0 < error < 0.1:
                 ww_mesh.imesh.getTagHandle(\
                     'ww_{0}_group_{1}'.format(particle, e_group))[ww_voxel]\
                      = flux/(2*max_fluxes[i]) # apply magic method
-            elif ww_bool == False and error == 0 :
+            elif ww_bool == False and error == 0.0 :
                 ww_mesh.imesh.getTagHandle(\
                     'ww_{0}_group_{1}'.format(particle, e_group))[ww_voxel]\
                      = null_value
@@ -232,7 +232,7 @@ def write_wwinp(ww_mesh, e_groups, output):
     e_groups = ww_mesh.imesh.getTagHandle("e_groups")[ww_mesh.imesh.rootSet]
     line_count = 0
 
-    for e_group in e_groups[1:]: #exclude the first value, it is a lower bound
+    for e_group in e_groups:
         block3 += "  {0:1.5E}".format(e_group)
         line_count += 1
         if line_count == 6:
@@ -243,8 +243,7 @@ def write_wwinp(ww_mesh, e_groups, output):
 
     # get ww_data
     count = 0
-    print e_groups
-    for e_group in e_groups:#[1:]:
+    for e_group in e_groups:
         voxels = ww_mesh.iterateHex('xyz')
         ww_data = []
         count += 1

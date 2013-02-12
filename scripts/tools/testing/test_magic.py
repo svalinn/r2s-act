@@ -51,7 +51,48 @@ def test_block_3():
 
 
 def test_overwrite():
-    pass
+    flux_h5m = 'files_test_magic/iteration_1.h5m'
+    ww_mesh = 'files_test_magic/iteration_0.wwmesh'
+    expected_file = 'files_test_magic/iteration_1.wwinp'
+    output = 'iteration_1_wwinp'
+    
+    if output in os.listdir('.'):
+        os.remove(output)
+    
+    magic.magic(flux_h5m, ww_mesh, False, 0, output, 'None')
+
+    f=open(output)
+    written = f.readlines()
+    f.close
+
+    g = open(expected_file)
+    expected = g.readlines()
+    g.close
+
+    assert_equal(written[1:], expected[1:])
+    os.remove(output)
+
+
+def test_null():
+    flux_h5m = 'files_test_magic/null_test.h5m'
+    expected_file = 'files_test_magic/null_test.wwinp'
+    output = 'null_wwinp'
+    
+    if output in os.listdir('.'):
+        os.remove(output)
+    
+    magic.magic(flux_h5m, 'None', False, 33333, output, 'None')
+
+    f=open(output)
+    written = f.readlines()
+    f.close
+
+    g = open(expected_file)
+    expected = g.readlines()
+    g.close
+
+    assert_equal(written[1:], expected[1:])
+    os.remove(output)
 
 
 # Run as script

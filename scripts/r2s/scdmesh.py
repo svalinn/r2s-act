@@ -262,7 +262,6 @@ def _scdIterSetup(dims, order, **kw):
             all([a in 'xyz' for a in order])):
         raise ScdMeshError('Invalid iteration order: ' + str(order))
 
-    # process kw
     spec = {}
     for idx, d in enumerate('xyz'):
         if d in kw:
