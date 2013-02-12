@@ -3,7 +3,7 @@ from nose.tools import assert_equal
 import os
 
 def test_mats2ALARA():
-    inp = 'mats2ALARA_test_inp.txt'
+    inp = 'files_test_mats2ALARA/mats2ALARA_test_inp.txt'
     output = 'alara_matlib.txt'
     
     if output in os.listdir('.'):

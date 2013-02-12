@@ -17,7 +17,7 @@ import linecache
 from optparse import OptionParser
 import sys
 from itaps import iMesh, iBase
-from scdmesh import ScdMesh
+from r2s.scdmesh import ScdMesh
 
 def print_value(sm, x, y, z, tag_name):
     voxel=sm.getHex(x,y,z)

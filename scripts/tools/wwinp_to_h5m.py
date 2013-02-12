@@ -11,7 +11,7 @@ from itaps import iBase
 # r2s imports
 from r2s.scdmesh import ScdMesh, ScdMeshError
 
-def cartesian(wwinp, output):
+def cartesian(wwinp, output, particle):
     """This function reads in a cartesian WWINP file and outputs tagged, 
         structured mesh .h5m file with name "output".
     """
@@ -38,6 +38,7 @@ def cartesian(wwinp, output):
     
     # Find the first line of WW values by counting through the e_bin values
     # until the expected number of e_bins is reached
+    # Then create a root level tag with energy the energy bounds.
     e_bins = []
     line_num = z_last_line + 1
     while len(e_bins) < num_e_bins:
@@ -47,8 +48,14 @@ def cartesian(wwinp, output):
     ww_first_line = line_num
 
     # tag structured mesh with WW values
-    tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nfx*nfy*nfz, output)
+    tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nfx*nfy*nfz, output, particle)
 
+    # tag root level of sm with energy bounds
+    tag_e_bin = sm.imesh.createTag("e_groups", len(e_bins), float)
+    tag_e_bin[sm.imesh.rootSet] = e_bins
+
+    # save to output
+    sm.scdset.save(output) 
 
 
 def block_2_bounds(wwinp, line_num, nc):
@@ -90,8 +97,7 @@ def block_2_bounds(wwinp, line_num, nc):
 
     return bounds, last_line
 
-
-def tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nf, output):
+def tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nf, output, particle):
     """This function reads in a structured and tags it with ww values from 
        wwinp then saves to output.
     """
@@ -102,7 +108,7 @@ def tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nf, output):
     line_num = ww_first_line
     for i in range(1, num_e_bins +1):
         # Create tags for e_group
-        tag_name = 'e_group_{0:03d}'.format(i) # good sorting for up to 999 groups
+        tag_name = 'ww_{0}_group_{1:03d}'.format(particle, i) # good sorting for up to 999 groups
         tag_ww = sm.imesh.createTag(tag_name, 1, float)
         
         # Get all data for energy group i
@@ -114,7 +120,15 @@ def tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nf, output):
 
         tag_ww[voxels] = ww_data # tag data to voxels
 
-    sm.scdset.save(output) # save to output
+    # save particle type to rootset
+    # (but first assign an int to each particle type)
+    if particle == 'n':
+        particle_int = 0
+    else:
+        particle_int = 1
+
+    tag_particle = sm.imesh.createTag("particle", 1, int)
+    tag_particle[sm.imesh.rootSet] = particle_int
 
       
           
@@ -126,18 +140,28 @@ def cylindrical(wwinp, output):
 
 
 def main(arguments=None):
-    parser = OptionParser(usage='%prog <wwinp_file> [options]')
+    parser = OptionParser(usage='%prog <wwinp_file> <particle type (n or p)> [options]')
     parser.add_option('-o', dest='output', default='wwinp.h5m',\
         help='Name of ALARA matlib output file, default=%default')
     (opts, args) = parser.parse_args(arguments)
+
+    if len(args) != 2:
+        parser.error('\nNeed 2 arguments: WWINP, particle type')
+
+    if args[1].lower() in ["n", "p"]:
+        particle = args[1].lower()
+    else:
+        parser.error('\nWWINP type must be "n" or "p"')    
 
     # determine nr from MCNP5 manual Table J.2
     # nr = 10 is Cartesian and nr = 16 is cylindrical
     nr = linecache.getline(args[0],1).split()[3]
     if int(nr) == 10:
-        cartesian(args[0], opts.output)
+        cartesian(args[0], opts.output, particle)
     elif int(nr) == 16:
-        cylindrical(args[0], opts.output)        
+        cylindrical(args[0], opts.output, particle)
+
+    print "WW mesh saved to {0}".format(opts.output)       
 
 if __name__ == '__main__':
     # No arguments case -> print help output

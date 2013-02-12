@@ -90,14 +90,17 @@ def magic_wwinp(flux_mesh, ww_mesh='None', total_bool=False, null_value=0):
     else:
         ww_bool = True # mesh file preexisting
         # make sure the supplied meshes have the same dimenstions
+        ww_mesh = ScdMesh.fromFile(ww_mesh)
         try:
             for i in ('x', 'y', 'z'):
                 flux_mesh.getDivisions(i) == ww_mesh.getDivisions(i)
-                print "\t Supplied meshes confirmed to have same dimensions"
+
         except:
             print >>sys.stderr, 'Mismatched dimensions on WWINP and flux meshes'
             sys.exit(1)
 
+    print "\t Supplied meshes confirmed to have same dimensions"
+    
     # iterate through all voxels          
     flux_voxels = flux_mesh.iterateHex('xyz')
     ww_voxels = ww_mesh.iterateHex('xyz')
@@ -113,7 +116,7 @@ def magic_wwinp(flux_mesh, ww_mesh='None', total_bool=False, null_value=0):
                 ww_mesh.imesh.getTagHandle(\
                     'ww_{0}_group_{1}'.format(particle, e_group))[ww_voxel]\
                      = flux/(2*max_fluxes[i]) # apply magic method
-            else:
+            elif ww_bool == False and error == 0 :
                 ww_mesh.imesh.getTagHandle(\
                     'ww_{0}_group_{1}'.format(particle, e_group))[ww_voxel]\
                      = null_value
@@ -121,9 +124,17 @@ def magic_wwinp(flux_mesh, ww_mesh='None', total_bool=False, null_value=0):
     return ww_mesh, e_groups
 
 
-def write_wwinp(ww_mesh, e_groups, particle, output):
+def write_wwinp(ww_mesh, e_groups, output):
     """This funtion reads a WW mesh file and prints out a corresponding WWIMP
     """
+
+    # find wwinp type
+    try:
+       tag=ww_mesh.imesh.getTagHandle('ww_n_group_001')
+       particle = 'n'
+    except:
+        particle = 'p'
+
     # create block 1 string
     block1 = '         1         1         1        10                     '
     # add date and time
@@ -144,40 +155,40 @@ def write_wwinp(ww_mesh, e_groups, particle, output):
     for i, points in enumerate([x, y, z]):
         coarse_points[i].append(points[0])
         j = 1
-        print "\n\n\nfirst coarse point in dim {0} is {1}".format(i, points[0])
+        ###print "\n\n\nfirst coarse point in dim {0} is {1}".format(i, points[0])
         while j < len(points)-1:
             fine_count = 1
              #floating point comparison: need to be careful because this characterizes
-             #course vs. fine. That is why 1.01E-2 is used.
+             #coarse vs. fine. That is why 1.01E-2 is used.
             while abs((points[j] - points[j-1]) - (points[j+1] - points[j])) <= 1.01E-2: 
-               print "dim {0} point {1} is a fine point".format(i, points[j])
+               ###print "dim {0} point {1} is a fine point".format(i, points[j])
                fine_count += 1
-               print "fine count increased to {0}".format(fine_count)
+               ###print "fine count increased to {0}".format(fine_count)
                j += 1
-               print "next point to be considered is {0}".format(points[j])
+               ###print "next point to be considered is {0}".format(points[j])
                if j == len(points) - 1:
-                   print "j is now equal to {0}, breaking".format(j)
+                   ###print "j is now equal to {0}, breaking".format(j)
                    break
 
-            print "appending fine count {0}".format(fine_count)
+            ###print "appending fine count {0}".format(fine_count)
             nfm[i].append(fine_count)
-            print "{0} is a coarse point".format(points[j])
+            ###print "{0} is a coarse point".format(points[j])
             coarse_points[i].append(points[j])
             j += 1
-            if j < len(points):
-                print "next point to be considered is {0} (bottom)".format(points[j])
+            ###if j < len(points):
+                ###print "next point to be considered is {0} (bottom)".format(points[j])
 
         # if j is on the second to last value, then you can't restart the loop 
         # but the last value has not been accounted for. This occures when the 
         # last two mesh points are both coarse (with one fine mesh in between)
         # this last case handles this final special case
         if j == len(points)-1:
-            print "inside stupid thing"
+            ###print "inside last course point loop"
             nfm[i].append(1)
             coarse_points[i].append(points[j])
 
-    print coarse_points
-    print nfm
+    ###print coarse_points
+    ###print nfm
     # append the rest of block 1
     block1 += " {0: 1.5E} {1: 1.5E} {2: 1.5E}"\
         .format(sum(nfm[0]), sum(nfm[1]), sum(nfm[2]))
@@ -221,7 +232,7 @@ def write_wwinp(ww_mesh, e_groups, particle, output):
     e_groups = ww_mesh.imesh.getTagHandle("e_groups")[ww_mesh.imesh.rootSet]
     line_count = 0
 
-    for e_group in e_groups[1:]: # exclude the first value, it is a lower bound
+    for e_group in e_groups[1:]: #exclude the first value, it is a lower bound
         block3 += "  {0:1.5E}".format(e_group)
         line_count += 1
         if line_count == 6:
@@ -232,7 +243,8 @@ def write_wwinp(ww_mesh, e_groups, particle, output):
 
     # get ww_data
     count = 0
-    for e_group in e_groups[1:]:
+    print e_groups
+    for e_group in e_groups:#[1:]:
         voxels = ww_mesh.iterateHex('xyz')
         ww_data = []
         count += 1
@@ -259,8 +271,21 @@ def write_wwinp(ww_mesh, e_groups, particle, output):
     out=file(output, 'w')
     out.write(block1)
     out.write(block2)
-    out.write(block3)
-              
+    out.write(block3)           
+
+
+
+def magic(flux_h5m, ww_mesh, total_bool, null_value, output, output_mesh):
+    """Runs magic.py from as a module
+    """
+    flux_mesh = ScdMesh.fromFile(flux_h5m)
+
+    ww_mesh, e_groups = magic_wwinp(flux_mesh, ww_mesh, total_bool, null_value)
+
+    if output_mesh != 'None':
+        ww_mesh.scdset.save(output_mesh)
+
+    write_wwinp(ww_mesh, e_groups, output)
 
 
 def main( arguments = None ):
@@ -293,17 +318,7 @@ def main( arguments = None ):
         ( '\nNeed exactly 1 argument: flux mesh' )
 
 
-    #Load Structured mesh from file
-
-    flux_mesh = ScdMesh.fromFile(args[0])
-
-    ww_mesh, e_groups = magic_wwinp(flux_mesh, opts.ww_mesh, opts.total_bool, opts.null_value)
-
-    # you should create an option for saving the new ww_mesh file
-    if opts.output_mesh != 'None':
-        ww_mesh.scdset.save(opts.output_mesh)
-
-    write_wwinp(ww_mesh, e_groups, 'n', opts.output_name)
+    magic(args[0], opts.ww_mesh, opts.total_bool, opts.null_value, opts.output_name, opts.output_mesh)
 
     print "\tWrote WWINP file {0}\n".format(opts.output_name)
 
@@ -311,6 +326,7 @@ def main( arguments = None ):
         print "\tWrote WW mesh file {0}\n".format(opts.output_mesh)
 
     print "Complete"
+
 
 if __name__ == '__main__':
     # No arguments case -> print help output

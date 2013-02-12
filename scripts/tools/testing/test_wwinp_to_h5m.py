@@ -5,7 +5,7 @@ from itaps import iMesh, iBase
 from r2s.scdmesh import ScdMesh
 
 def test_wwinp_to_h5m():
-    wwinp = 'wwinp_test.txt'
+    wwinp = 'files_test_wwinp_to_h5m/wwinp_test.txt'
     output = 'wwinp_mesh.h5m'
     particle = 'n'
     
@@ -17,7 +17,7 @@ def test_wwinp_to_h5m():
     with open(output) as f:
         written = f.read()
     
-    expected_sm = ScdMesh.fromFile('expected_wwinp_mesh.h5m')
+    expected_sm = ScdMesh.fromFile('files_test_wwinp_to_h5m/expected_wwinp_mesh.h5m')
     written_sm = ScdMesh.fromFile(output)
     
     for x in range(0,5):
