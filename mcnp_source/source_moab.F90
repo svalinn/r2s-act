@@ -88,9 +88,6 @@
 ! over 'direct discrete' sampling of PDFs. Creation of the alias tables uses
 ! the algorithm described by Vose (1991).
 
-! TBD: Best location for compiler directives??
-#define CHECK(a) \
-  if (ierr .ne. 0) print *, a
 
 
 
@@ -99,6 +96,12 @@ module source_data
   use mcnp_global
    
         implicit none
+! TBD: Best location for compiler directives??
+! #define CHECK seems to work in or out of module.
+#define CHECK(a) \
+  if (ierr .ne. 0) print *, a
+! This include needs to be within the module, at least, lower down might be OK
+! too.
 #include "iMesh_f.h"
 
         character*30 :: gammas_file = 'gammas'
@@ -173,7 +176,7 @@ subroutine source_setup
 
         call read_moab
 
-        call read_gammas(unitnum)
+        !call read_gammas(unitnum)
 
         ALLOCATE(ergAliases(1:n_mesh_cells, 1:n_ener_grps))
         ALLOCATE(ergBinsProbabilities(1:n_mesh_cells, 1:n_ener_grps))
@@ -232,66 +235,109 @@ subroutine read_moab
 ! 
   use source_data
   implicit none
-    ! declarations
-    integer vert_uses, i
-    integer ioffsets
+        ! declarations
+        integer vert_uses, i
+        integer ioffsets
 
-    iMesh_Instance :: mesh
-    IBASE_HANDLE_T rpents, rpverts, rpallverts, ipoffsets
-    IBASE_HANDLE_T ents, verts, allverts
-    pointer (rpents, ents(0:*))
-    pointer (rpverts, verts(0:*))
-    pointer (rpallverts, allverts(0:*))
-    pointer (ipoffsets, ioffsets(0,*))
-    integer ierr, ents_alloc, ents_size
-    integer iverts_alloc, iverts_size
-    integer allverts_alloc, allverts_size
-    integer offsets_alloc, offsets_size
-    iBase_EntitySetHandle root_set
+        iMesh_Instance :: mesh
+        IBASE_HANDLE_T :: rpents, rpverts, rpallverts, ipoffsets
+        IBASE_HANDLE_T :: ents, verts, allverts
 
-    ! create the Mesh instance
-    call iMesh_newMesh("", mesh, ierr)
-    CHECK("Problems instantiating interface.")
+        IBASE_HANDLE_T :: ergtag
+        
+        pointer (rpents, ents(0:*))
+        pointer (rpverts, verts(0:*))
+        pointer (rpallverts, allverts(0:*))
+        pointer (ipoffsets, ioffsets(0,*))
+        integer ierr, ents_alloc, ents_size
+        integer iverts_alloc, iverts_size
+        integer allverts_alloc, allverts_size
+        integer offsets_alloc, offsets_size
+        iBase_EntitySetHandle root_set
 
-    ! load the mesh
-    call iMesh_getRootSet(%VAL(mesh), root_set, ierr)
-    CHECK("Problems getting root set")
+        ! create the Mesh instance
+        call iMesh_newMesh("", mesh, ierr)
+        CHECK("Problems instantiating interface.")
 
-    call iMesh_load(%VAL(mesh), %VAL(root_set), &
-         mesh_file, "", ierr)
-         !"125hex.vtk", "", ierr)
-    CHECK("Load failed")
+        ! load the mesh
+        call iMesh_getRootSet(%VAL(mesh), root_set, ierr)
+        CHECK("Problems getting root set")
 
-    ! get all 3d elements
-    ents_alloc = 0
-    call iMesh_getEntities(%VAL(mesh), %VAL(root_set), %VAL(iBase_REGION), &
-         %VAL(iMesh_TETRAHEDRON), rpents, ents_alloc, ents_size, &
-         ierr)
-         !%VAL(iMesh_ALL_TOPOLOGIES), rpents, ents_alloc, ents_size, &
-         !ierr)
-    CHECK("Couldn't get entities")
+        call iMesh_load(%VAL(mesh), %VAL(root_set), &
+             mesh_file, "", ierr)
+             !"125hex.vtk", "", ierr)
+        CHECK("Load failed")
 
-    vert_uses = 0
+        ! get all 3d elements
+        ents_alloc = 0
+        call iMesh_getEntities(%VAL(mesh), %VAL(root_set), %VAL(iBase_REGION), &
+             %VAL(iMesh_TETRAHEDRON), rpents, ents_alloc, ents_size, &
+             ierr)
+             !%VAL(iMesh_ALL_TOPOLOGIES), rpents, ents_alloc, ents_size, &
+             !ierr)
+        CHECK("Couldn't get entities")
 
-    ! iterate through them; 
-    do i = 0, ents_size-1
-       ! get connectivity
-       iverts_alloc = 0
-       call iMesh_getEntAdj(%VAL(mesh), %VAL(ents(i)), &
-            %VAL(iBase_VERTEX), &
-            rpverts, iverts_alloc, iverts_size, &
-            ierr)
-       CHECK("Failure in getEntAdj")
-       ! sum number of vertex uses
+        vert_uses = 0
 
-       vert_uses = vert_uses + iverts_size
+        ! iterate through them; 
+        do i = 0, ents_size-1
+           ! get connectivity
+           iverts_alloc = 0
+           call iMesh_getEntAdj(%VAL(mesh), %VAL(ents(i)), &
+                %VAL(iBase_VERTEX), &
+                rpverts, iverts_alloc, iverts_size, &
+                ierr)
+           CHECK("Failure in getEntAdj")
+           ! sum number of vertex uses
 
-       if (iverts_size .ne. 0) call free(rpverts)
-    end do
+           vert_uses = vert_uses + iverts_size
+
+           if (iverts_size .ne. 0) call free(rpverts)
+        end do
+
+        ! Look for parameters line, and read parameters if found.
+
+        ! If ergs flag was found, we call read_custom_ergs.  Otherwise 
+        !  we use default energies.
+        call iMesh_getTagHandle(%VAL(mesh), "PHTN_ERGS", ergtag, ierr, 9)
+        
+        if (ierr.eq.0)
+          continue
+        else ! use default energy groups; 42 groups
+          n_ener_grps = 42
+          ALLOCATE(my_ener_phot(1:n_ener_grps+1))
+          my_ener_phot = (/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
+            0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
+            1.66,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0, &
+            10.0,12.0,14.0,20.0,30.0,50.0/)
+        endif
+
+        !! Prepare to read in spectrum information
+        !! set the spectrum array to: # of mesh cells * # energy groups
+        !ALLOCATE(spectrum(1:n_mesh_cells, 1:bias + n_ener_grps))
+        !ALLOCATE(tot_list(1:n_mesh_cells))
+        !if (bias.eq.1) ALLOCATE(bias_list(1:n_mesh_cells))
+        ! 
+        !! reading in source strength and alias table for each voxel 
+        !i = 1 ! i keeps track of # of voxel entries
+        !do
+        !  read(unitnum,*,iostat=stat) (spectrum(i,j), j=1,bias + n_ener_grps)
+        !  if (stat.ne.0) then
+        !    i = i - 1
+        !    exit ! exit the do loop
+        !  endif
+        !  if (bias.eq.1) bias_list(i) = spectrum(i,bias+n_ener_grps)
+        !  i = i + 1
+        !enddo
+        !
+        !! Check for correct number of voxel entries in gammas file.
+        !if (i.ne.n_mesh_cells) write(*,*) 'ERROR: ', i, ' voxels found in ' // &
+        !                'gammas file. ', n_mesh_cells, ' expected.'
 
 
-    call iMesh_dtor(%VAL(mesh), ierr)
-    CHECK("Failed to destroy interface")
+
+        call iMesh_dtor(%VAL(mesh), ierr)
+        CHECK("Failed to destroy interface")
 
 end subroutine read_moab
 
