@@ -331,4 +331,6 @@ program test_source
         call test_erg_sampling_distrib
         call test_uniform_sample
 
+        call read_moab
+
 end program test_source

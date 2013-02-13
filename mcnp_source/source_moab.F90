@@ -174,7 +174,7 @@ subroutine source_setup
 
         unitnum = getUnit()
 
-        call read_moab
+        call read_moab("n_fluxes_and_materials.h5m")
 
         !call read_gammas(unitnum)
 
@@ -231,13 +231,15 @@ subroutine source_setup
 end subroutine source_setup
 
 
-subroutine read_moab
+subroutine read_moab (filename)
 ! 
   use source_data
   implicit none
         ! declarations
         integer vert_uses, i
         integer ioffsets
+
+        character*30 :: filename
 
         iMesh_Instance :: mesh
         IBASE_HANDLE_T :: rpents, rpverts, rpallverts, ipoffsets
@@ -256,7 +258,7 @@ subroutine read_moab
         iBase_EntitySetHandle root_set
 
         ! create the Mesh instance
-        call iMesh_newMesh("", mesh, ierr)
+        call iMesh_newMesh(filename, mesh, ierr)
         CHECK("Problems instantiating interface.")
 
         ! load the mesh
