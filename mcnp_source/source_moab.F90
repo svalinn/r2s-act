@@ -301,7 +301,7 @@ subroutine read_moab
         !  we use default energies.
         call iMesh_getTagHandle(%VAL(mesh), "PHTN_ERGS", ergtag, ierr, 9)
         
-        if (ierr.eq.0)
+        if (ierr.eq.0) then 
           continue
         else ! use default energy groups; 42 groups
           n_ener_grps = 42
