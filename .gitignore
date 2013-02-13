@@ -5,7 +5,7 @@ scripts/r2s/mcnp
 
 # Ignore various temp files
 *.pyc
-.*.swp
+.*.sw?
 *~
 *.o
 *.mod
