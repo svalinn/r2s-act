@@ -4,7 +4,7 @@ python hide_source.py ../../source_moab.F90
 # Generate the .o files..
 gfortran -c mcnp_placeholder.F90 -fbounds-check -g
 
-gfortran -c source.F90 -fbounds-check -g -fcray-pointer -I/filespace/groups/cnerg/opt/MOAB/opt-cubit-c12/include -lstdc++ -liMesh -L/filespace/groups/cnerg/opt/MOAB/opt-nocgm/lib -lMOAB -lhdf5 -lnetcdf 
+gfortran -c source.F90 -fbounds-check -g -fcray-pointer -I/filespace/groups/cnerg/opt/MOAB/opt-cubit-c12/include -lstdc++ -liMesh -L/filespace/groups/cnerg/opt/MOAB/opt-nocgm/lib -lMOAB -lhdf5 -lnetcdf
 
 
 # For reference:
