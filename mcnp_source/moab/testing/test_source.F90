@@ -323,14 +323,15 @@ program test_source
 
         call RN_init_problem() ! init random number generator to defaults
 
-        write(*,*) "Running Fortran tests --"
-        call test_read_custom_ergs
-        call test_read_header
-        call test_read_params
-        call test_gen_erg_alias_table
-        call test_erg_sampling_distrib
-        call test_uniform_sample
+        !write(*,*) "Running Fortran tests --"
+        !call test_read_custom_ergs
+        !call test_read_header
+        !call test_read_params
+        !call test_gen_erg_alias_table
+        !call test_erg_sampling_distrib
+        !call test_uniform_sample
 
-        call read_moab
+        !call read_moab("125hex.vtk")
+        call read_moab("n_fluxes_and_materials.vtk")
 
 end program test_source

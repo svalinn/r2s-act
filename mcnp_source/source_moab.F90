@@ -174,7 +174,7 @@ subroutine source_setup
 
         unitnum = getUnit()
 
-        call read_moab("n_fluxes_and_materials.h5m")
+        call read_moab(mesh_file)
 
         !call read_gammas(unitnum)
 
@@ -245,7 +245,11 @@ subroutine read_moab (filename)
         IBASE_HANDLE_T :: rpents, rpverts, rpallverts, ipoffsets
         IBASE_HANDLE_T :: ents, verts, allverts
 
-        IBASE_HANDLE_T :: ergtag
+        IBASE_HANDLE_T :: rpertag !, ergtag
+        iBase_TagHandle :: ergtag, tagh
+        !pointer (rpergtag, ergtag)
+        !pointer (rpergtag, ergtag(0:*))
+        character*128 :: tname
         
         pointer (rpents, ents(0:*))
         pointer (rpverts, verts(0:*))
@@ -257,8 +261,28 @@ subroutine read_moab (filename)
         integer offsets_alloc, offsets_size
         iBase_EntitySetHandle root_set
 
+    IBASE_HANDLE_T rpsets
+    pointer (rpsets, sets(0:*))
+    iBase_EntitySetHandle sets
+    integer sets_alloc, sets_size, count
+
+    iBase_EntityArrIterator iter
+    IBASE_HANDLE_T rpdata
+    real*8 tag_data
+    pointer(rpdata, tag_data(0:*))
+
+    !real*8 dbl_val
+    !integer int_val, tag_type
+    !character*128 tname, fname
+    !character*1024 tname2
+
+    integer :: err, j, num_hops, atend !, num_commands, tname_len
+    !logical read_par
+    !data read_par/.false./
+
+
         ! create the Mesh instance
-        call iMesh_newMesh(filename, mesh, ierr)
+        call iMesh_newMesh("", mesh, ierr)
         CHECK("Problems instantiating interface.")
 
         ! load the mesh
@@ -266,9 +290,27 @@ subroutine read_moab (filename)
         CHECK("Problems getting root set")
 
         call iMesh_load(%VAL(mesh), %VAL(root_set), &
-             mesh_file, "", ierr)
+             filename, "", ierr)
              !"125hex.vtk", "", ierr)
         CHECK("Load failed")
+        Write(*,*) "opened ", filename
+
+        !!!!
+
+
+    ! get all sets
+    sets_alloc = 0
+    num_hops = 1
+    call iMesh_getEntSets(%VAL(mesh), %VAL(root_set), %VAL(num_hops), &
+         rpsets, sets_alloc, sets_size, err)
+    !ERRORR("Couldn't get all sets.")
+
+! get the number of ??? regions
+    call iMesh_getNumOfType(%VAL(mesh), %VAL(root_set), &
+        %VAL(iBase_REGION), i, ierr)
+        Write(*,*) "Number of regions:", i
+
+        !!!!!!
 
         ! get all 3d elements
         ents_alloc = 0
@@ -278,6 +320,46 @@ subroutine read_moab (filename)
              !%VAL(iMesh_ALL_TOPOLOGIES), rpents, ents_alloc, ents_size, &
              !ierr)
         CHECK("Couldn't get entities")
+
+        Write(*,*) "Number of tets:", ents_size
+
+       ! !call iMesh_createTag(%VAL(mesh), "pony", 8, iBase_DOUBLE, ergtag, ierr)
+       ! call iMesh_createTag(%VAL(mesh), "PHTN_ERGS", 1, iBase_DOUBLE, ergtag, ierr)
+
+       ! Write(*,*) "hrm"
+       ! call iMesh_tagIterate(%VAL(mesh), %VAL(ergtag), %VAL(iter), &
+       !         rpdata, i, ierr)
+       ! Write(*,*) "wooo", i
+        
+
+       Write(*,*) "hrm"
+! create a tag to put on the regions
+      call iMesh_createTagWithOptions(%VAL(mesh), "dumtag",  &
+          "moab:TAG_STORAGE_TYPE=DENSE moab:TAG_DEFAULT_VALUE=0.0",  &
+          %VAL(1), %VAL(iBase_DOUBLE), tagh, ierr)
+
+       Write(*,*) "hrm"
+
+       count = 0
+! iterate over tag memory
+10    call iMesh_tagIterate(%VAL(mesh), %VAL(tagh), %VAL(iter), &
+          rpdata, count, ierr)
+       Write(*,*) "pfeh"
+ 
+! step the iterator over count entities
+      call iMesh_stepEntArrIter(%VAL(mesh), %VAL(iter), %VAL(count), &
+          atend, ierr)
+
+      if (atend .eq. 0) go to 10
+
+       Write(*,*) "wat?!"
+
+        !call iMesh_getTagHandle(%VAL(mesh), "PHTN_ERGS", rpergtag, ierr, 9)
+        !call iMesh_getTagHandle(%VAL(mesh), "n_group_168", ergtag, ierr, 11)
+        !call iMesh_getTagHandle(%VAL(mesh), "n_group_168", ergtag, ierr)
+        !!tname = "n_group_168"
+        !!call iMesh_getTagHandle(%VAL(mesh), tname, ergtag, ierr, 128)
+        !!Write(*,*) "Found tag!"
 
         vert_uses = 0
 
@@ -301,18 +383,18 @@ subroutine read_moab (filename)
 
         ! If ergs flag was found, we call read_custom_ergs.  Otherwise 
         !  we use default energies.
-        call iMesh_getTagHandle(%VAL(mesh), "PHTN_ERGS", ergtag, ierr, 9)
+        !call iMesh_getTagHandle(%VAL(mesh), "PHTN_ERGS", rpergtag, ierr, 9)
         
-        if (ierr.eq.0) then 
-          continue
-        else ! use default energy groups; 42 groups
-          n_ener_grps = 42
-          ALLOCATE(my_ener_phot(1:n_ener_grps+1))
-          my_ener_phot = (/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
-            0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
-            1.66,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0, &
-            10.0,12.0,14.0,20.0,30.0,50.0/)
-        endif
+        !if (ierr.eq.0) then 
+        !  continue
+        !else ! use default energy groups; 42 groups
+        !  n_ener_grps = 42
+        !  ALLOCATE(my_ener_phot(1:n_ener_grps+1))
+        !  my_ener_phot = (/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
+        !    0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
+        !    1.66,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0, &
+        !    10.0,12.0,14.0,20.0,30.0,50.0/)
+        !endif
 
         !! Prepare to read in spectrum information
         !! set the spectrum array to: # of mesh cells * # energy groups
