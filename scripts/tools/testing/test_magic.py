@@ -94,6 +94,71 @@ def test_null():
     assert_equal(written[1:], expected[1:])
     os.remove(output)
 
+def single_group_test1():
+    flux_h5m = 'files_test_magic/single_group_test1.h5m'
+    expected_file = 'files_test_magic/single_group_test1.wwinp'
+    output = 'single_group_test1'
+    
+    if output in os.listdir('.'):
+        os.remove(output)
+    
+    magic.magic(flux_h5m, 'None', False, 0, output, 'None')
+
+    f=open(output)
+    written = f.readlines()
+    f.close
+
+    g = open(expected_file)
+    expected = g.readlines()
+    g.close
+
+    assert_equal(written[1:], expected[1:])
+    os.remove(output)
+
+def test_overwrite():
+    flux_h5m = 'files_test_magic/single_group_test2.h5m'
+    ww_mesh = 'files_test_magic/single_group_test1.wwmesh'
+    expected_file = 'files_test_magic/single_group_test2.wwinp'
+    output = 'single_group_test2'
+    
+    if output in os.listdir('.'):
+        os.remove(output)
+    
+    magic.magic(flux_h5m, ww_mesh, False, 0, output, 'None')
+
+    f=open(output)
+    written = f.readlines()
+    f.close
+
+    g = open(expected_file)
+    expected = g.readlines()
+    g.close
+
+    assert_equal(written[1:], expected[1:])
+    os.remove(output)
+
+
+def test_block_3():
+    flux_h5m = 'files_test_magic/iteration_0.h5m'
+    expected_file = 'files_test_magic/totals_test.wwinp'
+    output = 'totals_wwinp'
+    
+    if output in os.listdir('.'):
+        os.remove(output)
+    
+    magic.magic(flux_h5m, 'None', True, 0, output, 'None')
+
+    f=open(output)
+    written = f.readlines()
+    f.close
+
+    g = open(expected_file)
+    expected = g.readlines()
+    g.close
+
+    assert_equal(written[1:], expected[1:])
+    os.remove(output)
+
 
 # Run as script
 #

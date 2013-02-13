@@ -51,18 +51,24 @@ def magic_wwinp(flux_mesh, ww_mesh='None', total_bool=False, null_value=0):
     """
 
     # find meshtal type
-    try:
-       tag=flux_mesh.imesh.getTagHandle('n_group_001')
+    tag_names = []
+    for tag in flux_mesh.imesh.getAllTags(flux_mesh.getHex(0,0,0)):
+        tag_names.append(tag.name)
+
+    if 'n_group_001' in tag_names or 'n_group_total' in tag_names:
        particle = 'n'
-    except:
+    elif 'p_group_001' in tag_names or 'p_group_total' in tag_names:
         particle = 'p'
+    else:
+        print >>sys.stderr, 'Tag X_group_YYY or X_group_total not found'
+        sys.exit(1)
 
     # find number of e_groups
     num_e_groups = find_num_e_groups(flux_mesh, particle)
 
     if total_bool == False:
         e_groups = ['{0:03d}'.format(x) for x in range(1, num_e_groups + 1)]
-        print "\tGnerating WW for {0} energy groups".format(num_e_groups)
+        print "\tGenerating WW for {0} energy groups".format(num_e_groups)
     else:
         e_groups = ['total']
         print "\tGenerating WW for Total energy group"
@@ -71,7 +77,7 @@ def magic_wwinp(flux_mesh, ww_mesh='None', total_bool=False, null_value=0):
     max_fluxes = find_max_fluxes(flux_mesh, particle, e_groups, total_bool)
 
     if ww_mesh == 'None':
-        print "\tNo WW mesh file supplied, generating one based on meshtal"
+        print "\tNo WW mesh file supplied; generating one based on meshtal"
         ww_bool = False # mesh file NOT preexisting
         # create a mesh with the same dimensions as flux_mesh
         ww_mesh = ScdMesh(flux_mesh.getDivisions('x'),\
@@ -84,8 +90,13 @@ def magic_wwinp(flux_mesh, ww_mesh='None', total_bool=False, null_value=0):
 
         # create energy bounds
         tag_e_groups = ww_mesh.imesh.createTag("e_groups", len(e_groups), float)
-        tag_e_groups[ww_mesh.imesh.rootSet] = \
-            flux_mesh.imesh.getTagHandle("e_groups")[flux_mesh.imesh.rootSet]  
+
+        if e_groups != ['total']:
+            tag_e_groups[ww_mesh.imesh.rootSet] = \
+                flux_mesh.imesh.getTagHandle("e_groups")[flux_mesh.imesh.rootSet]
+        else:
+            tag_e_groups[ww_mesh.imesh.rootSet] = 1E36 # usual MCNP value           
+
 
     else:
         ww_bool = True # mesh file preexisting
@@ -99,7 +110,7 @@ def magic_wwinp(flux_mesh, ww_mesh='None', total_bool=False, null_value=0):
             print >>sys.stderr, 'Mismatched dimensions on WWINP and flux meshes'
             sys.exit(1)
 
-    print "\t Supplied meshes confirmed to have same dimensions"
+    print "\tSupplied meshes confirmed to have same dimensions"
     
     # iterate through all voxels          
     flux_voxels = flux_mesh.iterateHex('xyz')
@@ -129,11 +140,17 @@ def write_wwinp(ww_mesh, e_groups, output):
     """
 
     # find wwinp type
-    try:
-       tag=ww_mesh.imesh.getTagHandle('ww_n_group_001')
+    tag_names = []
+    for tag in ww_mesh.imesh.getAllTags(ww_mesh.getHex(0,0,0)):
+        tag_names.append(tag.name)
+
+    if 'ww_n_group_001' in tag_names or 'ww_n_group_total' in tag_names:
        particle = 'n'
-    except:
+    elif 'ww_p_group_001' in tag_names or 'ww_p_group_total' in tag_names:
         particle = 'p'
+    else:
+        print >>sys.stderr, 'Tag ww_X_group_YYY or ww_X_group_total not found'
+        sys.exit(1)
 
     # create block 1 string
     block1 = '         1         1         1        10                     '
@@ -229,11 +246,16 @@ def write_wwinp(ww_mesh, e_groups, output):
     # create block 3 string
     # first get energy values and added then to the block 3 string
     block3 = ''
-    e_groups = ww_mesh.imesh.getTagHandle("e_groups")[ww_mesh.imesh.rootSet]
+    e_bounds = ww_mesh.imesh.getTagHandle("e_groups")[ww_mesh.imesh.rootSet]
     line_count = 0
 
-    for e_group in e_groups:
-        block3 += "  {0:1.5E}".format(e_group)
+    #in the single e_group case, the "e_groups" tag returns a non-iterable float,
+    # if this is the case, put this float into an array so that it can be iterated over
+    if isinstance(e_bounds, float):
+        e_bounds = [e_bounds]
+
+    for e_bound in e_bounds:
+        block3 += "  {0:1.5E}".format(e_bound)
         line_count += 1
         if line_count == 6:
            block3 += '\n'
@@ -248,7 +270,7 @@ def write_wwinp(ww_mesh, e_groups, output):
         ww_data = []
         count += 1
         for voxel in voxels:
-            ww_data.append(ww_mesh.imesh.getTagHandle('ww_{0}_group_{1:03d}'.format(particle, count))[voxel])
+            ww_data.append(ww_mesh.imesh.getTagHandle('ww_{0}_group_{1}'.format(particle, e_group))[voxel])
           
         # append ww_data to block3 string
         line_count = 0
@@ -319,10 +341,10 @@ def main( arguments = None ):
 
     magic(args[0], opts.ww_mesh, opts.total_bool, opts.null_value, opts.output_name, opts.output_mesh)
 
-    print "\tWrote WWINP file {0}\n".format(opts.output_name)
+    print "\tWrote WWINP file '{0}'".format(opts.output_name)
 
     if opts.output_mesh != 'None':
-        print "\tWrote WW mesh file {0}\n".format(opts.output_mesh)
+        print "\tWrote WW mesh file '{0}'".format(opts.output_mesh)
 
     print "Complete"
 
