@@ -10,7 +10,7 @@ def test_block_1_2():
     if output in os.listdir('.'):
         os.remove(output)
     
-    magic.magic(flux_h5m, 'None', False, 0, output, 'None')
+    magic.magic(flux_h5m, 'None', False, 0, output, 'None', 0.1)
 
     f=open(output)
     written = f.readlines()
@@ -35,7 +35,7 @@ def test_block_3():
     if output in os.listdir('.'):
         os.remove(output)
     
-    magic.magic(flux_h5m, 'None', False, 0, output, 'None')
+    magic.magic(flux_h5m, 'None', False, 0, output, 'None', 0.1)
 
     f=open(output)
     written = f.readlines()
@@ -59,7 +59,7 @@ def test_overwrite():
     if output in os.listdir('.'):
         os.remove(output)
     
-    magic.magic(flux_h5m, ww_mesh, False, 0, output, 'None')
+    magic.magic(flux_h5m, ww_mesh, False, 0, output, 'None', 0.1)
 
     f=open(output)
     written = f.readlines()
@@ -81,7 +81,7 @@ def test_null():
     if output in os.listdir('.'):
         os.remove(output)
     
-    magic.magic(flux_h5m, 'None', False, 33333, output, 'None')
+    magic.magic(flux_h5m, 'None', False, 33333, output, 'None', 0.1)
 
     f=open(output)
     written = f.readlines()
@@ -102,7 +102,7 @@ def single_group_test1():
     if output in os.listdir('.'):
         os.remove(output)
     
-    magic.magic(flux_h5m, 'None', False, 0, output, 'None')
+    magic.magic(flux_h5m, 'None', False, 0, output, 'None', 0.1)
 
     f=open(output)
     written = f.readlines()
@@ -115,7 +115,7 @@ def single_group_test1():
     assert_equal(written[1:], expected[1:])
     os.remove(output)
 
-def test_overwrite():
+def test_single_group_test2():
     flux_h5m = 'files_test_magic/single_group_test2.h5m'
     ww_mesh = 'files_test_magic/single_group_test1.wwmesh'
     expected_file = 'files_test_magic/single_group_test2.wwinp'
@@ -124,7 +124,7 @@ def test_overwrite():
     if output in os.listdir('.'):
         os.remove(output)
     
-    magic.magic(flux_h5m, ww_mesh, False, 0, output, 'None')
+    magic.magic(flux_h5m, ww_mesh, False, 0, output, 'None', 0.1)
 
     f=open(output)
     written = f.readlines()
@@ -146,7 +146,30 @@ def test_block_3():
     if output in os.listdir('.'):
         os.remove(output)
     
-    magic.magic(flux_h5m, 'None', True, 0, output, 'None')
+    magic.magic(flux_h5m, 'None', True, 0, output, 'None', 0.1)
+
+    f=open(output)
+    written = f.readlines()
+    f.close
+
+    g = open(expected_file)
+    expected = g.readlines()
+    g.close
+
+    assert_equal(written[1:], expected[1:])
+    os.remove(output)
+
+###############################################################
+def test_tolerance():
+    flux_h5m = 'files_test_magic/iteration_1.h5m'
+    ww_mesh = 'files_test_magic/iteration_0.wwmesh'
+    expected_file = 'files_test_magic/tolerance_test.wwinp'
+    output = 'tolerance_test'
+    
+    if output in os.listdir('.'):
+        os.remove(output)
+    
+    magic.magic(flux_h5m, ww_mesh, False, 0, output, 'None', 0.7)
 
     f=open(output)
     written = f.readlines()

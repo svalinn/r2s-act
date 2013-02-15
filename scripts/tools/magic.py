@@ -45,7 +45,7 @@ def find_max_fluxes(flux_mesh, particle, e_groups, total_bool):
     return max_fluxes
 
 
-def magic_wwinp(flux_mesh, ww_mesh='None', total_bool=False, null_value=0):
+def magic_wwinp(flux_mesh, ww_mesh='None', total_bool=False, null_value=0, tolerance=0.1):
     """This function reads in a flux mesh and a ww mesh as well as relevant paramters
        then the magic method is applied and a newly tagged flux is returned.
     """
@@ -122,7 +122,7 @@ def magic_wwinp(flux_mesh, ww_mesh='None', total_bool=False, null_value=0):
                 '{0}_group_{1}'.format(particle, e_group))[flux_voxel]
             error = flux_mesh.imesh.getTagHandle(\
                  '{0}_group_{1}_error'.format(particle, e_group))[flux_voxel]
-            if (ww_bool == False and error != 0.0) or 0.0 < error < 0.1:
+            if (ww_bool == False and error != 0.0) or 0.0 < error < tolerance:
             #if 0 < error < 0.1:
                 ww_mesh.imesh.getTagHandle(\
                     'ww_{0}_group_{1}'.format(particle, e_group))[ww_voxel]\
@@ -296,12 +296,12 @@ def write_wwinp(ww_mesh, e_groups, output):
 
 
 
-def magic(flux_h5m, ww_mesh, total_bool, null_value, output, output_mesh):
+def magic(flux_h5m, ww_mesh, total_bool, null_value, output, output_mesh, tolerance):
     """Runs magic.py from as a module
     """
     flux_mesh = ScdMesh.fromFile(flux_h5m)
 
-    ww_mesh, e_groups = magic_wwinp(flux_mesh, ww_mesh, total_bool, null_value)
+    ww_mesh, e_groups = magic_wwinp(flux_mesh, ww_mesh, total_bool, null_value, tolerance)
 
     if output_mesh != 'None':
         ww_mesh.scdset.save(output_mesh)
@@ -332,6 +332,9 @@ def main( arguments = None ):
     parser.add_option('-n', dest='null_value', default='0',\
         help='WW value for voxels with error > 10%, default=%default')
 
+    parser.add_option('-e', dest='tolerance', default='0.1',\
+        help='Specify the maximum allowable error for overwriting  values, default=%default')
+
     (opts, args) = parser.parse_args( arguments )
 
     if len(args) != 1:
@@ -339,7 +342,7 @@ def main( arguments = None ):
         ( '\nNeed exactly 1 argument: flux mesh' )
 
 
-    magic(args[0], opts.ww_mesh, opts.total_bool, opts.null_value, opts.output_name, opts.output_mesh)
+    magic(args[0], opts.ww_mesh, opts.total_bool, opts.null_value, opts.output_name, opts.output_mesh, opts.tolerance)
 
     print "\tWrote WWINP file '{0}'".format(opts.output_name)
 
