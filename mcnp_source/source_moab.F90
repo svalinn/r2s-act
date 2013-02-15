@@ -137,6 +137,7 @@ module source_data
         integer :: ic_s, ib_s, ih_s  ! for binary search
         integer :: i_ints, j_ints, k_ints, n_mesh_cells, n_active_mat
         real, dimension(:), allocatable :: i_bins, j_bins, k_bins
+        real(dknd) :: volume
         integer, dimension(100) :: active_mat
         character*3000 :: line ! needed for reading active_mat from gammas
 
@@ -215,6 +216,22 @@ subroutine source_setup
         write(*,*) "n_mesh_cells:", n_mesh_cells, &
                 "n_source_cells:", n_source_cells
 
+        ! We scale each entry in tot_list (phtns/s/cc) by the voxel's volume
+        ! to get (phtns/s/voxel)
+        do i=1,n_mesh_cells
+          if (tot_list(i).gt.0) then
+            call iMesh_getEntTopo(%VAL(mesh), %VAL(ents(i)), voxel_type, ierr)
+            if (voxel_type.eq.iMesh_TETRAHEDRON) then
+              call get_tet_vol(ents(i), volume)
+            elseif (voxel_type.eq.iMesh_HEXAHEDRON) then
+              call get_hex_vol(ents(i), volume)
+            else
+              call expirx(1,'sourcb','Invalid voxel type')
+            endif
+
+            tot_list(i) = tot_list(i) * volume
+        enddo
+
         ! Generate alias table of voxels if needed
         if (samp_vox.eq.1) then
           call gen_voxel_alias_table
@@ -245,8 +262,8 @@ subroutine read_moab (filename)
         IBASE_HANDLE_T :: rpents, rpverts, rpallverts, ipoffsets
         IBASE_HANDLE_T :: ents, verts, allverts
 
-        IBASE_HANDLE_T :: rpertag !, ergtag
-        iBase_TagHandle :: ergtag, tagh
+        !IBASE_HANDLE_T :: rpergtag
+        iBase_TagHandle :: ergtagh, tagh
         !pointer (rpergtag, ergtag)
         !pointer (rpergtag, ergtag(0:*))
         character*128 :: tname
@@ -306,9 +323,9 @@ subroutine read_moab (filename)
     !ERRORR("Couldn't get all sets.")
 
 ! get the number of ??? regions
-    call iMesh_getNumOfType(%VAL(mesh), %VAL(root_set), &
-        %VAL(iBase_REGION), i, ierr)
-        Write(*,*) "Number of regions:", i
+        call iMesh_getNumOfType(%VAL(mesh), %VAL(root_set), &
+            %VAL(iBase_REGION), n_mesh_cells, ierr)
+        Write(*,*) "Number of regions:", n_mesh_cells
 
         !!!!!!
 
@@ -322,44 +339,6 @@ subroutine read_moab (filename)
         CHECK("Couldn't get entities")
 
         Write(*,*) "Number of tets:", ents_size
-
-       ! !call iMesh_createTag(%VAL(mesh), "pony", 8, iBase_DOUBLE, ergtag, ierr)
-       ! call iMesh_createTag(%VAL(mesh), "PHTN_ERGS", 1, iBase_DOUBLE, ergtag, ierr)
-
-       ! Write(*,*) "hrm"
-       ! call iMesh_tagIterate(%VAL(mesh), %VAL(ergtag), %VAL(iter), &
-       !         rpdata, i, ierr)
-       ! Write(*,*) "wooo", i
-        
-
-       Write(*,*) "hrm"
-! create a tag to put on the regions
-      call iMesh_createTagWithOptions(%VAL(mesh), "dumtag",  &
-          "moab:TAG_STORAGE_TYPE=DENSE moab:TAG_DEFAULT_VALUE=0.0",  &
-          %VAL(1), %VAL(iBase_DOUBLE), tagh, ierr)
-
-       Write(*,*) "hrm"
-
-       count = 0
-! iterate over tag memory
-10    call iMesh_tagIterate(%VAL(mesh), %VAL(tagh), %VAL(iter), &
-          rpdata, count, ierr)
-       Write(*,*) "pfeh"
- 
-! step the iterator over count entities
-      call iMesh_stepEntArrIter(%VAL(mesh), %VAL(iter), %VAL(count), &
-          atend, ierr)
-
-      if (atend .eq. 0) go to 10
-
-       Write(*,*) "wat?!"
-
-        !call iMesh_getTagHandle(%VAL(mesh), "PHTN_ERGS", rpergtag, ierr, 9)
-        !call iMesh_getTagHandle(%VAL(mesh), "n_group_168", ergtag, ierr, 11)
-        !call iMesh_getTagHandle(%VAL(mesh), "n_group_168", ergtag, ierr)
-        !!tname = "n_group_168"
-        !!call iMesh_getTagHandle(%VAL(mesh), tname, ergtag, ierr, 128)
-        !!Write(*,*) "Found tag!"
 
         vert_uses = 0
 
@@ -381,42 +360,58 @@ subroutine read_moab (filename)
 
         ! Look for parameters line, and read parameters if found.
 
+        ! Look for custom energy groups tag.
+        call iMesh_getTagHandle(%VAL(mesh), "PHTN_ERGS", ergtagh, ierr)
         ! If ergs flag was found, we call read_custom_ergs.  Otherwise 
         !  we use default energies.
-        !call iMesh_getTagHandle(%VAL(mesh), "PHTN_ERGS", rpergtag, ierr, 9)
-        
-        !if (ierr.eq.0) then 
-        !  continue
-        !else ! use default energy groups; 42 groups
-        !  n_ener_grps = 42
-        !  ALLOCATE(my_ener_phot(1:n_ener_grps+1))
-        !  my_ener_phot = (/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
-        !    0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
-        !    1.66,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0, &
-        !    10.0,12.0,14.0,20.0,30.0,50.0/)
-        !endif
+        if (ierr.eq.0) then 
+          ! Get n_ener_grps via length of data in the tag.
+          !  This length is the number of boundaries (groups + 1)
+          call iMesh_getTagSizeValues(%VAL(mesh), %VAL(ergtagh), &
+                n_ener_grps, ierr)
+          n_ener_grps = n_ener_grps - 1
+                
+          ALLOCATE(my_ener_phot(1:n_ener_grps+1))
+          
+          call iMesh_getEntSetDblData(%VAL(mesh), %VAL(root_set), &
+                %VAL(ergtagh), my_ener_phot, ierr)
+        else ! use default energy groups; 42 groups
+          n_ener_grps = 42
+          ALLOCATE(my_ener_phot(1:n_ener_grps+1))
+          my_ener_phot = (/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
+            0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
+            1.66,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0, &
+            10.0,12.0,14.0,20.0,30.0,50.0/)
+        endif
 
-        !! Prepare to read in spectrum information
-        !! set the spectrum array to: # of mesh cells * # energy groups
+        ! Prepare to read in spectrum information
+        ! set the spectrum array to: # of mesh cells * # energy groups
         !ALLOCATE(spectrum(1:n_mesh_cells, 1:bias + n_ener_grps))
-        !ALLOCATE(tot_list(1:n_mesh_cells))
-        !if (bias.eq.1) ALLOCATE(bias_list(1:n_mesh_cells))
-        ! 
-        !! reading in source strength and alias table for each voxel 
-        !i = 1 ! i keeps track of # of voxel entries
-        !do
-        !  read(unitnum,*,iostat=stat) (spectrum(i,j), j=1,bias + n_ener_grps)
-        !  if (stat.ne.0) then
-        !    i = i - 1
-        !    exit ! exit the do loop
-        !  endif
-        !  if (bias.eq.1) bias_list(i) = spectrum(i,bias+n_ener_grps)
-        !  i = i + 1
-        !enddo
-        !
-        !! Check for correct number of voxel entries in gammas file.
-        !if (i.ne.n_mesh_cells) write(*,*) 'ERROR: ', i, ' voxels found in ' // &
-        !                'gammas file. ', n_mesh_cells, ' expected.'
+        ALLOCATE(spectrum(1:n_mesh_cells, 1:n_ener_grps))
+        ALLOCATE(tot_list(1:n_mesh_cells))
+        if (bias.eq.1) ALLOCATE(bias_list(1:n_mesh_cells))
+         
+        ! reading in source strength and alias table for each voxel 
+        i = 1 ! i keeps track of # of voxel entries
+        do
+          read(unitnum,*,iostat=stat) (spectrum(i,j), j=1,bias + n_ener_grps)
+          if (stat.ne.0) then
+            i = i - 1
+            exit ! exit the do loop
+          endif
+          if (bias.eq.1) bias_list(i) = spectrum(i,bias+n_ener_grps)
+          i = i + 1
+        enddo
+
+        call iMesh_getEntities(%VAL(mesh), %VAL(root_set), %VAL(iBase_REGION), &
+                 %VAL(iMesh_ALL_TOPOLOGIES)
+        do i=1, n_mesh_cells
+          call iMesh
+        enddo
+        
+        ! Check for correct number of voxel entries in gammas file.
+        if (i.ne.n_mesh_cells) write(*,*) 'ERROR: ', i, ' voxels found in ' // &
+                        'gammas file. ', n_mesh_cells, ' expected.'
 
 
 
@@ -685,6 +680,55 @@ subroutine read_custom_ergs (myunit)
 888     continue
 
 end subroutine read_custom_ergs
+
+
+subroutine get_tet_vol(mesh, entity_handle, volume)
+! Subroutine calculates volume of a tetrahedron entity on a MOAB mesh
+! 
+! Parameters
+! ----------
+! mesh : iMesh_Instance
+!     Mesh object
+! entity_handle : iBase_EntityHandle
+!     Entity set handle
+! volume : float
+!     Stores the calculated volume
+! 
+! Notes
+! -----
+! Algorithm is from Wikipedia article for Tetrahedrons.
+! For points A, B, C, D::
+!     vol = (1/6) * abs( (A-D) . ((B-D) x (C-D)) )
+! 
+  use source_data
+  implicit none
+
+    volume = abs( (a(1)-d(1)) * (b(1)-d(1)) * (c(1)-d(1)) + &
+                  (a(2)-d(2)) * (b(2)-d(2)) * (c(2)-d(2)) + &
+                  (a(3)-d(3)) * (b(3)-d(3)) * (c(3)-d(3)) ) / 6._rknd
+end subroutine get_tet_vol
+
+
+subroutine get_hex_vol(mesh, entity_handle, volume)
+! Subroutine calculates volume of a hexahedron entity on a MOAB mesh
+! 
+! Parameters
+! ----------
+! mesh : iMesh_Instance
+!     Mesh object
+! entity_handle : iBase_EntityHandle
+!     Entity set handle
+! volume : float
+!     Stores the calculated volume
+! 
+! Notes
+! -----
+! 
+  use source_data
+  implicit none
+
+
+end subroutine get_hex_vol
 
 
 subroutine source
