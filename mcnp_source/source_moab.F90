@@ -98,8 +98,8 @@ module source_data
         implicit none
 ! TBD: Best location for compiler directives??
 ! #define CHECK seems to work in or out of module.
-#define CHECK(a) \
-  if (ierr .ne. 0) print *, a
+!#define CHECK(a) \
+  !if (ierr .ne. 0) write(*,*) a
 ! This include needs to be within the module, at least, lower down might be OK
 ! too.
 #include "iMesh_f.h"
@@ -274,15 +274,15 @@ subroutine read_moab (mymesh, filename, rpents)
 
         ! create the Mesh instance
         call iMesh_newMesh("", mymesh, ierr)
-        CHECK("Problems instantiating interface.")
+        !CHECK("Problems instantiating moab interface.")
 
         ! load the mesh
         call iMesh_getRootSet(%VAL(mymesh), root_set, ierr)
-        CHECK("Problems getting root set")
+        !CHECK("Problems getting root set")
 
         call iMesh_load(%VAL(mymesh), %VAL(root_set), &
              filename, "", ierr)
-        CHECK("Load failed")
+        !CHECK("Load failed")
 
         ! get all 3d elements
         ents_alloc = 0
@@ -292,7 +292,7 @@ subroutine read_moab (mymesh, filename, rpents)
              ierr)
              !%VAL(iMesh_TETRAHEDRON), rpents, ents_alloc, ents_size, &
              !ierr)
-        CHECK("Couldn't get entities")
+        !CHECK("Couldn't get entities")
 
 
         ! Look for parameters line, and read parameters if found.

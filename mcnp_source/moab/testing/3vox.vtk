@@ -1,0 +1,1820 @@
+# vtk DataFile Version 3.0
+MOAB 4.6.0pre
+ASCII
+DATASET UNSTRUCTURED_GRID
+POINTS 16 double
+-8 -20 -8
+8 -20 -8
+-8 -5 -8
+8 -5 -8
+-8 5 -8
+8 5 -8
+-8 20 -8
+8 20 -8
+-8 -20 8
+8 -20 8
+-8 -5 8
+8 -5 8
+-8 5 8
+8 5 8
+-8 20 8
+8 20 8
+CELLS 3 27
+8 0 1 3 2 8 9 11 10
+8 2 3 5 4 10 11 13 12
+8 4 5 7 6 12 13 15 14
+CELL_TYPES 3
+12
+12
+12
+CELL_DATA 3
+SCALARS mat1_rho-2.35 double 1
+LOOKUP_TABLE default
+0 
+0 
+1 
+SCALARS mat1_rho-2.35_err double 1
+LOOKUP_TABLE default
+0 
+0 
+0 
+SCALARS mat2_rho-1.0 double 1
+LOOKUP_TABLE default
+0 
+1 
+0 
+SCALARS mat2_rho-1.0_err double 1
+LOOKUP_TABLE default
+0 
+0 
+0 
+SCALARS matVOID double 1
+LOOKUP_TABLE default
+1 
+1.480297366e-18 
+1.291559452e-17 
+SCALARS matVOID_err double 1
+LOOKUP_TABLE default
+0 
+6.870504321e-19 
+2.184482728e-18 
+SCALARS n_group_001 double 1
+LOOKUP_TABLE default
+2.04319e-05 
+0.000306212 
+8.898e-05 
+SCALARS n_group_001_error double 1
+LOOKUP_TABLE default
+0.00345437 
+0.00163527 
+0.00256278 
+SCALARS n_group_002 double 1
+LOOKUP_TABLE default
+4.82447e-06 
+5.30286e-05 
+1.64604e-05 
+SCALARS n_group_002_error double 1
+LOOKUP_TABLE default
+0.00762654 
+0.0016854 
+0.00295075 
+SCALARS n_group_003 double 1
+LOOKUP_TABLE default
+4.25184e-07 
+3.67613e-06 
+1.24545e-06 
+SCALARS n_group_003_error double 1
+LOOKUP_TABLE default
+0.0276787 
+0.00382188 
+0.00734317 
+SCALARS n_group_004 double 1
+LOOKUP_TABLE default
+4.2e-07 
+3.65675e-06 
+1.22898e-06 
+SCALARS n_group_004_error double 1
+LOOKUP_TABLE default
+0.0276784 
+0.00382316 
+0.0073752 
+SCALARS n_group_005 double 1
+LOOKUP_TABLE default
+4.05421e-07 
+3.65248e-06 
+1.2352e-06 
+SCALARS n_group_005_error double 1
+LOOKUP_TABLE default
+0.0282972 
+0.00381787 
+0.00733104 
+SCALARS n_group_006 double 1
+LOOKUP_TABLE default
+4.18381e-07 
+3.67209e-06 
+1.22399e-06 
+SCALARS n_group_006_error double 1
+LOOKUP_TABLE default
+0.0279306 
+0.00380035 
+0.00732014 
+SCALARS n_group_007 double 1
+LOOKUP_TABLE default
+4.27123e-07 
+3.66919e-06 
+1.24463e-06 
+SCALARS n_group_007_error double 1
+LOOKUP_TABLE default
+0.0276946 
+0.0037941 
+0.00729852 
+SCALARS n_group_008 double 1
+LOOKUP_TABLE default
+4.23638e-07 
+3.72207e-06 
+1.23448e-06 
+SCALARS n_group_008_error double 1
+LOOKUP_TABLE default
+0.0277364 
+0.00375936 
+0.00723226 
+SCALARS n_group_009 double 1
+LOOKUP_TABLE default
+4.40603e-07 
+3.73378e-06 
+1.2631e-06 
+SCALARS n_group_009_error double 1
+LOOKUP_TABLE default
+0.0272391 
+0.00375339 
+0.00719619 
+SCALARS n_group_010 double 1
+LOOKUP_TABLE default
+4.18604e-07 
+3.74135e-06 
+1.27283e-06 
+SCALARS n_group_010_error double 1
+LOOKUP_TABLE default
+0.0278288 
+0.00374584 
+0.00720655 
+SCALARS n_group_011 double 1
+LOOKUP_TABLE default
+4.20417e-07 
+3.7764e-06 
+1.27832e-06 
+SCALARS n_group_011_error double 1
+LOOKUP_TABLE default
+0.027888 
+0.00373129 
+0.00712727 
+SCALARS n_group_012 double 1
+LOOKUP_TABLE default
+4.21492e-07 
+3.81312e-06 
+1.29261e-06 
+SCALARS n_group_012_error double 1
+LOOKUP_TABLE default
+0.027645 
+0.00370932 
+0.00708619 
+SCALARS n_group_013 double 1
+LOOKUP_TABLE default
+4.29887e-07 
+3.85564e-06 
+1.3033e-06 
+SCALARS n_group_013_error double 1
+LOOKUP_TABLE default
+0.0275738 
+0.00368447 
+0.00704088 
+SCALARS n_group_014 double 1
+LOOKUP_TABLE default
+4.44373e-07 
+3.89823e-06 
+1.31973e-06 
+SCALARS n_group_014_error double 1
+LOOKUP_TABLE default
+0.0269285 
+0.00366879 
+0.00701025 
+SCALARS n_group_015 double 1
+LOOKUP_TABLE default
+4.51466e-07 
+3.91599e-06 
+1.32836e-06 
+SCALARS n_group_015_error double 1
+LOOKUP_TABLE default
+0.0268624 
+0.00366448 
+0.00695731 
+SCALARS n_group_016 double 1
+LOOKUP_TABLE default
+4.63478e-07 
+3.96377e-06 
+1.35382e-06 
+SCALARS n_group_016_error double 1
+LOOKUP_TABLE default
+0.0265043 
+0.00362793 
+0.00691015 
+SCALARS n_group_017 double 1
+LOOKUP_TABLE default
+4.61813e-07 
+4.00433e-06 
+1.35742e-06 
+SCALARS n_group_017_error double 1
+LOOKUP_TABLE default
+0.0266162 
+0.00360458 
+0.00686007 
+SCALARS n_group_018 double 1
+LOOKUP_TABLE default
+4.75897e-07 
+4.05799e-06 
+1.3737e-06 
+SCALARS n_group_018_error double 1
+LOOKUP_TABLE default
+0.0261909 
+0.00359261 
+0.00682929 
+SCALARS n_group_019 double 1
+LOOKUP_TABLE default
+4.75168e-07 
+4.1009e-06 
+1.40272e-06 
+SCALARS n_group_019_error double 1
+LOOKUP_TABLE default
+0.0261185 
+0.00357759 
+0.00681491 
+SCALARS n_group_020 double 1
+LOOKUP_TABLE default
+4.7391e-07 
+4.12472e-06 
+1.3992e-06 
+SCALARS n_group_020_error double 1
+LOOKUP_TABLE default
+0.0263348 
+0.0035621 
+0.00676449 
+SCALARS n_group_021 double 1
+LOOKUP_TABLE default
+5.07052e-07 
+4.13123e-06 
+1.43014e-06 
+SCALARS n_group_021_error double 1
+LOOKUP_TABLE default
+0.0254071 
+0.0035468 
+0.00670677 
+SCALARS n_group_022 double 1
+LOOKUP_TABLE default
+4.95115e-07 
+4.21985e-06 
+1.43924e-06 
+SCALARS n_group_022_error double 1
+LOOKUP_TABLE default
+0.0256469 
+0.00352802 
+0.00670032 
+SCALARS n_group_023 double 1
+LOOKUP_TABLE default
+5.15524e-07 
+4.27161e-06 
+1.46039e-06 
+SCALARS n_group_023_error double 1
+LOOKUP_TABLE default
+0.0251722 
+0.00349976 
+0.00664837 
+SCALARS n_group_024 double 1
+LOOKUP_TABLE default
+5.18372e-07 
+4.31183e-06 
+1.47372e-06 
+SCALARS n_group_024_error double 1
+LOOKUP_TABLE default
+0.0251104 
+0.00349659 
+0.00660479 
+SCALARS n_group_025 double 1
+LOOKUP_TABLE default
+5.29277e-07 
+4.33741e-06 
+1.4713e-06 
+SCALARS n_group_025_error double 1
+LOOKUP_TABLE default
+0.0248025 
+0.00347447 
+0.00656027 
+SCALARS n_group_026 double 1
+LOOKUP_TABLE default
+5.40658e-07 
+4.40139e-06 
+1.50984e-06 
+SCALARS n_group_026_error double 1
+LOOKUP_TABLE default
+0.0246609 
+0.00345475 
+0.00651871 
+SCALARS n_group_027 double 1
+LOOKUP_TABLE default
+5.36545e-07 
+4.44243e-06 
+1.51295e-06 
+SCALARS n_group_027_error double 1
+LOOKUP_TABLE default
+0.0246838 
+0.00342774 
+0.00652664 
+SCALARS n_group_028 double 1
+LOOKUP_TABLE default
+5.49004e-07 
+4.46633e-06 
+1.50779e-06 
+SCALARS n_group_028_error double 1
+LOOKUP_TABLE default
+0.0243639 
+0.00342601 
+0.00646796 
+SCALARS n_group_029 double 1
+LOOKUP_TABLE default
+5.86963e-07 
+4.55137e-06 
+1.55444e-06 
+SCALARS n_group_029_error double 1
+LOOKUP_TABLE default
+0.0236485 
+0.00340097 
+0.00640885 
+SCALARS n_group_030 double 1
+LOOKUP_TABLE default
+5.51835e-07 
+4.55538e-06 
+1.56872e-06 
+SCALARS n_group_030_error double 1
+LOOKUP_TABLE default
+0.0241161 
+0.00339269 
+0.00639583 
+SCALARS n_group_031 double 1
+LOOKUP_TABLE default
+5.63664e-07 
+4.61771e-06 
+1.59568e-06 
+SCALARS n_group_031_error double 1
+LOOKUP_TABLE default
+0.0238876 
+0.00336716 
+0.0063234 
+SCALARS n_group_032 double 1
+LOOKUP_TABLE default
+5.65539e-07 
+4.67537e-06 
+1.60608e-06 
+SCALARS n_group_032_error double 1
+LOOKUP_TABLE default
+0.0239831 
+0.00334883 
+0.00629602 
+SCALARS n_group_033 double 1
+LOOKUP_TABLE default
+5.89369e-07 
+4.75888e-06 
+1.63518e-06 
+SCALARS n_group_033_error double 1
+LOOKUP_TABLE default
+0.0234835 
+0.00332961 
+0.00624547 
+SCALARS n_group_034 double 1
+LOOKUP_TABLE default
+5.89245e-07 
+4.79485e-06 
+1.66591e-06 
+SCALARS n_group_034_error double 1
+LOOKUP_TABLE default
+0.0234757 
+0.00331368 
+0.00621722 
+SCALARS n_group_035 double 1
+LOOKUP_TABLE default
+6.13736e-07 
+4.83318e-06 
+1.68475e-06 
+SCALARS n_group_035_error double 1
+LOOKUP_TABLE default
+0.0229557 
+0.0032939 
+0.00614746 
+SCALARS n_group_036 double 1
+LOOKUP_TABLE default
+6.27749e-07 
+4.8892e-06 
+1.71654e-06 
+SCALARS n_group_036_error double 1
+LOOKUP_TABLE default
+0.0227637 
+0.00329063 
+0.00613121 
+SCALARS n_group_037 double 1
+LOOKUP_TABLE default
+2.6041e-07 
+1.99319e-06 
+6.694e-07 
+SCALARS n_group_037_error double 1
+LOOKUP_TABLE default
+0.0354574 
+0.00496773 
+0.00917502 
+SCALARS n_group_038 double 1
+LOOKUP_TABLE default
+2.5192e-07 
+1.99432e-06 
+6.88892e-07 
+SCALARS n_group_038_error double 1
+LOOKUP_TABLE default
+0.0359294 
+0.00496115 
+0.00906188 
+SCALARS n_group_039 double 1
+LOOKUP_TABLE default
+1.11222e-07 
+1.01358e-06 
+3.54067e-07 
+SCALARS n_group_039_error double 1
+LOOKUP_TABLE default
+0.0533854 
+0.00688916 
+0.0123708 
+SCALARS n_group_040 double 1
+LOOKUP_TABLE default
+1.28478e-07 
+1.01506e-06 
+3.41232e-07 
+SCALARS n_group_040_error double 1
+LOOKUP_TABLE default
+0.0500912 
+0.00686225 
+0.0124027 
+SCALARS n_group_041 double 1
+LOOKUP_TABLE default
+2.52644e-07 
+2.01299e-06 
+6.90535e-07 
+SCALARS n_group_041_error double 1
+LOOKUP_TABLE default
+0.0357093 
+0.00494603 
+0.00902495 
+SCALARS n_group_042 double 1
+LOOKUP_TABLE default
+2.67955e-07 
+2.02109e-06 
+7.03058e-07 
+SCALARS n_group_042_error double 1
+LOOKUP_TABLE default
+0.0349146 
+0.00492365 
+0.00891815 
+SCALARS n_group_043 double 1
+LOOKUP_TABLE default
+2.57317e-07 
+2.0306e-06 
+6.97196e-07 
+SCALARS n_group_043_error double 1
+LOOKUP_TABLE default
+0.0355928 
+0.00491373 
+0.0089455 
+SCALARS n_group_044 double 1
+LOOKUP_TABLE default
+3.81888e-07 
+3.10613e-06 
+1.07373e-06 
+SCALARS n_group_044_error double 1
+LOOKUP_TABLE default
+0.0291358 
+0.00404406 
+0.0073915 
+SCALARS n_group_045 double 1
+LOOKUP_TABLE default
+6.88678e-07 
+5.20454e-06 
+1.82642e-06 
+SCALARS n_group_045_error double 1
+LOOKUP_TABLE default
+0.0216814 
+0.00321035 
+0.00597366 
+SCALARS n_group_046 double 1
+LOOKUP_TABLE default
+6.86688e-07 
+5.32589e-06 
+1.86008e-06 
+SCALARS n_group_046_error double 1
+LOOKUP_TABLE default
+0.0217315 
+0.00318562 
+0.00591447 
+SCALARS n_group_047 double 1
+LOOKUP_TABLE default
+7.25329e-07 
+5.45572e-06 
+1.88314e-06 
+SCALARS n_group_047_error double 1
+LOOKUP_TABLE default
+0.0212936 
+0.00317438 
+0.00586706 
+SCALARS n_group_048 double 1
+LOOKUP_TABLE default
+4.43315e-07 
+3.31368e-06 
+1.16578e-06 
+SCALARS n_group_048_error double 1
+LOOKUP_TABLE default
+0.0270682 
+0.00396597 
+0.00720224 
+SCALARS n_group_049 double 1
+LOOKUP_TABLE default
+2.88199e-07 
+2.2258e-06 
+7.90246e-07 
+SCALARS n_group_049_error double 1
+LOOKUP_TABLE default
+0.0335713 
+0.00480327 
+0.00853336 
+SCALARS n_group_050 double 1
+LOOKUP_TABLE default
+7.44014e-07 
+5.74591e-06 
+1.99332e-06 
+SCALARS n_group_050_error double 1
+LOOKUP_TABLE default
+0.0208264 
+0.00312118 
+0.00580213 
+SCALARS n_group_051 double 1
+LOOKUP_TABLE default
+7.86255e-07 
+5.9195e-06 
+2.07418e-06 
+SCALARS n_group_051_error double 1
+LOOKUP_TABLE default
+0.0202688 
+0.00310812 
+0.00574521 
+SCALARS n_group_052 double 1
+LOOKUP_TABLE default
+4.095e-07 
+3.04336e-06 
+1.06542e-06 
+SCALARS n_group_052_error double 1
+LOOKUP_TABLE default
+0.0280711 
+0.00422488 
+0.00766236 
+SCALARS n_group_053 double 1
+LOOKUP_TABLE default
+2.63433e-07 
+1.85337e-06 
+6.51866e-07 
+SCALARS n_group_053_error double 1
+LOOKUP_TABLE default
+0.0350083 
+0.00537741 
+0.00951952 
+SCALARS n_group_054 double 1
+LOOKUP_TABLE default
+8.62433e-08 
+6.31818e-07 
+2.18812e-07 
+SCALARS n_group_054_error double 1
+LOOKUP_TABLE default
+0.0616397 
+0.00909022 
+0.0161932 
+SCALARS n_group_055 double 1
+LOOKUP_TABLE default
+8.55432e-08 
+6.3176e-07 
+2.11729e-07 
+SCALARS n_group_055_error double 1
+LOOKUP_TABLE default
+0.0611932 
+0.00904636 
+0.0158515 
+SCALARS n_group_056 double 1
+LOOKUP_TABLE default
+1.72061e-07 
+1.25077e-06 
+4.37913e-07 
+SCALARS n_group_056_error double 1
+LOOKUP_TABLE default
+0.043399 
+0.00653329 
+0.0114595 
+SCALARS n_group_057 double 1
+LOOKUP_TABLE default
+1.14208e-07 
+8.99639e-07 
+3.16217e-07 
+SCALARS n_group_057_error double 1
+LOOKUP_TABLE default
+0.0532966 
+0.00768092 
+0.0137053 
+SCALARS n_group_058 double 1
+LOOKUP_TABLE default
+1.88672e-07 
+1.39058e-06 
+4.91173e-07 
+SCALARS n_group_058_error double 1
+LOOKUP_TABLE default
+0.0409403 
+0.00623328 
+0.010869 
+SCALARS n_group_059 double 1
+LOOKUP_TABLE default
+4.15503e-07 
+2.8663e-06 
+1.01215e-06 
+SCALARS n_group_059_error double 1
+LOOKUP_TABLE default
+0.027993 
+0.00443426 
+0.00785645 
+SCALARS n_group_060 double 1
+LOOKUP_TABLE default
+2.82466e-07 
+1.99563e-06 
+6.95013e-07 
+SCALARS n_group_060_error double 1
+LOOKUP_TABLE default
+0.0340089 
+0.00527356 
+0.00934296 
+SCALARS n_group_061 double 1
+LOOKUP_TABLE default
+6.75867e-07 
+4.77762e-06 
+1.69445e-06 
+SCALARS n_group_061_error double 1
+LOOKUP_TABLE default
+0.0218243 
+0.00354664 
+0.00636682 
+SCALARS n_group_062 double 1
+LOOKUP_TABLE default
+5.37118e-07 
+3.53834e-06 
+1.24921e-06 
+SCALARS n_group_062_error double 1
+LOOKUP_TABLE default
+0.0247619 
+0.00411851 
+0.00734864 
+SCALARS n_group_063 double 1
+LOOKUP_TABLE default
+5.27269e-07 
+3.64086e-06 
+1.35365e-06 
+SCALARS n_group_063_error double 1
+LOOKUP_TABLE default
+0.0248112 
+0.0040923 
+0.00711638 
+SCALARS n_group_064 double 1
+LOOKUP_TABLE default
+3.26681e-07 
+2.24358e-06 
+7.83557e-07 
+SCALARS n_group_064_error double 1
+LOOKUP_TABLE default
+0.0315661 
+0.0051828 
+0.00889503 
+SCALARS n_group_065 double 1
+LOOKUP_TABLE default
+7.71951e-07 
+5.4729e-06 
+1.88191e-06 
+SCALARS n_group_065_error double 1
+LOOKUP_TABLE default
+0.0204221 
+0.00346594 
+0.00612235 
+SCALARS n_group_066 double 1
+LOOKUP_TABLE default
+3.21599e-07 
+2.1491e-06 
+7.53209e-07 
+SCALARS n_group_066_error double 1
+LOOKUP_TABLE default
+0.0316428 
+0.00542905 
+0.00932005 
+SCALARS n_group_067 double 1
+LOOKUP_TABLE default
+4.63513e-07 
+3.28071e-06 
+1.17103e-06 
+SCALARS n_group_067_error double 1
+LOOKUP_TABLE default
+0.0260314 
+0.00447267 
+0.00775035 
+SCALARS n_group_068 double 1
+LOOKUP_TABLE default
+1.84162e-07 
+1.28037e-06 
+4.56574e-07 
+SCALARS n_group_068_error double 1
+LOOKUP_TABLE default
+0.0415181 
+0.00710705 
+0.0121042 
+SCALARS n_group_069 double 1
+LOOKUP_TABLE default
+2.48899e-07 
+1.64648e-06 
+5.84609e-07 
+SCALARS n_group_069_error double 1
+LOOKUP_TABLE default
+0.0355169 
+0.00631781 
+0.0108506 
+SCALARS n_group_070 double 1
+LOOKUP_TABLE default
+6.67409e-07 
+4.43903e-06 
+1.55886e-06 
+SCALARS n_group_070_error double 1
+LOOKUP_TABLE default
+0.02186 
+0.00397019 
+0.00691637 
+SCALARS n_group_071 double 1
+LOOKUP_TABLE default
+7.21883e-07 
+4.66411e-06 
+1.66733e-06 
+SCALARS n_group_071_error double 1
+LOOKUP_TABLE default
+0.0211202 
+0.0039389 
+0.00680806 
+SCALARS n_group_072 double 1
+LOOKUP_TABLE default
+2.93372e-07 
+1.9434e-06 
+6.81423e-07 
+SCALARS n_group_072_error double 1
+LOOKUP_TABLE default
+0.03314 
+0.00602764 
+0.0103416 
+SCALARS n_group_073 double 1
+LOOKUP_TABLE default
+2.88369e-07 
+1.98009e-06 
+7.07023e-07 
+SCALARS n_group_073_error double 1
+LOOKUP_TABLE default
+0.0332978 
+0.00602532 
+0.0102849 
+SCALARS n_group_074 double 1
+LOOKUP_TABLE default
+3.07543e-07 
+2.02399e-06 
+7.39565e-07 
+SCALARS n_group_074_error double 1
+LOOKUP_TABLE default
+0.0325128 
+0.00599073 
+0.0101232 
+SCALARS n_group_075 double 1
+LOOKUP_TABLE default
+3.15203e-07 
+2.06655e-06 
+7.61997e-07 
+SCALARS n_group_075_error double 1
+LOOKUP_TABLE default
+0.0317808 
+0.00600984 
+0.0100442 
+SCALARS n_group_076 double 1
+LOOKUP_TABLE default
+3.29115e-07 
+2.13404e-06 
+7.82178e-07 
+SCALARS n_group_076_error double 1
+LOOKUP_TABLE default
+0.0310301 
+0.00595195 
+0.00993483 
+SCALARS n_group_077 double 1
+LOOKUP_TABLE default
+3.2224e-07 
+2.17961e-06 
+8.23111e-07 
+SCALARS n_group_077_error double 1
+LOOKUP_TABLE default
+0.0313881 
+0.00593723 
+0.00977396 
+SCALARS n_group_078 double 1
+LOOKUP_TABLE default
+3.45236e-07 
+2.20915e-06 
+8.83823e-07 
+SCALARS n_group_078_error double 1
+LOOKUP_TABLE default
+0.030276 
+0.00589814 
+0.00944954 
+SCALARS n_group_079 double 1
+LOOKUP_TABLE default
+3.55863e-07 
+2.27383e-06 
+9.67561e-07 
+SCALARS n_group_079_error double 1
+LOOKUP_TABLE default
+0.0301513 
+0.00587228 
+0.00898096 
+SCALARS n_group_080 double 1
+LOOKUP_TABLE default
+3.74345e-07 
+2.30839e-06 
+9.60931e-07 
+SCALARS n_group_080_error double 1
+LOOKUP_TABLE default
+0.0292266 
+0.0058672 
+0.00874154 
+SCALARS n_group_081 double 1
+LOOKUP_TABLE default
+3.72221e-07 
+2.36924e-06 
+8.56308e-07 
+SCALARS n_group_081_error double 1
+LOOKUP_TABLE default
+0.0294838 
+0.00584469 
+0.00868648 
+SCALARS n_group_082 double 1
+LOOKUP_TABLE default
+3.81912e-07 
+2.42108e-06 
+7.988e-07 
+SCALARS n_group_082_error double 1
+LOOKUP_TABLE default
+0.0288388 
+0.0058247 
+0.00871401 
+SCALARS n_group_083 double 1
+LOOKUP_TABLE default
+4.02773e-07 
+2.50302e-06 
+8.14481e-07 
+SCALARS n_group_083_error double 1
+LOOKUP_TABLE default
+0.0280626 
+0.0058241 
+0.00872913 
+SCALARS n_group_084 double 1
+LOOKUP_TABLE default
+4.17887e-07 
+2.55626e-06 
+8.67707e-07 
+SCALARS n_group_084_error double 1
+LOOKUP_TABLE default
+0.0274416 
+0.00578668 
+0.00878775 
+SCALARS n_group_085 double 1
+LOOKUP_TABLE default
+4.22159e-07 
+2.62846e-06 
+8.9753e-07 
+SCALARS n_group_085_error double 1
+LOOKUP_TABLE default
+0.0274242 
+0.00575208 
+0.00879445 
+SCALARS n_group_086 double 1
+LOOKUP_TABLE default
+4.18572e-07 
+2.69855e-06 
+9.41168e-07 
+SCALARS n_group_086_error double 1
+LOOKUP_TABLE default
+0.027607 
+0.00572228 
+0.0088147 
+SCALARS n_group_087 double 1
+LOOKUP_TABLE default
+4.54466e-07 
+2.77621e-06 
+9.90356e-07 
+SCALARS n_group_087_error double 1
+LOOKUP_TABLE default
+0.0265667 
+0.00566328 
+0.00871532 
+SCALARS n_group_088 double 1
+LOOKUP_TABLE default
+9.5423e-07 
+5.8739e-06 
+2.1305e-06 
+SCALARS n_group_088_error double 1
+LOOKUP_TABLE default
+0.018316 
+0.00400651 
+0.00622251 
+SCALARS n_group_089 double 1
+LOOKUP_TABLE default
+4.85956e-07 
+3.11365e-06 
+1.1254e-06 
+SCALARS n_group_089_error double 1
+LOOKUP_TABLE default
+0.0255004 
+0.00549693 
+0.00838883 
+SCALARS n_group_090 double 1
+LOOKUP_TABLE default
+2.5499e-07 
+1.5881e-06 
+5.77037e-07 
+SCALARS n_group_090_error double 1
+LOOKUP_TABLE default
+0.0352204 
+0.00768975 
+0.0116951 
+SCALARS n_group_091 double 1
+LOOKUP_TABLE default
+8.86277e-08 
+5.93841e-07 
+2.06996e-07 
+SCALARS n_group_091_error double 1
+LOOKUP_TABLE default
+0.0603079 
+0.012627 
+0.0191065 
+SCALARS n_group_092 double 1
+LOOKUP_TABLE default
+4.48384e-08 
+2.92303e-07 
+1.0295e-07 
+SCALARS n_group_092_error double 1
+LOOKUP_TABLE default
+0.0842928 
+0.0179344 
+0.02737 
+SCALARS n_group_093 double 1
+LOOKUP_TABLE default
+1.18953e-07 
+7.41962e-07 
+2.72021e-07 
+SCALARS n_group_093_error double 1
+LOOKUP_TABLE default
+0.0515096 
+0.0113657 
+0.0169952 
+SCALARS n_group_094 double 1
+LOOKUP_TABLE default
+1.04606e-06 
+6.84233e-06 
+2.50009e-06 
+SCALARS n_group_094_error double 1
+LOOKUP_TABLE default
+0.0173641 
+0.00382253 
+0.00590589 
+SCALARS n_group_095 double 1
+LOOKUP_TABLE default
+1.1078e-06 
+7.11073e-06 
+2.41198e-06 
+SCALARS n_group_095_error double 1
+LOOKUP_TABLE default
+0.016929 
+0.00378196 
+0.00599127 
+SCALARS n_group_096 double 1
+LOOKUP_TABLE default
+5.71391e-07 
+3.33563e-06 
+1.04253e-06 
+SCALARS n_group_096_error double 1
+LOOKUP_TABLE default
+0.0236551 
+0.00542143 
+0.00859761 
+SCALARS n_group_097 double 1
+LOOKUP_TABLE default
+5.68611e-07 
+3.42826e-06 
+1.05253e-06 
+SCALARS n_group_097_error double 1
+LOOKUP_TABLE default
+0.0235838 
+0.00521239 
+0.00811592 
+SCALARS n_group_098 double 1
+LOOKUP_TABLE default
+9.91542e-07 
+6.08922e-06 
+1.75191e-06 
+SCALARS n_group_098_error double 1
+LOOKUP_TABLE default
+0.0178575 
+0.00378509 
+0.00583454 
+SCALARS n_group_099 double 1
+LOOKUP_TABLE default
+1.27646e-06 
+7.29563e-06 
+2.54536e-06 
+SCALARS n_group_099_error double 1
+LOOKUP_TABLE default
+0.0156874 
+0.00382163 
+0.00583683 
+SCALARS n_group_100 double 1
+LOOKUP_TABLE default
+7.34165e-07 
+4.16134e-06 
+1.49036e-06 
+SCALARS n_group_100_error double 1
+LOOKUP_TABLE default
+0.0205889 
+0.0051814 
+0.0078107 
+SCALARS n_group_101 double 1
+LOOKUP_TABLE default
+7.61661e-07 
+4.30972e-06 
+1.57174e-06 
+SCALARS n_group_101_error double 1
+LOOKUP_TABLE default
+0.0203495 
+0.00518793 
+0.0077207 
+SCALARS n_group_102 double 1
+LOOKUP_TABLE default
+7.75682e-07 
+4.47794e-06 
+1.57366e-06 
+SCALARS n_group_102_error double 1
+LOOKUP_TABLE default
+0.0200542 
+0.00512565 
+0.00768803 
+SCALARS n_group_103 double 1
+LOOKUP_TABLE default
+7.99868e-07 
+4.64556e-06 
+1.70535e-06 
+SCALARS n_group_103_error double 1
+LOOKUP_TABLE default
+0.0195832 
+0.00510282 
+0.00762602 
+SCALARS n_group_104 double 1
+LOOKUP_TABLE default
+8.64963e-07 
+4.83064e-06 
+1.84158e-06 
+SCALARS n_group_104_error double 1
+LOOKUP_TABLE default
+0.018893 
+0.00503223 
+0.00745184 
+SCALARS n_group_105 double 1
+LOOKUP_TABLE default
+8.89501e-07 
+5.03026e-06 
+1.92244e-06 
+SCALARS n_group_105_error double 1
+LOOKUP_TABLE default
+0.0186891 
+0.00496817 
+0.00732842 
+SCALARS n_group_106 double 1
+LOOKUP_TABLE default
+9.08975e-07 
+5.22423e-06 
+2.1051e-06 
+SCALARS n_group_106_error double 1
+LOOKUP_TABLE default
+0.0185395 
+0.00491702 
+0.00715117 
+SCALARS n_group_107 double 1
+LOOKUP_TABLE default
+9.49161e-07 
+5.57011e-06 
+2.20953e-06 
+SCALARS n_group_107_error double 1
+LOOKUP_TABLE default
+0.0180068 
+0.00480294 
+0.00699987 
+SCALARS n_group_108 double 1
+LOOKUP_TABLE default
+1.02774e-06 
+6.14686e-06 
+2.37226e-06 
+SCALARS n_group_108_error double 1
+LOOKUP_TABLE default
+0.0174214 
+0.00465455 
+0.00672768 
+SCALARS n_group_109 double 1
+LOOKUP_TABLE default
+1.09275e-06 
+6.6797e-06 
+2.53079e-06 
+SCALARS n_group_109_error double 1
+LOOKUP_TABLE default
+0.0168456 
+0.00449456 
+0.00639021 
+SCALARS n_group_110 double 1
+LOOKUP_TABLE default
+1.03863e-06 
+6.41262e-06 
+2.24699e-06 
+SCALARS n_group_110_error double 1
+LOOKUP_TABLE default
+0.0172028 
+0.00461562 
+0.00677519 
+SCALARS n_group_111 double 1
+LOOKUP_TABLE default
+1.02055e-06 
+6.05339e-06 
+2.10671e-06 
+SCALARS n_group_111_error double 1
+LOOKUP_TABLE default
+0.0173245 
+0.00470882 
+0.0070421 
+SCALARS n_group_112 double 1
+LOOKUP_TABLE default
+1.17338e-06 
+6.73991e-06 
+2.09675e-06 
+SCALARS n_group_112_error double 1
+LOOKUP_TABLE default
+0.0161951 
+0.00438397 
+0.00671372 
+SCALARS n_group_113 double 1
+LOOKUP_TABLE default
+7.60875e-07 
+4.49239e-06 
+1.23803e-06 
+SCALARS n_group_113_error double 1
+LOOKUP_TABLE default
+0.0201276 
+0.00508558 
+0.00775915 
+SCALARS n_group_114 double 1
+LOOKUP_TABLE default
+2.1297e-06 
+1.1856e-05 
+3.66575e-06 
+SCALARS n_group_114_error double 1
+LOOKUP_TABLE default
+0.0120622 
+0.00336182 
+0.00535086 
+SCALARS n_group_115 double 1
+LOOKUP_TABLE default
+1.17992e-06 
+6.40732e-06 
+2.26584e-06 
+SCALARS n_group_115_error double 1
+LOOKUP_TABLE default
+0.0161021 
+0.00469914 
+0.00711966 
+SCALARS n_group_116 double 1
+LOOKUP_TABLE default
+1.29794e-06 
+7.32236e-06 
+2.61833e-06 
+SCALARS n_group_116_error double 1
+LOOKUP_TABLE default
+0.0153276 
+0.00445991 
+0.00669044 
+SCALARS n_group_117 double 1
+LOOKUP_TABLE default
+1.41799e-06 
+7.64456e-06 
+2.76417e-06 
+SCALARS n_group_117_error double 1
+LOOKUP_TABLE default
+0.0147237 
+0.00435052 
+0.00647284 
+SCALARS n_group_118 double 1
+LOOKUP_TABLE default
+1.23756e-06 
+6.91923e-06 
+2.20825e-06 
+SCALARS n_group_118_error double 1
+LOOKUP_TABLE default
+0.0157089 
+0.00446654 
+0.00674818 
+SCALARS n_group_119 double 1
+LOOKUP_TABLE default
+1.45613e-06 
+8.2451e-06 
+2.81846e-06 
+SCALARS n_group_119_error double 1
+LOOKUP_TABLE default
+0.0143767 
+0.00433113 
+0.00657252 
+SCALARS n_group_120 double 1
+LOOKUP_TABLE default
+1.53629e-06 
+8.97672e-06 
+3.07427e-06 
+SCALARS n_group_120_error double 1
+LOOKUP_TABLE default
+0.0140203 
+0.00422177 
+0.00645383 
+SCALARS n_group_121 double 1
+LOOKUP_TABLE default
+1.66598e-06 
+9.15427e-06 
+2.95791e-06 
+SCALARS n_group_121_error double 1
+LOOKUP_TABLE default
+0.0134672 
+0.00419727 
+0.00664398 
+SCALARS n_group_122 double 1
+LOOKUP_TABLE default
+1.67166e-06 
+9.13976e-06 
+2.7864e-06 
+SCALARS n_group_122_error double 1
+LOOKUP_TABLE default
+0.0134377 
+0.00420134 
+0.00670332 
+SCALARS n_group_123 double 1
+LOOKUP_TABLE default
+1.77206e-06 
+9.63541e-06 
+3.10579e-06 
+SCALARS n_group_123_error double 1
+LOOKUP_TABLE default
+0.0130411 
+0.00412241 
+0.00655716 
+SCALARS n_group_124 double 1
+LOOKUP_TABLE default
+1.90096e-06 
+1.02447e-05 
+3.56184e-06 
+SCALARS n_group_124_error double 1
+LOOKUP_TABLE default
+0.0125474 
+0.0040264 
+0.0062975 
+SCALARS n_group_125 double 1
+LOOKUP_TABLE default
+1.79485e-06 
+9.54344e-06 
+2.80647e-06 
+SCALARS n_group_125_error double 1
+LOOKUP_TABLE default
+0.012884 
+0.00410684 
+0.00664256 
+SCALARS n_group_126 double 1
+LOOKUP_TABLE default
+1.96668e-06 
+1.01604e-05 
+3.12472e-06 
+SCALARS n_group_126_error double 1
+LOOKUP_TABLE default
+0.012331 
+0.00405644 
+0.00665861 
+SCALARS n_group_127 double 1
+LOOKUP_TABLE default
+2.08716e-06 
+1.0785e-05 
+3.52348e-06 
+SCALARS n_group_127_error double 1
+LOOKUP_TABLE default
+0.0119365 
+0.00398443 
+0.0064384 
+SCALARS n_group_128 double 1
+LOOKUP_TABLE default
+2.19559e-06 
+1.13808e-05 
+3.84516e-06 
+SCALARS n_group_128_error double 1
+LOOKUP_TABLE default
+0.0116387 
+0.003925 
+0.00627379 
+SCALARS n_group_129 double 1
+LOOKUP_TABLE default
+1.54254e-06 
+8.03154e-06 
+2.87182e-06 
+SCALARS n_group_129_error double 1
+LOOKUP_TABLE default
+0.0138031 
+0.00472917 
+0.00737562 
+SCALARS n_group_130 double 1
+LOOKUP_TABLE default
+8.42387e-07 
+4.322e-06 
+1.64231e-06 
+SCALARS n_group_130_error double 1
+LOOKUP_TABLE default
+0.0186645 
+0.0065423 
+0.0100632 
+SCALARS n_group_131 double 1
+LOOKUP_TABLE default
+4.27722e-07 
+2.19441e-06 
+8.48226e-07 
+SCALARS n_group_131_error double 1
+LOOKUP_TABLE default
+0.025979 
+0.00920383 
+0.0140856 
+SCALARS n_group_132 double 1
+LOOKUP_TABLE default
+4.17205e-07 
+2.21665e-06 
+8.1721e-07 
+SCALARS n_group_132_error double 1
+LOOKUP_TABLE default
+0.0264162 
+0.00914711 
+0.0140809 
+SCALARS n_group_133 double 1
+LOOKUP_TABLE default
+1.66428e-06 
+8.68577e-06 
+3.21723e-06 
+SCALARS n_group_133_error double 1
+LOOKUP_TABLE default
+0.013283 
+0.0045894 
+0.00704935 
+SCALARS n_group_134 double 1
+LOOKUP_TABLE default
+2.53376e-06 
+1.36123e-05 
+4.73311e-06 
+SCALARS n_group_134_error double 1
+LOOKUP_TABLE default
+0.0107872 
+0.00368081 
+0.00572307 
+SCALARS n_group_135 double 1
+LOOKUP_TABLE default
+2.57696e-06 
+1.3952e-05 
+4.85298e-06 
+SCALARS n_group_135_error double 1
+LOOKUP_TABLE default
+0.010743 
+0.00367488 
+0.00568832 
+SCALARS n_group_136 double 1
+LOOKUP_TABLE default
+2.53848e-06 
+1.31183e-05 
+4.45208e-06 
+SCALARS n_group_136_error double 1
+LOOKUP_TABLE default
+0.0107789 
+0.00377166 
+0.00594403 
+SCALARS n_group_137 double 1
+LOOKUP_TABLE default
+2.45938e-06 
+1.27214e-05 
+4.30996e-06 
+SCALARS n_group_137_error double 1
+LOOKUP_TABLE default
+0.0108905 
+0.0038273 
+0.00609646 
+SCALARS n_group_138 double 1
+LOOKUP_TABLE default
+2.63952e-06 
+1.32794e-05 
+4.49439e-06 
+SCALARS n_group_138_error double 1
+LOOKUP_TABLE default
+0.0105788 
+0.00372774 
+0.00589464 
+SCALARS n_group_139 double 1
+LOOKUP_TABLE default
+2.55684e-06 
+1.38732e-05 
+4.17106e-06 
+SCALARS n_group_139_error double 1
+LOOKUP_TABLE default
+0.010737 
+0.0036182 
+0.00580836 
+SCALARS n_group_140 double 1
+LOOKUP_TABLE default
+5.01029e-06 
+2.62598e-05 
+7.59068e-06 
+SCALARS n_group_140_error double 1
+LOOKUP_TABLE default
+0.00765848 
+0.00264634 
+0.00443059 
+SCALARS n_group_141 double 1
+LOOKUP_TABLE default
+5.27966e-06 
+2.69145e-05 
+8.04479e-06 
+SCALARS n_group_141_error double 1
+LOOKUP_TABLE default
+0.00742782 
+0.00264001 
+0.00444166 
+SCALARS n_group_142 double 1
+LOOKUP_TABLE default
+5.54382e-06 
+2.74855e-05 
+8.63286e-06 
+SCALARS n_group_142_error double 1
+LOOKUP_TABLE default
+0.00724014 
+0.00265314 
+0.0044154 
+SCALARS n_group_143 double 1
+LOOKUP_TABLE default
+2.93105e-06 
+1.45107e-05 
+4.44005e-06 
+SCALARS n_group_143_error double 1
+LOOKUP_TABLE default
+0.00993366 
+0.00368055 
+0.00613127 
+SCALARS n_group_144 double 1
+LOOKUP_TABLE default
+3.42282e-06 
+1.75712e-05 
+5.00417e-06 
+SCALARS n_group_144_error double 1
+LOOKUP_TABLE default
+0.00916967 
+0.00341848 
+0.00576475 
+SCALARS n_group_145 double 1
+LOOKUP_TABLE default
+3.17878e-06 
+1.66214e-05 
+4.6782e-06 
+SCALARS n_group_145_error double 1
+LOOKUP_TABLE default
+0.00957261 
+0.00350801 
+0.00594221 
+SCALARS n_group_146 double 1
+LOOKUP_TABLE default
+3.37641e-06 
+1.68853e-05 
+4.97048e-06 
+SCALARS n_group_146_error double 1
+LOOKUP_TABLE default
+0.00928285 
+0.00348838 
+0.00597924 
+SCALARS n_group_147 double 1
+LOOKUP_TABLE default
+3.65004e-06 
+2.0384e-05 
+4.81563e-06 
+SCALARS n_group_147_error double 1
+LOOKUP_TABLE default
+0.00889637 
+0.00326578 
+0.00590791 
+SCALARS n_group_148 double 1
+LOOKUP_TABLE default
+3.91903e-06 
+2.03944e-05 
+5.08557e-06 
+SCALARS n_group_148_error double 1
+LOOKUP_TABLE default
+0.00855157 
+0.00321046 
+0.00585032 
+SCALARS n_group_149 double 1
+LOOKUP_TABLE default
+4.19734e-06 
+2.06966e-05 
+5.5576e-06 
+SCALARS n_group_149_error double 1
+LOOKUP_TABLE default
+0.00823678 
+0.00315115 
+0.00574539 
+SCALARS n_group_150 double 1
+LOOKUP_TABLE default
+3.0785e-06 
+1.45198e-05 
+3.99964e-06 
+SCALARS n_group_150_error double 1
+LOOKUP_TABLE default
+0.00961315 
+0.00372992 
+0.00674985 
+SCALARS n_group_151 double 1
+LOOKUP_TABLE default
+1.60591e-06 
+7.5158e-06 
+1.9831e-06 
+SCALARS n_group_151_error double 1
+LOOKUP_TABLE default
+0.0132552 
+0.0051329 
+0.0093761 
+SCALARS n_group_152 double 1
+LOOKUP_TABLE default
+4.25683e-06 
+1.98725e-05 
+5.11809e-06 
+SCALARS n_group_152_error double 1
+LOOKUP_TABLE default
+0.00816225 
+0.00316571 
+0.00596225 
+SCALARS n_group_153 double 1
+LOOKUP_TABLE default
+3.94336e-06 
+1.83548e-05 
+4.40803e-06 
+SCALARS n_group_153_error double 1
+LOOKUP_TABLE default
+0.00847576 
+0.00327965 
+0.00636113 
+SCALARS n_group_154 double 1
+LOOKUP_TABLE default
+4.46897e-06 
+2.05637e-05 
+4.90228e-06 
+SCALARS n_group_154_error double 1
+LOOKUP_TABLE default
+0.00791268 
+0.00308277 
+0.00602285 
+SCALARS n_group_155 double 1
+LOOKUP_TABLE default
+3.31182e-06 
+1.53888e-05 
+3.43426e-06 
+SCALARS n_group_155_error double 1
+LOOKUP_TABLE default
+0.00931268 
+0.00364052 
+0.00729077 
+SCALARS n_group_156 double 1
+LOOKUP_TABLE default
+3.34706e-06 
+1.54922e-05 
+3.43346e-06 
+SCALARS n_group_156_error double 1
+LOOKUP_TABLE default
+0.00930198 
+0.00364066 
+0.00724479 
+SCALARS n_group_157 double 1
+LOOKUP_TABLE default
+3.49313e-06 
+1.63141e-05 
+3.68414e-06 
+SCALARS n_group_157_error double 1
+LOOKUP_TABLE default
+0.00904254 
+0.00355553 
+0.0069632 
+SCALARS n_group_158 double 1
+LOOKUP_TABLE default
+3.7086e-06 
+1.73522e-05 
+4.02787e-06 
+SCALARS n_group_158_error double 1
+LOOKUP_TABLE default
+0.00874157 
+0.00344773 
+0.00670178 
+SCALARS n_group_159 double 1
+LOOKUP_TABLE default
+3.85214e-06 
+1.79024e-05 
+3.98637e-06 
+SCALARS n_group_159_error double 1
+LOOKUP_TABLE default
+0.00856303 
+0.00339669 
+0.00668998 
+SCALARS n_group_160 double 1
+LOOKUP_TABLE default
+3.99937e-06 
+1.82926e-05 
+4.1626e-06 
+SCALARS n_group_160_error double 1
+LOOKUP_TABLE default
+0.00838735 
+0.00334958 
+0.00648627 
+SCALARS n_group_161 double 1
+LOOKUP_TABLE default
+5.63764e-06 
+3.26228e-05 
+6.57324e-06 
+SCALARS n_group_161_error double 1
+LOOKUP_TABLE default
+0.00698347 
+0.00275967 
+0.00508911 
+SCALARS n_group_162 double 1
+LOOKUP_TABLE default
+5.58415e-06 
+3.06072e-05 
+6.70963e-06 
+SCALARS n_group_162_error double 1
+LOOKUP_TABLE default
+0.00704995 
+0.00272791 
+0.00498269 
+SCALARS n_group_163 double 1
+LOOKUP_TABLE default
+9.16648e-06 
+4.70129e-05 
+1.17117e-05 
+SCALARS n_group_163_error double 1
+LOOKUP_TABLE default
+0.00553471 
+0.00215127 
+0.00382634 
+SCALARS n_group_164 double 1
+LOOKUP_TABLE default
+6.7528e-06 
+3.35287e-05 
+8.20659e-06 
+SCALARS n_group_164_error double 1
+LOOKUP_TABLE default
+0.00643106 
+0.00250986 
+0.00461436 
+SCALARS n_group_165 double 1
+LOOKUP_TABLE default
+6.89279e-06 
+3.29548e-05 
+8.36668e-06 
+SCALARS n_group_165_error double 1
+LOOKUP_TABLE default
+0.00632505 
+0.00248573 
+0.00455948 
+SCALARS n_group_166 double 1
+LOOKUP_TABLE default
+1.08718e-05 
+4.98557e-05 
+1.44785e-05 
+SCALARS n_group_166_error double 1
+LOOKUP_TABLE default
+0.00498291 
+0.00198154 
+0.00344738 
+SCALARS n_group_167 double 1
+LOOKUP_TABLE default
+1.6277e-05 
+7.35957e-05 
+2.16454e-05 
+SCALARS n_group_167_error double 1
+LOOKUP_TABLE default
+0.00395739 
+0.00157164 
+0.00276259 
+SCALARS n_group_168 double 1
+LOOKUP_TABLE default
+0.00031083 
+0.00227346 
+0.000181971 
+SCALARS n_group_168_error double 1
+LOOKUP_TABLE default
+0.000933145 
+0.000161755 
+0.00103424 
+SCALARS n_group_169 double 1
+LOOKUP_TABLE default
+0 
+0 
+0 
+SCALARS n_group_169_error double 1
+LOOKUP_TABLE default
+0 
+0 
+0 
+SCALARS n_group_170 double 1
+LOOKUP_TABLE default
+0 
+0 
+0 
+SCALARS n_group_170_error double 1
+LOOKUP_TABLE default
+0 
+0 
+0 
+SCALARS n_group_171 double 1
+LOOKUP_TABLE default
+0 
+0 
+0 
+SCALARS n_group_171_error double 1
+LOOKUP_TABLE default
+0 
+0 
+0 
+SCALARS n_group_172 double 1
+LOOKUP_TABLE default
+0 
+0 
+0 
+SCALARS n_group_172_error double 1
+LOOKUP_TABLE default
+0 
+0 
+0 
+SCALARS n_group_173 double 1
+LOOKUP_TABLE default
+0 
+0 
+0 
+SCALARS n_group_173_error double 1
+LOOKUP_TABLE default
+0 
+0 
+0 
+SCALARS n_group_174 double 1
+LOOKUP_TABLE default
+0 
+0 
+0 
+SCALARS n_group_174_error double 1
+LOOKUP_TABLE default
+0 
+0 
+0 
+SCALARS n_group_175 double 1
+LOOKUP_TABLE default
+0 
+0 
+0 
+SCALARS n_group_175_error double 1
+LOOKUP_TABLE default
+0 
+0 
+0 
+SCALARS n_group_total double 1
+LOOKUP_TABLE default
+0.000578977 
+0.00396511 
+0.000688061 
+SCALARS n_group_total_error double 1
+LOOKUP_TABLE default
+0.000641166 
+0.000206355 
+0.000799913 
