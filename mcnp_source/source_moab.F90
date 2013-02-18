@@ -104,6 +104,10 @@ module source_data
 ! too.
 #include "iMesh_f.h"
 
+        ! MOAB related
+        iMesh_Instance :: mesh
+        integer :: ierr
+        ! Startup
         character*30 :: gammas_file = 'gammas'
         character*30 :: mesh_file = 'n_fluxes_and_materials.h5m'
         integer(i8knd) :: ikffl = 0 ! = local record of history #
@@ -137,7 +141,6 @@ module source_data
         integer :: ic_s, ib_s, ih_s  ! for binary search
         integer :: i_ints, j_ints, k_ints, n_mesh_cells, n_active_mat
         real, dimension(:), allocatable :: i_bins, j_bins, k_bins
-        real(dknd) :: volume
         integer, dimension(100) :: active_mat
         character*3000 :: line ! needed for reading active_mat from gammas
 
@@ -171,44 +174,34 @@ subroutine source_setup
   use source_data
   implicit none
  
-        integer :: unitnum, i, j
+        real(dknd) :: volume
+        integer :: unitnum, voxel_type, i, j
+        iBase_EntityHandle :: entity_handles, pointer_entity_handles
+
+        pointer (pointer_entity_handles, entity_handles(1:*))
 
         unitnum = getUnit()
 
-        call read_moab(mesh_file)
+        call read_moab(mesh, mesh_file, entity_handles, 0)
 
         !call read_gammas(unitnum)
 
         ALLOCATE(ergAliases(1:n_mesh_cells, 1:n_ener_grps))
         ALLOCATE(ergBinsProbabilities(1:n_mesh_cells, 1:n_ener_grps))
 
-        ! Create bins list.  Depending on if cumulative probabilities
-        !  were supplied, convert to individual bin probabilities so that
-        !  alias table of erg bins can be generated, too.
-        if (cumulative.eq.1) then
-          do i=1,n_mesh_cells
-            tot_list(i) = spectrum(i,n_ener_grps)
-            do j=n_ener_grps,2,-1
-              spectrum(i,j) = (spectrum(i,j) - spectrum(i,j-1)) / tot_list(i)
-            enddo
-            spectrum(i,1) = spectrum(i,1) / tot_list(i)
-            call gen_erg_alias_table (n_ener_grps, spectrum(i,1:n_ener_grps), &
-                        ergAliases(i,1:n_ener_grps), &
-                        ergBinsProbabilities(i,1:n_ener_grps))
+        ! Create alias tables for each voxel's energy distribution.
+        ! Normalizes each row in spectrum.
+        do i=1,n_mesh_cells
+          tot_list(i) = sum(spectrum(i,1:n_ener_grps))
+          do j=1,n_ener_grps
+            spectrum(i,j) = spectrum(i,j) / tot_list(i)
           enddo
-        else
-          do i=1,n_mesh_cells
-            tot_list(i) = sum(spectrum(i,1:n_ener_grps))
-            do j=1,n_ener_grps
-              spectrum(i,j) = spectrum(i,j) / tot_list(i)
-            enddo
-            call gen_erg_alias_table (n_ener_grps, spectrum(i,1:n_ener_grps), &
-                        ergAliases(i,1:n_ener_grps), &
-                        ergBinsProbabilities(i,1:n_ener_grps))
-          enddo
-        endif
+          call gen_erg_alias_table (n_ener_grps, spectrum(i,1:n_ener_grps), &
+                      ergAliases(i,1:n_ener_grps), &
+                      ergBinsProbabilities(i,1:n_ener_grps))
+        enddo
 
-        ! We calculate the number of source voxels.
+        ! Calculate the number of source voxels.
         n_source_cells = 0
         do i=1,n_mesh_cells
           if (tot_list(i).gt.0) n_source_cells = n_source_cells + 1
@@ -216,21 +209,27 @@ subroutine source_setup
         write(*,*) "n_mesh_cells:", n_mesh_cells, &
                 "n_source_cells:", n_source_cells
 
-        ! We scale each entry in tot_list (phtns/s/cc) by the voxel's volume
-        ! to get (phtns/s/voxel)
+        ! Scale each entry in tot_list (phtns/s/cc) by the voxel's volume
+        ! to get (phtns/s/voxel).
         do i=1,n_mesh_cells
           if (tot_list(i).gt.0) then
-            call iMesh_getEntTopo(%VAL(mesh), %VAL(ents(i)), voxel_type, ierr)
+            call iMesh_getEntTopo(%VAL(mesh), %VAL(entity_handles(i)), &
+                  voxel_type, ierr)
             if (voxel_type.eq.iMesh_TETRAHEDRON) then
-              call get_tet_vol(ents(i), volume)
+              call get_tet_vol(entity_handles(i), volume)
             elseif (voxel_type.eq.iMesh_HEXAHEDRON) then
-              call get_hex_vol(ents(i), volume)
+              call get_hex_vol(entity_handles(i), volume)
             else
               call expirx(1,'sourcb','Invalid voxel type')
             endif
 
             tot_list(i) = tot_list(i) * volume
+          endif
         enddo
+
+        
+        !call iMesh_dtor(%VAL(mesh), ierr)
+        !CHECK("Failed to destroy interface")
 
         ! Generate alias table of voxels if needed
         if (samp_vox.eq.1) then
@@ -248,132 +247,70 @@ subroutine source_setup
 end subroutine source_setup
 
 
-subroutine read_moab (filename)
+subroutine read_moab (mymesh, filename, rpents)
 ! 
   use source_data
   implicit none
         ! declarations
-        integer vert_uses, i
-        integer ioffsets
+        integer i, j
 
-        character*30 :: filename
+        iMesh_Instance, intent(INOUT) :: mymesh
+        character*30, intent(IN) :: filename
+        !IBASE_HANDLE_T, intent(INOUT) :: ents
+        IBASE_HANDLE_T, intent(INOUT) :: rpents
 
-        iMesh_Instance :: mesh
-        IBASE_HANDLE_T :: rpents, rpverts, rpallverts, ipoffsets
-        IBASE_HANDLE_T :: ents, verts, allverts
+        IBASE_HANDLE_T :: ents
+        !IBASE_HANDLE_T :: rpents
+        IBASE_HANDLE_T :: verts
 
-        !IBASE_HANDLE_T :: rpergtag
         iBase_TagHandle :: ergtagh, tagh
-        !pointer (rpergtag, ergtag)
-        !pointer (rpergtag, ergtag(0:*))
-        character*128 :: tname
+        character*128 :: tagname
         
-        pointer (rpents, ents(0:*))
-        pointer (rpverts, verts(0:*))
-        pointer (rpallverts, allverts(0:*))
-        pointer (ipoffsets, ioffsets(0,*))
-        integer ierr, ents_alloc, ents_size
-        integer iverts_alloc, iverts_size
-        integer allverts_alloc, allverts_size
-        integer offsets_alloc, offsets_size
+        integer ents_alloc, ents_size
         iBase_EntitySetHandle root_set
+        real*8 tag_data
 
-    IBASE_HANDLE_T rpsets
-    pointer (rpsets, sets(0:*))
-    iBase_EntitySetHandle sets
-    integer sets_alloc, sets_size, count
-
-    iBase_EntityArrIterator iter
-    IBASE_HANDLE_T rpdata
-    real*8 tag_data
-    pointer(rpdata, tag_data(0:*))
-
-    !real*8 dbl_val
-    !integer int_val, tag_type
-    !character*128 tname, fname
-    !character*1024 tname2
-
-    integer :: err, j, num_hops, atend !, num_commands, tname_len
-    !logical read_par
-    !data read_par/.false./
-
+        pointer (rpents, ents(0:*))
 
         ! create the Mesh instance
-        call iMesh_newMesh("", mesh, ierr)
+        call iMesh_newMesh("", mymesh, ierr)
         CHECK("Problems instantiating interface.")
 
         ! load the mesh
-        call iMesh_getRootSet(%VAL(mesh), root_set, ierr)
+        call iMesh_getRootSet(%VAL(mymesh), root_set, ierr)
         CHECK("Problems getting root set")
 
-        call iMesh_load(%VAL(mesh), %VAL(root_set), &
+        call iMesh_load(%VAL(mymesh), %VAL(root_set), &
              filename, "", ierr)
-             !"125hex.vtk", "", ierr)
         CHECK("Load failed")
-        Write(*,*) "opened ", filename
-
-        !!!!
-
-
-    ! get all sets
-    sets_alloc = 0
-    num_hops = 1
-    call iMesh_getEntSets(%VAL(mesh), %VAL(root_set), %VAL(num_hops), &
-         rpsets, sets_alloc, sets_size, err)
-    !ERRORR("Couldn't get all sets.")
-
-! get the number of ??? regions
-        call iMesh_getNumOfType(%VAL(mesh), %VAL(root_set), &
-            %VAL(iBase_REGION), n_mesh_cells, ierr)
-        Write(*,*) "Number of regions:", n_mesh_cells
-
-        !!!!!!
 
         ! get all 3d elements
         ents_alloc = 0
-        call iMesh_getEntities(%VAL(mesh), %VAL(root_set), %VAL(iBase_REGION), &
-             %VAL(iMesh_TETRAHEDRON), rpents, ents_alloc, ents_size, &
+        call iMesh_getEntities(%VAL(mymesh), %VAL(root_set), &
+             %VAL(iBase_REGION), &
+             %VAL(iMesh_ALL_TOPOLOGIES), rpents, ents_alloc, ents_size, &
              ierr)
-             !%VAL(iMesh_ALL_TOPOLOGIES), rpents, ents_alloc, ents_size, &
+             !%VAL(iMesh_TETRAHEDRON), rpents, ents_alloc, ents_size, &
              !ierr)
         CHECK("Couldn't get entities")
 
-        Write(*,*) "Number of tets:", ents_size
-
-        vert_uses = 0
-
-        ! iterate through them; 
-        do i = 0, ents_size-1
-           ! get connectivity
-           iverts_alloc = 0
-           call iMesh_getEntAdj(%VAL(mesh), %VAL(ents(i)), &
-                %VAL(iBase_VERTEX), &
-                rpverts, iverts_alloc, iverts_size, &
-                ierr)
-           CHECK("Failure in getEntAdj")
-           ! sum number of vertex uses
-
-           vert_uses = vert_uses + iverts_size
-
-           if (iverts_size .ne. 0) call free(rpverts)
-        end do
 
         ! Look for parameters line, and read parameters if found.
 
         ! Look for custom energy groups tag.
-        call iMesh_getTagHandle(%VAL(mesh), "PHTN_ERGS", ergtagh, ierr)
+        call iMesh_getTagHandle(%VAL(mymesh), "PHTN_ERGS", ergtagh, ierr)
         ! If ergs flag was found, we call read_custom_ergs.  Otherwise 
         !  we use default energies.
         if (ierr.eq.0) then 
           ! Get n_ener_grps via length of data in the tag.
           !  This length is the number of boundaries (groups + 1)
-          call iMesh_getTagSizeValues(%VAL(mesh), %VAL(ergtagh), &
+          call iMesh_getTagSizeValues(%VAL(mymesh), %VAL(ergtagh), &
                 n_ener_grps, ierr)
           n_ener_grps = n_ener_grps - 1
                 
           ALLOCATE(my_ener_phot(1:n_ener_grps+1))
           
-          call iMesh_getEntSetDblData(%VAL(mesh), %VAL(root_set), &
+          call iMesh_getEntSetDblData(%VAL(mymesh), %VAL(root_set), &
                 %VAL(ergtagh), my_ener_phot, ierr)
         else ! use default energy groups; 42 groups
           n_ener_grps = 42
@@ -384,39 +321,54 @@ subroutine read_moab (filename)
             10.0,12.0,14.0,20.0,30.0,50.0/)
         endif
 
+        ! Look for biases tag
+        call iMesh_getTagHandle(%VAL(mymesh), "PHTN_ERGS", tagh, ierr)
+        if (ierr.eq.0) then
+          bias = 1
+          ALLOCATE(bias_list(1:n_mesh_cells))
+          do i=1,n_mesh_cells
+            call iMesh_getDblData(%VAL(mymesh), %VAL(ents(i)), &
+                %VAL(tagh), tag_data, ierr)
+            bias_list(i) = tag_data
+          enddo
+        endif
+
+
         ! Prepare to read in spectrum information
         ! set the spectrum array to: # of mesh cells * # energy groups
         !ALLOCATE(spectrum(1:n_mesh_cells, 1:bias + n_ener_grps))
         ALLOCATE(spectrum(1:n_mesh_cells, 1:n_ener_grps))
         ALLOCATE(tot_list(1:n_mesh_cells))
-        if (bias.eq.1) ALLOCATE(bias_list(1:n_mesh_cells))
          
-        ! reading in source strength and alias table for each voxel 
-        i = 1 ! i keeps track of # of voxel entries
-        do
-          read(unitnum,*,iostat=stat) (spectrum(i,j), j=1,bias + n_ener_grps)
-          if (stat.ne.0) then
-            i = i - 1
-            exit ! exit the do loop
-          endif
-          if (bias.eq.1) bias_list(i) = spectrum(i,bias+n_ener_grps)
-          i = i + 1
-        enddo
+        !! reading in source strength and alias table for each voxel 
+        !i = 1 ! i keeps track of # of voxel entries
+        !do
+        !  read(unitnum,*,iostat=stat) (spectrum(i,j), j=1,bias + n_ener_grps)
+        !  if (stat.ne.0) then
+        !    i = i - 1
+        !    exit ! exit the do loop
+        !  endif
+        !  if (bias.eq.1) bias_list(i) = spectrum(i,bias+n_ener_grps)
+        !  i = i + 1
+        !enddo
 
-        call iMesh_getEntities(%VAL(mesh), %VAL(root_set), %VAL(iBase_REGION), &
-                 %VAL(iMesh_ALL_TOPOLOGIES)
-        do i=1, n_mesh_cells
-          call iMesh
+        ! fill spectrum
+        do j=1, n_ener_grps
+          ! Grab next tag handle
+          write(tagname, '(a, i3.3)') "phtn_src_group_", j
+          call iMesh_getTagHandle(%VAL(mymesh), tagname, tagh, ierr)
+          ! Iterate through each voxel, grabbing and storing values
+          do i=1, n_mesh_cells
+            call iMesh_getDblData(%VAL(mymesh), %VAL(ents(i)), %VAL(tagh), &
+                tag_data, ierr)
+            spectrum(i,j) = tag_data
+          enddo
         enddo
         
-        ! Check for correct number of voxel entries in gammas file.
-        if (i.ne.n_mesh_cells) write(*,*) 'ERROR: ', i, ' voxels found in ' // &
-                        'gammas file. ', n_mesh_cells, ' expected.'
+        !! Check for correct number of voxel entries in gammas file.
+        !if (i.ne.n_mesh_cells) write(*,*) 'ERROR: ', i, ' voxels found ' // &
+        !                'in gammas file. ', n_mesh_cells, ' expected.'
 
-
-
-        call iMesh_dtor(%VAL(mesh), ierr)
-        CHECK("Failed to destroy interface")
 
 end subroutine read_moab
 
@@ -658,7 +610,7 @@ end subroutine read_params
 
 subroutine read_custom_ergs (myunit)
 ! Read line from gammas file to get a custom set of energy bins
-
+! 
 ! Parameters
 ! ----------
 ! myunit : int
@@ -682,14 +634,14 @@ subroutine read_custom_ergs (myunit)
 end subroutine read_custom_ergs
 
 
-subroutine get_tet_vol(mesh, entity_handle, volume)
+subroutine get_tet_vol(mymesh, tet_entity_handle, volume)
 ! Subroutine calculates volume of a tetrahedron entity on a MOAB mesh
 ! 
 ! Parameters
 ! ----------
-! mesh : iMesh_Instance
+! mymesh : iMesh_Instance
 !     Mesh object
-! entity_handle : iBase_EntityHandle
+! tet_entity_handle : iBase_EntityHandle
 !     Entity set handle
 ! volume : float
 !     Stores the calculated volume
@@ -703,18 +655,57 @@ subroutine get_tet_vol(mesh, entity_handle, volume)
   use source_data
   implicit none
 
-    volume = abs( (a(1)-d(1)) * (b(1)-d(1)) * (c(1)-d(1)) + &
-                  (a(2)-d(2)) * (b(2)-d(2)) * (c(2)-d(2)) + &
-                  (a(3)-d(3)) * (b(3)-d(3)) * (c(3)-d(3)) ) / 6._rknd
+        ! Parameters
+        iMesh_Instance, intent(IN) :: mymesh
+        iBase_EntityHandle, intent(IN) :: tet_entity_handle
+        real(dknd), intent(OUT) :: volume
+        ! Other variables 
+        integer :: iverts_alloc, iverts_size
+        integer :: icoords_alloc, icoords_size
+        iBase_EntityHandle :: verts, pointer_verts
+        real*8 :: coords
+        iBase_EntityHandle :: pointer_coords
+        real*8, dimension(1:3) :: a, b, c, d
+        ! cray pointers
+        pointer (pointer_verts, verts(1,*))
+        pointer (pointer_coords, coords(1,*))
+
+        ! Get vertices' handles
+        iverts_alloc = 0
+        call iMesh_getEntAdj(%VAL(mymesh), %VAL(tet_entity_handle), &
+              %VAL(iBase_VERTEX), pointer_verts, &
+              iverts_alloc, iverts_size, ierr)
+
+        ! Get vertices' coordinates
+        icoords_alloc = 0
+        call iMesh_getVtxArrCoords(%VAL(mymesh), %VAL(pointer_verts), %VAL(4), &
+              iBase_BLOCKED, pointer_coords, icoords_alloc, icoords_size, ierr)
+
+        a(1) = coords(1)
+        b(1) = coords(2)
+        c(1) = coords(3)
+        d(1) = coords(4)
+        a(1) = coords(5)
+        b(1) = coords(6)
+        c(1) = coords(7)
+        d(1) = coords(8)
+        a(1) = coords(9)
+        b(1) = coords(10)
+        c(1) = coords(11)
+        d(1) = coords(12)
+
+        volume = abs( (a(1)-d(1)) * (b(1)-d(1)) * (c(1)-d(1)) + &
+                      (a(2)-d(2)) * (b(2)-d(2)) * (c(2)-d(2)) + &
+                      (a(3)-d(3)) * (b(3)-d(3)) * (c(3)-d(3)) ) / 6._rknd
 end subroutine get_tet_vol
 
 
-subroutine get_hex_vol(mesh, entity_handle, volume)
+subroutine get_hex_vol(mymesh, hex_entity_handle, volume)
 ! Subroutine calculates volume of a hexahedron entity on a MOAB mesh
 ! 
 ! Parameters
 ! ----------
-! mesh : iMesh_Instance
+! mymesh : iMesh_Instance
 !     Mesh object
 ! entity_handle : iBase_EntityHandle
 !     Entity set handle
@@ -726,8 +717,43 @@ subroutine get_hex_vol(mesh, entity_handle, volume)
 ! 
   use source_data
   implicit none
+ 
+        ! Parameters
+        iMesh_Instance, intent(IN) :: mymesh
+        iBase_EntityHandle, intent(IN) :: hex_entity_handle
+        real(dknd), intent(OUT) :: volume
+        ! Other variables 
+        integer :: iverts_alloc, iverts_size
+        integer :: icoords_alloc, icoords_size
+        iBase_EntityHandle :: verts, pointer_verts
+        real*8 :: coords
+        iBase_EntityHandle :: pointer_coords
+        real*8, dimension(1:3) :: a, b, c, d, e, f, g, h
+        ! cray pointers
+        pointer (pointer_verts, verts(1,*))
+        pointer (pointer_coords, coords(1,*))
 
+        ! Get vertices' handles
+        iverts_alloc = 0
+        call iMesh_getEntAdj(%VAL(mymesh), %VAL(hex_entity_handle), &
+              %VAL(iBase_VERTEX), pointer_verts, &
+              iverts_alloc, iverts_size, ierr)
 
+        ! Get vertices' coordinates
+        iverts_alloc = 0
+        call iMesh_getVtxArrCoords(%VAL(mymesh), %VAL(pointer_verts), %VAL(8), &
+              iBase_BLOCKED, pointer_coords, icoords_alloc, icoords_size, ierr)
+        a = coords(1:3)
+        b = coords(4:6)
+        c = coords(7:9)
+        d = coords(10:12)
+        e = coords(13:15)
+        f = coords(16:18)
+        g = coords(19:21)
+        h = coords(22:24)
+
+        ! volume = ...
+  
 end subroutine get_hex_vol
 
 

@@ -17,7 +17,7 @@ gfortran test_source.F90 -o test_source   -fcray-pointer mcnp_placeholder.o sour
 ./test_source
 
 # cleanup
-#rm *.o
-#rm *.mod
-#rm test_source
-#rm source.F90
+rm *.o
+rm *.mod
+rm test_source
+rm source.F90
