@@ -703,6 +703,38 @@ subroutine get_tet_vol(mymesh, tet_entity_handle, volume)
 end subroutine get_tet_vol
 
 
+
+subroutine get_ents(mymesh)
+  use source_data
+  implicit none
+
+        ! Parameters
+        iMesh_Instance, intent(IN) :: mymesh
+        !iBase_EntityHandle, intent(IN) :: tet_entity_handle
+        !real(dknd), intent(OUT) :: volume
+        ! Other variables 
+        integer :: iverts_alloc, iverts_size, order
+        integer :: icoords_alloc, icoords_size
+        iBase_EntityHandle :: verts, pointer_verts
+        real*8 :: coords
+        iBase_EntityHandle :: pointer_coords
+        real*8, dimension(1:3) :: a, b, c, d
+        ! cray pointers
+        pointer (pointer_verts, verts(1,*))
+        pointer (pointer_coords, coords(1,*))
+
+        ! Get vertices' handles
+        iverts_alloc = 0
+        Write(*,*) "problem next..."
+        call iMesh_getDfltStorage(%VAL(mymesh), order, ierr)
+        !call iMesh_getEntities(%VAL(mymesh), %VAL(iBase_REGION), &
+        !      %VAL(iMesh_TETRAHEDRON), pointer_verts, &
+        !      iverts_alloc, iverts_size, ierr)
+
+        Write(*,*) "wha", ierr
+
+end subroutine get_ents
+
 subroutine get_hex_vol(mymesh, hex_entity_handle, volume)
 ! Subroutine calculates volume of a hexahedron entity on a MOAB mesh
 ! 

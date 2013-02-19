@@ -17,6 +17,11 @@ program test_source
 
         !call read_moab("125hex.vtk")
         !call read_moab("n_fluxes_and_materials.vtk")
-        call test_get_tet_vol
+
+        ! Attempt to get around 'ambiguous reference' errors.
+        iBase_REGION_t = iBase_REGION
+        iMesh_TETRAHEDRON_t = iMesh_TETRAHEDRON
+        !call test_get_tet_vol
+        call test_get_ents
 
 end program test_source

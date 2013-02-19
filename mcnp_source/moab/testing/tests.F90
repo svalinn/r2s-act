@@ -12,8 +12,9 @@ implicit none
 #include "iMesh_f.h"
 
         integer :: testunitnum, i
-        
 
+        ! Attempt to get around 'ambiguous reference' errors.
+        integer :: iBase_REGION_t, iMesh_TETRAHEDRON_t
 
 
 !contains 
@@ -343,26 +344,76 @@ subroutine test_get_tet_vol
   implicit none
 ! Tests ...
         iMesh_Instance :: mymesh
-        character*30 :: filename
         iBase_EntitySetHandle :: root_set
-        !IBASE_HANDLE_T :: ents
-        !IBASE_HANDLE_T :: rpents
+        integer :: ents_alloc, ents_size
+        IBASE_HANDLE_T :: entity_handles
+        IBASE_HANDLE_T :: pointer_entity_handles
 
         real(dknd) :: volume
-
+        pointer (pointer_entity_handles, entity_handles(1:*))
         ! create the Mesh instance
         call iMesh_newMesh("", mymesh, ierr)
         ! load the mesh
         call iMesh_getRootSet(%VAL(mymesh), root_set, ierr)
         ! Read mesh file
         call iMesh_load(%VAL(mymesh), %VAL(root_set), &
-             filename, "", ierr)
+             "1tet.vtk", "", ierr)
 
+        !! get single tet element
+        !ents_alloc = 0
+        !call iMesh_getEntities(%VAL(mymesh), %VAL(root_set), &
+        !     %VAL(iBase_REGION_t), &
+        !     %VAL(iMesh_TETRAHEDRON_t), pointer_entity_handles, &
+        !     ents_alloc, ents_size, ierr)
 
-
-        !call get_tet_vol(mesh,entity_handles,volume)
+        !call get_tet_vol(mymesh,entity_handles,volume)
         write(*,*) "todo"
+
+        call iMesh_dtor(%VAL(mymesh), ierr)
+
 end subroutine test_get_tet_vol
+
+
+subroutine test_get_ents
+  use tests_mod
+  use source_data
+  use source_data
+  implicit none
+! Tests ...
+        iMesh_Instance :: mymesh
+        iBase_EntitySetHandle :: root_set
+        integer :: ents_alloc, ents_size
+        IBASE_HANDLE_T :: entity_handles
+        IBASE_HANDLE_T :: pointer_entity_handles
+
+        real(dknd) :: volume
+        pointer (pointer_entity_handles, entity_handles(1:*))
+        ! create the Mesh instance
+        call iMesh_newMesh("", mymesh, ierr)
+        ! load the mesh
+        call iMesh_getRootSet(%VAL(mymesh), root_set, ierr)
+        ! Read mesh file
+        call iMesh_load(%VAL(mymesh), %VAL(root_set), &
+             "1tet.vtk", "", ierr)
+
+        Write(*,*) 'hmm', ierr
+
+        !call get_ents(%VAL(mymesh))
+        call get_ents(mymesh)
+
+        !! get single tet element
+        !ents_alloc = 0
+        !call iMesh_getEntities(%VAL(mymesh), %VAL(root_set), &
+        !     %VAL(iBase_REGION_t), &
+        !     %VAL(iMesh_TETRAHEDRON_t), pointer_entity_handles, &
+        !     ents_alloc, ents_size, ierr)
+
+        !call get_tet_vol(mymesh,entity_handles,volume)
+        write(*,*) "todo"
+
+        call iMesh_dtor(%VAL(mymesh), ierr)
+
+end subroutine test_get_ents
 
 ! End of test subroutines
 
