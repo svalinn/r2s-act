@@ -182,7 +182,8 @@ subroutine source_setup
 
         unitnum = getUnit()
 
-        call read_moab(mesh, mesh_file, entity_handles, 0)
+        !call read_moab(mesh, mesh_file, entity_handles)
+        call read_moab(mesh, mesh_file, pointer_entity_handles)
 
         !call read_gammas(unitnum)
 
@@ -213,12 +214,13 @@ subroutine source_setup
         ! to get (phtns/s/voxel).
         do i=1,n_mesh_cells
           if (tot_list(i).gt.0) then
-            call iMesh_getEntTopo(%VAL(mesh), %VAL(entity_handles(i)), &
+            !call iMesh_getEntTopo(%VAL(mesh), %VAL(entity_handles(i)), &
+            call iMesh_getEntTopo(%VAL(mesh), entity_handles(i), &
                   voxel_type, ierr)
             if (voxel_type.eq.iMesh_TETRAHEDRON) then
-              call get_tet_vol(entity_handles(i), volume)
+              call get_tet_vol(mesh, entity_handles(i), volume)
             elseif (voxel_type.eq.iMesh_HEXAHEDRON) then
-              call get_hex_vol(entity_handles(i), volume)
+              call get_hex_vol(mesh, entity_handles(i), volume)
             else
               call expirx(1,'sourcb','Invalid voxel type')
             endif
@@ -266,9 +268,9 @@ subroutine read_moab (mymesh, filename, rpents)
         iBase_TagHandle :: ergtagh, tagh
         character*128 :: tagname
         
-        integer ents_alloc, ents_size
-        iBase_EntitySetHandle root_set
-        real*8 tag_data
+        integer :: ents_alloc, ents_size
+        iBase_EntitySetHandle :: root_set
+        real*8 :: tag_data
 
         pointer (rpents, ents(0:*))
 
@@ -280,6 +282,7 @@ subroutine read_moab (mymesh, filename, rpents)
         call iMesh_getRootSet(%VAL(mymesh), root_set, ierr)
         !CHECK("Problems getting root set")
 
+        ! Read mesh file
         call iMesh_load(%VAL(mymesh), %VAL(root_set), &
              filename, "", ierr)
         !CHECK("Load failed")
