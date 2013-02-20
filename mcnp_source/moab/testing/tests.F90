@@ -3,6 +3,7 @@
 ! In lieu of packaging a unit testing framework, current tests are ad-hoc
 !  checks using conditionals.
 !
+
 module tests_mod
 ! Module contains all tests
         use mcnp_global
@@ -11,7 +12,14 @@ implicit none
 
 #include "iMesh_f.h"
 
-        integer :: testunitnum, i
+#define SET_UP \
+  terr = 0
+#define ASSERT_EQUAL(a,b) \
+  if (a.ne.b) terr = terr + 1
+#define ASSERT_NOT_EQUAL(a,b) \
+  if (a.eq.b) terr = terr + 1
+
+        integer :: testunitnum, i, terr
 
         ! Attempt to get around 'ambiguous reference' errors.
         integer :: iBase_REGION_t, iMesh_TETRAHEDRON_t
@@ -407,11 +415,19 @@ subroutine test_read_moab1
 
         pointer (t_pointer_entity_handles, t_entity_handles(1:*))
 
+        SET_UP
+
         call read_moab(mesh, "1tet.vtk", t_pointer_entity_handles)
 
         call iMesh_dtor(%VAL(mesh), ierr)
 
-        write(*,*) "test_read_moab1: correctly read mesh"
+        ASSERT_EQUAL(n_mesh_cells, 1)
+
+        if (terr.eq.0) then
+          write(*,*) "test_read_moab1: correctly read mesh"
+        else
+          write(*,*) "ERROR - test_read_moab1: unspecified error"
+        endif
 
         deallocate(my_ener_phot)
         !deallocate(bias_list)
@@ -435,14 +451,20 @@ subroutine test_read_moab2
 
         pointer (t_pointer_entity_handles, t_entity_handles(1:*))
 
+        SET_UP
+
         call read_moab(mesh, "3vox.vtk", t_pointer_entity_handles)
 
         myerr = ierr
 
         call iMesh_dtor(%VAL(mesh), ierr)
 
+        ASSERT_EQUAL(n_mesh_cells, 3)
+
         if (bias.eq.0.or.myerr.ne.0) then
-          write(*,*) "ERROR - test_read_moab2: Error ierr:", myerr
+          write(*,*) "ERROR - test_read_moab2: MOAB Error - ierr=", myerr
+        elseif (terr.ne.0) then
+          write(*,*) "ERROR - test_read_moab2: unspecified error"
         else
           write(*,*) "test_read_moab2: correctly read mesh with bias value tags"
         endif
