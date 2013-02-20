@@ -107,6 +107,7 @@ module source_data
         ! MOAB related
         iMesh_Instance :: mesh
         integer :: ierr
+        iBase_EntityHandle, dimension(:), allocatable :: entity_handles
         ! Startup
         character*30 :: gammas_file = 'gammas'
         character*30 :: mesh_file = 'n_fluxes_and_materials.h5m'
@@ -176,14 +177,20 @@ subroutine source_setup
  
         real(dknd) :: volume
         integer :: unitnum, voxel_type, i, j
-        iBase_EntityHandle :: entity_handles, pointer_entity_handles
 
-        pointer (pointer_entity_handles, entity_handles(1:*))
+        ! Stores the 
+        iBase_EntityHandle :: myentity_handles, mypointer_entity_handles
+        pointer (mypointer_entity_handles, myentity_handles(1:*))
 
         unitnum = getUnit()
 
-        !call read_moab(mesh, mesh_file, entity_handles)
-        call read_moab(mesh, mesh_file, pointer_entity_handles)
+        call read_moab(mesh, mesh_file, mypointer_entity_handles)
+        if (ierr.ne.0) then
+          call expirx(1,'sourcb','Error reading MOAB mesh.')
+        endif
+
+        ALLOCATE(entity_handles(1:n_mesh_cells))
+        entity_handles = myentity_handles
 
         !call read_gammas(unitnum)
 
@@ -214,7 +221,6 @@ subroutine source_setup
         ! to get (phtns/s/voxel).
         do i=1,n_mesh_cells
           if (tot_list(i).gt.0) then
-            !call iMesh_getEntTopo(%VAL(mesh), %VAL(entity_handles(i)), &
             call iMesh_getEntTopo(%VAL(mesh), entity_handles(i), &
                   voxel_type, ierr)
             if (voxel_type.eq.iMesh_TETRAHEDRON) then
@@ -251,13 +257,24 @@ end subroutine source_setup
 
 subroutine read_moab (mymesh, filename, rpents)
 ! 
+! Parameters
+! ----------
+! mymesh : iMesh_Instance
+!     Mesh instance which will be initialized and then read
+! filename : character array
+!     Filename to read mesh data from. (.vtk or .h5m file)
+! rpents : pointer to array of IBASE_HANDLE_T
+!     Pointer to an array that will be filled with iBase_REGION entity
+!     handles
+! 
   use source_data
   implicit none
         ! declarations
         integer i, j
 
         iMesh_Instance, intent(INOUT) :: mymesh
-        character*30, intent(IN) :: filename
+        !character*28, intent(IN) :: filename
+        character(len=*), intent(IN) :: filename
         !IBASE_HANDLE_T, intent(INOUT) :: ents
         IBASE_HANDLE_T, intent(INOUT) :: rpents
 
@@ -276,16 +293,25 @@ subroutine read_moab (mymesh, filename, rpents)
 
         ! create the Mesh instance
         call iMesh_newMesh("", mymesh, ierr)
-        !CHECK("Problems instantiating moab interface.")
+        if (ierr.ne.0) then
+          write(*,*) "ERROR - Failed to create mesh instance."
+          return
+        endif
 
         ! load the mesh
         call iMesh_getRootSet(%VAL(mymesh), root_set, ierr)
-        !CHECK("Problems getting root set")
+        if (ierr.ne.0) then
+          write(*,*) "ERROR - Failed to get mesh rootSet."
+          return
+        endif
 
         ! Read mesh file
         call iMesh_load(%VAL(mymesh), %VAL(root_set), &
              filename, "", ierr)
-        !CHECK("Load failed")
+        if (ierr.ne.0) then
+          write(*,*) "ERROR - Mesh file load error:", filename
+          return
+        endif
 
         ! get all 3d elements
         ents_alloc = 0
@@ -293,12 +319,13 @@ subroutine read_moab (mymesh, filename, rpents)
              %VAL(iBase_REGION), &
              %VAL(iMesh_ALL_TOPOLOGIES), rpents, ents_alloc, ents_size, &
              ierr)
-             !%VAL(iMesh_TETRAHEDRON), rpents, ents_alloc, ents_size, &
-             !ierr)
-        !CHECK("Couldn't get entities")
-
+        if (ierr.ne.0) then
+          write(*,*) "ERROR - Failed to load volume entities for mesh."
+          return
+        endif
 
         ! Look for parameters line, and read parameters if found.
+        ! TODO
 
         ! Look for custom energy groups tag.
         call iMesh_getTagHandle(%VAL(mymesh), "PHTN_ERGS", ergtagh, ierr)
@@ -325,7 +352,7 @@ subroutine read_moab (mymesh, filename, rpents)
         endif
 
         ! Look for biases tag
-        call iMesh_getTagHandle(%VAL(mymesh), "PHTN_ERGS", tagh, ierr)
+        call iMesh_getTagHandle(%VAL(mymesh), "PHTN_BIAS", tagh, ierr)
         if (ierr.eq.0) then
           bias = 1
           ALLOCATE(bias_list(1:n_mesh_cells))
@@ -360,6 +387,10 @@ subroutine read_moab (mymesh, filename, rpents)
           ! Grab next tag handle
           write(tagname, '(a, i3.3)') "phtn_src_group_", j
           call iMesh_getTagHandle(%VAL(mymesh), tagname, tagh, ierr)
+          if (ierr.eq.14) then ! 14 = iBase_TAG_NOT_FOUND
+            write(*,*) "ERROR - Missing tag:", tagname
+            return
+          endif
           ! Iterate through each voxel, grabbing and storing values
           do i=1, n_mesh_cells
             call iMesh_getDblData(%VAL(mymesh), %VAL(ents(i)), %VAL(tagh), &
@@ -368,11 +399,6 @@ subroutine read_moab (mymesh, filename, rpents)
           enddo
         enddo
         
-        !! Check for correct number of voxel entries in gammas file.
-        !if (i.ne.n_mesh_cells) write(*,*) 'ERROR: ', i, ' voxels found ' // &
-        !                'in gammas file. ', n_mesh_cells, ' expected.'
-
-
 end subroutine read_moab
 
 
@@ -431,7 +457,7 @@ subroutine read_gammas (unitnum)
                         'gammas file. ', n_mesh_cells, ' expected.'
 
         CLOSE(unitnum)
-        WRITE(*,*) 'Reading gammas file completed!'
+        write(*,*) 'Reading gammas file completed!'
 
 end subroutine read_gammas
 
@@ -681,59 +707,29 @@ subroutine get_tet_vol(mymesh, tet_entity_handle, volume)
 
         ! Get vertices' coordinates
         icoords_alloc = 0
-        call iMesh_getVtxArrCoords(%VAL(mymesh), %VAL(pointer_verts), %VAL(4), &
-              iBase_BLOCKED, pointer_coords, icoords_alloc, icoords_size, ierr)
+        call iMesh_getVtxArrCoords(%VAL(mymesh), %VAL(pointer_verts), &
+              %VAL(4), iBase_BLOCKED, pointer_coords, &
+              icoords_alloc, icoords_size, ierr)
 
         a(1) = coords(1)
         b(1) = coords(2)
         c(1) = coords(3)
         d(1) = coords(4)
-        a(1) = coords(5)
-        b(1) = coords(6)
-        c(1) = coords(7)
-        d(1) = coords(8)
-        a(1) = coords(9)
-        b(1) = coords(10)
-        c(1) = coords(11)
-        d(1) = coords(12)
+        a(2) = coords(5)
+        b(2) = coords(6)
+        c(2) = coords(7)
+        d(2) = coords(8)
+        a(3) = coords(9)
+        b(3) = coords(10)
+        c(3) = coords(11)
+        d(3) = coords(12)
 
         volume = abs( (a(1)-d(1)) * (b(1)-d(1)) * (c(1)-d(1)) + &
                       (a(2)-d(2)) * (b(2)-d(2)) * (c(2)-d(2)) + &
                       (a(3)-d(3)) * (b(3)-d(3)) * (c(3)-d(3)) ) / 6._rknd
+
 end subroutine get_tet_vol
 
-
-
-subroutine get_ents(mymesh)
-  use source_data
-  implicit none
-
-        ! Parameters
-        iMesh_Instance, intent(IN) :: mymesh
-        !iBase_EntityHandle, intent(IN) :: tet_entity_handle
-        !real(dknd), intent(OUT) :: volume
-        ! Other variables 
-        integer :: iverts_alloc, iverts_size, order
-        integer :: icoords_alloc, icoords_size
-        iBase_EntityHandle :: verts, pointer_verts
-        real*8 :: coords
-        iBase_EntityHandle :: pointer_coords
-        real*8, dimension(1:3) :: a, b, c, d
-        ! cray pointers
-        pointer (pointer_verts, verts(1,*))
-        pointer (pointer_coords, coords(1,*))
-
-        ! Get vertices' handles
-        iverts_alloc = 0
-        Write(*,*) "problem next..."
-        call iMesh_getDfltStorage(%VAL(mymesh), order, ierr)
-        !call iMesh_getEntities(%VAL(mymesh), %VAL(iBase_REGION), &
-        !      %VAL(iMesh_TETRAHEDRON), pointer_verts, &
-        !      iverts_alloc, iverts_size, ierr)
-
-        Write(*,*) "wha", ierr
-
-end subroutine get_ents
 
 subroutine get_hex_vol(mymesh, hex_entity_handle, volume)
 ! Subroutine calculates volume of a hexahedron entity on a MOAB mesh
@@ -776,8 +772,10 @@ subroutine get_hex_vol(mymesh, hex_entity_handle, volume)
 
         ! Get vertices' coordinates
         iverts_alloc = 0
-        call iMesh_getVtxArrCoords(%VAL(mymesh), %VAL(pointer_verts), %VAL(8), &
-              iBase_BLOCKED, pointer_coords, icoords_alloc, icoords_size, ierr)
+        call iMesh_getVtxArrCoords(%VAL(mymesh), %VAL(pointer_verts), &
+              %VAL(8), iBase_BLOCKED, pointer_coords, &
+              icoords_alloc, icoords_size, ierr)
+
         a = coords(1:3)
         b = coords(4:6)
         c = coords(7:9)

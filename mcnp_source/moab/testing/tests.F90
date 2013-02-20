@@ -53,6 +53,8 @@ subroutine test_read_custom_ergs
 
         write(*,*) "test_custom_ergs: successfully read bins"
 
+        deallocate(my_ener_phot)
+
 end subroutine test_read_custom_ergs
 
 
@@ -269,6 +271,10 @@ subroutine test_erg_sampling_distrib
         binList = (/ .01,.04,.05,.07,.09,.1,.13,.2,.22,.09 /)
         tallyList = (/ 0,0,0,0,0,0,0,0,0,0 /)
         
+        ! Initialize my_ener_phot array
+        ALLOCATE(my_ener_phot(1:nbins+1))
+        my_ener_phot = (/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15,0.2/)
+
         call gen_erg_alias_table(nbins, binList, pairsList(1,1:10,1:2), &
                                               probList(1,1:10) )
 
@@ -298,6 +304,8 @@ subroutine test_erg_sampling_distrib
         write(*,'(a,a,es10.3)') " test_erg_sampling_distrib: maximum ", &
                 "relative error in bin sampling frequency - ", maxdev
         write(*,*) tallyList
+
+        deallocate(my_ener_phot)
 
 end subroutine test_erg_sampling_distrib
 
@@ -338,83 +346,113 @@ end subroutine test_uniform_sample
 
 
 subroutine test_get_tet_vol
+! Tests that the volume of the reference tetrahedron in 1tet.vtk is 1/6.
   use tests_mod
   use source_data
-  use source_data
   implicit none
-! Tests ...
-        iMesh_Instance :: mymesh
-        iBase_EntitySetHandle :: root_set
-        integer :: ents_alloc, ents_size
-        IBASE_HANDLE_T :: entity_handles
-        IBASE_HANDLE_T :: pointer_entity_handles
 
-        real(dknd) :: volume
-        pointer (pointer_entity_handles, entity_handles(1:*))
+        iBase_EntitySetHandle :: root_set
+        integer :: ents_alloc, ents_size, myerr
+        IBASE_HANDLE_T :: t_entity_handles
+        IBASE_HANDLE_T :: t_pointer_entity_handles
+        real(dknd) :: volume, a, b
+
+        pointer (t_pointer_entity_handles, t_entity_handles(1:*))
+
         ! create the Mesh instance
-        call iMesh_newMesh("", mymesh, ierr)
+        call iMesh_newMesh("", mesh, ierr)
         ! load the mesh
-        call iMesh_getRootSet(%VAL(mymesh), root_set, ierr)
+        call iMesh_getRootSet(%VAL(mesh), root_set, ierr)
         ! Read mesh file
-        call iMesh_load(%VAL(mymesh), %VAL(root_set), &
+        call iMesh_load(%VAL(mesh), %VAL(root_set), &
              "1tet.vtk", "", ierr)
 
-        !! get single tet element
-        !ents_alloc = 0
-        !call iMesh_getEntities(%VAL(mymesh), %VAL(root_set), &
-        !     %VAL(iBase_REGION_t), &
-        !     %VAL(iMesh_TETRAHEDRON_t), pointer_entity_handles, &
-        !     ents_alloc, ents_size, ierr)
+        ! get single tet element
+        ents_alloc = 0
+        call iMesh_getEntities(%VAL(mesh), %VAL(root_set), &
+             %VAL(iBase_REGION_t), &
+             %VAL(iMesh_TETRAHEDRON_t), t_pointer_entity_handles, &
+             ents_alloc, ents_size, ierr)
 
-        !call get_tet_vol(mymesh,entity_handles,volume)
-        write(*,*) "todo"
+        call get_tet_vol(mesh, t_entity_handles, volume)
 
-        call iMesh_dtor(%VAL(mymesh), ierr)
+        myerr = ierr
+
+        call iMesh_dtor(%VAL(mesh), ierr)
+
+        a = volume
+        b = 1._rknd/6
+        if (abs(a-b).gt.(1e-4*max(a,b))) then
+          write(*,*) "ERROR - test_get_tet_vol; ierr=", myerr
+          write(*,*) "expected:", b, "calculated:", a
+          return
+        endif
+
+        write(*,*) "test_get_tet_vol: got correct volume for reference tet"
 
 end subroutine test_get_tet_vol
 
 
-subroutine test_get_ents
+subroutine test_read_moab1
+!
   use tests_mod
-  use source_data
   use source_data
   implicit none
 ! Tests ...
-        iMesh_Instance :: mymesh
         iBase_EntitySetHandle :: root_set
-        integer :: ents_alloc, ents_size
-        IBASE_HANDLE_T :: entity_handles
-        IBASE_HANDLE_T :: pointer_entity_handles
+        integer :: ents_alloc, ents_size, myerr
+        IBASE_HANDLE_T :: t_entity_handles
+        IBASE_HANDLE_T :: t_pointer_entity_handles
+        real(dknd) :: volume, a, b
 
-        real(dknd) :: volume
-        pointer (pointer_entity_handles, entity_handles(1:*))
-        ! create the Mesh instance
-        call iMesh_newMesh("", mymesh, ierr)
-        ! load the mesh
-        call iMesh_getRootSet(%VAL(mymesh), root_set, ierr)
-        ! Read mesh file
-        call iMesh_load(%VAL(mymesh), %VAL(root_set), &
-             "1tet.vtk", "", ierr)
+        pointer (t_pointer_entity_handles, t_entity_handles(1:*))
 
-        Write(*,*) 'hmm', ierr
+        call read_moab(mesh, "1tet.vtk", t_pointer_entity_handles)
 
-        !call get_ents(%VAL(mymesh))
-        call get_ents(mymesh)
+        call iMesh_dtor(%VAL(mesh), ierr)
 
-        !! get single tet element
-        !ents_alloc = 0
-        !call iMesh_getEntities(%VAL(mymesh), %VAL(root_set), &
-        !     %VAL(iBase_REGION_t), &
-        !     %VAL(iMesh_TETRAHEDRON_t), pointer_entity_handles, &
-        !     ents_alloc, ents_size, ierr)
+        write(*,*) "test_read_moab1: correctly read mesh"
 
-        !call get_tet_vol(mymesh,entity_handles,volume)
-        write(*,*) "todo"
+        deallocate(my_ener_phot)
+        !deallocate(bias_list)
+        deallocate(spectrum)
+        deallocate(tot_list)
 
-        call iMesh_dtor(%VAL(mymesh), ierr)
+end subroutine test_read_moab1
 
-end subroutine test_get_ents
+
+subroutine test_read_moab2
+!
+  use tests_mod
+  use source_data
+  implicit none
+! Tests ...
+        iBase_EntitySetHandle :: root_set
+        integer :: ents_alloc, ents_size, myerr
+        IBASE_HANDLE_T :: t_entity_handles
+        IBASE_HANDLE_T :: t_pointer_entity_handles
+        real(dknd) :: volume, a, b
+
+        pointer (t_pointer_entity_handles, t_entity_handles(1:*))
+
+        call read_moab(mesh, "3vox.vtk", t_pointer_entity_handles)
+
+        myerr = ierr
+
+        call iMesh_dtor(%VAL(mesh), ierr)
+
+        if (bias.eq.0.or.myerr.ne.0) then
+          write(*,*) "ERROR - test_read_moab2: Error ierr:", myerr
+        else
+          write(*,*) "test_read_moab2: correctly read mesh with bias value tags"
+        endif
+
+        deallocate(my_ener_phot)
+        deallocate(bias_list)
+        deallocate(spectrum)
+        deallocate(tot_list)
+
+end subroutine test_read_moab2
 
 ! End of test subroutines
-
 
