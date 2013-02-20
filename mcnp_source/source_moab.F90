@@ -289,7 +289,7 @@ subroutine read_moab (mymesh, filename, rpents)
         iBase_EntitySetHandle :: root_set
         real*8 :: tag_data
 
-        pointer (rpents, ents(0:*))
+        pointer (rpents, ents(1:*))
 
         ! create the Mesh instance
         call iMesh_newMesh("", mymesh, ierr)
@@ -323,6 +323,7 @@ subroutine read_moab (mymesh, filename, rpents)
           write(*,*) "ERROR - Failed to load volume entities for mesh."
           return
         endif
+        n_mesh_cells = ents_size
 
         ! Look for parameters line, and read parameters if found.
         ! TODO

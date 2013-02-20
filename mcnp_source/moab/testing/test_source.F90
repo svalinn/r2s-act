@@ -20,6 +20,6 @@ program test_source
         iMesh_TETRAHEDRON_t = iMesh_TETRAHEDRON
         call test_get_tet_vol
         call test_read_moab1
-        call test_read_moab2
+        !call test_read_moab2
 
 end program test_source
