@@ -708,9 +708,9 @@ subroutine get_tet_vol(mymesh, tet_entity_handle, volume)
         integer :: iverts_alloc, iverts_size
         integer :: icoords_alloc, icoords_size
         iBase_EntityHandle :: verts, pointer_verts
-        real*8 :: coords
+        real(dknd) :: coords
         iBase_EntityHandle :: pointer_coords
-        real*8, dimension(1:3) :: a, b, c, d
+        real(dknd), dimension(1:3) :: a, b, c, d
         ! cray pointers
         pointer (pointer_verts, verts(1,*))
         pointer (pointer_coords, coords(1,*))
@@ -752,7 +752,7 @@ real(dknd) function calc_tet_vol(a, b, c, d)
 ! 
 ! Parameters
 ! ----------
-! a, b, c, d - real*8(1:3)
+! a, b, c, d - real(dknd)(1:3)
 !     Coordinate lists for four points forming a tetrahedra
 !
   use source_data
@@ -798,9 +798,9 @@ subroutine get_hex_vol(mymesh, hex_entity_handle, volume)
         integer :: iverts_alloc, iverts_size
         integer :: icoords_alloc, icoords_size
         iBase_EntityHandle :: verts, pointer_verts
-        real*8 :: coords
+        real(dknd) :: coords
         iBase_EntityHandle :: pointer_coords
-        real*8, dimension(1:3) :: a, b, c, d, e, f, g, h
+        real(dknd), dimension(1:3) :: a, b, c, d, e, f, g, h
         ! cray pointers
         pointer (pointer_verts, verts(1,*))
         pointer (pointer_coords, coords(1,*))
@@ -1193,8 +1193,9 @@ subroutine sample_tetrahedra (co)
 ! 
 ! Parameters
 ! -----------
-! co - list of 24 real*8 values
-!     The x y z coordinates of four points for a tetrahedron
+! co - list of 12 real*8 values
+!     The x y z coordinates of four points for a tetrahedron.  These numbers
+!     are in xxx.. yyy.. zzz.. order.
 ! 
 ! Notes
 ! ------
@@ -1242,14 +1243,16 @@ end subroutine sample_tetrahedra
 
 
 subroutine sample_hexahedra (co)
-! This subroutine receives the eight vertices of a tetrahedron and sets
+! This subroutine receives the eight vertices of a hexahedron and sets
 ! xxx, yyy, zzz, to values corresponding to a uniformly sampled point
-! within the tetrahedron.
+! within the voxel.  
+! It is assumed that the tetrahedron is a right tetrahedron.
 ! 
 ! Parameters
 ! -----------
-! co - list of 24 real*8 values
-!     The x y z coordinates of four points for a tetrahedron
+! co - list of 12 real*8 values
+!     The x y z coordinates of four points for a tetrahedron.  These numbers
+!     are in xxx.. yyy.. zzz.. order.
 ! 
 ! Notes
 ! ------
@@ -1261,33 +1264,32 @@ subroutine sample_hexahedra (co)
         ! Parameters
         real(dknd), dimension(1:24), intent(IN) :: co
 
-        continue
-        !real(dknd) :: ss, tt, uu, temp
+        real(dknd), dimension(1:3) :: a, b, c, d, e, f, g, h
+        real(dknd), dimension(1:3) :: v1, v2, v3
 
-        !ss = rang()
-        !tt = rang()
-        !uu = rang()
+        real(dknd) :: ss, tt, uu, temp
 
-        !if ((ss+tt).gt.1._rknd) then
-        !  ss = 1._rknd - ss
-        !  tt = 1._rknd - tt
-        !endif
+        a = co(1::8)
+        b = co(2::8)
+        c = co(3::8)
+        d = co(4::8)
+        e = co(5::8)
+        f = co(6::8)
+        g = co(7::8)
+        h = co(8::8)
+        
+        ss = rang()
+        tt = rang()
+        uu = rang()
 
-        !if ((ss+tt+uu).gt.1._rknd) then
-        !  if ((tt+uu).gt.1._rknd) then
-        !    temp = tt
-        !    tt = 1 - uu
-        !    uu = 1._rknd - temp - ss
-        !  else
-        !    temp = ss
-        !    ss = 1._rknd - uu - tt
-        !    uu = temp + tt + uu - 1._rknd
-        !  endif
-        !endif
-
-        !xxx = p1x + (p2x-p1x)*ss + (p3x-p1x)*tt + (p4x-p1x)*uu
-        !yyy = p1y + (p2y-p1y)*ss + (p3y-p1y)*tt + (p4y-p1y)*uu
-        !zzz = p1z + (p2z-p1z)*ss + (p3z-p1z)*tt + (p4z-p1z)*uu
+        v1 = ss * (b - a)
+        v2 = tt * (e - a)
+        v3 = uu * (d - a)
+        
+        ! Sample random point within the voxel
+        xxx = a(1) + v1(1) + v2(1) + v3(1)
+        yyy = a(2) + v1(2) + v2(2) + v3(2)
+        zzz = a(3) + v1(3) + v2(3) + v3(3)
 
 end subroutine sample_hexahedra
 
