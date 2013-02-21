@@ -184,15 +184,15 @@ subroutine source_setup
 
         unitnum = getUnit()
 
+        !call read_gammas(unitnum)
+
         call read_moab(mesh, mesh_file, mypointer_entity_handles)
         if (ierr.ne.0) then
-          call expirx(1,'sourcb','Error reading MOAB mesh.')
+          call expirx(1,'source_setup','Error reading MOAB mesh.')
         endif
 
         ALLOCATE(entity_handles(1:n_mesh_cells))
         entity_handles = myentity_handles
-
-        !call read_gammas(unitnum)
 
         ALLOCATE(ergAliases(1:n_mesh_cells, 1:n_ener_grps))
         ALLOCATE(ergBinsProbabilities(1:n_mesh_cells, 1:n_ener_grps))
@@ -228,7 +228,7 @@ subroutine source_setup
             elseif (voxel_type.eq.iMesh_HEXAHEDRON) then
               call get_hex_vol(mesh, entity_handles(i), volume)
             else
-              call expirx(1,'sourcb','Invalid voxel type')
+              call expirx(1,'source_setup','Invalid voxel type.')
             endif
 
             tot_list(i) = tot_list(i) * volume
@@ -327,6 +327,19 @@ subroutine read_moab (mymesh, filename, rpents)
 
         ! Look for parameters line, and read parameters if found.
         ! TODO
+        ! Initialize parameters to defaults.
+        ! Defaults are chosen such that gammas format specified by Leichtle
+        !  will hopefully be read correctly without a parameters line.
+        !  (untested)
+        bias = 0
+        samp_vox = 1
+        samp_uni = 0
+        debug = 0
+        ergs = 0
+        mat_rej = 0
+        cumulative = 0
+        resample = 0
+        uni_resamp_all = 0
 
         ! Look for custom energy groups tag.
         call iMesh_getTagHandle(%VAL(mymesh), "PHTN_ERGS", ergtagh, ierr)
@@ -689,6 +702,8 @@ subroutine get_tet_vol(mymesh, tet_entity_handle, volume)
         iMesh_Instance, intent(IN) :: mymesh
         iBase_EntityHandle, intent(IN) :: tet_entity_handle
         real(dknd), intent(OUT) :: volume
+        ! Function type
+        real(dknd) :: calc_tet_vol
         ! Other variables 
         integer :: iverts_alloc, iverts_size
         integer :: icoords_alloc, icoords_size
@@ -706,9 +721,11 @@ subroutine get_tet_vol(mymesh, tet_entity_handle, volume)
               %VAL(iBase_VERTEX), pointer_verts, &
               iverts_alloc, iverts_size, ierr)
 
-        ! Get vertices' coordinates
+        ! Get all vertices' coordinates
         icoords_alloc = 0
         call iMesh_getVtxArrCoords(%VAL(mymesh), %VAL(pointer_verts), &
+              !%VAL(4), iBase_INTERLEAVED, pointer_coords, &
+              !icoords_alloc, icoords_size, ierr)
               %VAL(4), iBase_BLOCKED, pointer_coords, &
               icoords_alloc, icoords_size, ierr)
 
@@ -725,11 +742,31 @@ subroutine get_tet_vol(mymesh, tet_entity_handle, volume)
         c(3) = coords(11)
         d(3) = coords(12)
 
-        volume = abs( (a(1)-d(1)) * (b(1)-d(1)) * (c(1)-d(1)) + &
-                      (a(2)-d(2)) * (b(2)-d(2)) * (c(2)-d(2)) + &
-                      (a(3)-d(3)) * (b(3)-d(3)) * (c(3)-d(3)) ) / 6._rknd
-
+        volume = calc_tet_vol(a, b, c, d)
+        
 end subroutine get_tet_vol
+
+
+real(dknd) function calc_tet_vol(a, b, c, d)
+! Function returns the volume of a tetrahedron, given the vertex coordinates
+! 
+! Parameters
+! ----------
+! a, b, c, d - real*8(1:3)
+!     Coordinate lists for four points forming a tetrahedra
+!
+  use source_data
+  implicit none
+        
+        ! Parameters
+        real(dknd), dimension(1:3), intent(IN) :: a, b, c, d
+        
+        calc_tet_vol = abs( (a(1)-d(1)) * (b(1)-d(1)) * (c(1)-d(1)) + &
+                            (a(2)-d(2)) * (b(2)-d(2)) * (c(2)-d(2)) + &
+                            (a(3)-d(3)) * (b(3)-d(3)) * (c(3)-d(3)) ) &
+                            / 6._rknd
+
+end function calc_tet_vol
 
 
 subroutine get_hex_vol(mymesh, hex_entity_handle, volume)
@@ -746,6 +783,7 @@ subroutine get_hex_vol(mymesh, hex_entity_handle, volume)
 ! 
 ! Notes
 ! -----
+! Current implementation assumes 8 vertext hex with square planar facets
 ! 
   use source_data
   implicit none
@@ -754,6 +792,8 @@ subroutine get_hex_vol(mymesh, hex_entity_handle, volume)
         iMesh_Instance, intent(IN) :: mymesh
         iBase_EntityHandle, intent(IN) :: hex_entity_handle
         real(dknd), intent(OUT) :: volume
+        ! Function type
+        real(dknd) :: calc_tet_vol
         ! Other variables 
         integer :: iverts_alloc, iverts_size
         integer :: icoords_alloc, icoords_size
@@ -771,23 +811,29 @@ subroutine get_hex_vol(mymesh, hex_entity_handle, volume)
               %VAL(iBase_VERTEX), pointer_verts, &
               iverts_alloc, iverts_size, ierr)
 
-        ! Get vertices' coordinates
+        ! Get all vertices' coordinates
         iverts_alloc = 0
         call iMesh_getVtxArrCoords(%VAL(mymesh), %VAL(pointer_verts), &
               %VAL(8), iBase_BLOCKED, pointer_coords, &
               icoords_alloc, icoords_size, ierr)
 
-        a = coords(1:3)
-        b = coords(4:6)
-        c = coords(7:9)
-        d = coords(10:12)
-        e = coords(13:15)
-        f = coords(16:18)
-        g = coords(19:21)
-        h = coords(22:24)
+        a = coords(1:24:8)
+        b = coords(2:24:8)
+        c = coords(3:24:8)
+        d = coords(4:24:8)
+        e = coords(5:24:8)
+        f = coords(6:24:8)
+        g = coords(7:24:8)
+        h = coords(8:24:8)
 
-        ! volume = ...
-  
+        ! Adapted from get_tet_vol and
+        ! measure.cpp's measure() case moab::MBHEX
+        volume = calc_tet_vol(a, b, d, e) + &
+                 calc_tet_vol(h, d, g, e) + &
+                 calc_tet_vol(e, f, b, g) + &
+                 calc_tet_vol(b, g, d, e) + &
+                 calc_tet_vol(c, g, d, b)
+
 end subroutine get_hex_vol
 
 
@@ -825,11 +871,12 @@ subroutine source
         ! -voxel
         ! -xxx, yyy and zzz
         ! -ii, jj, and kk
-10      if (samp_vox.eq.1) then
-          call voxel_sample
-        elseif (samp_uni.eq.1) then
-          call uniform_sample
-        endif
+!10      if (samp_vox.eq.1) then
+!          call voxel_sample
+!        elseif (samp_uni.eq.1) then
+!          call uniform_sample
+!        endif
+10      call voxel_sample
 
         ! sample a new position if voxel has zero source strength
         if (tot_list(voxel).eq.0) goto 10
@@ -903,10 +950,11 @@ subroutine source
 
 543     continue
         ! Rejection and resampling conditions
-        !
+
+        ! no resampling
         if (resample.eq.0) then
           goto 544 ! Always accept position when resampling is disabled.
-        ! rejection of non-void materials is enabled...
+        ! rejection of non-void materials is enabled... TODO: untested
         elseif (mat_rej.eq.1) then
           do i=1,n_active_mat
             if (nmt(mat(icl)).eq.active_mat(i)) then
@@ -917,7 +965,7 @@ subroutine source
         elseif (samp_vox.eq.1) then
           if (mat(icl).eq.0) then
             ! particle rejected... resample within the voxel
-            call sample_hexahedra
+            call sample_region_entity(mesh, entity_handles(voxel))
             goto 555
           else
             goto 544
@@ -927,7 +975,7 @@ subroutine source
           if (mat(icl).eq.0) then
             if (uni_resamp_all.eq.0) then
               ! particle rejected... resample within the voxel and recheck
-              call sample_hexahedra
+              call sample_box
               goto 555
             else
               goto 10 ! sample anew
@@ -999,7 +1047,7 @@ subroutine voxel_sample
         
         voxel = voxel + 1
         
-        call sample_hexahedra
+        call sample_region_entity(mesh, entity_handles(voxel))
         
 end subroutine voxel_sample
 
@@ -1008,6 +1056,7 @@ subroutine uniform_sample
 ! Uniformly sample photon position in the entire volume of the mesh tally.
   use source_data
   implicit none
+
         integer :: binary_search
 
         ! Choose position
@@ -1043,6 +1092,7 @@ integer function binary_search(pos, len, table)
 ! Copied from algorithm used elsewhere in MCNP code.
   use source_data
   implicit none
+
         real(dknd), intent(IN) :: pos
         integer, intent (IN) :: len
         real(dknd), intent(IN), dimension(1:len) :: table
@@ -1064,7 +1114,7 @@ integer function binary_search(pos, len, table)
 end function binary_search
 
 
-subroutine sample_hexahedra
+subroutine sample_box
 ! Uniformly samples within the extents of a hexahedral voxel
 ! 
 ! Notes
@@ -1079,17 +1129,72 @@ subroutine sample_hexahedra
         yyy = j_bins(jj+1) + rang() * (j_bins(jj+2) - j_bins(jj+1))
         zzz = k_bins(kk+1) + rang() * (k_bins(kk+2) - k_bins(kk+1))
 
-end subroutine sample_hexahedra
+end subroutine sample_box
 
 
-subroutine sample_tetrahedra(p1x,p2x,p3x,p4x,p1y,p2y,p3y,p4y,p1z,p2z,p3z,p4z)
-! This subroutine receives the four points of a tetrahedron and sets
+subroutine sample_region_entity (mymesh, entity_handle)
+! This subroutine retrieves the vertices of the sampled voxel, and calls
+! the appropriate sampling subroutine to get a sampled point.
+! 
+! Parameters
+! ----------
+! mymesh : iMesh_Instance
+!     Mesh object
+! entity_handle : iBase_EntityHandle
+!     Entity set handle
+! 
+  use source_data
+  implicit none
+
+        ! Parameters
+        iMesh_Instance, intent(IN) :: mymesh
+        iBase_EntityHandle, intent(IN) :: entity_handle
+        ! Other variables 
+        integer :: iverts_alloc, iverts_size
+        integer :: icoords_alloc, icoords_size
+        iBase_EntityHandle :: verts, pointer_verts
+        real*8 :: coords
+        iBase_EntityHandle :: pointer_coords
+        ! cray pointers
+        pointer (pointer_verts, verts(1,*))
+        pointer (pointer_coords, coords(1,*))
+
+        ! Get vertices' handles
+        iverts_alloc = 0
+        call iMesh_getEntAdj(%VAL(mymesh), %VAL(entity_handle), &
+              %VAL(iBase_VERTEX), pointer_verts, &
+              iverts_alloc, iverts_size, ierr)
+
+        ! Get all vertices' coordinates
+        icoords_alloc = 0
+        call iMesh_getVtxArrCoords(%VAL(mymesh), %VAL(pointer_verts), &
+              %VAL(iverts_size), iBase_BLOCKED, pointer_coords, &
+              icoords_alloc, icoords_size, ierr)
+
+        ! Call appropriate sampling routine
+        if (icoords_size.eq.12) then
+          call sample_tetrahedra(coords)
+        elseif (icoords_size.eq.24) then
+          call sample_hexahedra(coords)
+        else
+          ! Error
+          !call expirx(1,'sample_region_entity', &
+          !      "Entity with invalid number of vertices.")
+          continue
+        endif
+
+end subroutine sample_region_entity
+
+
+subroutine sample_tetrahedra (co)
+! This subroutine receives the four vertices of a tetrahedron and sets
 ! xxx, yyy, zzz, to values corresponding to a uniformly sampled point
 ! within the tetrahedron.
 ! 
 ! Parameters
 ! -----------
-! The x y z coordinates of four points for a tetrahedron
+! co - list of 24 real*8 values
+!     The x y z coordinates of four points for a tetrahedron
 ! 
 ! Notes
 ! ------
@@ -1098,37 +1203,93 @@ subroutine sample_tetrahedra(p1x,p2x,p3x,p4x,p1y,p2y,p3y,p4y,p1z,p2z,p3z,p4z)
   use source_data
   implicit none
 
-      real(dknd), intent(IN) :: p1x, p2x, p3x, p4x, p1y, p2y, p3y, p4y, &
-                p1z, p2z, p3z, p4z
+        ! Parameters
+        real(dknd), dimension(1:12), intent(IN) :: co
 
-      real(dknd) :: ss, tt, uu, temp
+        real(dknd) :: ss, tt, uu, temp
 
-      ss = rang()
-      tt = rang()
-      uu = rang()
+        ss = rang()
+        tt = rang()
+        uu = rang()
 
-      if ((ss+tt).gt.1._rknd) then
-        ss = 1._rknd - ss
-        tt = 1._rknd - tt
-      endif
-
-      if ((ss+tt+uu).gt.1._rknd) then
-        if ((tt+uu).gt.1._rknd) then
-          temp = tt
-          tt = 1 - uu
-          uu = 1._rknd - temp - ss
-        else
-          temp = ss
-          ss = 1._rknd - uu - tt
-          uu = temp + tt + uu - 1._rknd
+        if ((ss+tt).gt.1._rknd) then
+          ss = 1._rknd - ss
+          tt = 1._rknd - tt
         endif
-      endif
 
-      xxx = p1x + (p2x-p1x)*ss + (p3x-p1x)*tt + (p4x-p1x)*uu
-      yyy = p1y + (p2y-p1y)*ss + (p3y-p1y)*tt + (p4y-p1y)*uu
-      zzz = p1z + (p2z-p1z)*ss + (p3z-p1z)*tt + (p4z-p1z)*uu
+        if ((ss+tt+uu).gt.1._rknd) then
+          if ((tt+uu).gt.1._rknd) then
+            temp = tt
+            tt = 1 - uu
+            uu = 1._rknd - temp - ss
+          else
+            temp = ss
+            ss = 1._rknd - uu - tt
+            uu = temp + tt + uu - 1._rknd
+          endif
+        endif
+
+        ! For reference:
+        !xxx = p1x + (p2x-p1x)*ss + (p3x-p1x)*tt + (p4x-p1x)*uu
+        !yyy = p1y + (p2y-p1y)*ss + (p3y-p1y)*tt + (p4y-p1y)*uu
+        !zzz = p1z + (p2z-p1z)*ss + (p3z-p1z)*tt + (p4z-p1z)*uu
+        xxx = co(1) + (co(2)-co(1))*ss + (co(3)-co(1))*tt + (co(4)-co(1))*uu
+        yyy = co(5) + (co(6)-co(5))*ss + (co(7)-co(5))*tt + (co(8)-co(5))*uu
+        zzz = co(9) + (co(10)-co(9))*ss + (co(11)-co(9))*tt + &
+                    (co(12)-co(9))*uu
 
 end subroutine sample_tetrahedra
+
+
+subroutine sample_hexahedra (co)
+! This subroutine receives the eight vertices of a tetrahedron and sets
+! xxx, yyy, zzz, to values corresponding to a uniformly sampled point
+! within the tetrahedron.
+! 
+! Parameters
+! -----------
+! co - list of 24 real*8 values
+!     The x y z coordinates of four points for a tetrahedron
+! 
+! Notes
+! ------
+! The algorithm used is ...
+! 
+  use source_data
+  implicit none
+
+        ! Parameters
+        real(dknd), dimension(1:24), intent(IN) :: co
+
+        continue
+        !real(dknd) :: ss, tt, uu, temp
+
+        !ss = rang()
+        !tt = rang()
+        !uu = rang()
+
+        !if ((ss+tt).gt.1._rknd) then
+        !  ss = 1._rknd - ss
+        !  tt = 1._rknd - tt
+        !endif
+
+        !if ((ss+tt+uu).gt.1._rknd) then
+        !  if ((tt+uu).gt.1._rknd) then
+        !    temp = tt
+        !    tt = 1 - uu
+        !    uu = 1._rknd - temp - ss
+        !  else
+        !    temp = ss
+        !    ss = 1._rknd - uu - tt
+        !    uu = temp + tt + uu - 1._rknd
+        !  endif
+        !endif
+
+        !xxx = p1x + (p2x-p1x)*ss + (p3x-p1x)*tt + (p4x-p1x)*uu
+        !yyy = p1y + (p2y-p1y)*ss + (p3y-p1y)*tt + (p4y-p1y)*uu
+        !zzz = p1z + (p2z-p1z)*ss + (p3z-p1z)*tt + (p4z-p1z)*uu
+
+end subroutine sample_hexahedra
 
 
 subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, aliasesList)
@@ -1148,9 +1309,10 @@ subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, aliasesList)
 !     List of bin probabilities for energy PDF, for each voxel
 ! aliasesList : list of lists of integers
 !     Alias indices for energy group, for each voxel
-
+! 
   use source_data
   implicit none
+  
         real(dknd), intent(OUT) :: myerg
         integer, intent(IN) :: myvoxel, n_grp, n_vox
         real(dknd), dimension(1:n_vox,1:n_grp), intent(IN) :: probList
@@ -1223,9 +1385,11 @@ subroutine gen_voxel_alias_table
 ! 
 ! Notes
 ! -----
-! The resulting alias table is stored in lists `aliases` and `binsProbabilities`.
+! The resulting alias table is stored in lists `aliases` and 
+! `binsProbabilities`.
 ! 
 ! tot_list does not have to be normalized prior to calling this subroutine
+! 
   use source_data
   implicit none
 
@@ -1303,6 +1467,7 @@ subroutine gen_alias_table (bins, aliases, probs_list, len)
 !   alias_j    aliases(j)
 ! 
   use mcnp_global
+  implicit none
    
         ! subroutine argument variables
         real(dknd), dimension(1:len), intent(INOUT) :: bins
@@ -1389,7 +1554,7 @@ subroutine print_debug
   use source_data
   implicit none
 
-        !
+        ! 
         integer :: unitdebug, statusdebug, i
         ! Array storing debug information
         real(dknd), dimension(1:10000,1:4) :: source_debug_array
