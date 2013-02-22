@@ -180,7 +180,7 @@ def test_tolerance():
     g.close
 
     assert_equal(written[1:], expected[1:])
-    os.remove(output)
+    #os.remove(output)
 
 
 # Run as script

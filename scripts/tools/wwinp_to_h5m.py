@@ -109,7 +109,7 @@ def tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nf, output, particle):
     # iterate over energy groups
     line_num = ww_first_line
     for i in range(1, num_e_bins +1):
-        # Create tags for e_group
+        # Create tags for e_groupz
         tag_name = 'ww_{0}_group_{1:03d}'.format(particle, i) # good sorting for up to 999 groups
         tag_ww = sm.imesh.createTag(tag_name, 1, float)
         
