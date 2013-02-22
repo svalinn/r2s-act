@@ -122,11 +122,20 @@ def magic_wwinp(flux_mesh, ww_mesh='None', total_bool=False, null_value=0, toler
                 '{0}_group_{1}'.format(particle, e_group))[flux_voxel]
             error = flux_mesh.imesh.getTagHandle(\
                  '{0}_group_{1}_error'.format(particle, e_group))[flux_voxel]
-            if (ww_bool == False and error != 0.0) or 0.0 < error < tolerance:
-            #if 0 < error < 0.1:
-                ww_mesh.imesh.getTagHandle(\
-                    'ww_{0}_group_{1}'.format(particle, e_group))[ww_voxel]\
-                     = flux/(2*max_fluxes[i]) # apply magic method
+            if ((ww_bool == False and error != 0.0) \
+            or (0.0 < error and error < tolerance)):
+                if ww_bool == True:
+                    if ww_mesh.imesh.getTagHandle('ww_{0}_group_{1}'\
+                    .format(particle, e_group))[ww_voxel] != -1:       
+                        ww_mesh.imesh.getTagHandle('ww_{0}_group_{1}'\
+                        .format(particle, e_group))[ww_voxel]\
+                        = flux/(2*max_fluxes[i]) # apply magic method
+
+                else:
+                    ww_mesh.imesh.getTagHandle(\
+                        'ww_{0}_group_{1}'.format(particle, e_group))[ww_voxel]\
+                         = flux/(2*max_fluxes[i]) # apply magic method
+
             elif ww_bool == False and error == 0.0 :
                 ww_mesh.imesh.getTagHandle(\
                     'ww_{0}_group_{1}'.format(particle, e_group))[ww_voxel]\
