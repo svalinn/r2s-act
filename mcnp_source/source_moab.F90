@@ -263,31 +263,29 @@ subroutine read_moab (mymesh, filename, rpents)
 !     Mesh instance which will be initialized and then read
 ! filename : character array
 !     Filename to read mesh data from. (.vtk or .h5m file)
-! rpents : pointer to array of IBASE_HANDLE_T
+! rpents : pointer to array of iBase_EntitySetHandle
 !     Pointer to an array that will be filled with iBase_REGION entity
 !     handles
 ! 
   use source_data
   implicit none
+
+        ! Parameters
+        iMesh_Instance, intent(INOUT) :: mymesh
+        character(len=*), intent(IN) :: filename
+        iBase_EntitySetHandle, intent(INOUT) :: rpents
+
         ! declarations
         integer i, j
-
-        iMesh_Instance, intent(INOUT) :: mymesh
-        !character*28, intent(IN) :: filename
-        character(len=*), intent(IN) :: filename
-        !IBASE_HANDLE_T, intent(INOUT) :: ents
-        IBASE_HANDLE_T, intent(INOUT) :: rpents
-
-        IBASE_HANDLE_T :: ents
-        !IBASE_HANDLE_T :: rpents
-        IBASE_HANDLE_T :: verts
+        iBase_EntitySetHandle :: ents
+        iBase_EntitySetHandle :: verts
 
         iBase_TagHandle :: ergtagh, tagh
         character*128 :: tagname
         
         integer :: ents_alloc, ents_size
         iBase_EntitySetHandle :: root_set
-        real*8 :: tag_data
+        real(dknd) :: tag_data
 
         pointer (rpents, ents(1:*))
 
@@ -747,7 +745,7 @@ subroutine get_tet_vol(mymesh, tet_entity_handle, volume)
 end subroutine get_tet_vol
 
 
-real(dknd) function calc_tet_vol(a, b, c, d)
+real*8 function calc_tet_vol(a, b, c, d)
 ! Function returns the volume of a tetrahedron, given the vertex coordinates
 ! 
 ! Parameters
@@ -1153,7 +1151,7 @@ subroutine sample_region_entity (mymesh, entity_handle)
         integer :: iverts_alloc, iverts_size
         integer :: icoords_alloc, icoords_size
         iBase_EntityHandle :: verts, pointer_verts
-        real*8 :: coords
+        real(dknd) :: coords
         iBase_EntityHandle :: pointer_coords
         ! cray pointers
         pointer (pointer_verts, verts(1,*))
@@ -1246,12 +1244,13 @@ subroutine sample_hexahedra (co)
 ! This subroutine receives the eight vertices of a hexahedron and sets
 ! xxx, yyy, zzz, to values corresponding to a uniformly sampled point
 ! within the voxel.  
-! It is assumed that the tetrahedron is a right tetrahedron.
+! 
+! It is assumed that the hexahedron is a parallelepiped.
 ! 
 ! Parameters
 ! -----------
 ! co - list of 12 real*8 values
-!     The x y z coordinates of four points for a tetrahedron.  These numbers
+!     The x y z coordinates of four points for a hexaahedron.  These numbers
 !     are in xxx.. yyy.. zzz.. order.
 ! 
 ! Notes
@@ -1266,7 +1265,6 @@ subroutine sample_hexahedra (co)
 
         real(dknd), dimension(1:3) :: a, b, c, d, e, f, g, h
         real(dknd), dimension(1:3) :: v1, v2, v3
-
         real(dknd) :: ss, tt, uu, temp
 
         a = co(1::8)
@@ -1282,6 +1280,7 @@ subroutine sample_hexahedra (co)
         tt = rang()
         uu = rang()
 
+        ! Get 3 edge vectors that begin at point 'a'
         v1 = ss * (b - a)
         v2 = tt * (e - a)
         v3 = uu * (d - a)
@@ -1472,10 +1471,10 @@ subroutine gen_alias_table (bins, aliases, probs_list, len)
   implicit none
    
         ! subroutine argument variables
+        integer, intent(in) :: len
         real(dknd), dimension(1:len), intent(INOUT) :: bins
         integer(i4knd), dimension(1:len), intent(OUT) :: aliases
         real(dknd), dimension(1:len), intent(OUT) :: probs_list
-        integer, intent(in) :: len
 
         ! internal variables
         integer :: largecnt, j,k,s,l
@@ -1584,3 +1583,4 @@ subroutine print_debug
         endif
 
 end subroutine print_debug
+
