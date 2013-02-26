@@ -442,7 +442,9 @@ subroutine test_read_moab2
   use tests_mod
   use source_data
   implicit none
-! Tests ...
+! Tests:
+! - correct number of voxels found
+! - ...
         iBase_EntitySetHandle :: root_set
         integer :: ents_alloc, ents_size, myerr
         IBASE_HANDLE_T :: t_entity_handles

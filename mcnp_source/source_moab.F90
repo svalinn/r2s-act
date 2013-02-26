@@ -217,8 +217,8 @@ subroutine source_setup
         write(*,*) "n_mesh_cells:", n_mesh_cells, &
                 "n_source_cells:", n_source_cells
 
-        ! Scale each entry in tot_list (phtns/s/cc) by the voxel's volume
-        ! to get (phtns/s/voxel).
+        ! Scale each entry in tot_list ([phtns/s/cc]) by the voxel's volume
+        ! to get [phtns/s/voxel], giving the relative voxel source strengths.
         do i=1,n_mesh_cells
           if (tot_list(i).gt.0) then
             call iMesh_getEntTopo(%VAL(mesh), entity_handles(i), &
@@ -228,6 +228,7 @@ subroutine source_setup
             elseif (voxel_type.eq.iMesh_HEXAHEDRON) then
               call get_hex_vol(mesh, entity_handles(i), volume)
             else
+              write(*,*) "Current voxel type is: ", voxel_type
               call expirx(1,'source_setup','Invalid voxel type.')
             endif
 
@@ -235,7 +236,6 @@ subroutine source_setup
           endif
         enddo
 
-        
         !call iMesh_dtor(%VAL(mesh), ierr)
         !CHECK("Failed to destroy interface")
 
@@ -375,24 +375,10 @@ subroutine read_moab (mymesh, filename, rpents)
           enddo
         endif
 
-
         ! Prepare to read in spectrum information
         ! set the spectrum array to: # of mesh cells * # energy groups
-        !ALLOCATE(spectrum(1:n_mesh_cells, 1:bias + n_ener_grps))
         ALLOCATE(spectrum(1:n_mesh_cells, 1:n_ener_grps))
         ALLOCATE(tot_list(1:n_mesh_cells))
-         
-        !! reading in source strength and alias table for each voxel 
-        !i = 1 ! i keeps track of # of voxel entries
-        !do
-        !  read(unitnum,*,iostat=stat) (spectrum(i,j), j=1,bias + n_ener_grps)
-        !  if (stat.ne.0) then
-        !    i = i - 1
-        !    exit ! exit the do loop
-        !  endif
-        !  if (bias.eq.1) bias_list(i) = spectrum(i,bias+n_ener_grps)
-        !  i = i + 1
-        !enddo
 
         ! fill spectrum
         do j=1, n_ener_grps
@@ -400,7 +386,7 @@ subroutine read_moab (mymesh, filename, rpents)
           write(tagname, '(a, i3.3)') "phtn_src_group_", j
           call iMesh_getTagHandle(%VAL(mymesh), tagname, tagh, ierr)
           if (ierr.eq.14) then ! 14 = iBase_TAG_NOT_FOUND
-            write(*,*) "ERROR - Missing tag:", tagname
+            write(*,*) "ERROR - Missing expected mesh tag:", tagname
             return
           endif
           ! Iterate through each voxel, grabbing and storing values
@@ -1396,9 +1382,6 @@ subroutine gen_voxel_alias_table
 
         integer :: i
    
-        ! Note that the first entry for each voxel in 'gammas' is
-        ! a relative probability of that voxel being the source location.
-        ! If biasing is used, the second entry is the bias value of the voxel
         ! Sum up a normalization factor
         sourceSum = sum(tot_list)
         write(*,*) "sourceSum:", sourceSum 
@@ -1410,7 +1393,7 @@ subroutine gen_voxel_alias_table
         ! make the unsorted list of bins
         bias_probability_sum = 0
         do i=1,n_mesh_cells
-          ! the average bin(i,1) value assigned is n_inv
+          ! the average bins(i) value assigned is n_inv
           bins(i) = tot_list(i) / sourceSum
 
           ! if biasing being done, get the quantity: sum(p_i*b_i)
@@ -1421,8 +1404,8 @@ subroutine gen_voxel_alias_table
           endif
         enddo
 
-        ! if bias values were found, update the bin(i,1) values for biasing
-        !  and then update the bias values so that they are now particle wgt
+        ! if bias values were found, update the bins(i) values for biasing
+        !  and then update convert the bias values into particle weights
         if (bias.eq.1) then
           do i=1,n_mesh_cells
             bins(i) = bins(i) * bias_list(i) / bias_probability_sum
