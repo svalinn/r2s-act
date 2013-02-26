@@ -176,9 +176,9 @@ subroutine source_setup
   implicit none
  
         real(dknd) :: volume
-        integer :: unitnum, voxel_type, i, j
+        integer :: unitnum, voxel_topo, i, j
 
-        ! Stores the 
+        ! Stores the list of volume entities returned by read_moab()
         iBase_EntityHandle :: myentity_handles, mypointer_entity_handles
         pointer (mypointer_entity_handles, myentity_handles(1:*))
 
@@ -191,8 +191,9 @@ subroutine source_setup
           call expirx(1,'source_setup','Error reading MOAB mesh.')
         endif
 
+        ! Copy entity handels to global variable
         ALLOCATE(entity_handles(1:n_mesh_cells))
-        entity_handles = myentity_handles
+        entity_handles(1:n_mesh_cells) = myentity_handles(1:n_mesh_cells)
 
         ALLOCATE(ergAliases(1:n_mesh_cells, 1:n_ener_grps))
         ALLOCATE(ergBinsProbabilities(1:n_mesh_cells, 1:n_ener_grps))
@@ -222,13 +223,13 @@ subroutine source_setup
         do i=1,n_mesh_cells
           if (tot_list(i).gt.0) then
             call iMesh_getEntTopo(%VAL(mesh), %VAL(entity_handles(i)), &
-                  voxel_type, ierr)
-            if (voxel_type.eq.iMesh_TETRAHEDRON) then
+                  voxel_topo, ierr)
+            if (voxel_topo.eq.iMesh_TETRAHEDRON) then
               call get_tet_vol(mesh, entity_handles(i), volume)
-            elseif (voxel_type.eq.iMesh_HEXAHEDRON) then
+            elseif (voxel_topo.eq.iMesh_HEXAHEDRON) then
               call get_hex_vol(mesh, entity_handles(i), volume)
             else
-              write(*,*) "Problematic voxel; type is: ", voxel_type
+              write(*,*) "Problematic voxel; topology is: ", voxel_topo
               call expirx(1,'source_setup','Invalid voxel type.')
             endif
 
@@ -263,7 +264,7 @@ subroutine read_moab (mymesh, filename, rpents)
 !     Mesh instance which will be initialized and then read
 ! filename : character array
 !     Filename to read mesh data from. (.vtk or .h5m file)
-! rpents : pointer to array of iBase_EntitySetHandle
+! rpents : pointer to array of iBase_EntityHandle
 !     Pointer to an array that will be filled with iBase_REGION entity
 !     handles
 ! 
@@ -273,12 +274,12 @@ subroutine read_moab (mymesh, filename, rpents)
         ! Parameters
         iMesh_Instance, intent(INOUT) :: mymesh
         character(len=*), intent(IN) :: filename
-        iBase_EntitySetHandle, intent(INOUT) :: rpents
+        iBase_EntityHandle, intent(INOUT) :: rpents
 
         ! declarations
         integer i, j
-        iBase_EntitySetHandle :: ents
-        iBase_EntitySetHandle :: verts
+        iBase_EntityHandle :: ents
+        iBase_EntityHandle :: verts
 
         iBase_TagHandle :: ergtagh, tagh
         character*128 :: tagname
@@ -796,7 +797,7 @@ subroutine get_hex_vol(mymesh, hex_entity_handle, volume)
               iverts_alloc, iverts_size, ierr)
 
         ! Get all vertices' coordinates
-        iverts_alloc = 0
+        icoords_alloc = 0
         call iMesh_getVtxArrCoords(%VAL(mymesh), %VAL(pointer_verts), &
               %VAL(8), iBase_BLOCKED, pointer_coords, &
               icoords_alloc, icoords_size, ierr)
