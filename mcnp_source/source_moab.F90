@@ -221,14 +221,14 @@ subroutine source_setup
         ! to get [phtns/s/voxel], giving the relative voxel source strengths.
         do i=1,n_mesh_cells
           if (tot_list(i).gt.0) then
-            call iMesh_getEntTopo(%VAL(mesh), entity_handles(i), &
+            call iMesh_getEntTopo(%VAL(mesh), %VAL(entity_handles(i)), &
                   voxel_type, ierr)
             if (voxel_type.eq.iMesh_TETRAHEDRON) then
               call get_tet_vol(mesh, entity_handles(i), volume)
             elseif (voxel_type.eq.iMesh_HEXAHEDRON) then
               call get_hex_vol(mesh, entity_handles(i), volume)
             else
-              write(*,*) "Current voxel type is: ", voxel_type
+              write(*,*) "Problematic voxel; type is: ", voxel_type
               call expirx(1,'source_setup','Invalid voxel type.')
             endif
 
