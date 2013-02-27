@@ -162,7 +162,16 @@ def write_wwinp(ww_mesh, e_groups, output):
         sys.exit(1)
 
     # create block 1 string
-    block1 = '         1         1         1        10                     '
+    block1 = '         1         1         '
+
+    # add particle specifier
+    if particle == 'n':
+        block1 += '1'
+    else:
+        blcok1 += '2'
+
+    # add 10 to specify cartesian geometry
+    block1 += '        10                     '
     # add date and time
     now = datetime.datetime.now()
     block1 += '{0:02d}/{1}/{2} {3}:{4}:{5}\n'\
