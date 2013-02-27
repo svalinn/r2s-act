@@ -11,12 +11,19 @@ from itaps import iBase
 # r2s imports
 from r2s.scdmesh import ScdMesh, ScdMeshError
 
-def cartesian(wwinp, output, particle):
+def cartesian(wwinp, output):
     """This function reads in a cartesian WWINP file and outputs tagged, 
         structured mesh .h5m file with name "output".
     """
 
     print "Parsing Cartesian WWINP"
+
+    particle_identifier = linecache.getline(wwinp, 1).split()[2]
+    if particle_identifier == '1':
+        particle = 'n'
+    elif particle_identifier =='2':
+        particle = 'p'
+
 
     # collect easy to parse energy group and mesh sized info
     num_e_bins = int(linecache.getline(wwinp, 2).split()[0])
@@ -125,9 +132,9 @@ def tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nf, output, particle):
     # save particle type to rootset
     # (but first assign an int to each particle type)
     if particle == 'n':
-        particle_int = 0
-    else:
         particle_int = 1
+    else:
+        particle_int = 2
 
     tag_particle = sm.imesh.createTag("particle", 1, int)
     tag_particle[sm.imesh.rootSet] = particle_int
@@ -148,20 +155,15 @@ def main(arguments=None):
     (opts, args) = parser.parse_args(arguments)
 
     if len(args) != 2:
-        parser.error('\nNeed 2 arguments: WWINP, particle type')
-
-    if args[1].lower() in ["n", "p"]:
-        particle = args[1].lower()
-    else:
-        parser.error('\nWWINP type must be "n" or "p"')    
+        parser.error('\nNeed 1 argument: WWINP')  
 
     # determine nr from MCNP5 manual Table J.2
     # nr = 10 is Cartesian and nr = 16 is cylindrical
     nr = linecache.getline(args[0],1).split()[3]
     if int(nr) == 10:
-        cartesian(args[0], opts.output, particle)
+        cartesian(args[0], opts.output)
     elif int(nr) == 16:
-        cylindrical(args[0], opts.output, particle)
+        cylindrical(args[0], opts.output)
 
     print "WW mesh saved to {0}".format(opts.output)       
 

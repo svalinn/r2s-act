@@ -7,12 +7,11 @@ from r2s.scdmesh import ScdMesh
 def test_wwinp_to_h5m():
     wwinp = 'files_test_wwinp_to_h5m/wwinp_test.txt'
     output = 'wwinp_mesh.h5m'
-    particle = 'n'
     
     if output in os.listdir('.'):
         os.remove(output)
     
-    wwinp_to_h5m.cartesian(wwinp, output, particle)
+    wwinp_to_h5m.cartesian(wwinp, output)
     
     with open(output) as f:
         written = f.read()
