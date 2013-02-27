@@ -22,7 +22,7 @@ implicit none
         integer :: testunitnum, i, terr
 
         ! Attempt to get around 'ambiguous reference' errors.
-        integer :: iBase_REGION_t, iMesh_TETRAHEDRON_t
+        integer :: iBase_REGION_t, iMesh_TETRAHEDRON_t, iMesh_HEXAHEDRON_t
 
 
 !contains 
@@ -401,6 +401,102 @@ subroutine test_get_tet_vol
 end subroutine test_get_tet_vol
 
 
+subroutine test_get_hex_vol1
+! Tests that the volume of the reference hexahedron in 1hex.vtk is 1.00.
+  use tests_mod
+  use source_data
+  implicit none
+
+        iBase_EntitySetHandle :: root_set
+        integer :: ents_alloc, ents_size, myerr
+        IBASE_HANDLE_T :: t_entity_handles
+        IBASE_HANDLE_T :: t_pointer_entity_handles
+        real(dknd) :: volume, a, b
+
+        pointer (t_pointer_entity_handles, t_entity_handles(1:*))
+
+        ! create the Mesh instance
+        call iMesh_newMesh("", mesh, ierr)
+        ! load the mesh
+        call iMesh_getRootSet(%VAL(mesh), root_set, ierr)
+        ! Read mesh file
+        call iMesh_load(%VAL(mesh), %VAL(root_set), &
+             "1hex.vtk", "", ierr)
+
+        ! get single hex element
+        ents_alloc = 0
+        call iMesh_getEntities(%VAL(mesh), %VAL(root_set), &
+             %VAL(iBase_REGION_t), &
+             %VAL(iMesh_HEXAHEDRON_t), t_pointer_entity_handles, &
+             ents_alloc, ents_size, ierr)
+
+        call get_hex_vol(mesh, t_entity_handles, volume)
+
+        myerr = ierr
+
+        call iMesh_dtor(%VAL(mesh), ierr)
+
+        a = volume
+        b = 1._rknd
+        if (abs(a-b).gt.(1e-4*max(a,b))) then
+          write(*,*) "ERROR - test_get_hex_vol1; ierr=", myerr
+          write(*,*) "expected:", b, "calculated:", a
+          return
+        endif
+
+        write(*,*) "test_get_hex_vol1: got correct volume for reference hex"
+
+end subroutine test_get_hex_vol1
+
+subroutine test_get_hex_vol2
+! Tests that the volume of the reference hexahedron in 1hex.vtk is 1.00.
+  use tests_mod
+  use source_data
+  implicit none
+
+        iBase_EntitySetHandle :: root_set
+        integer :: ents_alloc, ents_size, myerr
+        IBASE_HANDLE_T :: t_entity_handles
+        IBASE_HANDLE_T :: t_pointer_entity_handles
+        real(dknd) :: volume, a, b
+
+        pointer (t_pointer_entity_handles, t_entity_handles(1:*))
+
+        ! create the Mesh instance
+        call iMesh_newMesh("", mesh, ierr)
+        ! load the mesh
+        call iMesh_getRootSet(%VAL(mesh), root_set, ierr)
+        ! Read mesh file
+        call iMesh_load(%VAL(mesh), %VAL(root_set), &
+             "1hexRotated.vtk", "", ierr)
+
+        ! get single hex element
+        ents_alloc = 0
+        call iMesh_getEntities(%VAL(mesh), %VAL(root_set), &
+             %VAL(iBase_REGION_t), &
+             %VAL(iMesh_HEXAHEDRON_t), t_pointer_entity_handles, &
+             ents_alloc, ents_size, ierr)
+
+        call get_hex_vol(mesh, t_entity_handles, volume)
+
+        myerr = ierr
+
+        call iMesh_dtor(%VAL(mesh), ierr)
+
+        a = volume
+        b = 1._rknd
+        if (abs(a-b).gt.(1e-4*max(a,b))) then
+          write(*,*) "ERROR - test_get_hex_vol2; ierr=", myerr
+          write(*,*) "expected:", b, "calculated:", a
+          return
+        endif
+
+        write(*,*) "test_get_hex_vol2: got correct volume for rotated " &
+                // "reference hex"
+
+end subroutine test_get_hex_vol2
+
+
 subroutine test_read_moab1
 !
   use tests_mod
@@ -442,7 +538,9 @@ subroutine test_read_moab2
   use tests_mod
   use source_data
   implicit none
-! Tests ...
+! Tests:
+! - correct number of voxels found
+! - ...
         iBase_EntitySetHandle :: root_set
         integer :: ents_alloc, ents_size, myerr
         IBASE_HANDLE_T :: t_entity_handles

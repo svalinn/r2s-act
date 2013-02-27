@@ -18,7 +18,10 @@ program test_source
         ! Attempt to get around 'ambiguous reference' errors.
         iBase_REGION_t = iBase_REGION
         iMesh_TETRAHEDRON_t = iMesh_TETRAHEDRON
+        iMesh_HEXAHEDRON_t = iMesh_HEXAHEDRON
         call test_get_tet_vol
+        call test_get_hex_vol1
+        call test_get_hex_vol2
         call test_read_moab1
         call test_read_moab2
 

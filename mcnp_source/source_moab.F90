@@ -176,9 +176,9 @@ subroutine source_setup
   implicit none
  
         real(dknd) :: volume
-        integer :: unitnum, voxel_type, i, j
+        integer :: unitnum, voxel_topo, i, j
 
-        ! Stores the 
+        ! Stores the list of volume entities returned by read_moab()
         iBase_EntityHandle :: myentity_handles, mypointer_entity_handles
         pointer (mypointer_entity_handles, myentity_handles(1:*))
 
@@ -191,8 +191,9 @@ subroutine source_setup
           call expirx(1,'source_setup','Error reading MOAB mesh.')
         endif
 
+        ! Copy entity handels to global variable
         ALLOCATE(entity_handles(1:n_mesh_cells))
-        entity_handles = myentity_handles
+        entity_handles(1:n_mesh_cells) = myentity_handles(1:n_mesh_cells)
 
         ALLOCATE(ergAliases(1:n_mesh_cells, 1:n_ener_grps))
         ALLOCATE(ergBinsProbabilities(1:n_mesh_cells, 1:n_ener_grps))
@@ -217,25 +218,24 @@ subroutine source_setup
         write(*,*) "n_mesh_cells:", n_mesh_cells, &
                 "n_source_cells:", n_source_cells
 
-        ! Scale each entry in tot_list (phtns/s/cc) by the voxel's volume
-        ! to get (phtns/s/voxel).
+        ! Scale each entry in tot_list ([phtns/s/cc]) by the voxel's volume
+        ! to get [phtns/s/voxel], giving the relative voxel source strengths.
         do i=1,n_mesh_cells
           if (tot_list(i).gt.0) then
-            call iMesh_getEntTopo(%VAL(mesh), entity_handles(i), &
-                  voxel_type, ierr)
-            if (voxel_type.eq.iMesh_TETRAHEDRON) then
+            call iMesh_getEntTopo(%VAL(mesh), %VAL(entity_handles(i)), &
+                  voxel_topo, ierr)
+            if (voxel_topo.eq.iMesh_TETRAHEDRON) then
               call get_tet_vol(mesh, entity_handles(i), volume)
-            elseif (voxel_type.eq.iMesh_HEXAHEDRON) then
+            elseif (voxel_topo.eq.iMesh_HEXAHEDRON) then
               call get_hex_vol(mesh, entity_handles(i), volume)
             else
+              write(*,*) "Problematic voxel; topology is: ", voxel_topo
               call expirx(1,'source_setup','Invalid voxel type.')
             endif
-
             tot_list(i) = tot_list(i) * volume
           endif
         enddo
 
-        
         !call iMesh_dtor(%VAL(mesh), ierr)
         !CHECK("Failed to destroy interface")
 
@@ -263,7 +263,7 @@ subroutine read_moab (mymesh, filename, rpents)
 !     Mesh instance which will be initialized and then read
 ! filename : character array
 !     Filename to read mesh data from. (.vtk or .h5m file)
-! rpents : pointer to array of iBase_EntitySetHandle
+! rpents : pointer to array of iBase_EntityHandle
 !     Pointer to an array that will be filled with iBase_REGION entity
 !     handles
 ! 
@@ -273,12 +273,12 @@ subroutine read_moab (mymesh, filename, rpents)
         ! Parameters
         iMesh_Instance, intent(INOUT) :: mymesh
         character(len=*), intent(IN) :: filename
-        iBase_EntitySetHandle, intent(INOUT) :: rpents
+        iBase_EntityHandle, intent(INOUT) :: rpents
 
         ! declarations
         integer i, j
-        iBase_EntitySetHandle :: ents
-        iBase_EntitySetHandle :: verts
+        iBase_EntityHandle :: ents
+        iBase_EntityHandle :: verts
 
         iBase_TagHandle :: ergtagh, tagh
         character*128 :: tagname
@@ -375,24 +375,10 @@ subroutine read_moab (mymesh, filename, rpents)
           enddo
         endif
 
-
         ! Prepare to read in spectrum information
         ! set the spectrum array to: # of mesh cells * # energy groups
-        !ALLOCATE(spectrum(1:n_mesh_cells, 1:bias + n_ener_grps))
         ALLOCATE(spectrum(1:n_mesh_cells, 1:n_ener_grps))
         ALLOCATE(tot_list(1:n_mesh_cells))
-         
-        !! reading in source strength and alias table for each voxel 
-        !i = 1 ! i keeps track of # of voxel entries
-        !do
-        !  read(unitnum,*,iostat=stat) (spectrum(i,j), j=1,bias + n_ener_grps)
-        !  if (stat.ne.0) then
-        !    i = i - 1
-        !    exit ! exit the do loop
-        !  endif
-        !  if (bias.eq.1) bias_list(i) = spectrum(i,bias+n_ener_grps)
-        !  i = i + 1
-        !enddo
 
         ! fill spectrum
         do j=1, n_ener_grps
@@ -400,7 +386,7 @@ subroutine read_moab (mymesh, filename, rpents)
           write(tagname, '(a, i3.3)') "phtn_src_group_", j
           call iMesh_getTagHandle(%VAL(mymesh), tagname, tagh, ierr)
           if (ierr.eq.14) then ! 14 = iBase_TAG_NOT_FOUND
-            write(*,*) "ERROR - Missing tag:", tagname
+            write(*,*) "ERROR - Missing expected mesh tag:", tagname
             return
           endif
           ! Iterate through each voxel, grabbing and storing values
@@ -727,18 +713,18 @@ subroutine get_tet_vol(mymesh, tet_entity_handle, volume)
               %VAL(4), iBase_BLOCKED, pointer_coords, &
               icoords_alloc, icoords_size, ierr)
 
-        a(1) = coords(1)
-        b(1) = coords(2)
-        c(1) = coords(3)
-        d(1) = coords(4)
-        a(2) = coords(5)
-        b(2) = coords(6)
-        c(2) = coords(7)
-        d(2) = coords(8)
-        a(3) = coords(9)
-        b(3) = coords(10)
-        c(3) = coords(11)
-        d(3) = coords(12)
+        a(1) = coords(1,1)
+        b(1) = coords(1,2)
+        c(1) = coords(1,3)
+        d(1) = coords(1,4)
+        a(2) = coords(1,5)
+        b(2) = coords(1,6)
+        c(2) = coords(1,7)
+        d(2) = coords(1,8)
+        a(3) = coords(1,9)
+        b(3) = coords(1,10)
+        c(3) = coords(1,11)
+        d(3) = coords(1,12)
 
         volume = calc_tet_vol(a, b, c, d)
         
@@ -759,10 +745,13 @@ real*8 function calc_tet_vol(a, b, c, d)
         ! Parameters
         real(dknd), dimension(1:3), intent(IN) :: a, b, c, d
         
-        calc_tet_vol = abs( (a(1)-d(1)) * (b(1)-d(1)) * (c(1)-d(1)) + &
-                            (a(2)-d(2)) * (b(2)-d(2)) * (c(2)-d(2)) + &
-                            (a(3)-d(3)) * (b(3)-d(3)) * (c(3)-d(3)) ) &
-                            / 6._rknd
+        calc_tet_vol = abs( (a(3)-d(3)) * &
+            ( b(1)*c(2)-b(2)*c(1)+b(2)*d(1)-c(2)*d(1)-b(1)*d(2)+c(1)*d(2)) + &
+            (a(2)-d(2)) * &
+            (b(3)*c(1)-b(1)*c(3)-b(3)*d(1)+c(3)*d(1)+b(1)*d(3)-c(1)*d(3)) + &
+            (a(1)-d(1)) * &
+            (b(2)*c(3)-b(3)*c(2)+b(3)*d(2)-c(3)*d(2)-b(2)*d(3)+c(2)*d(3)) ) &
+            / 6._rknd
 
 end function calc_tet_vol
 
@@ -810,19 +799,19 @@ subroutine get_hex_vol(mymesh, hex_entity_handle, volume)
               iverts_alloc, iverts_size, ierr)
 
         ! Get all vertices' coordinates
-        iverts_alloc = 0
+        icoords_alloc = 0
         call iMesh_getVtxArrCoords(%VAL(mymesh), %VAL(pointer_verts), &
               %VAL(8), iBase_BLOCKED, pointer_coords, &
               icoords_alloc, icoords_size, ierr)
 
-        a = coords(1:24:8)
-        b = coords(2:24:8)
-        c = coords(3:24:8)
-        d = coords(4:24:8)
-        e = coords(5:24:8)
-        f = coords(6:24:8)
-        g = coords(7:24:8)
-        h = coords(8:24:8)
+        a = coords(1,1:24:8)
+        b = coords(1,2:24:8)
+        c = coords(1,3:24:8)
+        d = coords(1,4:24:8)
+        e = coords(1,5:24:8)
+        f = coords(1,6:24:8)
+        g = coords(1,7:24:8)
+        h = coords(1,8:24:8)
 
         ! Adapted from get_tet_vol and
         ! measure.cpp's measure() case moab::MBHEX
@@ -1036,15 +1025,17 @@ subroutine voxel_sample
           call expirx(1,'voxel_sample','Invalid indice sampled.')
         endif
        
-        ! We -=1 the value of the index 'voxel' to calc ii,jj,kk easily
-        voxel = voxel - 1
-        ! Math to get mesh indices in each dimension
-        ii = voxel / (k_ints*j_ints)
-        jj = mod(voxel, k_ints*j_ints) / k_ints
-        kk = mod(mod(voxel, k_ints*j_ints), k_ints)
+        ! If structured mesh ...
+        !! We -=1 the value of the index 'voxel' to calc ii,jj,kk easily
+        !voxel = voxel - 1
+        !! Math to get mesh indices in each dimension
+        !ii = voxel / (k_ints*j_ints)
+        !jj = mod(voxel, k_ints*j_ints) / k_ints
+        !kk = mod(mod(voxel, k_ints*j_ints), k_ints)
+        !
+        !voxel = voxel + 1
         
-        voxel = voxel + 1
-        
+        ! If unstructured mesh ...
         call sample_region_entity(mesh, entity_handles(voxel))
         
 end subroutine voxel_sample
@@ -1396,9 +1387,6 @@ subroutine gen_voxel_alias_table
 
         integer :: i
    
-        ! Note that the first entry for each voxel in 'gammas' is
-        ! a relative probability of that voxel being the source location.
-        ! If biasing is used, the second entry is the bias value of the voxel
         ! Sum up a normalization factor
         sourceSum = sum(tot_list)
         write(*,*) "sourceSum:", sourceSum 
@@ -1410,7 +1398,7 @@ subroutine gen_voxel_alias_table
         ! make the unsorted list of bins
         bias_probability_sum = 0
         do i=1,n_mesh_cells
-          ! the average bin(i,1) value assigned is n_inv
+          ! the average bins(i) value assigned is n_inv
           bins(i) = tot_list(i) / sourceSum
 
           ! if biasing being done, get the quantity: sum(p_i*b_i)
@@ -1421,8 +1409,8 @@ subroutine gen_voxel_alias_table
           endif
         enddo
 
-        ! if bias values were found, update the bin(i,1) values for biasing
-        !  and then update the bias values so that they are now particle wgt
+        ! if bias values were found, update the bins(i) values for biasing
+        !  and then update convert the bias values into particle weights
         if (bias.eq.1) then
           do i=1,n_mesh_cells
             bins(i) = bins(i) * bias_list(i) / bias_probability_sum
