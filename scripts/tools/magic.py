@@ -168,7 +168,7 @@ def write_wwinp(ww_mesh, e_groups, output):
     if particle == 'n':
         block1 += '1'
     else:
-        blcok1 += '2'
+        block1 += '2'
 
     # add 10 to specify cartesian geometry
     block1 += '        10                     '
