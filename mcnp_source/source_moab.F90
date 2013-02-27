@@ -232,7 +232,6 @@ subroutine source_setup
               write(*,*) "Problematic voxel; topology is: ", voxel_topo
               call expirx(1,'source_setup','Invalid voxel type.')
             endif
-
             tot_list(i) = tot_list(i) * volume
           endif
         enddo
@@ -714,18 +713,18 @@ subroutine get_tet_vol(mymesh, tet_entity_handle, volume)
               %VAL(4), iBase_BLOCKED, pointer_coords, &
               icoords_alloc, icoords_size, ierr)
 
-        a(1) = coords(1)
-        b(1) = coords(2)
-        c(1) = coords(3)
-        d(1) = coords(4)
-        a(2) = coords(5)
-        b(2) = coords(6)
-        c(2) = coords(7)
-        d(2) = coords(8)
-        a(3) = coords(9)
-        b(3) = coords(10)
-        c(3) = coords(11)
-        d(3) = coords(12)
+        a(1) = coords(1,1)
+        b(1) = coords(1,2)
+        c(1) = coords(1,3)
+        d(1) = coords(1,4)
+        a(2) = coords(1,5)
+        b(2) = coords(1,6)
+        c(2) = coords(1,7)
+        d(2) = coords(1,8)
+        a(3) = coords(1,9)
+        b(3) = coords(1,10)
+        c(3) = coords(1,11)
+        d(3) = coords(1,12)
 
         volume = calc_tet_vol(a, b, c, d)
         
@@ -746,10 +745,13 @@ real*8 function calc_tet_vol(a, b, c, d)
         ! Parameters
         real(dknd), dimension(1:3), intent(IN) :: a, b, c, d
         
-        calc_tet_vol = abs( (a(1)-d(1)) * (b(1)-d(1)) * (c(1)-d(1)) + &
-                            (a(2)-d(2)) * (b(2)-d(2)) * (c(2)-d(2)) + &
-                            (a(3)-d(3)) * (b(3)-d(3)) * (c(3)-d(3)) ) &
-                            / 6._rknd
+        calc_tet_vol = abs( (a(3)-d(3)) * &
+            ( b(1)*c(2)-b(2)*c(1)+b(2)*d(1)-c(2)*d(1)-b(1)*d(2)+c(1)*d(2)) + &
+            (a(2)-d(2)) * &
+            (b(3)*c(1)-b(1)*c(3)-b(3)*d(1)+c(3)*d(1)+b(1)*d(3)-c(1)*d(3)) + &
+            (a(1)-d(1)) * &
+            (b(2)*c(3)-b(3)*c(2)+b(3)*d(2)-c(3)*d(2)-b(2)*d(3)+c(2)*d(3)) ) &
+            / 6._rknd
 
 end function calc_tet_vol
 
@@ -802,14 +804,14 @@ subroutine get_hex_vol(mymesh, hex_entity_handle, volume)
               %VAL(8), iBase_BLOCKED, pointer_coords, &
               icoords_alloc, icoords_size, ierr)
 
-        a = coords(1:24:8)
-        b = coords(2:24:8)
-        c = coords(3:24:8)
-        d = coords(4:24:8)
-        e = coords(5:24:8)
-        f = coords(6:24:8)
-        g = coords(7:24:8)
-        h = coords(8:24:8)
+        a = coords(1,1:24:8)
+        b = coords(1,2:24:8)
+        c = coords(1,3:24:8)
+        d = coords(1,4:24:8)
+        e = coords(1,5:24:8)
+        f = coords(1,6:24:8)
+        g = coords(1,7:24:8)
+        h = coords(1,8:24:8)
 
         ! Adapted from get_tet_vol and
         ! measure.cpp's measure() case moab::MBHEX
@@ -1023,15 +1025,17 @@ subroutine voxel_sample
           call expirx(1,'voxel_sample','Invalid indice sampled.')
         endif
        
-        ! We -=1 the value of the index 'voxel' to calc ii,jj,kk easily
-        voxel = voxel - 1
-        ! Math to get mesh indices in each dimension
-        ii = voxel / (k_ints*j_ints)
-        jj = mod(voxel, k_ints*j_ints) / k_ints
-        kk = mod(mod(voxel, k_ints*j_ints), k_ints)
+        ! If structured mesh ...
+        !! We -=1 the value of the index 'voxel' to calc ii,jj,kk easily
+        !voxel = voxel - 1
+        !! Math to get mesh indices in each dimension
+        !ii = voxel / (k_ints*j_ints)
+        !jj = mod(voxel, k_ints*j_ints) / k_ints
+        !kk = mod(mod(voxel, k_ints*j_ints), k_ints)
+        !
+        !voxel = voxel + 1
         
-        voxel = voxel + 1
-        
+        ! If unstructured mesh ...
         call sample_region_entity(mesh, entity_handles(voxel))
         
 end subroutine voxel_sample
