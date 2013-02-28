@@ -1,5 +1,5 @@
 # Modify and copy source.F90 file
-python hide_source.py ../../source_moab.F90
+python hide_source.py ../source_moab.F90
 
 # Generate the .o files..
 gfortran -c mcnp_placeholder.F90 source.F90 tests.F90 \
