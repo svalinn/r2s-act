@@ -1167,8 +1167,7 @@ subroutine sample_region_entity (mymesh, entity_handle)
           call sample_hexahedra(coords)
         else
           ! Error
-          call expirx(1,'sample_region_entity', &
-                "Entity with invalid number of vertices.")
+          call expirx(1, 'sample_region_entity', "Entity with invalid number of vertices.")
           continue
         endif
 
