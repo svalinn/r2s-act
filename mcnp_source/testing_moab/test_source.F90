@@ -24,5 +24,7 @@ program test_source
         call test_get_hex_vol2
         call test_read_moab1
         call test_read_moab2
+        call test_sample_region_entity_tet
+        call test_sample_region_entity_hex
 
 end program test_source

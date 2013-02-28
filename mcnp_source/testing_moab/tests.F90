@@ -14,10 +14,12 @@ implicit none
 
 #define SET_UP \
   terr = 0
+#define ASSERT_TRUE(a) \
+  if (.not.a) terr=terr+1
 #define ASSERT_EQUAL(a,b) \
-  if (a.ne.b) terr = terr + 1
+  if (a.ne.b) terr=terr+1
 #define ASSERT_NOT_EQUAL(a,b) \
-  if (a.eq.b) terr = terr + 1
+  if (a.eq.b) terr=terr+1
 
         integer :: testunitnum, i, terr
 
@@ -448,6 +450,7 @@ subroutine test_get_hex_vol1
 
 end subroutine test_get_hex_vol1
 
+
 subroutine test_get_hex_vol2
 ! Tests that the volume of the reference hexahedron in 1hex.vtk is 1.00.
   use tests_mod
@@ -500,7 +503,6 @@ end subroutine test_get_hex_vol2
 subroutine test_read_moab1
 ! Tests:
 ! - correct number of voxels found
-! - ...
   use tests_mod
   use source_data
   implicit none
@@ -537,7 +539,7 @@ end subroutine test_read_moab1
 subroutine test_read_moab2
 ! Tests:
 ! - correct number of voxels found
-! - ...
+! - bias values are read from mesh
   use tests_mod
   use source_data
   implicit none
@@ -574,5 +576,127 @@ subroutine test_read_moab2
 
 end subroutine test_read_moab2
 
-! End of test subroutines
 
+subroutine test_sample_region_entity_tet
+! Tests:
+! - Sampled points fall within the reference tetrahedron
+  use tests_mod
+  use source_data
+  implicit none
+
+        integer :: ents_alloc, ents_size, myerr
+        iBase_EntityHandle :: t_entity_handles
+        iBase_EntityHandle :: t_pointer_entity_handles
+        real(dknd) :: volume, a, b, l1, l2, l3, l4
+
+        pointer (t_pointer_entity_handles, t_entity_handles(1:*))
+
+        SET_UP
+
+        call read_moab(mesh, "1tet.vtk", t_pointer_entity_handles)
+
+        myerr = ierr
+
+        if (myerr.ne.0) then
+          write(*,*) "ERROR - test_sample_region_entity_tet: " &
+                      // "MOAB Error - ierr=", myerr
+        endif
+
+        ! Check points are within the reference tet
+        do i=1,1000
+          call sample_region_entity(mesh, t_entity_handles(1))
+
+          ! We use barycentric coords to check that point is in tet.
+          ! The barycentric coords for the reference tet are
+          !   l1 = 1-xxx-yyy-zzz; l2 = xxx; l3 = yyy; l4 = 1-l1-l2-l3;
+          ! These are pre-calculated equations based on the tet's coords.
+          l1 = 1-xxx-yyy-zzz
+          l2 = xxx
+          l3 = yyy
+          l4 = 1-l1-l2-l3
+          if (l1.lt.0.0.or.l2.lt.0.0.or.l3.lt.0.0.or.l4.lt.0.0 &
+             .or.l1.gt.1.0.or.l2.gt.1.0.or.l3.gt.1.0.or.l4.gt.1.0) then
+             terr = terr + 1
+          endif
+        enddo
+
+        call iMesh_dtor(%VAL(mesh), ierr)
+
+        if (terr.eq.0) then
+          write(*,*) "test_sample_region_entity_tet: correctly read mesh"
+        else
+          write(*,*) "ERROR - test_sample_region_entity_tet: ", terr, &
+              "points did not fall within the unit tetrahedron."
+        endif
+
+        deallocate(my_ener_phot)
+        !deallocate(bias_list)
+        deallocate(spectrum)
+        deallocate(tot_list)
+
+end subroutine test_sample_region_entity_tet
+
+
+subroutine test_sample_region_entity_hex
+! Tests:
+! - Sampled points fall within a rotated unit hexahedron (rotated cube)
+  use tests_mod
+  use source_data
+  implicit none
+
+        integer :: ents_alloc, ents_size, myerr
+        iBase_EntityHandle :: t_entity_handles
+        iBase_EntityHandle :: t_pointer_entity_handles
+        real(dknd) :: volume, a, b, x, y, z
+
+        pointer (t_pointer_entity_handles, t_entity_handles(1:*))
+
+        SET_UP
+
+        call read_moab(mesh, "1hexRotated.vtk", t_pointer_entity_handles)
+
+        myerr = ierr
+
+        if (myerr.ne.0) then
+          write(*,*) "ERROR - test_sample_region_entity_hex: " &
+                      // "MOAB Error - ierr=", myerr
+        endif
+
+        ! Check points are within the rotated unit cube
+        do i=1,1000
+          call sample_region_entity(mesh, t_entity_handles(1))
+          
+          ! Vector math: A.v=r  -> v = A^-1.r
+          ! Where: A = basis vectors; |b-a,c-a,d-a|
+          !        r = (xxx,yyy,zzz) - a
+          !        a,b,c,d,e,f,g,h are vertices of cube
+          !        v = (x=[0..1],y=[0..1,z=[0..1]) if point is within cube
+          ! Analytical solution for our reference cube is
+          !  x =  0.57735 xxx + 0.57735  yyy + 0.57735  zzz
+          !  y = -0.57735 xxx + 0.788675 yyy - 0.211325 zzz
+          !  z = -0.57735 xxx - 0.211325 yyy + 0.788675 zzz
+          x =  0.57735*xxx + 0.57735 *yyy + 0.57735 *zzz
+          y = -0.57735*xxx + 0.788675*yyy - 0.211325*zzz
+          z = -0.57735*xxx - 0.211325*yyy + 0.788675*zzz
+
+          ASSERT_TRUE(x.le.1._dknd.and.x.ge.0._dknd.and.y.le.1._dknd.and.y.ge.0._dknd.and.z.le.1._dknd.and.z.ge.0._dknd)
+
+        enddo
+
+        call iMesh_dtor(%VAL(mesh), ierr)
+
+        if (terr.ne.0) then
+          write(*,*) "ERROR - test_sample_region_entity_hex: ", terr, &
+              "points did not fall within the rotated unit cube."
+        else
+          write(*,*) "test_sample_region_entity_hex: correctly read mesh with bias value tags"
+        endif
+
+        deallocate(my_ener_phot)
+        !deallocate(bias_list)
+        deallocate(spectrum)
+        deallocate(tot_list)
+
+end subroutine test_sample_region_entity_hex
+
+! End of test subroutines
