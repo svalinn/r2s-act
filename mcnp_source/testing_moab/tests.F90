@@ -361,8 +361,8 @@ subroutine test_get_tet_vol
 
         iBase_EntitySetHandle :: root_set
         integer :: ents_alloc, ents_size, myerr
-        IBASE_HANDLE_T :: t_entity_handles
-        IBASE_HANDLE_T :: t_pointer_entity_handles
+        iBase_EntityHandle :: t_entity_handles
+        iBase_EntityHandle :: t_pointer_entity_handles
         real(dknd) :: volume, a, b
 
         pointer (t_pointer_entity_handles, t_entity_handles(1:*))
@@ -409,8 +409,8 @@ subroutine test_get_hex_vol1
 
         iBase_EntitySetHandle :: root_set
         integer :: ents_alloc, ents_size, myerr
-        IBASE_HANDLE_T :: t_entity_handles
-        IBASE_HANDLE_T :: t_pointer_entity_handles
+        iBase_EntityHandle :: t_entity_handles
+        iBase_EntityHandle :: t_pointer_entity_handles
         real(dknd) :: volume, a, b
 
         pointer (t_pointer_entity_handles, t_entity_handles(1:*))
@@ -456,8 +456,8 @@ subroutine test_get_hex_vol2
 
         iBase_EntitySetHandle :: root_set
         integer :: ents_alloc, ents_size, myerr
-        IBASE_HANDLE_T :: t_entity_handles
-        IBASE_HANDLE_T :: t_pointer_entity_handles
+        iBase_EntityHandle :: t_entity_handles
+        iBase_EntityHandle :: t_pointer_entity_handles
         real(dknd) :: volume, a, b
 
         pointer (t_pointer_entity_handles, t_entity_handles(1:*))
@@ -498,15 +498,16 @@ end subroutine test_get_hex_vol2
 
 
 subroutine test_read_moab1
-!
+! Tests:
+! - correct number of voxels found
+! - ...
   use tests_mod
   use source_data
   implicit none
-! Tests ...
-        iBase_EntitySetHandle :: root_set
+
         integer :: ents_alloc, ents_size, myerr
-        IBASE_HANDLE_T :: t_entity_handles
-        IBASE_HANDLE_T :: t_pointer_entity_handles
+        iBase_EntityHandle :: t_entity_handles
+        iBase_EntityHandle :: t_pointer_entity_handles
         real(dknd) :: volume, a, b
 
         pointer (t_pointer_entity_handles, t_entity_handles(1:*))
@@ -534,17 +535,16 @@ end subroutine test_read_moab1
 
 
 subroutine test_read_moab2
-!
-  use tests_mod
-  use source_data
-  implicit none
 ! Tests:
 ! - correct number of voxels found
 ! - ...
-        iBase_EntitySetHandle :: root_set
+  use tests_mod
+  use source_data
+  implicit none
+
         integer :: ents_alloc, ents_size, myerr
-        IBASE_HANDLE_T :: t_entity_handles
-        IBASE_HANDLE_T :: t_pointer_entity_handles
+        iBase_EntityHandle :: t_entity_handles
+        iBase_EntityHandle :: t_pointer_entity_handles
         real(dknd) :: volume, a, b
 
         pointer (t_pointer_entity_handles, t_entity_handles(1:*))
