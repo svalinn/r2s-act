@@ -39,7 +39,7 @@ def find_tallies(meshtal) :
     tally_lines=[]
     tally_numbers = []
     count = 1;
-    line=linecache.getline(meshtal, count)
+    line = linecache.getline(meshtal, count)
     while line != '' :
 
         if line.split()[0:3] == ['Mesh', 'Tally', 'Number'] :
@@ -173,7 +173,7 @@ def find_mesh_bounds(meshtal,tally_line) :
 ###############################################################################
 
 def tag_fluxes(meshtal, meshtal_type, m, spatial_points, \
-               e_bins, sm,  norm ) :
+               e_bins, sm, norm) :
     """Tags the fluxes from a meshtally to a structured mesh.
 
     Parameters
@@ -198,7 +198,7 @@ def tag_fluxes(meshtal, meshtal_type, m, spatial_points, \
     N/A
     """
     
-    voxels=list(sm.iterateHex('xyz'))
+    voxels = list(sm.iterateHex('xyz'))
     
     for e_group in range(1, e_bins +1) : 
         # Create tags if they do not already exist
@@ -207,14 +207,14 @@ def tag_fluxes(meshtal, meshtal_type, m, spatial_points, \
             error_str = '{0}_group_{1:03d}_error'.format(meshtal_type, e_group)
         elif e_group == e_bins : # tag name for totals group
             flux_str = meshtal_type + '_group_total'
-            error_str = meshtal_type+'_group_total_error'
+            error_str = meshtal_type + '_group_total_error'
 
         try:
-            tag_flux=sm.imesh.createTag(flux_str, 1, float)
+            tag_flux = sm.imesh.createTag(flux_str, 1, float)
         except iBase.TagAlreadyExistsError:
             tag_flux = sm.imesh.getTagHandle(flux_str)
         try:
-            tag_error=sm.imesh.createTag(error_str ,1, float)
+            tag_error = sm.imesh.createTag(error_str ,1, float)
         except iBase.TagAlreadyExistsError:
             tag_error = sm.imesh.getTagHandle(error_str)
 
@@ -228,9 +228,9 @@ def tag_fluxes(meshtal, meshtal_type, m, spatial_points, \
                                (e_group-1)*spatial_points ).split()[-1]))
 
         #Tag data for energy group 'e_group' onto all voxels
-        tag_flux[voxels]=flux_data
-        tag_error[voxels]=error_data
-    print '\tFluxes multiplied by source normalization of {0}'.format(norm)
+        tag_flux[voxels] = flux_data
+        tag_error[voxels] = error_data
+    print "\tFluxes multiplied by source normalization of {0}".format(norm)
 
 
 def read_meshtal( filename, tally_line, norm=1.0, **kw ):
@@ -255,12 +255,13 @@ def read_meshtal( filename, tally_line, norm=1.0, **kw ):
     #Getting relevant information from meshtal header
     meshtal_type = find_meshtal_type( filename, tally_line )
     m = find_first_line( filename, tally_line )
-    x_bounds, y_bounds, z_bounds, e_groups = find_mesh_bounds( filename, tally_line )
+    x_bounds, y_bounds, z_bounds, e_groups = \
+            find_mesh_bounds( filename, tally_line )
  
     #Calculating pertainent information from meshtal header and input
     spatial_points = (len(x_bounds)-1)*(len(y_bounds)-1)*(len(z_bounds)-1)
     if len(e_groups) > 2 :
-        e_bins = len(e_groups) #dont substract 1; cancels with totals bin
+        e_bins = len(e_groups) #don't substract 1; cancels with totals bin
     elif len(e_groups) == 2 : #for 1 energy bin, meshtal doesn't have TOTALS group
         e_bins = 1 
     sm = ScdMesh(x_bounds, y_bounds, z_bounds)
@@ -268,7 +269,8 @@ def read_meshtal( filename, tally_line, norm=1.0, **kw ):
     if 'smesh' in kw:
         dims = kw['smesh'].dims
         if dims != sm.dims:
-            raise ScdMeshError('Incorrect dimension in preexisting structured mesh')
+            raise ScdMeshError( \
+                    "Incorrect dimension in preexisting structured mesh")
         sm = kw['smesh']
 
     #Tagging structured mesh with e_groups (at root level)
@@ -291,9 +293,9 @@ def main( arguments = None ) :
              (usage='%prog <meshtal_file> <normalization_factor> [options]')
 
     parser.add_option('-o', dest='mesh_output', default=None,\
-                      help = 'Name of mesh output file, default=%default')
+                      help='Name of mesh output file, default=%default')
     parser.add_option('-n', dest='norm', default=None,
-                      help = 'Normalization factor, default=%default')
+                      help='Normalization factor, default=%default')
     parser.add_option('-m', dest='smesh_filename', default=None,
                       help='Preexisting mesh on which to tag fluxes')
                          
@@ -304,25 +306,24 @@ def main( arguments = None ) :
      #   parser.error('\nNeed 1 argument: meshtal file')
     print "\n\nRunning read_meshtal.py"
     tally_numbers, tally_lines = find_tallies(args[1])
-    print 'Number of tallies found: {0}\nTally number(s): {1}'\
+    print "Number of tallies found: {0}\nTally number(s): {1}" \
                                      .format(len(tally_numbers), tally_numbers)
 
     # Parse input from options parser, generate default values
     if opts.norm :
         norm = opts.norm.split(',')
     else :
-        norm=[1]*len(tally_numbers)
+        norm = [1]*len(tally_numbers)
 
     if opts.mesh_output :
         mesh_output = opts.mesh_output.split(',')
     else:
-        mesh_output=[]
+        mesh_output = list()
         for n in range(0, len(tally_numbers)) :
             if len(tally_numbers) == 1 :
                 mesh_output.append('flux_mesh.h5m')
             else :
                 mesh_output.append('flux_mesh_tally{0}.h5m'.format(tally_numbers[n]))
-    
 
     # Convert each tally to h5m and name accordingly
     for n in range(0,len(tally_numbers)) :
@@ -336,7 +337,7 @@ def main( arguments = None ) :
         sm.scdset.save(mesh_output[n])
 
         print "\tSaved tally {0} as {1}".format(tally_numbers[n], mesh_output[n])
-    print '\nStructured mesh tagging complete\n\n'
+    print "\nStructured mesh tagging complete\n\n"
 
 
 
