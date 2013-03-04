@@ -78,7 +78,7 @@ def destroy_erg_bins_tag(sm):
     """
 
     try:
-        sm.imesh.destroyTag(mesh.imesh.getTagHandle("PHTN_ERGS"), force=True)
+        sm.imesh.destroyTag(sm.imesh.getTagHandle("PHTN_ERGS"), force=True)
     except:
         print "Failed to delete 'PHTN_ERGS' tag from the MOAB mesh."
         return 0
@@ -108,7 +108,7 @@ def main():
     # Call the method to read fr and tag mesh
     read_and_tag_phtn_ergs(fr, sm)
 
-    mesh.save(args[1])
+    sm.scdset.save(args[1])
     fr.close()
 
     return 1
