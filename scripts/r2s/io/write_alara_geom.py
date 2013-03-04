@@ -267,21 +267,6 @@ def write_alara_geom(filename, mesh, namedict={}):
         write_mat_loading(mesh, mat_tags, mixtures, output_file)
 
 
-#def write_alara_unstr_geom(filename, mesh, namedict={}):
-#    """Given a structured mesh with mmgrid tags, write an ALARA geometry
-#    
-#    Parameters
-#    ----------
-#    
-#    """
-#    mixtures, mat_tags = create_mixture_definitions(mesh)
-#
-#    with open(filename,'w') as output_file:
-#        write_zones(mesh, output_file)
-#        write_mixtures(mixtures, mat_tags, namedict, output_file)
-#        write_mat_loading(mesh, mat_tags, mixtures, output_file)
-
-
 def main():
 
     # TODO: How to handle non-structured meshes from the command line...
