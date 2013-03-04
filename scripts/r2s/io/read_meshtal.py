@@ -286,6 +286,11 @@ def read_meshtal( filename, tally_line, norm=1.0, **kw ):
     Keyword arguments:
         smesh: An existing scdmesh on which to tag the fluxes.  
                A ScdMeshError is raised if this mesh has incompatible ijk dims
+
+    Returns
+    -------
+    sm : ScdMesh object
+        Opened structured mesh from filename, with meshtally data tagged
     """
     #Getting relevant information from meshtal header
     meshtal_type = find_meshtal_type( filename, tally_line )
