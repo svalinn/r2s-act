@@ -56,8 +56,7 @@ def print_fluxes(mesh, num_e_groups, backward_bool, fluxin_name, tags=None):
         voxels = mesh.iterateHex('xyz')
         meshtype = 'scd'
     else:
-        voxels = [v for v in \
-                mesh.iterate(iBase.Type.region, iMesh.Topology.all)]
+        voxels = list(mesh.iterate(iBase.Type.region, iMesh.Topology.all))
         meshtype = 'gen'
         print "Got {0} voxels from mesh.".format(len(voxels))
 

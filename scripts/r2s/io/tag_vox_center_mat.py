@@ -81,19 +81,7 @@ class matGrid:
         self.mesh = mesh
         self.materials = prepare_materials()
 
-        #idim = scdmesh.dims.imax - scdmesh.dims.imin
-        #jdim = scdmesh.dims.jmax - scdmesh.dims.jmin
-        #kdim = scdmesh.dims.kmax - scdmesh.dims.kmin
-        #mat_dim = len( self.materials )
-
-        #self.voxel_dt = np.dtype([('mats',np.float64,mat_dim)])
-        #self.voxel_dt = np.dtype([('mats',np.float64,mat_dim),
-        #                          ('errs',np.float64,mat_dim)])
-        #self.grid = np.zeros( (idim, jdim, kdim), dtype=self.voxel_dt )
-        #self.first_vol = None
-        self.voxels = [v for v in \
-                mesh.iterate(iBase.Type.region, iMesh.Topology.all)]
-        #self.voxmats = [0] * len(voxels)dd
+        self.voxels = list(mesh.iterate(iBase.Type.region, iMesh.Topology.all))
 
 
     def create_tags(self):

@@ -121,13 +121,12 @@ def create_mixture_definitions(mesh):
     if isinstance(mesh, ScdMesh):
         # The material tags are a subset of all the tags on a hex of the scdmesh
         # Pick the hex at minimum (i,j,k)
-        voxels = [v for v in mesh.iterateHex('xyz')]
+        voxels = list(mesh.iterateHex('xyz'))
         tags = mesh.imesh.getAllTags( mesh.getHex( *(mesh.dims[:3]) ))
         void_tag = [mesh.imesh.getTagHandle('matVOID')]
     else:
         # Grab volume entities on mesh, then grab tags off the first one
-        voxels = [v for v in \
-                mesh.iterate(iBase.Type.region, iMesh.Topology.all)]
+        voxels = list(mesh.iterate(iBase.Type.region, iMesh.Topology.all))
         tags = mesh.getAllTags(voxels[0])
         void_tag = [mesh.getTagHandle('matVOID')]
         print "Got {0} voxels from mesh.".format(len(voxels))
