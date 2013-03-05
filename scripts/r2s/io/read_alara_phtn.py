@@ -10,7 +10,7 @@ from itaps import iBase,iMesh
 from r2s.scdmesh import ScdMesh, ScdMeshError
 
 
-def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
+def read_to_h5m(inputfile, meshobj, isotope="TOTAL", coolingstep=0, \
         retag=False, totals=False):
     """Read in a phtn_src file and tag the contents to a structured mesh.
     
@@ -23,7 +23,7 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
     ----------
     inputfile : string
         Path to an ALARA-style 'phtn_src' file
-    sm : scdmesh.ScdMesh
+    meshobj : ScdMesh object
         Structured mesh object to tag,
     isotope : string
         Isotope to read data for from 'phtn_src' file 
@@ -58,22 +58,27 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
 
     # structured mesh stuff starts here
 
-    # We grab the list of structured mesh entity objects
-    voxels = list(sm.iterateHex('xyz'))
+    # We grab the list of voxels from the mesh
+    if isinstance(meshobj, ScdMesh):
+        mesh = meshobj.imesh
+        voxels = list(meshobj.iterateHex('xyz'))
+    else:
+        mesh = meshobj
+        voxels = list(mesh.iterate(iBase.Type.region, iMesh.Topology.all))
 
     # We create a list of tag objects ('tagList') to use while parsing phtn_src
     tagList = []
     for grp in xrange(numergbins): # group tags = parts in the line - 2
         try:
             # If tags are new to file... create tag
-            tagList.append(sm.imesh.createTag( \
+            tagList.append(mesh.createTag( \
                     "phtn_src_group_{0:03d}".format(grp+1), 1, float))
         except iBase.TagAlreadyExistsError:
             # Else if the tags already exist...
             if retag:
                 # Get existing tag
                 # We will overwrite tag values that already exist
-                tagList.append(sm.imesh.getTagHandle( \
+                tagList.append(mesh.getTagHandle( \
                         "phtn_src_group_{0:03d}".format(grp+1)))
             else:
                 # Or print error if retagging was not specified.
@@ -136,16 +141,16 @@ def read_to_h5m(inputfile, sm, isotope="TOTAL", coolingstep=0, \
         grp = len(lineparts) - 2
         while grp:
             try:
-                tag = sm.imesh.getTagHandle( \
+                tag = mesh.getTagHandle( \
                         "phtn_src_group_"+"{0:03d}".format(grp+1))
                 # Normally an exception is thrown by above line
-                sm.imesh.destroyTag(tag,force=True)
+                mesh.destroyTag(tag,force=True)
                 grp += 1
             except iBase.TagNotFoundError:
                 grp = 0 # breaks the while loop
 
     if totals:
-        if not tag_phtn_src_totals(sm, numergbins, retag):
+        if not tag_phtn_src_totals(mesh, voxels, numergbins, retag):
             print "ERROR: failed to tagged the total photon source strengths."
             return 0
 
@@ -217,22 +222,28 @@ def get_cooling_step_name(coolingstep, fr):
     return (coolingstep, numergbins)
 
 
-def tag_phtn_src_totals(sm, numergbins=-1, retag=False):
+def tag_phtn_src_totals(mesh, voxels, numergbins=-1, retag=False):
     """Method tags the total photon source strength for each voxel.
 
     ACTION: Method calculate the total photon source strength, and 
     if retagging is enabled or the tag does not exist, tags the structured mesh.
-    RECEIVES: sm, scdmesh.ScdMesh object
-    OPTIONAL: numergbins, number of energy group tags to read; retag,
-    whether to overwrite an existing 'phtn_src_total' tag.
-    """
 
-    voxels = list(sm.iterateHex('xyz'))
+    Parameters
+    ----------
+    mesh : iMesh.Mesh object
+        Mesh from which to get/create/delete tags
+    voxels : list of iMesh.Entity handles
+        List of voxel entity handles (iBase.Type.Region)
+    numergbins : int (optional)
+        Number of energy group tags to read
+    retag : boolean
+        Whether to overwrite existing 'phtn_src_total' tag. (Default: False)
+    """
 
     # Check if 'phtn_src_total' tag already exists
     try:
         # If tags are new to file... create tag
-        totalPhtnSrcTag = sm.imesh.createTag( \
+        totalPhtnSrcTag = mesh.createTag( \
                 "phtn_src_total", 1, float)
     except iBase.TagAlreadyExistsError:
         if not retag:
@@ -241,13 +252,13 @@ def tag_phtn_src_totals(sm, numergbins=-1, retag=False):
             return 0
 
         else:
-            totalPhtnSrcTag = sm.imesh.getTagHandle("phtn_src_total")
+            totalPhtnSrcTag = mesh.getTagHandle("phtn_src_total")
  
     # If not supplied, se try/except to find number of energy bins
     if not numergbins:
         for i in xrange(1,1000): #~ Arbitrary: we look for up to 1000 groups
             try:
-                sm.imesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
+                mesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
             except iBase.TagNotFoundError: 
                 numergbins = i - 1
                 break
@@ -257,9 +268,9 @@ def tag_phtn_src_totals(sm, numergbins=-1, retag=False):
     for cnt, vox in enumerate(voxels):
         totstrength = 0.0
 
-        #get total for the voxel
+        # get total for the voxel
         for i in xrange(1,numergbins + 1):
-            grouptag = sm.imesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
+            grouptag = mesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
             try:
                 totstrength += float(grouptag[vox])
             except iBase.TagNotFoundError:
@@ -316,13 +327,20 @@ def main():
     (options, args) = parser.parse_args()
 
     # Open an ScdMesh and then call read_to_h5m
-    sm = ScdMesh.fromFile(options.meshfile)
+    try:
+        mesh = ScdMesh.fromFile(options.meshfile)
+    except ScdMeshError:
+        mesh = iMesh.Mesh()
+        mesh.load(options.meshfile)
 
     read_to_h5m( \
-                options.phtnsrcfile, sm, options.isotope, \
+                options.phtnsrcfile, mesh, options.isotope, \
                 options.coolingstep, options.retag, options.totals)
 
-    sm.imesh.save(options.meshfile)
+    if isinstance(mesh, ScdMesh):
+        mesh.imesh.save(options.meshfile)
+    else:
+        mesh.save(options.meshfile)
 
     return 1
 

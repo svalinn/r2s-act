@@ -137,19 +137,27 @@ def handle_phtn_data(datafile, phtn_src, opt_isotope, opt_cooling,  \
 
     Returns
     -------
-    smesh : ScdMesh object
-        Structured mesh object
+    mesh : ScdMesh object or iMesh.Mesh object
+        MOAB mesh object
+
+    Notes
+    -----
+    Only creates gammas file if mesh is an ScdMesh.
     """
     print "Loading step one data file '{0}'".format(datafile)
-    smesh = ScdMesh.fromFile(datafile)
+    try:
+        mesh = ScdMesh.fromFile(datafile)
+    except ScdMeshError:
+        mesh = iMesh.Mesh()
+        mesh.load(datafile)
 
     # Tagging mesh
     print "Reading ALARA photon source '{0}'".format(phtn_src)
-    read_alara_phtn.read_to_h5m(phtn_src, smesh, isotope=opt_isotope, \
+    read_alara_phtn.read_to_h5m(phtn_src, mesh, isotope=opt_isotope, \
             coolingstep=opt_cooling, retag=True, totals=True)
 
     print "Saving photon source information to '{0}'".format(datafile)
-    smesh.imesh.save(datafile)
+    mesh.save(datafile)
 
     with open(phtn_src, 'r') as fr:
         try:
@@ -158,23 +166,24 @@ def handle_phtn_data(datafile, phtn_src, opt_isotope, opt_cooling,  \
         except ValueError:
             coolingstepstring = opt_cooling
 
-    print "Writing gammas file"
-    write_gammas.gen_gammas_file_from_h5m(smesh, outfile=gammas, \
-            sampling=opt_sampling, do_bias=opt_bias, \
-            cumulative=opt_cumulative, cust_ergbins=cust_ergbins, \
-            coolingstep=coolingstepstring, isotope=opt_isotope, \
-            resample=resample, uni_resamp_all=uni_resamp_all)
+    if isinstance(mesh, ScdMesh):
+        print "Writing gammas file"
+        write_gammas.gen_gammas_file_from_h5m(mesh, outfile=gammas, \
+                sampling=opt_sampling, do_bias=opt_bias, \
+                cumulative=opt_cumulative, cust_ergbins=cust_ergbins, \
+                coolingstep=coolingstepstring, isotope=opt_isotope, \
+                resample=resample, uni_resamp_all=uni_resamp_all)
 
-    return smesh
+    return mesh
 
 
-def gen_mcnp_p(smesh, mcnp_p_problem, mcnp_n_problem, opt_phtnfmesh):
+def gen_mcnp_p(mesh, mcnp_p_problem, mcnp_n_problem, opt_phtnfmesh):
     """Create photon MCNP input file from neutron input if it doesn't exist
     already
 
     Parameters
     ----------
-    smesh : ScdMesh object
+    mesh : ScdMesh object or iMesh.Mesh object
         Structured mesh object
     mcnp_p_problem : string
         Path to MCNP input for photon transport
@@ -199,8 +208,8 @@ def gen_mcnp_p(smesh, mcnp_p_problem, mcnp_n_problem, opt_phtnfmesh):
 
             # If phtnfmesh is True, we generate an fmesh card with same 
             #  layout as found on the scdmesh.
-            if opt_phtnfmesh:
-                mod.add_fmesh_from_scdmesh(smesh)
+            if opt_phtnfmesh and isinstance(mesh, ScdMesh):
+                mod.add_fmesh_from_scdmesh(mesh)
 
             mod.write_deck(mcnp_p_problem)
 
@@ -221,11 +230,11 @@ if __name__ == "__main__":
 
         (opt_isotope, opt_cooling, opt_sampling, opt_ergs, opt_bias, opt_cumulative, opt_phtnfmesh, resampling, uni_resamp_all) = load_config_params(config)
 
-        smesh = handle_phtn_data(datafile, phtn_src, opt_isotope, opt_cooling, \
+        mesh = handle_phtn_data(datafile, phtn_src, opt_isotope, opt_cooling, \
                 opt_sampling, opt_bias, opt_cumulative, opt_ergs, resampling, \
                 uni_resamp_all)
 
-        gen_mcnp_p(smesh, mcnp_p_problem, mcnp_n_problem, opt_phtnfmesh)
+        gen_mcnp_p(mesh, mcnp_p_problem, mcnp_n_problem, opt_phtnfmesh)
 
     except Exception as e:
         print "ERROR: {0}\n(in r2s.cfg file {1})".format( e, \
