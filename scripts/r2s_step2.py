@@ -157,22 +157,24 @@ def handle_phtn_data(datafile, phtn_src, opt_isotope, opt_cooling,  \
             coolingstep=opt_cooling, retag=True, totals=True)
 
     print "Saving photon source information to '{0}'".format(datafile)
-    mesh.save(datafile)
-
-    with open(phtn_src, 'r') as fr:
-        try:
-            coolingstepstring = read_alara_phtn.get_cooling_step_name( \
-                opt_cooling, fr)[0]
-        except ValueError:
-            coolingstepstring = opt_cooling
-
     if isinstance(mesh, ScdMesh):
+        mesh.imesh.save(datafile)
+
+        with open(phtn_src, 'r') as fr:
+            try:
+                coolingstepstring = read_alara_phtn.get_cooling_step_name( \
+                    opt_cooling, fr)[0]
+            except ValueError:
+                coolingstepstring = opt_cooling
+
         print "Writing gammas file"
         write_gammas.gen_gammas_file_from_h5m(mesh, outfile=gammas, \
                 sampling=opt_sampling, do_bias=opt_bias, \
                 cumulative=opt_cumulative, cust_ergbins=cust_ergbins, \
                 coolingstep=coolingstepstring, isotope=opt_isotope, \
                 resample=resample, uni_resamp_all=uni_resamp_all)
+    else:
+        mesh.save(datafile)
 
     return mesh
 
