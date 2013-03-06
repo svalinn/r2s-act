@@ -52,7 +52,7 @@ def main(arguments=None):
 if __name__ == '__main__':
     # No arguments case -> print help output
     if len(sys.argv) == 1:
-        sys.arv.append('-h')
+        sys.argv.append('-h')
 
     main()
 
