@@ -233,41 +233,6 @@ def tag_fluxes(meshtal, meshtal_type, m, spatial_points, \
     print "\tFluxes multiplied by source normalization of {0}".format(norm)
 
 
-def get_flux_tag_handles(mesh):
-    """Method identifies all tags containing flux information on a mesh
-
-    Parameters
-    ----------
-    mesh : iMesh.Mesh object
-        MOAB mesh file object containing tags of the form TALLY_TAG_lowE-highE
-
-    Returns
-    -------
-    fluxtaghandles : list of iMesh.Tag objects
-        List of tag handles, sorted by tag name, from lowest energy to high
-    """
-
-    # Grab first voxel entity on mesh, from which we get voxel-level tag handles
-    for x in mesh.iterate(iBase.Type.region, iMesh.Topology.all):
-        break
-    handles = mesh.getAllTags(x)
-
-    datatags = list()
-
-    for handle in handles:
-        tagname = handle.name.lower().split("_")
-        if tagname[0:2] == ['tally', 'tag'] and len(tagname) > 2:
-            erg = tagname[2].replace("e-","ee").split("-")[0]
-            erg = float(erg.replace("ee","e-"))
-            datatags.append([erg, handle])
-
-    datatags.sort()
-
-    fluxtaghandles = [x[1] for x in datatags]
-    
-    return fluxtaghandles
-
-
 def read_meshtal( filename, tally_line, norm=1.0, **kw ):
     """Read an MCNP meshtal file and return a tagged structured mesh for it
 
@@ -292,13 +257,13 @@ def read_meshtal( filename, tally_line, norm=1.0, **kw ):
     sm : ScdMesh object
         Opened structured mesh from filename, with meshtally data tagged
     """
-    #Getting relevant information from meshtal header
+    # Getting relevant information from meshtal header
     meshtal_type = find_meshtal_type( filename, tally_line )
     m = find_first_line( filename, tally_line )
     x_bounds, y_bounds, z_bounds, e_groups = \
             find_mesh_bounds( filename, tally_line )
  
-    #Calculating pertainent information from meshtal header and input
+    # Calculating pertinent information from meshtal header and input
     spatial_points = (len(x_bounds)-1)*(len(y_bounds)-1)*(len(z_bounds)-1)
     if len(e_groups) > 2 :
         e_bins = len(e_groups) #don't substract 1; cancels with totals bin
@@ -313,12 +278,12 @@ def read_meshtal( filename, tally_line, norm=1.0, **kw ):
                     "Incorrect dimension in preexisting structured mesh")
         sm = kw['smesh']
 
-    #Tagging structured mesh with e_groups (at root level)
+    # Tagging structured mesh with e_groups (at root level)
     # The tag will only have the upper bound, the 0.000 lower bound will not appear
     tag_e_bin = sm.imesh.createTag("e_groups", len(e_groups) - 1, float)
     tag_e_bin[sm.imesh.rootSet] = e_groups[1:]
 
-    #Tagging structured mesh
+    # Tagging structured mesh
     tag_fluxes(filename, meshtal_type, m, spatial_points,
                e_bins, sm, norm)
 
@@ -328,7 +293,7 @@ def read_meshtal( filename, tally_line, norm=1.0, **kw ):
 
 def main( arguments = None ) :
 
-   #Instantiate option parser
+    # Instantiate option parser
     parser = OptionParser\
              (usage='%prog <meshtal_file> <normalization_factor> [options]')
 
