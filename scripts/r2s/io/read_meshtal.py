@@ -297,8 +297,12 @@ def main( arguments = None ) :
     parser = OptionParser\
              (usage='%prog <meshtal_file> <normalization_factor> [options]')
 
-    parser.add_option('-o', dest='mesh_output', default=None,\
-                      help='Name of mesh output file, default=%default')
+    parser.add_option('-o', dest='mesh_output', default='flux_mesh.h5m',\
+                      help = 'Name of mesh output file, default=%default.\
+                             Note, for meshtal files with multiple tallies,\
+                             if the -o flag is used all tallies must be named,\
+                             with file names seperated by commas and no spaces\
+                             (e.g. "tally14.h5m,tally24.h5m,tally34.h5m")')
     parser.add_option('-n', dest='norm', default=None,
                       help='Normalization factor, default=%default')
     parser.add_option('-m', dest='smesh_filename', default=None,
