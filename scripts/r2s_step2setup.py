@@ -8,28 +8,21 @@ import re
 import ConfigParser
 from time import gmtime, strftime
 from shutil import copy
-from r2s_setup import get_input_file
+from r2s_setup import get_input_file, R2S_CFG_Error
 
 
-class R2S_CFG_Error(Exception):
-    pass
-
-def load_configs(cfgfile):
+def load_configs(config):
     """Read needed information from .cfg file.
 
     Parameters
     ----------
-    cfgfile - string
-        File path to an r2s.cfg file
+    config : ConfigParser.ConfigParser object
 
     Returns
     -------
     A list of the following values taken from the .cfg file:
     mcnp_n_problem, mcnp_p_problem, datafile, phtn_src, opt_isotope, opt_cooling
     """
-    config = ConfigParser.SafeConfigParser()
-    config.read(cfgfile)
-
     # Get isotopes and cooling times
 
     # Filenames
@@ -100,7 +93,8 @@ def gen_iso_cool_lists(opt_isotope, opt_cooling, phtn_src):
                         firstisotope = line.split("\t")[0].strip()
                     isotope = line.split("\t")[0].strip()
                     if isotope != firstisotope:
-                        raise R2S_CFG_Error("Fewer than {0} cooling steps are in " \
+                        raise R2S_CFG_Error(
+                                "Fewer than {0} cooling steps are in "
                                 "{1}".format(time_idx, phtn_src))
                     linecnt += 1
                 # replace integers in cool_list with cooling step names
@@ -119,15 +113,16 @@ def gen_iso_cool_lists(opt_isotope, opt_cooling, phtn_src):
             # If opt_cooling starts off with 'all'
             if cool_list[0].lower() == 'all':
                 cool_list = all_cool_list
-                print "In {0}, 'all' cooling times corresponds with: ".format( \
+                print "In {0}, 'all' cooling times corresponds with: ".format(
                         phtn_src) + ", ".join(cool_list)
             else:  # Else check that all supplied cooling times are valid
                 for cooling_time in cool_list:
                     if cooling_time not in all_cool_list:
-                        raise R2S_CFG_Error("Cooling time {0} is not found in {1}" \
+                        raise R2S_CFG_Error(
+                                "Cooling time {0} is not found in {1}"
                                 "".format(cooling_time, phtn_src))
         else:
-            raise R2S_CFG_Error("'photon_cooling' in r2s.cfg file appears to " \
+            raise R2S_CFG_Error("'photon_cooling' in r2s.cfg file appears to "
                     "have a mix of strings and integer values.")
 
     return iso_list, cool_list
@@ -165,7 +160,8 @@ def make_folders(iso_list, cool_list):
     return path_list
 
 
-def create_new_files(path_list, datafile, cfgfile, mcnp_n_problem, mcnp_p_problem, phtn_src):
+def create_new_files(path_list, datafile, cfgfile, mcnp_n_problem, 
+                     mcnp_p_problem, phtn_src):
     """Creates files for step 2 calculation for each combination of cooling time
     and isotope.
 
@@ -196,10 +192,12 @@ def create_new_files(path_list, datafile, cfgfile, mcnp_n_problem, mcnp_p_proble
         oldfile = os.path.join(thisdir, cfgfile)
         newfile = os.path.join(thisdir, folder, os.path.basename(cfgfile))
 
-        _copy_and_mod_r2scfg(oldfile, newfile, iso, time, mcnp_n_problem, phtn_src)
+        _copy_and_mod_r2scfg(oldfile, newfile, iso, time, mcnp_n_problem, 
+                             phtn_src)
 
         oldfile = os.path.join(thisdir, os.path.basename(mcnp_p_problem))
-        newfile = os.path.join(thisdir, folder, os.path.basename(mcnp_p_problem))
+        newfile = os.path.join(
+                thisdir, folder, os.path.basename(mcnp_p_problem))
         _copy_and_mod_mcnpinp(oldfile, newfile, iso, time)
 
 
@@ -328,9 +326,12 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         cfgfile = sys.argv[1]
 
+    config = ConfigParser.SafeConfigParser()
+    config.read(cfgfile)
+
     try:
         (mcnp_n_problem, mcnp_p_problem, datafile, phtn_src, opt_isotope, \
-                opt_cooling) = load_configs(cfgfile)
+                opt_cooling) = load_configs(config)
         iso_list, cool_list = gen_iso_cool_lists(opt_isotope, opt_cooling, \
                 phtn_src)
         path_list = make_folders(iso_list, cool_list)
@@ -338,6 +339,6 @@ if __name__ == "__main__":
                 mcnp_p_problem, phtn_src)
         gen_run_script([x[0] for x in path_list])
 
-    except Exception as e:
+    except R2S_CFG_Error as e:
         print "ERROR: {0}\n(in r2s.cfg file {1})".format( e, \
                 os.path.abspath(cfgfile) )

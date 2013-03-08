@@ -5,10 +5,11 @@ import os.path
 from tempfile import NamedTemporaryFile as NTF
 from tempfile import mkdtemp
 from shutil import rmtree
+import ConfigParser
 import contextlib
 
+from r2s_setup import R2S_CFG_Error
 import r2s_step2setup as s2s
-from r2s_step2setup import R2S_CFG_Error
 
 
 class TestLoadConfigs(unittest.TestCase):
@@ -22,9 +23,9 @@ class TestLoadConfigs(unittest.TestCase):
     def test_load_configs(self):
         """Simulate a .cfg file and check that everything is read correctly.
         """
-        with NTF() as myNTF:
+        with NTF() as cfgNTF:
             # Create placeholder for r2s.cfg file
-            myNTF.write("[r2s-files]\n" \
+            cfgNTF.write("[r2s-files]\n" \
                     "neutron_mcnp_input = mcnp_n\n" \
                     "photon_mcnp_input = mcnp_p\n" \
                     "step1_datafile = mesh.h5m\n" \
@@ -33,10 +34,13 @@ class TestLoadConfigs(unittest.TestCase):
                     "photon_isotope = u235\n" \
                     "photon_cooling = shutdown\n" \
                     )
-            myNTF.seek(0) # Goes to beginning
+            cfgNTF.seek(0) # Goes to beginning
+
+            config = ConfigParser.SafeConfigParser()
+            config.read(cfgNTF.name)
 
             mcnp_n, mcnp_p, datafile, phtn_src, iso, cool = \
-                    s2s.load_configs(myNTF.name)
+                    s2s.load_configs(config)
 
             # Check for correctness
             self.assertEqual(mcnp_n, 'mcnp_n')

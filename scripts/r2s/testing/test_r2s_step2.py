@@ -8,6 +8,7 @@ from shutil import copyfile
 import ConfigParser
 import contextlib
 
+from r2s_setup import R2S_CFG_Error
 import r2s_step2 as s2
 
 
