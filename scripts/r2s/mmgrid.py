@@ -35,6 +35,13 @@ def _msg(msg, newline=True):
 
 
 def prepare_materials():
+    """
+
+    Returns
+    -------
+    names : ?
+        ?
+    """
     matset = dagutil.get_material_set(with_rho=True)
     names = {}
     for idx, (mat, rho) in enumerate(sorted(matset, key=itemgetter(0))):
@@ -47,7 +54,12 @@ def prepare_materials():
 
 
 def get_mat_id(materials, volume_id):
+    """
 
+    Returns
+    -------
+    mat_idx : int?
+    """
     mat = dagmc.volume_metadata(volume_id)
     matnum = mat['material']
     matrho = mat['rho']
@@ -58,7 +70,19 @@ def get_mat_id(materials, volume_id):
 
 
 def _linspace_square( n ):
-    """Return a callable that creates an evenly spaced grid in the given quad"""
+    """Return a callable that creates an evenly spaced grid in the given quad
+    
+    Parameters
+    ----------
+    n : integer
+        Number of rays to fire in each dimension
+    
+    Returns
+    -------
+    points_inside : generator
+        Generator that provides n 
+        uniformly spaced (a,b) points given (a0, a1, b0, b1)
+    """
     def points_inside(a0, a1, b0, b1):
         # We want our points to start/end a half-interval from edges, so we do
         #  some math.
@@ -74,7 +98,18 @@ def _linspace_square( n ):
 
 
 def _random_square( n ):
-    """Return a callable that creates randomly distributed points in the give quad"""
+    """Return a callable that creates randomly distributed points in the give quad
+    
+    Parameters
+    ----------
+    n : integer
+        Number of rays to fire
+    
+    Returns
+    -------
+    points_inside : generator
+        Generator that provides n random (a,b) points given (a0, a1, b0, b1)
+    """
     def points_inside(a0, a1, b0, b1):
         for _ in xrange(n):
             a = random.uniform(a0,a1)
@@ -277,10 +312,12 @@ class mmGrid:
             max_err = max(max_err, max(vox['errs']))
         _msg("Maximum error: {0}".format(max_err))
 
+
     def createTags(self):
         """ """
         mesh = self.scdmesh.imesh
         for idx, ((mat, rho), (matnum,matname)) in enumerate(self.materials.iteritems()):
+            # Get tag handle
             try: 
                 mattag = mesh.createTag( matname, 1, np.float64 )
             except iBase.TagAlreadyExistsError:
@@ -290,11 +327,13 @@ class mmGrid:
             except iBase.TagAlreadyExistsError:
                 errtag = mesh.getTagHandle( matname + '_err')
 
+            # Tag each hex
             for ijk, (mat,err) in np.ndenumerate(self.grid):
                 offset_ijk = [x+y for x,y in zip(ijk,self.scdmesh.dims[0:3])]
                 hx = self.scdmesh.getHex(*offset_ijk)
                 mattag[hx] = mat[matnum]
                 errtag[hx] = err[matnum]
+
 
     def writeFile(self, filename, alara_geom_file=None ):
         """ """
@@ -302,6 +341,7 @@ class mmGrid:
         mesh.scdset.save(filename)
         if alara_geom_file:
             write_alara_geom(alara_geom_file, mesh)
+
 
 def load_geom(filename):
     """Load geometry from the given file into dagmc
