@@ -6,6 +6,44 @@ from itaps import iMesh, iBase
 from r2s.scdmesh import ScdMesh
 
 
+def get_flux_tag_handles(mesh):
+    """Method identifies all tags containing flux information from a meshtally
+
+    Parameters
+    ----------
+    mesh : iMesh.Mesh object
+        MOAB mesh file object containing tags of the form TALLY_TAG_lowE-highE
+
+    Returns
+    -------
+    fluxtaghandles : list of iMesh.Tag objects
+        List of tag handles, sorted by tag name, from lowest energy to high
+    """
+
+    # Grab first voxel entity on mesh, from which we get voxel-level tag handles
+    for x in mesh.iterate(iBase.Type.region, iMesh.Topology.all):
+        break
+    handles = mesh.getAllTags(x)
+
+    datatags = list()
+
+    for handle in handles:
+        tagname = handle.name.lower().split("_")
+        if tagname[0:2] == ['tally', 'tag'] and len(tagname) > 2:
+            erg = tagname[2].replace("e-","ee").split("-")[0]
+            erg = float(erg.replace("ee","e-"))
+            datatags.append([erg, handle])
+
+    if not len(datatags):
+        return None
+
+    datatags.sort()
+
+    fluxtaghandles = [x[1] for x in datatags]
+    
+    return fluxtaghandles
+
+
 def find_num_e_groups(sm):
     """ """    
     num_e_groups = 0
@@ -45,7 +83,7 @@ def print_fluxes(mesh, num_e_groups, backward_bool, fluxin_name, tags=None):
         If true, output data is in order from high energy to low energy.
     fluxin_name : string
         Filename for output ALARA fluxin file
-    fluxtaghandles : list of iMesh.Tag objects
+    tags : list of iMesh.Tag objects
         List of tag handles, sorted by tag name, from lowest energy to high
     """
 
@@ -105,18 +143,24 @@ def print_fluxes(mesh, num_e_groups, backward_bool, fluxin_name, tags=None):
     output.close()
 
 
-def write_alara_fluxin( filename, sm, backwards=False ):
+def write_alara_fluxin(filename, mesh, backwards=False):
     """ """    
-    #Find number of energy groups
-    num_e_groups = find_num_e_groups(sm)
+    if isinstance(mesh, ScdMesh):
+        # Find number of energy groups
+        num_e_groups = find_num_e_groups(mesh)
+        fluxtaghandles = None
+    else:
+        # Get list of tag handles, sorted by tag name (lowest energy to high)
+        fluxtaghandles = get_flux_tag_handles(mesh)
+        num_e_groups = len(fluxtaghandles)
 
-    #Print flux.in file
-    print_fluxes(sm, num_e_groups, backwards, filename)
+    # Print flux.in file
+    print_fluxes(mesh, num_e_groups, backwards, filename, tags=fluxtaghandles)
 
 
-def main( arguments=None ):
+def main(arguments=None):
     """ """    
-    #Instatiate options parser
+    # Instatiate options parser
     parser = OptionParser\
              (usage='%prog <structured mesh> [options]')
 
@@ -134,7 +178,7 @@ def main( arguments=None ):
         parser.error\
         ( '\nNeed exactly 1 argument: structured mesh file' )
 
-    #Load Structured mesh from file
+    # Load Structured mesh from file
     sm = ScdMesh.fromFile(args[1])
 
     write_alara_fluxin( opts.fluxin_name, sm, opts.backward_bool )
