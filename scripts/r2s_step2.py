@@ -8,7 +8,7 @@ from r2s.io import read_alara_phtn, write_gammas
 from r2s import mcnp_n2p
 from r2s.scdmesh import ScdMesh, ScdMeshError
 from itaps import iMesh, iMeshExtensions
-from r2s_setup import get_input_file, FileMissingError
+from r2s_setup import get_input_file, FileMissingError, R2S_CFG_Error
 
 
 ##################
@@ -41,6 +41,7 @@ def load_config_files(config):
         mcnp_p_problem = config.get('r2s-files','photon_mcnp_input')
         
     return (datafile, phtn_src, mcnp_n_problem, mcnp_p_problem)
+
 
 def load_config_params(config):
     """Read in config file information for parameters
@@ -87,11 +88,11 @@ def load_config_params(config):
 
     # Check for multiple comma delimited values; raise error if this is found
     if len(opt_isotope.split(",")) != 1:
-        raise Exception ("r2s.cfg entry 'photon_isotope' contains " \
+        raise R2S_CFG_Error("r2s.cfg entry 'photon_isotope' contains " \
                 "multiple values. r2s_step2.py only uses a single value.")
 
     if len(opt_cooling.split(",")) != 1:
-        raise Exception ("r2s.cfg entry 'photon_cooling' contains " \
+        raise R2S_CFG_Error("r2s.cfg entry 'photon_cooling' contains " \
                 "multiple values. r2s_step2.py only uses a single value.")
 
     return (opt_isotope, opt_cooling, opt_sampling, opt_ergs, opt_bias, opt_cumulative, opt_phtnfmesh, resampling, uni_resamp_all)
@@ -176,6 +177,8 @@ def handle_phtn_data(datafile, phtn_src, opt_isotope, opt_cooling,  \
     else:
         mesh.save(datafile)
 
+    print "\n"
+
     return mesh
 
 
@@ -228,17 +231,22 @@ if __name__ == "__main__":
     config.read(cfgfile)
 
     try:
-        (datafile, phtn_src, mcnp_n_problem, mcnp_p_problem) = load_config_files(config)
+        # Read config file
+        (datafile, phtn_src, mcnp_n_problem, mcnp_p_problem) = \
+                load_config_files(config)
 
-        (opt_isotope, opt_cooling, opt_sampling, opt_ergs, opt_bias, opt_cumulative, opt_phtnfmesh, resampling, uni_resamp_all) = load_config_params(config)
+        (opt_isotope, opt_cooling, opt_sampling, opt_ergs, opt_bias, \
+                opt_cumulative, opt_phtnfmesh, resampling, uni_resamp_all) = \
+                load_config_params(config)
 
+        # Do step 2
         mesh = handle_phtn_data(datafile, phtn_src, opt_isotope, opt_cooling, \
                 opt_sampling, opt_bias, opt_cumulative, opt_ergs, resampling, \
                 uni_resamp_all)
 
         gen_mcnp_p(mesh, mcnp_p_problem, mcnp_n_problem, opt_phtnfmesh)
 
-    except Exception as e:
+    except R2S_CFG_Error as e:
         print "ERROR: {0}\n(in r2s.cfg file {1})".format( e, \
                 os.path.abspath(cfgfile) )
 
