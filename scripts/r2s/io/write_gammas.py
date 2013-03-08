@@ -29,7 +29,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
 
     Parameters
     ----------
-    sm : scdmesh.ScdMesh
+    sm : ScdMesh
         Structured mesh object to generate 'gammas' from.
     outfile : string, optional
         Output file name for the 'gammas' file
@@ -132,8 +132,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
         print "ERROR: Zero photon source strength was found on the mesh."
         return 0
 
-    if cust_ergbins:
-        # We now look for the tag with the energy bin boundary values
+    if cust_ergbins: # We now look for the tag with the energy bin boundary values
         try:
             phtn_ergs = sm.imesh.getTagHandle("PHTN_ERGS")
             myergbins = phtn_ergs[sm.scdset] 
@@ -239,7 +238,7 @@ def _gen_gammas_header(sm, outfile, sampling, ergbins, biasing, cumulative, \
     sampling : char
         Character/flag corresponding with sampling type to be used. Options are:
         'v' for voxel sampling; 'u' for uniform sampling;
-    ergbins : 
+    ergbins :  --
         is either a null string or a list of energies. 
     biasing : boolean
         Flag for biasing is added if true.
