@@ -8,6 +8,9 @@ import ConfigParser
 class FileMissingError(Exception):
     pass
 
+class R2S_CFG_Error(Exception):
+    pass
+
 def get_input_file(config, key):
     filename = config.get('r2s-files',key)
     if not os.path.exists(filename):
@@ -129,13 +132,17 @@ photon_mcnp_input = mcnp_p.inp
 # Step 1 Parameters
 #-------------------------------------------------------------------------------
 
+# If structuredmesh is true, the mesh/problem will be treated as a structured
+# mesh.  Otherwise, an unstructured mehs is assumed and ray-tracing for
+# macromaterials is not done.
+structuredmesh = True
+
 # The number of rays per mesh row to fire
 # during Monte Carlo generation of the macromaterial grid.
 # Raising this number will reduce material errors, but 
 # also increase the runtime of r2s_step1.
 mmgrid_rays = 10
 
-# If 
 # If gen_mmgrid is True, ray tracing is performed to generate the macromaterials
 #  grid during r2s_step1.py. If the macromaterial grid already exists, set this
 #  parameter to False to avoid re-running the ray tracing.
