@@ -39,10 +39,10 @@ class ScdMesh:
             in which to place the mesh; if None, a new instance will be 
             created.
         keyword arguments:
-            bdtag :
+            bdtag : iMesh.Tag handle
                 if the BOX_DIMS tag has already been looked up, it may
                 be passed thus
-            _scdset :
+            _scdset : iMesh.EntitySet handle (?)
                 an existing scdset to use; clients should use 
                 fromEntSet() instead of using this parameter.
         """
