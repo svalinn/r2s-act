@@ -96,16 +96,14 @@ module source_data
   use mcnp_global
    
         implicit none
-! TBD: Best location for compiler directives??
-! #define CHECK seems to work in or out of module.
-!#define CHECK(a) \
-  !if (ierr .ne. 0) write(*,*) a
+
 ! This include needs to be within the module, at least, lower down might be OK
 ! too.
 #include "iMesh_f.h"
 
         ! MOAB related
         iMesh_Instance :: mesh
+        iBase_EntitySetHandle :: root_set
         integer :: ierr
         iBase_EntityHandle, dimension(:), allocatable :: entity_handles
         ! Startup
@@ -175,13 +173,14 @@ subroutine source_setup
   use source_data
   implicit none
  
-        real(dknd) :: volume
+        real(dknd) :: volume, phtn_total
         integer :: unitnum, voxel_topo, i, j
 
         ! Stores the list of volume entities returned by read_moab()
         iBase_EntityHandle :: myentity_handles, mypointer_entity_handles
         pointer (mypointer_entity_handles, myentity_handles(1:*))
 
+        iBase_TagHandle :: tagh
         unitnum = getUnit()
 
         !call read_gammas(unitnum)
@@ -236,8 +235,30 @@ subroutine source_setup
           endif
         enddo
 
+        ! Tag rootSet of mesh with total source strength (photons/s)
+        call iMesh_getTagHandle(%VAL(mesh), "PHTN_SRC_TOTAL", tagh, ierr)
+        if (ierr.ne.0) then
+          call iMesh_createTag(%VAL(mesh), "PHTN_SRC_TOTAL", &
+                  %VAL(1), %VAL(iBase_DOUBLE), tagh, ierr)
+        endif
+
+        phtn_total = sum(tot_list)
+        call iMesh_setEntSetDblData(%VAL(mesh), %VAL(root_set), %VAL(tagh), &
+                phtn_total, ierr)
+        if (ierr.ne.0) then
+                write(*,*) "ERROR - Failed to tag total photon source to " &
+                        // "mesh. Error code:", ierr
+        endif
+
+        ! And save newly tagged mesh
+        call iMesh_save(%VAL(mesh), %VAL(root_set), &
+                mesh_file, "", ierr)
+        if (ierr.ne.0) then
+          write(*,*) "ERROR - Mesh saving error:", mesh_file
+          return
+        endif
+
         !call iMesh_dtor(%VAL(mesh), ierr)
-        !CHECK("Failed to destroy interface")
 
         ! Generate alias table of voxels if needed
         if (samp_vox.eq.1) then
@@ -284,7 +305,6 @@ subroutine read_moab (mymesh, filename, rpents)
         character*128 :: tagname
         
         integer :: ents_alloc, ents_size
-        iBase_EntitySetHandle :: root_set
         real(dknd) :: tag_data
 
         pointer (rpents, ents(1:*))
