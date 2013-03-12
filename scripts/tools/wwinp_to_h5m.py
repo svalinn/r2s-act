@@ -26,12 +26,12 @@ def cartesian(wwinp, output):
 
 
     # collect easy to parse energy group and mesh sized info
-    num_e_bins = int(linecache.getline(wwinp, 2).split()[0])
+    num_e_bins = int(linecache.getline(wwinp, 2).split()[-1])
     # total number of fine mesh points
     nfx, nfy, nfz = \
         [int(float(x)) for x in linecache.getline(wwinp, 3).split()[0:3]]
     x0, y0, z0 = [float(x) for x in linecache.getline(wwinp, 3).split()[3:6]]
-    # numer of course points
+    # number of course points
     ncx, ncy, ncz = \
         [int(float(x)) for x in linecache.getline(wwinp, 4).split()[0:3]]
 
@@ -153,8 +153,8 @@ def main(arguments=None):
     parser.add_option('-o', dest='output', default='wwinp.h5m',\
         help='Name of ALARA matlib output file, default=%default')
     (opts, args) = parser.parse_args(arguments)
-
-    if len(args) != 2:
+    print args
+    if len(args) != 1:
         parser.error('\nNeed 1 argument: WWINP')  
 
     # determine nr from MCNP5 manual Table J.2
@@ -170,7 +170,7 @@ def main(arguments=None):
 if __name__ == '__main__':
     # No arguments case -> print help output
     if len(sys.argv) == 1:
-        sys.arv.append('-h')
+        sys.argv.append('-h')
 
     main()
 

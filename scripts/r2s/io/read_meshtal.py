@@ -324,10 +324,10 @@ def main( arguments = None ) :
     else :
         norm = [1]*len(tally_numbers)
 
-    if opts.mesh_output :
+    if opts.mesh_output !='flux_mesh.h5m' :
         mesh_output = opts.mesh_output.split(',')
     else:
-        mesh_output = list()
+        mesh_output = []
         for n in range(0, len(tally_numbers)) :
             if len(tally_numbers) == 1 :
                 mesh_output.append('flux_mesh.h5m')
@@ -342,7 +342,6 @@ def main( arguments = None ) :
             sm = read_meshtal(args[1], tally_lines[n], float(norm[n]), smesh=alt_sm)
         else:
             sm = read_meshtal(args[1], tally_lines[n],float(norm[n]))
-
         sm.scdset.save(mesh_output[n])
 
         print "\tSaved tally {0} as {1}".format(tally_numbers[n], mesh_output[n])
