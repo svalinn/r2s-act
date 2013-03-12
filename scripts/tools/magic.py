@@ -177,6 +177,10 @@ def write_wwinp(ww_mesh, e_groups, output):
     block1 += '{0:02d}/{1}/{2} {3}:{4}:{5}\n'\
         .format(now.month, now.day, str(now.year)[2:], now.hour, now.minute, \
         now.second)
+    # if it is a photon mesh, append the number of neutron e_groups, zero.
+    if particle == 'p':
+        block1 += '         0'
+
     # append number of e_groups
     block1 += '         {0}\n'.format(len(e_groups))
 

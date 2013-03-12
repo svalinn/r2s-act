@@ -299,12 +299,16 @@ def main( arguments = None ) :
 
     parser.add_option('-o', dest='mesh_output', default='flux_mesh.h5m',\
                       help = 'Name of mesh output file, default=%default.\
-                             Note, for meshtal files with multiple tallies,\
+                             For meshtal files with multiple tallies,\
                              if the -o flag is used all tallies must be named,\
                              with file names seperated by commas and no spaces\
                              (e.g. "tally14.h5m,tally24.h5m,tally34.h5m")')
     parser.add_option('-n', dest='norm', default=None,
-                      help='Normalization factor, default=%default')
+                      help='Normalization factor, default=%default,\
+                            For meshtal files with multiple tallies, if the -n\
+                            flag is used, a normalization factor must be\
+                            specified for all tallies, seperated by commas but \
+                            not spaces (eg. -n 1.1,2.2,3.3) ')
     parser.add_option('-m', dest='smesh_filename', default=None,
                       help='Preexisting mesh on which to tag fluxes')
                          
@@ -351,4 +355,7 @@ def main( arguments = None ) :
 
 ###############################################################################
 if __name__ == '__main__':
+    # No arguments case -> print help output
+    if len(sys.argv) == 1:
+        sys.argv.append('-h')
     main( sys.argv )
