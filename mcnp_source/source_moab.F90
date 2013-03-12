@@ -108,7 +108,7 @@ module source_data
         iBase_EntityHandle, dimension(:), allocatable :: entity_handles
         ! Startup
         character*30 :: gammas_file = 'gammas'
-        character*30 :: mesh_file = 'n_fluxes_and_materials.h5m'
+        character*30 :: mesh_file = 'source.h5m'
         integer(i8knd) :: ikffl = 0 ! = local record of history #
         ! Parameters - these are toggled by gammas
         integer :: bias, samp_vox, samp_uni, debug, ergs, &

@@ -361,7 +361,7 @@ subroutine test_get_tet_vol
   use source_data
   implicit none
 
-        iBase_EntitySetHandle :: root_set
+        !iBase_EntitySetHandle :: root_set
         integer :: ents_alloc, ents_size, myerr
         iBase_EntityHandle :: t_entity_handles
         iBase_EntityHandle :: t_pointer_entity_handles
@@ -409,7 +409,7 @@ subroutine test_get_hex_vol1
   use source_data
   implicit none
 
-        iBase_EntitySetHandle :: root_set
+        !iBase_EntitySetHandle :: root_set
         integer :: ents_alloc, ents_size, myerr
         iBase_EntityHandle :: t_entity_handles
         iBase_EntityHandle :: t_pointer_entity_handles
@@ -457,7 +457,7 @@ subroutine test_get_hex_vol2
   use source_data
   implicit none
 
-        iBase_EntitySetHandle :: root_set
+        !iBase_EntitySetHandle :: root_set
         integer :: ents_alloc, ents_size, myerr
         iBase_EntityHandle :: t_entity_handles
         iBase_EntityHandle :: t_pointer_entity_handles
