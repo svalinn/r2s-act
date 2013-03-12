@@ -153,7 +153,6 @@ def main(arguments=None):
     parser.add_option('-o', dest='output', default='wwinp.h5m',\
         help='Name of ALARA matlib output file, default=%default')
     (opts, args) = parser.parse_args(arguments)
-    print args
     if len(args) != 1:
         parser.error('\nNeed 1 argument: WWINP')  
 
