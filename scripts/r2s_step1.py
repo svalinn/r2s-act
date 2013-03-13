@@ -15,17 +15,17 @@ from r2s_setup import get_input_file as r2s_input_file
 from r2s_setup import FileMissingError, R2S_CFG_Error
 from r2s.scdmesh import ScdMesh, ScdMeshError
 
-cfgfile = 'r2s.cfg'
-if len(sys.argv) > 1:
-    cfgfile = sys.argv[1]
-
-config = ConfigParser.SafeConfigParser()
-config.read(cfgfile)
+#cfgfile = 'r2s.cfg'
+#if len(sys.argv) > 1:
+#    cfgfile = sys.argv[1]
+#
+#config = ConfigParser.SafeConfigParser()
+#config.read(cfgfile)
 
 def get_input_file(name):
     return r2s_input_file(config,name)
 
-def get_material_dict():
+def get_material_dict(config):
     d = {}
     if config.has_section('r2s-material'):
         keys = config.options('r2s-material')
@@ -81,7 +81,7 @@ def load_config_files(config):
     datafile = config.get('r2s-files','step1_datafile')
     fluxin = config.get('r2s-files','alara_fluxin')
     alara_geom = config.get('r2s-files','alara_geom')
-    alara_matdict = get_material_dict()
+    alara_matdict = get_material_dict(config)
 
     return (meshtal_file, mcnp_geom, alara_snippet, visfile, datafile, \
             fluxin, alara_geom, alara_matdict)
@@ -161,14 +161,14 @@ def handle_meshtal(meshtal_file, gen_mmgrid, datafile, isscd=True):
     # If not regenerating the mmGrid info, attempt to load existing datafile
     if gen_mmgrid == False:
         print "Attempting to re-use existing ScdMesh file '{0}'".format(datafile)
-        alt_sm = ScdMesh.fromFile(datafile)
+        alt_sm = ScdMesh.fromFile(datafile)  # Note: ray tracing is done later
         try:
             mesh = read_meshtal(meshtal_file, tally_lines[0], mesh=alt_sm)
         except ScdMeshError:
             print "ERROR:"
-            print "Existing mesh in '{0}' does not match mesh in '{1}'. Set the " \
-                    "'gen_mmgrid' option to True in your 'r2s.cfg' file.".format( \
-                    datafile, meshtal_file)
+            print "Existing mesh in '{0}' does not match mesh in '{1}'. " \
+                    "Set the 'gen_mmgrid' option to True in your 'r2s.cfg' " \
+                    "file.".format(datafile, meshtal_file)
 
     else:
         print "Creating ScdMesh file '{0}' from scratch.".format(datafile)
@@ -201,10 +201,12 @@ def handle_mesh_materials(mesh, mcnp_geom, gen_mmgrid=False, mmgrid_rays=10,
     mmgrid.load_geom(mcnp_geom)
 
     if not isscd: # is unstructured
-        # Materials should already exist.
-        return
+        # Use non-structured mesh approach: tag material of voxel center points
+        grid = tagmat.matGrid(mesh)
+        grid.gen_vox_mats_list()
+        grid.create_tags()
 
-    if gen_mmgrid:
+    elif gen_mmgrid:
         # Do ray tracing to create macromaterials, if enabled.
         print "Will use {0} rays per mesh row".format(mmgrid_rays)
 
@@ -213,10 +215,8 @@ def handle_mesh_materials(mesh, mcnp_geom, gen_mmgrid=False, mmgrid_rays=10,
         grid.createTags()
 
     else:
-        # Use non-structured mesh approach: tag material of voxel center points
-        grid = tagmat.matGrid(mesh)
-        grid.gen_vox_mats_list()
-        grid.create_tags()
+        # Materials should already exist, e.g. via mmgrid
+        return
 
 
 def save_mesh(mesh, datafile, visfile=None):
@@ -245,7 +245,7 @@ def save_mesh(mesh, datafile, visfile=None):
         os.system('mbconvert {0} {1}'.format(datafile, visfile))
 
 
-def gen_alara_main_input(mesh, alara_geom, alara_snippet=None):
+def gen_alara_main_input(mesh, alara_geom, config, alara_snippet=None):
     """Create ALARA input file
 
     Parameters
@@ -254,11 +254,13 @@ def gen_alara_main_input(mesh, alara_geom, alara_snippet=None):
         Mesh object tagged with material/volume information to be written.
     alara_geom : string
         Filename/path for ALARA input file.
+    config : ConfigParser.ConfigParser object
+        Config parser to find optional material dict in.
     alara_snippet : string
         Filename/path for snippet file containing non-geom/material input.
     """
     print "Writing alara problem file `{0}'".format(alara_geom)
-    mdict = get_material_dict()
+    mdict = get_material_dict(config)
     write_alara_geom(alara_geom, mesh, mdict)
 
     if alara_snippet:
@@ -308,7 +310,7 @@ if __name__ == "__main__":
 
         save_mesh(mesh, datafile, visfile)
 
-        gen_alara_main_input(mesh, alara_geom, alara_snippet)
+        gen_alara_main_input(mesh, alara_geom, config, alara_snippet)
 
         gen_alara_fluxin(mesh, fluxin)
 

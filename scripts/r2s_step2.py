@@ -250,4 +250,15 @@ if __name__ == "__main__":
         print "ERROR: {0}\n(in r2s.cfg file {1})".format( e, \
                 os.path.abspath(cfgfile) )
 
+    print "It should now be possible to run photon transport (once any "\
+          "tallies are added)."
+    if isinstance(mesh, ScdMesh):
+        print "Photon transport should be run in a directory containing " \
+              "the 'gammas' file using an executable compiled " \
+              "with 'source_gamma.F90'."
+    else:
+        print "Photon transport should be run in a directory containing " \
+              "'source.h5m' (which can be a link to '{0}')\n" \
+              "using an executable compiled with 'source_moab.F90', and in " \
+              "a directory containing ".format(datafile)
     print "" # Empty line to separate output from multiple runs of this script
