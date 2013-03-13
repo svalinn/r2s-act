@@ -55,7 +55,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
 
     Notes
     ------
-    Requires that the structured mesh have photon source strength tags of the
+    Requires that the structured mesh has photon source strength tags of the
     form 'phtn_src_group_###'.
     Will read photon energy bin boundary values if the root set has the tag 
     'PHTN_ERG' (a list of floats).

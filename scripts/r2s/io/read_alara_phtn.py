@@ -2,7 +2,7 @@
 
 """Module includes methods which find the lines in a 'phtn_src' file from ALARA
 that match a specified isotope and cooling time, and tags the photon source
-information to a structured mesh.
+information to a mesh.
 """
 
 from optparse import OptionParser
@@ -12,11 +12,11 @@ from r2s.scdmesh import ScdMesh, ScdMeshError
 
 def read_to_h5m(inputfile, meshobj, isotope="TOTAL", coolingstep=0, \
         retag=False, totals=False):
-    """Read in a phtn_src file and tag the contents to a structured mesh.
+    """Read in a phtn_src file and tag the contents to a mesh.
     
     Method reads in a phtn_src file line by line, looking for
     a specific isotope at a specific cooling step, and repeats for each voxel.
-    Method tags the structured mesh with the photon source information,
+    Method tags the mesh with the photon source information,
     and then saves the mesh.
 
     Parameters
@@ -56,7 +56,7 @@ def read_to_h5m(inputfile, meshobj, isotope="TOTAL", coolingstep=0, \
 
     print "The cooling step being read is '{0}'".format(coolingstep)
 
-    # structured mesh stuff starts here
+    # mesh stuff starts here
 
     # We grab the list of voxels from the mesh
     if isinstance(meshobj, ScdMesh):
@@ -83,7 +83,7 @@ def read_to_h5m(inputfile, meshobj, isotope="TOTAL", coolingstep=0, \
             else:
                 # Or print error if retagging was not specified.
                 print "ERROR: The tag phtn_src_group_{0:03d} already exists " \
-                        "in the structured mesh." \
+                        "on the mesh." \
                         "\nUse -r option to overwrite tags." \
                         "".format(grp+1)
                 return 0
@@ -154,8 +154,8 @@ def read_to_h5m(inputfile, meshobj, isotope="TOTAL", coolingstep=0, \
             print "ERROR: failed to tagged the total photon source strengths."
             return 0
 
-    print "The structured mesh is now tagged with the photon source strengths" \
-            " for isotope '{0}' at cooling step '{1}'" \
+    print "The mesh is now tagged with the photon source strengths for\n" \
+            "isotope '{0}' at cooling step '{1}'" \
             "".format(isotope, coolingstep)
 
     return 1
@@ -226,7 +226,7 @@ def tag_phtn_src_totals(mesh, voxels, numergbins=-1, retag=False):
     """Method tags the total photon source strength for each voxel.
 
     ACTION: Method calculate the total photon source strength, and 
-    if retagging is enabled or the tag does not exist, tags the structured mesh.
+    if retagging is enabled or the tag does not exist, tags the mesh.
 
     Parameters
     ----------
