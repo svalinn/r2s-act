@@ -758,55 +758,6 @@ subroutine sample_hexahedra
 end subroutine sample_hexahedra
 
 
-subroutine sample_tetrahedra(p1x,p2x,p3x,p4x,p1y,p2y,p3y,p4y,p1z,p2z,p3z,p4z)
-! This subroutine receives the four points of a tetrahedron and sets
-! xxx, yyy, zzz, to values corresponding to a uniformly sampled point
-! within the tetrahedron.
-! 
-! Parameters
-! -----------
-! The x y z coordinates of four points for a tetrahedron
-! 
-! Notes
-! ------
-! The algorithm used is that described by Rocchini & Cignoni (2001)
-! 
-  use source_data
-  implicit none
-
-      real(dknd), intent(IN) :: p1x, p2x, p3x, p4x, p1y, p2y, p3y, p4y, &
-                p1z, p2z, p3z, p4z
-
-      real(dknd) :: ss, tt, uu, temp
-
-      ss = rang()
-      tt = rang()
-      uu = rang()
-
-      if ((ss+tt).gt.1._rknd) then
-        ss = 1._rknd - ss
-        tt = 1._rknd - tt
-      endif
-
-      if ((ss+tt+uu).gt.1._rknd) then
-        if ((tt+uu).gt.1._rknd) then
-          temp = tt
-          tt = 1 - uu
-          uu = 1._rknd - temp - ss
-        else
-          temp = ss
-          ss = 1._rknd - uu - tt
-          uu = temp + tt + uu - 1._rknd
-        endif
-      endif
-
-      xxx = p1x + (p2x-p1x)*ss + (p3x-p1x)*tt + (p4x-p1x)*uu
-      yyy = p1y + (p2y-p1y)*ss + (p3y-p1y)*tt + (p4y-p1y)*uu
-      zzz = p1z + (p2z-p1z)*ss + (p3z-p1z)*tt + (p4z-p1z)*uu
-
-end subroutine sample_tetrahedra
-
-
 subroutine sample_erg (myerg, myvoxel, n_grp, n_vox, probList, aliasesList)
 ! Sample the alias table of energy bins for the selected voxel. 
 ! 
