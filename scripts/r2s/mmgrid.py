@@ -69,6 +69,60 @@ def get_mat_id(materials, volume_id):
     return mat_idx
 
 
+def get_vox_centers(mesh, voxels):
+    """Calculate the center point of voxels and return a list of (x,y,z) coords
+
+    Parameters
+    ----------
+    mesh : iMesh.Mesh object
+        Mesh on which voxels are stored.
+    voxels : list of iBase.EntityHandles
+        List of volume entities on mesh to get center points of.
+
+    Returns
+    -------
+    coords : list of (x, y, z) float triplets
+        Coordinates of voxel centers in mesh's canonical voxel order.
+    """
+    coords = list()
+    for voxel in voxels:
+        vtxcoords = mesh.getVtxCoords(mesh.getEntAdj(voxel, iBase.Type.vertex))
+        xavg = np.mean([c[0] for c in vtxcoords])
+        yavg = np.mean([c[1] for c in vtxcoords])
+        zavg = np.mean([c[2] for c in vtxcoords])
+        coords.append( [xavg, yavg, zavg] )
+
+    print "Got center coords for {0} voxels.".format(len(voxels))
+    return coords
+
+
+def get_point_materials(materials, coords):
+    """Query DAGMC for materials at a list of points
+
+    Parameters
+    ----------
+    materials : dictionary
+        ...
+    coords : list of (x, y, z) float triplets
+        Point coordinates; typically for voxel centers.
+    
+    Returns
+    -------
+    mats : list of integers
+        List of integers corresponding material at each point in coords.
+
+    Notes
+    -----
+    Requires that DagMC geometry has already been loaded via dagmc.load().
+    """
+    mats = list()
+    for coord in coords:
+        vol_id = dagmc.find_volume(coord)
+        mats.append(get_mat_id(materials, vol_id))
+        
+    return mats
+
+
 def _linspace_square( n ):
     """Return a callable that creates an evenly spaced grid in the given quad
     
@@ -127,13 +181,77 @@ def pairwise(l):
         x0 = x1
 
 
-class mmGrid:
+class MatGrid:
+    """Parent class for mmGrid-likes.
+    
+    Daughter classes should define
+    - create_tags()
+    - generate()
+    """
+
+    def __init__(self, mesh):
+        """ """
+        self.materials = prepare_materials()
+
+
+class SingleMatGrid(MatGrid):
+    """Object representing a single material grid
+    
+    Each voxel on the grid contains a single material.
+    """
+
+    def __init__( self, mesh ):
+        """Create a grid based on a given structured mesh"""
+        MatGrid.__init__(self, mesh)
+        self.mesh = mesh
+
+        self.voxels = list(mesh.iterate(iBase.Type.region, iMesh.Topology.all))
+
+
+    def create_tags(self):
+        """Tag voxels with each material
+        """
+        mesh = self.mesh
+        # Iterate through each material in the problem
+        for idx, ((mat, rho), (matnum,matname)) in enumerate(self.materials.iteritems()):
+            # Get tag handle
+            try: 
+                mattag = mesh.createTag( matname, 1, np.float64 )
+            except iBase.TagAlreadyExistsError:
+                mattag = mesh.getTagHandle( matname )
+            try:
+                errtag = mesh.createTag( matname+'_err', 1, np.float64 )
+            except iBase.TagAlreadyExistsError:
+                errtag = mesh.getTagHandle( matname + '_err')
+
+            # Tag each voxel
+            for vox, mat in itertools.izip(self.voxels, self.voxmats):
+
+                if mat == matnum:
+                    # Material matnum is assumed to be 100%  of voxel contents
+                    mattag[vox] = 1.0
+                else:
+                    # matnum is treated as not present in the voxel
+                    mattag[vox] = 0.0
+
+                # We don't have errors with this method
+                errtag[vox] = 0.0
+
+
+    def generate(self):
+        """Get voxel materials by getting voxel centers and checking with DagMC
+        """
+        self.coords = get_vox_centers(self.mesh, self.voxels)
+        self.voxmats = get_point_materials(self.materials, self.coords)
+
+
+class mmGrid(MatGrid):
     """Object representing a macromaterial grid"""
 
     def __init__( self, scdmesh ):
         """Create a grid based on a given structured mesh"""
+        MatGrid.__init__(self, scdmesh.imesh)
         self.scdmesh = scdmesh
-        self.materials = prepare_materials()
 
         idim = scdmesh.dims.imax - scdmesh.dims.imin
         jdim = scdmesh.dims.jmax - scdmesh.dims.jmin
@@ -313,7 +431,7 @@ class mmGrid:
         _msg("Maximum error: {0}".format(max_err))
 
 
-    def createTags(self):
+    def create_tags(self):
         """ """
         mesh = self.scdmesh.imesh
         for idx, ((mat, rho), (matnum,matname)) in enumerate(self.materials.iteritems()):
@@ -346,24 +464,26 @@ class mmGrid:
 def load_geom(filename):
     """Load geometry from the given file into dagmc
 
-    This is provided as a convenience so client code doesn't need to invoke pydagmc.
-
-    Note that DagMC can only have one set of geometry loaded per program invocation.
-    This means that this function should only be called once, and the resulting 
-    geometry will become globally visible to all clients of mmgrid.
+    This is provided as a convenience so client code doesn't need to invoke 
+    pydagmc.  Note that DagMC can only have one set of geometry loaded per 
+    program invocation.  This means that this function should only be called 
+    once, and the resulting geometry will become globally visible to all 
+    clients of mmgrid.
     """
     dagmc.load( filename )
+
 
 def main( arguments=None ):
     global _quiet
     op = optparse.OptionParser()
     op.set_usage('%prog [options] geometry_file [structured_mesh_file]')
-    op.set_description('Compute a macromaterial grid in the tradition of mmGridGen.  '
-                       'The first required argument should be a DagMC-loadable geometry.  '
-                       'The optional second argument must be a file with a single '
-                       'structured mesh.  In the absence of the second argument, '
-                       'mmgrid will attempt to infer the shape of the DagMC geometry '
-                       'and create a structured grid to match it, with NDVIS divisions '
+    op.set_description('Compute a macromaterial grid in the tradition of '
+                       'mmGridGen.  The first required argument should be a '
+                       'DagMC-loadable geometry.  The optional second argument '
+                       'must be a file with a single structured mesh.  In the '
+                       'absence of the second argument, mmgrid will attempt to '
+                       'infer the shape of the DagMC geometry and create a '
+                       'structured grid to match it, with NDVIS divisions '
                        'on each side.')
     op.add_option( '-n',  help='Set N. N^2 rays fired per row.  Default N=%default',
                    dest='numrays', default=20, type=int )

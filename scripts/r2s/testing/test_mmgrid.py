@@ -103,7 +103,7 @@ class mmGridTest( unittest.TestCase ):
                     msg='Normality at ijk={0}:\n'
                         '    sum({1}) = {2} != 1.0'.format(ijk, x['mats'], sum(x['mats'])))
 
-        grid.createTags()
+        grid.create_tags()
 
 
     def test_unequal_grid_size(self):

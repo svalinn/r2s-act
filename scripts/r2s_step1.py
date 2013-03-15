@@ -10,7 +10,6 @@ from r2s.io.read_meshtal import read_meshtal, find_tallies
 from r2s.io.write_alara_fluxin import write_alara_fluxin
 from r2s.io.write_alara_geom import write_alara_geom
 from r2s import mmgrid
-from r2s.io import tag_vox_center_mat as tagmat
 from r2s_setup import get_input_file as r2s_input_file
 from r2s_setup import FileMissingError, R2S_CFG_Error
 from r2s.scdmesh import ScdMesh, ScdMeshError
@@ -197,13 +196,12 @@ def handle_mesh_materials(mesh, mcnp_geom, gen_mmgrid=False, mmgrid_rays=10,
     """
 
     print "Loading geometry file `{0}'".format(mcnp_geom)
-    # This could also call tagmat.load_geom()... eventually merge mmgrid+tagmat
     mmgrid.load_geom(mcnp_geom)
 
     if not isscd: # is unstructured
         # Use non-structured mesh approach: tag material of voxel center points
-        grid = tagmat.matGrid(mesh)
-        grid.gen_vox_mats_list()
+        grid = mmgrid.SingleMatGrid(mesh)
+        grid.generate()
         grid.create_tags()
 
     elif gen_mmgrid:
@@ -212,7 +210,7 @@ def handle_mesh_materials(mesh, mcnp_geom, gen_mmgrid=False, mmgrid_rays=10,
 
         grid = mmgrid.mmGrid( mesh )
         grid.generate( mmgrid_rays, False )
-        grid.createTags()
+        grid.create_tags()
 
     else:
         # Materials should already exist, e.g. via mmgrid
