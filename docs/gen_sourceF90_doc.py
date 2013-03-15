@@ -1,11 +1,16 @@
 #! /usr/bin/env python
 
-#This script is passed a path for a source.F90 file (e.g. from the parent
+# This script is passed a path for a source.F90 file (e.g. from the parent
 #  directory).  It searches the file for all subroutines, and copies the 
-#  comments in the lines that immediately follow. A 'fake' python script is then generated
+#  comments in the lines that immediately follow. 
+#  A 'fake' python script is then generated
 # 
-# Expected comment format: either a # or ! symbol, followed by one space, and then the contents of the comment. #This is bad; # This is ok. 
-# '#This' becomes 'his'; '#  and this' becomes ' and this'.
+# Expected comment format: either a # or ! symbol, followed by one space, and 
+#  then the contents of the comment.
+# Example:
+#     '#This' is bad; '# This' is ok. 
+#     '#This'         becomes   'his'
+#     '#  and this'   becomes   ' and this'.
 
 import sys
 import os
@@ -73,7 +78,8 @@ def gen_method(line, fr, fw):
     """Parse a subroutine and create python method
     """
     name = line.split()[1]
-    print '  generated definition for method...', name
+    name = name.split("(")[:1][0]
+    print '  generated method definition for subroutine...', name
 
     while line.strip()[-1] == '&':
         if line[0] in comchar:

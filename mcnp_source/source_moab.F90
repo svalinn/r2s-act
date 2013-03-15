@@ -30,8 +30,8 @@
 ! These features would be set in the r2s.cfg file.
 ! * ~~r: Particles starting in a void are resampled (within the same voxel).~~
 ! * ~~a: Resample entire particle when a particle would start in void. Requires
-!   u and r to be enabled. Can give incorrect results due to playing an
-!   unfair game.~~
+! u and r to be enabled. Can give incorrect results due to playing an
+! unfair game.~~
 ! 
 ! ~~If the parameters line is not present, the default is to set u, m, c as True.
 ! If 'e' parameter exists, line 7 lists custom energy group boundaries, space
@@ -380,7 +380,7 @@ subroutine read_moab (mymesh, filename, rpents)
 end subroutine read_moab
 
 
-subroutine get_tet_vol(mymesh, tet_entity_handle, volume)
+subroutine get_tet_vol (mymesh, tet_entity_handle, volume)
 ! Subroutine calculates volume of a tetrahedron entity on a MOAB mesh
 ! 
 ! Parameters
@@ -396,6 +396,7 @@ subroutine get_tet_vol(mymesh, tet_entity_handle, volume)
 ! -----
 ! Algorithm is from Wikipedia article for Tetrahedrons.
 ! For points A, B, C, D::
+! 
 !     vol = (1/6) * abs( (A-D) . ((B-D) x (C-D)) )
 ! 
   use source_data
@@ -475,7 +476,7 @@ real*8 function calc_tet_vol(a, b, c, d)
 end function calc_tet_vol
 
 
-subroutine get_hex_vol(mymesh, hex_entity_handle, volume)
+subroutine get_hex_vol (mymesh, hex_entity_handle, volume)
 ! Subroutine calculates volume of a hexahedron entity on a MOAB mesh
 ! 
 ! Parameters
