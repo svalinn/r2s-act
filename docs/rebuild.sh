@@ -6,7 +6,8 @@
 # create fake list of functions and docstrings from source_gamma.F90
 mkdir scripts/r2s/mcnp/
 echo pass > scripts/r2s/mcnp/__init__.py
-python docs/gen_source_gamma_doc.py mcnp_source/source_gamma.F90 scripts/r2s/mcnp/source_gamma_doc.py
+python docs/gen_sourceF90_doc.py mcnp_source/source_gamma.F90 scripts/r2s/mcnp/source_gamma_doc.py
+python docs/gen_sourceF90_doc.py mcnp_source/source_moab.F90 scripts/r2s/mcnp/source_moab_doc.py
 
 # regenerate the .rst files for modules in scripts/r2s/ and below
 sphinx-apidoc -f -o docs/r2s scripts/r2s
