@@ -8,78 +8,37 @@
 ! Dieter Leichtle from KIT.
 ! Changes have been made by Eric Relson with UW-Madison/CNERG goals in mind.
 ! 
-! This source file implements photon source sampling on a cartesian mesh.
-! Two photon position sampling methods are avaiable: 
+! This source file implements photon source sampling on a mesh.  The voxel
+! sampling technique is used, whereby a voxel is first chosen based on relative
+! source strengths, and then a point is uniformly, randomly sampled within the
+! voxel.  Hexahedral and tetrahedral voxels (and mixes there-of) are supported.
 ! 
-! (1) voxel sampling
-! (2) uniform sampling
+! Subroutine source reads in the file `source.h5m` from the directory
+! that MCNP is being run in.  This file is a MOAB mesh containing a mesh that
+! overlays the problem geometry, and is tagged with photon source information:
+! tags of the form `phtn_src_group_xxx`, where xxx is the 3-digit group number
+! with leading zeros.
+! These tags should give values of source density in photons/cm3/s.
 ! 
-! Subroutine source reads in the file `gammas` from the directory
-! that MCNP is being run in.  The `gammas` file has two parts - a header and
-! a listing of information for each voxel.
+! Additionally, tags can be included for custom photon energy bins and for bias
+! values assigned to each voxel.
+! * Energy bins are tagged to the rootSet tag `PHTN_ERGS`
+! * Bias values are tagged to each voxel with the tag `PHTN_BIAS`
 ! 
-! Header lines
-! ------------
-! The header section can be preceded by any number of comment line starting with
-! the # character.
-! 
-! The header lines are 5 lines containing the following information:
-! 
-! 1. Number of intervals for x, y, z
-! 2. Mesh coordinates for x direction
-! 3. Mesh coordinates for y direction
-! 4. Mesh coordinates for z direction
-! 5. List of activated materials; use of this info requires the m parameter
-! 
-! These are optionally followed by a parameters line (line 6). This line begins 
-! with a 'p', and single character parameters, separated by spaces, follow.
-! The currently supported parameters are (order does not matter):
-! 
-! * u: Enable uniform sampling.
-! * v: Enable voxel sampling.
-! * m: Enable source position rejection based on activated materials.
-! * e: Read in custom list of energy bin boundaries.
-! * d: Enable debug output to file source_debug. Dumps xxx,yyy,zzz,wgt every 10k
-!   particles.
-! * c: Treat bins for each voxel as cumulative.
-! * b: Flag indicating bias values are used; only valid with voxel sampling.
-! * r: Particles starting in a void are resampled (within the same voxel).
-! * a: Resample entire particle when a particle would start in void. Requires
+! Parameters (not currently implemented)
+! --------------------------------------
+! These features would be set in the r2s.cfg file.
+! * ~~r: Particles starting in a void are resampled (within the same voxel).~~
+! * ~~a: Resample entire particle when a particle would start in void. Requires
 !   u and r to be enabled. Can give incorrect results due to playing an
-!   unfair game.
+!   unfair game.~~
 ! 
-! An example parameter line: `p u d m e`
-! 
-! If the parameters line is not present, the default is to set u, m, c as True.
+! ~~If the parameters line is not present, the default is to set u, m, c as True.
 ! If 'e' parameter exists, line 7 lists custom energy group boundaries, space
-! delimited. This line start with the integer number of groups. The default
-! energy bins are a 42 group structure.
-! All subsequent lines are for voxels.
+! delimited. This line start with the integer number of groups. ~~
 ! 
-! Voxel lines
-! -------------
-! Two formats are supported, cumulative bins, or non-cumulative bins. In both
-! cases, lines list bin values from low energy to high energy, delimited by
-! spaces.
-! 
-! Note that the normalization for voxel and uniform sampling is different, and 
-! will result in differing gammas files. In general, for voxel sampling,
-! normalization is based on the average source strength in photons/voxel/s; 
-! For uniform sampling, we want average source strength in phtons/cm3/s.
-! 
-! If the R2S-ACT workflow is not being used to generate the gammas file,
-! one should verify that the gammas files are being generated correctly.
-! To do this, use a simple test problem to verify that you get the same 
-! average energy per source
-! particle in all test cases, and that all uniform sampling test cases have a
-! weight of 1.0 per source particle. (See the summary table in MCNP output)
-! 
-! Note that correct normalization also depends on whether
-! material rejection is being used.
-! 
-! In either case, the last bin can be followed by a bias value for the voxel.
-! An arbitrary range of bias values can be used since the source routine does
-! the necessary re-normalization for voxel sampling.
+! ~~Note that correct normalization also depends on whether
+! material rejection is being used.~~
 ! 
 ! Other notes
 ! --------------
@@ -87,8 +46,11 @@
 ! 'alias discrete' or 'alias' sampling.  This provides efficiency benefits
 ! over 'direct discrete' sampling of PDFs. Creation of the alias tables uses
 ! the algorithm described by Vose (1991).
-
-
+! 
+! The default energy bins are a 42 group structure.
+! 
+! An arbitrary range of bias values can be used since the source routine does
+! the necessary re-normalization for voxel sampling.
 
 
 module source_data
@@ -97,8 +59,7 @@ module source_data
    
         implicit none
 
-! This include needs to be within the module, at least, lower down might be OK
-! too.
+! Don't indent the #include!
 #include "iMesh_f.h"
 
         ! MOAB related
@@ -175,16 +136,15 @@ subroutine source_setup
  
         real(dknd) :: volume, phtn_total
         integer :: unitnum, voxel_topo, i, j
+        iBase_TagHandle :: tagh
 
         ! Stores the list of volume entities returned by read_moab()
         iBase_EntityHandle :: myentity_handles, mypointer_entity_handles
         pointer (mypointer_entity_handles, myentity_handles(1:*))
 
-        iBase_TagHandle :: tagh
         unitnum = getUnit()
 
-        !call read_gammas(unitnum)
-
+        ! Read general date from the moab mesh
         call read_moab(mesh, mesh_file, mypointer_entity_handles)
         if (ierr.ne.0) then
           call expirx(1,'source_setup','Error reading MOAB mesh.')
@@ -277,6 +237,8 @@ end subroutine source_setup
 
 
 subroutine read_moab (mymesh, filename, rpents)
+! Read in the moab mesh, getting the root set and voxel entities, and looking
+! for bias and energy tags.
 ! 
 ! Parameters
 ! ----------
@@ -343,12 +305,7 @@ subroutine read_moab (mymesh, filename, rpents)
         endif
         n_mesh_cells = ents_size
 
-        ! Look for parameters line, and read parameters if found.
-        ! TODO
         ! Initialize parameters to defaults.
-        ! Defaults are chosen such that gammas format specified by Leichtle
-        !  will hopefully be read correctly without a parameters line.
-        !  (untested)
         bias = 0
         samp_vox = 1
         samp_uni = 0
@@ -359,9 +316,12 @@ subroutine read_moab (mymesh, filename, rpents)
         resample = 0
         uni_resamp_all = 0
 
+        ! Look for parameters in r2s.cfg
+        ! TODO
+
         ! Look for custom energy groups tag.
         call iMesh_getTagHandle(%VAL(mymesh), "PHTN_ERGS", ergtagh, ierr)
-        ! If ergs flag was found, we call read_custom_ergs.  Otherwise 
+        ! If ergs tag was found, we call read_custom_ergs.  Otherwise 
         !  we use default energies.
         if (ierr.eq.0) then 
           ! Get n_ener_grps via length of data in the tag.
@@ -400,7 +360,7 @@ subroutine read_moab (mymesh, filename, rpents)
         ALLOCATE(spectrum(1:n_mesh_cells, 1:n_ener_grps))
         ALLOCATE(tot_list(1:n_mesh_cells))
 
-        ! fill spectrum
+        ! Fill spectrum
         do j=1, n_ener_grps
           ! Grab next tag handle
           write(tagname, '(a, i3.3)') "phtn_src_group_", j
@@ -418,267 +378,6 @@ subroutine read_moab (mymesh, filename, rpents)
         enddo
         
 end subroutine read_moab
-
-
-subroutine read_gammas (unitnum)
-!
-  use source_data
-  implicit none
- 
-        integer :: unitnum, i, j
-
-        OPEN(unit=unitnum, form='formatted', file=gammas_file)
-
-        ! Read first 5 lines of gammas
-        call read_header(unitnum)
-
-        ! Look for parameters line, and read parameters if found.
-        call read_params(unitnum)
-
-        ! If ergs flag was found, we call read_custom_ergs.  Otherwise 
-        !  we use default energies.
-        if (ergs.eq.1) then
-          call read_custom_ergs(unitnum)
-          write(*,*) "The following custom energy bins are being used:"
-          do i=1,n_ener_grps
-            write(*,'(2es11.3)') my_ener_phot(i), my_ener_phot(i+1)
-            enddo
-        else ! use default energy groups; 42 groups
-          n_ener_grps = 42
-          ALLOCATE(my_ener_phot(1:n_ener_grps+1))
-          my_ener_phot = (/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
-            0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
-            1.66,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0, &
-            10.0,12.0,14.0,20.0,30.0,50.0/)
-        endif
-
-        ! Prepare to read in spectrum information
-        ! set the spectrum array to: # of mesh cells * # energy groups
-        ALLOCATE(spectrum(1:n_mesh_cells, 1:bias + n_ener_grps))
-        ALLOCATE(tot_list(1:n_mesh_cells))
-        if (bias.eq.1) ALLOCATE(bias_list(1:n_mesh_cells))
-         
-        ! reading in source strength and alias table for each voxel 
-        i = 1 ! i keeps track of # of voxel entries
-        do
-          read(unitnum,*,iostat=stat) (spectrum(i,j), j=1,bias + n_ener_grps)
-          if (stat.ne.0) then
-            i = i - 1
-            exit ! exit the do loop
-          endif
-          if (bias.eq.1) bias_list(i) = spectrum(i,bias+n_ener_grps)
-          i = i + 1
-        enddo
-        
-        ! Check for correct number of voxel entries in gammas file.
-        if (i.ne.n_mesh_cells) write(*,*) 'ERROR: ', i, ' voxels found in ' // &
-                        'gammas file. ', n_mesh_cells, ' expected.'
-
-        CLOSE(unitnum)
-        write(*,*) 'Reading gammas file completed!'
-
-end subroutine read_gammas
-
-
-subroutine read_header (myunit)
-! Read in first 5 lines of gammas file, as well as comment lines
-! 
-! Parameters
-! ----------
-! myunit : int
-!     Unit number for an opened file (i.e. file 'gammas')
-! 
-! Notes
-! -----
-! First 5 non-comment  lines contain the x,y,z mesh intervals
-! and the list of active materials
-! 
-! Also skips over any comment lines (beginning with # character) at start of
-! file.
-! 
-  use source_data
-  implicit none
-        
-        integer, intent(IN) :: myunit
-        integer :: i
-        character :: letter
-        character*30 :: commentline
-
-        ! initialize an empty 'activated materials' array
-        do i=1,100
-          active_mat(i)=0
-        enddo
-
-        ! Read and skip over comment lines
-        do
-          letter = " "
-          read(myunit,'(A)') commentline
-          read(commentline,*,end=976) letter
-976       continue
-
-          if (letter.ne.'#') then
-            backspace(myunit)
-            exit
-          endif
-        enddo
-
-        ! read first parameter line
-        read(myunit,*) i_ints,j_ints,k_ints
-        n_mesh_cells = i_ints * j_ints * k_ints
-
-        ALLOCATE(i_bins(1:i_ints+1))
-        ALLOCATE(j_bins(1:j_ints+1))
-        ALLOCATE(k_bins(1:k_ints+1))
-
-        ! read lines 2,3,4,5
-        read(myunit,*) (i_bins(i),i=1,i_ints+1)
-        read(myunit,*) (j_bins(i),i=1,j_ints+1)
-        read(myunit,*) (k_bins(i),i=1,k_ints+1)
-        read(myunit,'(A)') line
-        read(line,*,end=887) (active_mat(i),i=1,100)
-887     continue
-
-        ! counting number of activated materials specified
-        do i=1,100
-          if (active_mat(i).eq.0) exit
-        enddo
-        n_active_mat = i-1
-
-end subroutine read_header
-
-
-subroutine read_params (myunit)
-! Read in the parameters line, if there is one.
-! 
-! Parameters
-! ----------
-! myunit : int
-!     Unit number for an opened file (i.e. file 'gammas')
-! 
-! Notes
-! -----
-! Line should start with a 'p' and have single characters
-! that are space delimited.
-! 
-! Set various parameters to 1 (true) if they exist.
-  use source_data
-  implicit none
-
-        integer, intent(IN) :: myunit
-
-        integer :: i
-        character, dimension(1:30) :: letters
-        character*30 :: paramline
-
-        ! Initialize parameters to defaults.
-        ! Defaults are chosen such that gammas format specified by Leichtle
-        !  will hopefully be read correctly without a parameters line.
-        !  (untested)
-        bias = 0
-        samp_vox = 1
-        samp_uni = 0
-        debug = 0
-        ergs = 0
-        mat_rej = 1
-        cumulative = 1
-        resample = 0
-        uni_resamp_all = 0
-
-        ! Read enough characters to fill paramline
-        read(myunit,'(A)') paramline
-
-        ! fill list of parameters with placeholder character
-        do i=1,30
-          letters(i) = " "
-        enddo
-
-        ! Place individual characters in a list
-        read(paramline,*,end=876) (letters(i),i=1,30)
-876     continue
-
-        ! No parameter line found
-        if (letters(1).ne.'p') then
-          backspace(myunit)
-          return
-        endif 
-
-        ! If parameters present, we assume everything is disabled initially
-        samp_vox = 0
-        mat_rej = 0
-        cumulative = 0
-
-        do i=2,30
-          SELECT CASE (letters(i))
-          CASE (' ') ! indicates all parameters have been handled.
-            exit
-          CASE ('e')
-            write(*,*) "Custom energy bins will be read."
-            ergs = 1
-          CASE ('m')
-            write(*,*) "Material-based rejection enabled."
-            mat_rej = 1
-          CASE ('b')
-            write(*,*) "Biased sampling of source voxels is enabled."
-            bias = 1
-          ! only want one type of sampling enabled.
-          CASE ('v')
-            write(*,*) "Voxel sampling enabled."
-            samp_uni = 0
-            samp_vox = 1
-          CASE ('u')
-            write(*,*) "Uniform sampling enabled."
-            samp_uni = 1
-            samp_vox = 0
-          CASE ('d')
-            write(*,*) "Debug output of starting positions enabled."
-            debug = 1
-          CASE ('c')
-            write(*,*) "Enabled reading of cumulative energy bins."
-            cumulative = 1
-          CASE ('r')
-            write(*,*) "Enabled resampling for void and/or material rejection."
-            resample = 1
-          CASE ('a')
-            write(*,*) "Uniform sampling will resample entire problem if " // &
-              "void is hit"
-            uni_resamp_all = 1
-          CASE DEFAULT
-            write(*,*) " "
-            write(*,*) "Invalid parameter!: ", letters(i)
-          END SELECT
-
-        enddo
-
-        ! Biasing in conjunction with uniform sampling not supported
-        if (samp_uni.eq.1) bias = 0
-
-end subroutine read_params
-
-
-subroutine read_custom_ergs (myunit)
-! Read line from gammas file to get a custom set of energy bins
-! 
-! Parameters
-! ----------
-! myunit : int
-!     Unit number for an opened file (i.e. file 'gammas')
-! 
-! Notes
-! ------
-! N/A
-  use source_data
-  implicit none
-        
-        integer, intent(IN) :: myunit
-        integer :: i
-
-        read(myunit,*) n_ener_grps ! reads an integer for # of grps
-        backspace(myunit) ! bit of a hack since read(myunit,*,advance='NO') is invalid Fortran
-        ALLOCATE(my_ener_phot(1:n_ener_grps+1))
-        read(myunit,*,end=888) n_ener_grps, (my_ener_phot(i),i=1,n_ener_grps+1)
-888     continue
-
-end subroutine read_custom_ergs
 
 
 subroutine get_tet_vol(mymesh, tet_entity_handle, volume)
@@ -877,12 +576,6 @@ subroutine source
         !  sampling subroutine must set:
         ! -voxel
         ! -xxx, yyy and zzz
-        ! -ii, jj, and kk
-!10      if (samp_vox.eq.1) then
-!          call voxel_sample
-!        elseif (samp_uni.eq.1) then
-!          call uniform_sample
-!        endif
 10      call voxel_sample
 
         ! sample a new position if voxel has zero source strength
@@ -1059,29 +752,6 @@ subroutine voxel_sample
         call sample_region_entity(mesh, entity_handles(voxel))
         
 end subroutine voxel_sample
-
-
-subroutine uniform_sample
-! Uniformly sample photon position in the entire volume of the mesh tally.
-  use source_data
-  implicit none
-
-        integer :: binary_search
-
-        ! Choose position
-        xxx = i_bins(1)+rang()*(i_bins(i_ints+1)-i_bins(1))
-        yyy = j_bins(1)+rang()*(j_bins(j_ints+1)-j_bins(1))
-        zzz = k_bins(1)+rang()*(k_bins(k_ints+1)-k_bins(1))
-
-        ! binary search of mesh planes
-        ! ii, jj, kk are shifted into the range [0, i_ints/j_ints/k_ints].
-        ii = binary_search(xxx, i_ints+1, i_bins) - 1
-        jj = binary_search(yyy, j_ints+1, j_bins) - 1
-        kk = binary_search(zzz, k_ints+1, k_bins) - 1
-
-        voxel = (kk) + (jj)*k_ints + (ii)*j_ints*k_ints + 1
-
-end subroutine uniform_sample
 
 
 integer function binary_search(pos, len, table)

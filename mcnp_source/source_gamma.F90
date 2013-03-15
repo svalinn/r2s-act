@@ -65,7 +65,7 @@
 ! Note that the normalization for voxel and uniform sampling is different, and 
 ! will result in differing gammas files. In general, for voxel sampling,
 ! normalization is based on the average source strength in photons/voxel/s; 
-! For uniform sampling, we want average source strength in phtons/cm3/s.
+! For uniform sampling, we want average source density in phtons/cm3/s.
 ! 
 ! If the R2S-ACT workflow is not being used to generate the gammas file,
 ! one should verify that the gammas files are being generated correctly.
