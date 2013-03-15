@@ -90,6 +90,15 @@
 </li>
 </ul>
 </li>
+<li><a class="reference internal" href="#module-r2s.mcnp.source_moab_doc"><tt class="docutils literal"><span class="pre">source_moab_doc</span></tt> Module</a><ul>
+<li><a class="reference internal" href="#mcnp-source-source-moab-f90">mcnp_source/source_moab.F90</a></li>
+<li><a class="reference internal" href="#id2">Summary</a><ul>
+<li><a class="reference internal" href="#parameters-not-currently-implemented">Parameters (not currently implemented)</a></li>
+<li><a class="reference internal" href="#id3">Other notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -166,9 +175,11 @@ spaces.</p>
 <p>Note that the normalization for voxel and uniform sampling is different, and 
 will result in differing gammas files. In general, for voxel sampling,
 normalization is based on the average source strength in photons/voxel/s; 
-For uniform sampling, we want average source strength in phtons/cm3/s.</p>
-<p>As an exercise to verify that the gammas files are being generated correctly,
-do a test problem and verify that you get the same average energy per source
+For uniform sampling, we want average source density in phtons/cm3/s.</p>
+<p>If the R2S-ACT workflow is not being used to generate the gammas file,
+one should verify that the gammas files are being generated correctly.
+To do this, use a simple test problem to verify that you get the same 
+average energy per source
 particle in all test cases, and that all uniform sampling test cases have a
 weight of 1.0 per source particle. (See the summary table in MCNP output)</p>
 <p>Note that correct normalization also depends on whether
@@ -180,9 +191,9 @@ the necessary re-normalization for voxel sampling.</p>
 <div class="section" id="other-notes">
 <h4>Other notes<a class="headerlink" href="#other-notes" title="Permalink to this headline">¶</a></h4>
 <p>Voxel sampling and energy sampling use a sampling technique referred to as
-&#8216;alias discrete&#8217; or &#8216;alias table&#8217; sampling.  This provides efficiency
-benefits over &#8216;direct discrete&#8217; sampling. Creation of the alias tables uses
-the heap sort algorithm.</p>
+&#8216;alias discrete&#8217; or &#8216;alias&#8217; sampling.  This provides efficiency benefits
+over &#8216;direct discrete&#8217; sampling of PDFs. Creation of the alias tables uses
+the algorithm described by Vose (1991).</p>
 <dl class="function">
 <dt id="r2s.mcnp.source_gamma_doc.gen_alias_table">
 <tt class="descclassname">r2s.mcnp.source_gamma_doc.</tt><tt class="descname">gen_alias_table</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_gamma_doc.gen_alias_table" title="Permalink to this definition">¶</a></dt>
@@ -191,17 +202,17 @@ the heap sort algorithm.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>bins</strong> : list of [int, float] pairs (INOUT)</p>
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>bins</strong> : list of floats (INOUT)</p>
 <blockquote>
-<div><p>PDF&#8217;s bin indices and absolute probabilities.</p>
+<div><p>PDF&#8217;s absolute probabilities</p>
 </div></blockquote>
-<p><strong>pairs</strong> : list of [int, int] pairs (OUT)</p>
+<p><strong>aliases</strong> : list of integers (OUT)</p>
 <blockquote>
-<div><p>Filled with pairs of bin and alias indices.</p>
+<div><p>Filled with alias indices.</p>
 </div></blockquote>
 <p><strong>probs_list</strong> : list of floats (OUT)</p>
 <blockquote>
-<div><p>List of probabilities for first bin in each alias pair.</p>
+<div><p>List of probabilities for each bin/alias pair.</p>
 </div></blockquote>
 <p><strong>len</strong> : int</p>
 <blockquote class="last">
@@ -212,17 +223,16 @@ the heap sort algorithm.</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>note that bins is a list of pairs of the form (probability,value)
-The sum of the probabilities in bins must be 1.</p>
+<p>The sum of the probabilities in bins must be 1.</p>
 <p>We implement the alias table creation algorithm described by Vose (1991).
 For reference:</p>
 <div class="highlight-python"><pre>Vose:      Code:
-p_j        bins(j,1)
+p_j        bins(j)
 large_l    ind_large(l)
 small_s    ind_small(s)
 prob_j     probs_list(j)
-'bin' j    pairs(j,1)
-alias_j    pairs(j,2)</pre>
+'bin' j    j
+alias_j    aliases(j)</pre>
 </div>
 </dd></dl>
 
@@ -242,13 +252,13 @@ alias_j    pairs(j,2)</pre>
 <blockquote>
 <div><p>ergsList values must total 1!</p>
 </div></blockquote>
-<p><strong>myErgPairs</strong> : list of [int, int] (OUT)</p>
+<p><strong>myErgAliases</strong> : list of integers (OUT)</p>
 <blockquote>
-<div><p>The generated pairs of bin and alias indices for the energy PDF</p>
+<div><p>The generated alias indices for the energy PDF</p>
 </div></blockquote>
-<p><strong>myErgPairsProbabilities</strong> : list of floats (OUT)</p>
+<p><strong>myErgBinsProbabilities</strong> : list of floats (OUT)</p>
 <blockquote class="last">
-<div><p>List of probabilities for first bin in each alias pair.</p>
+<div><p>List of probabilities for each bin/alias pair.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -261,7 +271,7 @@ alias_j    pairs(j,2)</pre>
 <tt class="descclassname">r2s.mcnp.source_gamma_doc.</tt><tt class="descname">gen_voxel_alias_table</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_gamma_doc.gen_voxel_alias_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate alias table for voxels in the problem</p>
 <p class="rubric">Notes</p>
-<p>The resulting alias table is stored in lists <cite>pairs</cite> and <cite>pairsProbabilities</cite>.</p>
+<p>The resulting alias table is stored in lists <cite>aliases</cite> and <cite>binsProbabilities</cite>.</p>
 <p>tot_list does not have to be normalized prior to calling this subroutine</p>
 </dd></dl>
 
@@ -349,11 +359,11 @@ that are space delimited.</p>
 </div></blockquote>
 <p><strong>probList</strong> : list of lists of floats</p>
 <blockquote>
-<div><p>List of alias pair probabilities for energy PDF, for each voxel</p>
+<div><p>List of bin probabilities for energy PDF, for each voxel</p>
 </div></blockquote>
-<p><strong>pairsList</strong> : list of lists of [int, int] pairs</p>
+<p><strong>aliasesList</strong> : list of lists of integers</p>
 <blockquote class="last">
-<div><p>Bin and alias indices for energy group, for each voxel</p>
+<div><p>Alias indices for energy group, for each voxel</p>
 </div></blockquote>
 </td>
 </tr>
@@ -362,9 +372,9 @@ that are space delimited.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="r2s.mcnp.source_gamma_doc.sample_within_voxel">
-<tt class="descclassname">r2s.mcnp.source_gamma_doc.</tt><tt class="descname">sample_within_voxel</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_gamma_doc.sample_within_voxel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Samples within the extents of a voxel</p>
+<dt id="r2s.mcnp.source_gamma_doc.sample_hexahedra">
+<tt class="descclassname">r2s.mcnp.source_gamma_doc.</tt><tt class="descname">sample_hexahedra</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_gamma_doc.sample_hexahedra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uniformly samples within the extents of a hexahedral voxel</p>
 <p class="rubric">Notes</p>
 <p>ii, jj, kk are presumed to have been already determined, and have values
 in the range [1, i_ints/j_ints/k_ints].</p>
@@ -404,6 +414,373 @@ subroutine srcdx may also be needed.</p>
 </div>
 </div>
 </div>
+<div class="section" id="module-r2s.mcnp.source_moab_doc">
+<span id="source-moab-doc-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">source_moab_doc</span></tt> Module<a class="headerlink" href="#module-r2s.mcnp.source_moab_doc" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="mcnp-source-source-moab-f90">
+<h3>mcnp_source/source_moab.F90<a class="headerlink" href="#mcnp-source-source-moab-f90" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="id2">
+<h3>Summary<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Adapted from source routine (<cite>source_gamma_meshtal2.F90</cite>) provided by 
+Dieter Leichtle from KIT.
+Changes have been made by Eric Relson with UW-Madison/CNERG goals in mind.</p>
+<p>This source file implements photon source sampling on a mesh.  The voxel
+sampling technique is used, whereby a voxel is first chosen based on relative
+source strengths, and then a point is uniformly, randomly sampled within the
+voxel.  Hexahedral and tetrahedral voxels (and mixes there-of) are supported.</p>
+<p>Subroutine source reads in the file <cite>source.h5m</cite> from the directory
+that MCNP is being run in.  This file is a MOAB mesh containing a mesh that
+overlays the problem geometry, and is tagged with photon source information:
+tags of the form <cite>phtn_src_group_xxx</cite>, where xxx is the 3-digit group number
+with leading zeros.
+These tags should give values of source density in photons/cm3/s.</p>
+<p>Additionally, tags can be included for custom photon energy bins and for bias
+values assigned to each voxel.
+* Energy bins are tagged to the rootSet tag <cite>PHTN_ERGS</cite>
+* Bias values are tagged to each voxel with the tag <cite>PHTN_BIAS</cite></p>
+<div class="section" id="parameters-not-currently-implemented">
+<h4>Parameters (not currently implemented)<a class="headerlink" href="#parameters-not-currently-implemented" title="Permalink to this headline">¶</a></h4>
+<p>These features would be set in the r2s.cfg file.
+* ~~r: Particles starting in a void are resampled (within the same voxel).~~
+* ~~a: Resample entire particle when a particle would start in void. Requires
+u and r to be enabled. Can give incorrect results due to playing an
+unfair game.~~</p>
+<p>~~If the parameters line is not present, the default is to set u, m, c as True.
+If &#8216;e&#8217; parameter exists, line 7 lists custom energy group boundaries, space
+delimited. This line start with the integer number of groups. ~~</p>
+<p>~~Note that correct normalization also depends on whether
+material rejection is being used.~~</p>
+</div>
+<div class="section" id="id3">
+<h4>Other notes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<p>Voxel sampling and energy sampling use a sampling technique referred to as
+&#8216;alias discrete&#8217; or &#8216;alias&#8217; sampling.  This provides efficiency benefits
+over &#8216;direct discrete&#8217; sampling of PDFs. Creation of the alias tables uses
+the algorithm described by Vose (1991).</p>
+<p>The default energy bins are a 42 group structure.</p>
+<p>An arbitrary range of bias values can be used since the source routine does
+the necessary re-normalization for voxel sampling.</p>
+<dl class="function">
+<dt id="r2s.mcnp.source_moab_doc.gen_alias_table">
+<tt class="descclassname">r2s.mcnp.source_moab_doc.</tt><tt class="descname">gen_alias_table</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_moab_doc.gen_alias_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subroutine generates an alias table</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>bins</strong> : list of floats (INOUT)</p>
+<blockquote>
+<div><p>PDF&#8217;s absolute probabilities</p>
+</div></blockquote>
+<p><strong>aliases</strong> : list of integers (OUT)</p>
+<blockquote>
+<div><p>Filled with alias indices.</p>
+</div></blockquote>
+<p><strong>probs_list</strong> : list of floats (OUT)</p>
+<blockquote>
+<div><p>List of probabilities for each bin/alias pair.</p>
+</div></blockquote>
+<p><strong>len</strong> : int</p>
+<blockquote class="last">
+<div><p>Number of bins in the alias table</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The sum of the probabilities in bins must be 1.</p>
+<p>We implement the alias table creation algorithm described by Vose (1991).
+For reference:</p>
+<div class="highlight-python"><pre>Vose:      Code:
+p_j        bins(j)
+large_l    ind_large(l)
+small_s    ind_small(s)
+prob_j     probs_list(j)
+'bin' j    j
+alias_j    aliases(j)</pre>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mcnp.source_moab_doc.gen_erg_alias_table">
+<tt class="descclassname">r2s.mcnp.source_moab_doc.</tt><tt class="descname">gen_erg_alias_table</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_moab_doc.gen_erg_alias_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create alias table for energy bins of a single voxel</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>len</strong> : int</p>
+<blockquote>
+<div><p>length of ergsList</p>
+</div></blockquote>
+<p><strong>ergsList</strong> : list of floats</p>
+<blockquote>
+<div><p>ergsList values must total 1!</p>
+</div></blockquote>
+<p><strong>myErgAliases</strong> : list of integers (OUT)</p>
+<blockquote>
+<div><p>The generated alias indices for the energy PDF</p>
+</div></blockquote>
+<p><strong>myErgBinsProbabilities</strong> : list of floats (OUT)</p>
+<blockquote class="last">
+<div><p>List of probabilities for each bin/alias pair.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mcnp.source_moab_doc.gen_voxel_alias_table">
+<tt class="descclassname">r2s.mcnp.source_moab_doc.</tt><tt class="descname">gen_voxel_alias_table</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_moab_doc.gen_voxel_alias_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate alias table for voxels in the problem</p>
+<p class="rubric">Notes</p>
+<p>The resulting alias table is stored in lists <cite>aliases</cite> and 
+<cite>binsProbabilities</cite>.</p>
+<p>tot_list does not have to be normalized prior to calling this subroutine</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mcnp.source_moab_doc.get_hex_vol">
+<tt class="descclassname">r2s.mcnp.source_moab_doc.</tt><tt class="descname">get_hex_vol</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_moab_doc.get_hex_vol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subroutine calculates volume of a hexahedron entity on a MOAB mesh</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>mymesh</strong> : iMesh_Instance</p>
+<blockquote>
+<div><p>Mesh object</p>
+</div></blockquote>
+<p><strong>entity_handle</strong> : iBase_EntityHandle</p>
+<blockquote>
+<div><p>Entity set handle</p>
+</div></blockquote>
+<p><strong>volume</strong> : float</p>
+<blockquote class="last">
+<div><p>Stores the calculated volume</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Current implementation assumes 8 vertext hex with square planar facets</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mcnp.source_moab_doc.get_tet_vol">
+<tt class="descclassname">r2s.mcnp.source_moab_doc.</tt><tt class="descname">get_tet_vol</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_moab_doc.get_tet_vol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subroutine calculates volume of a tetrahedron entity on a MOAB mesh</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>mymesh</strong> : iMesh_Instance</p>
+<blockquote>
+<div><p>Mesh object</p>
+</div></blockquote>
+<p><strong>tet_entity_handle</strong> : iBase_EntityHandle</p>
+<blockquote>
+<div><p>Entity set handle</p>
+</div></blockquote>
+<p><strong>volume</strong> : float</p>
+<blockquote class="last">
+<div><p>Stores the calculated volume</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Algorithm is from Wikipedia article for Tetrahedrons.
+For points A, B, C, D:</p>
+<div class="highlight-python"><pre>vol = (1/6) * abs( (A-D) . ((B-D) x (C-D)) )</pre>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mcnp.source_moab_doc.print_debug">
+<tt class="descclassname">r2s.mcnp.source_moab_doc.</tt><tt class="descname">print_debug</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_moab_doc.print_debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subroutine stores debug info in an array, and write the array to a file
+after every 10000 particles.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mcnp.source_moab_doc.read_moab">
+<tt class="descclassname">r2s.mcnp.source_moab_doc.</tt><tt class="descname">read_moab</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_moab_doc.read_moab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in the moab mesh, getting the root set and voxel entities, and looking
+for bias and energy tags.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>mymesh</strong> : iMesh_Instance</p>
+<blockquote>
+<div><p>Mesh instance which will be initialized and then read</p>
+</div></blockquote>
+<p><strong>filename</strong> : character array</p>
+<blockquote>
+<div><p>Filename to read mesh data from. (.vtk or .h5m file)</p>
+</div></blockquote>
+<p><strong>rpents</strong> : pointer to array of iBase_EntityHandle</p>
+<blockquote class="last">
+<div><p>Pointer to an array that will be filled with iBase_REGION entity
+handles</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mcnp.source_moab_doc.sample_box">
+<tt class="descclassname">r2s.mcnp.source_moab_doc.</tt><tt class="descname">sample_box</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_moab_doc.sample_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uniformly samples within the extents of a hexahedral voxel</p>
+<p class="rubric">Notes</p>
+<p>ii, jj, kk are presumed to have been already determined, and have values
+in the range [1, i_ints/j_ints/k_ints].</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mcnp.source_moab_doc.sample_erg">
+<tt class="descclassname">r2s.mcnp.source_moab_doc.</tt><tt class="descname">sample_erg</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_moab_doc.sample_erg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample the alias table of energy bins for the selected voxel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>myerg</strong> : float (OUT)</p>
+<blockquote>
+<div><p>Sampled energy is stored in this variable</p>
+</div></blockquote>
+<p><strong>myvoxel</strong> : int</p>
+<blockquote>
+<div><p>Index of sampled voxel</p>
+</div></blockquote>
+<p><strong>n_grp</strong> : int</p>
+<blockquote>
+<div><p>Number of energy groups</p>
+</div></blockquote>
+<p><strong>n_vox</strong> : int</p>
+<blockquote>
+<div><p>Length of next two arrays</p>
+</div></blockquote>
+<p><strong>probList</strong> : list of lists of floats</p>
+<blockquote>
+<div><p>List of bin probabilities for energy PDF, for each voxel</p>
+</div></blockquote>
+<p><strong>aliasesList</strong> : list of lists of integers</p>
+<blockquote class="last">
+<div><p>Alias indices for energy group, for each voxel</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mcnp.source_moab_doc.sample_hexahedra">
+<tt class="descclassname">r2s.mcnp.source_moab_doc.</tt><tt class="descname">sample_hexahedra</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_moab_doc.sample_hexahedra" title="Permalink to this definition">¶</a></dt>
+<dd><p>This subroutine receives the eight vertices of a hexahedron and sets
+xxx, yyy, zzz, to values corresponding to a uniformly sampled point
+within the voxel.</p>
+<p>It is assumed that the hexahedron is a parallelepiped.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>co - list of 12 real*8 values</strong> :</p>
+<blockquote class="last">
+<div><p>The x y z coordinates of four points for a hexaahedron.  These numbers
+are in xxx.. yyy.. zzz.. order.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The algorithm used is ...</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mcnp.source_moab_doc.sample_region_entity">
+<tt class="descclassname">r2s.mcnp.source_moab_doc.</tt><tt class="descname">sample_region_entity</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_moab_doc.sample_region_entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>This subroutine retrieves the vertices of the sampled voxel, and calls
+the appropriate sampling subroutine to get a sampled point.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>mymesh</strong> : iMesh_Instance</p>
+<blockquote>
+<div><p>Mesh object</p>
+</div></blockquote>
+<p><strong>entity_handle</strong> : iBase_EntityHandle</p>
+<blockquote class="last">
+<div><p>Entity set handle</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mcnp.source_moab_doc.sample_tetrahedra">
+<tt class="descclassname">r2s.mcnp.source_moab_doc.</tt><tt class="descname">sample_tetrahedra</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_moab_doc.sample_tetrahedra" title="Permalink to this definition">¶</a></dt>
+<dd><p>This subroutine receives the four vertices of a tetrahedron and sets
+xxx, yyy, zzz, to values corresponding to a uniformly sampled point
+within the tetrahedron.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>co - list of 12 real*8 values</strong> :</p>
+<blockquote class="last">
+<div><p>The x y z coordinates of four points for a tetrahedron.  These numbers
+are in xxx.. yyy.. zzz.. order.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The algorithm used is that described by Rocchini &amp; Cignoni (2001)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mcnp.source_moab_doc.source">
+<tt class="descclassname">r2s.mcnp.source_moab_doc.</tt><tt class="descname">source</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_moab_doc.source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subroutine manages sampling of photons on mesh</p>
+<p>Adapted from dummy source.F90 file.</p>
+<p class="rubric">Notes</p>
+<p>if nsr=0, subroutine source must be furnished by the user.
+at entrance, a random set of uuu,vvv,www has been defined.  the
+following variables must be defined within the subroutine:
+xxx,yyy,zzz,icl,jsu,erg,wgt,tme and possibly ipt,uuu,vvv,www.
+subroutine srcdx may also be needed.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mcnp.source_moab_doc.source_setup">
+<tt class="descclassname">r2s.mcnp.source_moab_doc.</tt><tt class="descname">source_setup</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_moab_doc.source_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subroutine handles parsing of the &#8216;gammas&#8217; file and related initializations</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mcnp.source_moab_doc.voxel_sample">
+<tt class="descclassname">r2s.mcnp.source_moab_doc.</tt><tt class="descname">voxel_sample</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_moab_doc.voxel_sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample photon position from alias table of voxels.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
 </div>
 
 
@@ -417,7 +794,7 @@ subroutine srcdx may also be needed.</p>
         &copy; Copyright 2013, CNERG.
       </p>
       <p>
-      Last updated on Jan 29, 2013.
+      Last updated on Mar 15, 2013.
       </p>
       <p>
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.

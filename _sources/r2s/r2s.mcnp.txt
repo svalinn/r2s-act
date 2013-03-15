@@ -17,3 +17,11 @@ mcnp Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`source_moab_doc` Module
+-----------------------------
+
+.. automodule:: r2s.mcnp.source_moab_doc
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

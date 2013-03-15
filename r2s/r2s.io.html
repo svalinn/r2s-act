@@ -103,7 +103,7 @@
 <span id="read-alara-phtn-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">read_alara_phtn</span></tt> Module<a class="headerlink" href="#module-r2s.io.read_alara_phtn" title="Permalink to this headline">¶</a></h2>
 <p>Module includes methods which find the lines in a &#8216;phtn_src&#8217; file from ALARA
 that match a specified isotope and cooling time, and tags the photon source
-information to a structured mesh.</p>
+information to a mesh.</p>
 <dl class="function">
 <dt id="r2s.io.read_alara_phtn.get_cooling_step_name">
 <tt class="descclassname">r2s.io.read_alara_phtn.</tt><tt class="descname">get_cooling_step_name</tt><big>(</big><em>coolingstep</em>, <em>fr</em><big>)</big><a class="headerlink" href="#r2s.io.read_alara_phtn.get_cooling_step_name" title="Permalink to this definition">¶</a></dt>
@@ -144,11 +144,11 @@ RECEIVES: N/A</p>
 
 <dl class="function">
 <dt id="r2s.io.read_alara_phtn.read_to_h5m">
-<tt class="descclassname">r2s.io.read_alara_phtn.</tt><tt class="descname">read_to_h5m</tt><big>(</big><em>inputfile</em>, <em>sm</em>, <em>isotope='TOTAL'</em>, <em>coolingstep=0</em>, <em>retag=False</em>, <em>totals=False</em><big>)</big><a class="headerlink" href="#r2s.io.read_alara_phtn.read_to_h5m" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read in a phtn_src file and tag the contents to a structured mesh.</p>
+<tt class="descclassname">r2s.io.read_alara_phtn.</tt><tt class="descname">read_to_h5m</tt><big>(</big><em>inputfile</em>, <em>meshobj</em>, <em>isotope='TOTAL'</em>, <em>coolingstep=0</em>, <em>retag=False</em>, <em>totals=False</em><big>)</big><a class="headerlink" href="#r2s.io.read_alara_phtn.read_to_h5m" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in a phtn_src file and tag the contents to a mesh.</p>
 <p>Method reads in a phtn_src file line by line, looking for
 a specific isotope at a specific cooling step, and repeats for each voxel.
-Method tags the structured mesh with the photon source information,
+Method tags the mesh with the photon source information,
 and then saves the mesh.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -158,7 +158,7 @@ and then saves the mesh.</p>
 <blockquote>
 <div><p>Path to an ALARA-style &#8216;phtn_src&#8217; file</p>
 </div></blockquote>
-<p><strong>sm</strong> : scdmesh.ScdMesh</p>
+<p><strong>meshobj</strong> : ScdMesh object</p>
 <blockquote>
 <div><p>Structured mesh object to tag,</p>
 </div></blockquote>
@@ -186,13 +186,34 @@ and then saves the mesh.</p>
 
 <dl class="function">
 <dt id="r2s.io.read_alara_phtn.tag_phtn_src_totals">
-<tt class="descclassname">r2s.io.read_alara_phtn.</tt><tt class="descname">tag_phtn_src_totals</tt><big>(</big><em>sm</em>, <em>numergbins=-1</em>, <em>retag=False</em><big>)</big><a class="headerlink" href="#r2s.io.read_alara_phtn.tag_phtn_src_totals" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">r2s.io.read_alara_phtn.</tt><tt class="descname">tag_phtn_src_totals</tt><big>(</big><em>mesh</em>, <em>voxels</em>, <em>numergbins=-1</em>, <em>retag=False</em><big>)</big><a class="headerlink" href="#r2s.io.read_alara_phtn.tag_phtn_src_totals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method tags the total photon source strength for each voxel.</p>
 <p>ACTION: Method calculate the total photon source strength, and 
-if retagging is enabled or the tag does not exist, tags the structured mesh.
-RECEIVES: sm, scdmesh.ScdMesh object
-OPTIONAL: numergbins, number of energy group tags to read; retag,
-whether to overwrite an existing &#8216;phtn_src_total&#8217; tag.</p>
+if retagging is enabled or the tag does not exist, tags the mesh.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>mesh</strong> : iMesh.Mesh object</p>
+<blockquote>
+<div><p>Mesh from which to get/create/delete tags</p>
+</div></blockquote>
+<p><strong>voxels</strong> : list of iMesh.Entity handles</p>
+<blockquote>
+<div><p>List of voxel entity handles (iBase.Type.Region)</p>
+</div></blockquote>
+<p><strong>numergbins</strong> : int (optional)</p>
+<blockquote>
+<div><p>Number of energy group tags to read</p>
+</div></blockquote>
+<p><strong>retag</strong> : boolean</p>
+<blockquote class="last">
+<div><p>Whether to overwrite existing &#8216;phtn_src_total&#8217; tag. (Default: False)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -341,12 +362,18 @@ in the original MCNP problem.</p>
 <div><p>Normalization factor to multiply into each flux value.</p>
 </div></blockquote>
 <p><strong>Keyword arguments:</strong> :</p>
-<blockquote class="last">
+<blockquote>
 <div><dl class="docutils">
 <dt>smesh: An existing scdmesh on which to tag the fluxes.  </dt>
 <dd><p class="first last">A ScdMeshError is raised if this mesh has incompatible ijk dims</p>
 </dd>
 </dl>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>sm</strong> : ScdMesh object</p>
+<blockquote class="last">
+<div><p>Opened structured mesh from filename, with meshtally data tagged</p>
 </div></blockquote>
 </td>
 </tr>
@@ -408,18 +435,72 @@ in the original MCNP problem.</p>
 <dd></dd></dl>
 
 <dl class="function">
+<dt id="r2s.io.write_alara_fluxin.get_flux_tag_handles">
+<tt class="descclassname">r2s.io.write_alara_fluxin.</tt><tt class="descname">get_flux_tag_handles</tt><big>(</big><em>mesh</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_fluxin.get_flux_tag_handles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method identifies all tags containing flux information from a meshtally</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>mesh</strong> : iMesh.Mesh object</p>
+<blockquote>
+<div><p>MOAB mesh file object containing tags of the form TALLY_TAG_lowE-highE</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>fluxtaghandles</strong> : list of iMesh.Tag objects</p>
+<blockquote class="last">
+<div><p>List of tag handles, sorted by tag name, from lowest energy to high</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="r2s.io.write_alara_fluxin.main">
 <tt class="descclassname">r2s.io.write_alara_fluxin.</tt><tt class="descname">main</tt><big>(</big><em>arguments=None</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_fluxin.main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="r2s.io.write_alara_fluxin.print_fluxes">
-<tt class="descclassname">r2s.io.write_alara_fluxin.</tt><tt class="descname">print_fluxes</tt><big>(</big><em>sm</em>, <em>num_e_groups</em>, <em>backward_bool</em>, <em>fluxin_name</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_fluxin.print_fluxes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descclassname">r2s.io.write_alara_fluxin.</tt><tt class="descname">print_fluxes</tt><big>(</big><em>mesh</em>, <em>num_e_groups</em>, <em>backward_bool</em>, <em>fluxin_name</em>, <em>tags=None</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_fluxin.print_fluxes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method writes tag values to ALARA fluxin format for the flux at each
+energy for each voxel</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>mesh</strong> : iMesh.Mesh object</p>
+<blockquote>
+<div><p>MOAB mesh file object containing tags of the form TALLY_TAG_lowE-highE</p>
+</div></blockquote>
+<p><strong>num_e_groups</strong> : integer</p>
+<blockquote>
+<div><p>Number of energy groups in tally</p>
+</div></blockquote>
+<p><strong>backward_bool</strong> : boolean</p>
+<blockquote>
+<div><p>If true, output data is in order from high energy to low energy.</p>
+</div></blockquote>
+<p><strong>fluxin_name</strong> : string</p>
+<blockquote>
+<div><p>Filename for output ALARA fluxin file</p>
+</div></blockquote>
+<p><strong>tags</strong> : list of iMesh.Tag objects</p>
+<blockquote class="last">
+<div><p>List of tag handles, sorted by tag name, from lowest energy to high</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="r2s.io.write_alara_fluxin.write_alara_fluxin">
-<tt class="descclassname">r2s.io.write_alara_fluxin.</tt><tt class="descname">write_alara_fluxin</tt><big>(</big><em>filename</em>, <em>sm</em>, <em>backwards=False</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_fluxin.write_alara_fluxin" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">r2s.io.write_alara_fluxin.</tt><tt class="descname">write_alara_fluxin</tt><big>(</big><em>filename</em>, <em>mesh</em>, <em>backwards=False</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_fluxin.write_alara_fluxin" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -427,15 +508,35 @@ in the original MCNP problem.</p>
 <span id="write-alara-geom-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">write_alara_geom</span></tt> Module<a class="headerlink" href="#module-r2s.io.write_alara_geom" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="r2s.io.write_alara_geom.create_mixture_definitions">
-<tt class="descclassname">r2s.io.write_alara_geom.</tt><tt class="descname">create_mixture_definitions</tt><big>(</big><em>scdmesh</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_geom.create_mixture_definitions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of unique materials tagged onto the mesh by mmgrid.</p>
-<p>Returns a tuple (unique_mixtures, mat_tags)</p>
+<tt class="descclassname">r2s.io.write_alara_geom.</tt><tt class="descname">create_mixture_definitions</tt><big>(</big><em>mesh</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_geom.create_mixture_definitions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of unique materials tagged onto the mesh.</p>
 <p>unique_mixtures is a dictionary mapping mixture tuples (created through
-create_mixture_tuple) to lists.  The first element in the list is a
+_create_mixture_tuple) to lists.  The first element in the list is a
 unique integer ID for the mixtures; the rest of the elements
 are the hex handles that participate in that mixture.</p>
 <p>mat_tags is a list of the material tags from the input mesh.  This list
 is ordered in the same order as the mixture tuples.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>mesh</strong> : ScdMesh object or iMesh.Mesh object</p>
+<blockquote>
+<div><p>Mesh object to read materials data from</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>...</strong> : tuple</p>
+<blockquote class="last">
+<div><p>A tuple of the list of mixtures and tag handles list;
+i.e. (unique_mixtures, mat_tags)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>It is assumed that the mesh has the &#8216;matVOID&#8217; tag.</p>
 </dd></dl>
 
 <dl class="function">
@@ -445,26 +546,110 @@ is ordered in the same order as the mixture tuples.</p>
 
 <dl class="function">
 <dt id="r2s.io.write_alara_geom.write_alara_geom">
-<tt class="descclassname">r2s.io.write_alara_geom.</tt><tt class="descname">write_alara_geom</tt><big>(</big><em>filename</em>, <em>scdmesh</em>, <em>namedict={}</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_geom.write_alara_geom" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a structured mesh with mmgrid tags, write an ALARA geometry</p>
+<tt class="descclassname">r2s.io.write_alara_geom.</tt><tt class="descname">write_alara_geom</tt><big>(</big><em>filename</em>, <em>mesh</em>, <em>namedict={}</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_geom.write_alara_geom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a mesh with mmgrid tags, write an ALARA geometry file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>filename</strong> : string</p>
+<blockquote>
+<div><p>Path/filename of mesh file to write ALARA geometry to</p>
+</div></blockquote>
+<p><strong>mesh</strong> : ScdMesh object or iMesh.Mesh object</p>
+<blockquote>
+<div><p>Mesh object containing materials tags</p>
+</div></blockquote>
+<p><strong>namedict</strong> : dictionary (optional)</p>
+<blockquote class="last">
+<div><p>Dictionary of names for material compositions</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="r2s.io.write_alara_geom.write_mat_loading">
-<tt class="descclassname">r2s.io.write_alara_geom.</tt><tt class="descname">write_mat_loading</tt><big>(</big><em>scdmesh</em>, <em>mat_tags</em>, <em>mixtures</em>, <em>output_file</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_geom.write_mat_loading" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">r2s.io.write_alara_geom.</tt><tt class="descname">write_mat_loading</tt><big>(</big><em>mesh</em>, <em>mat_tags</em>, <em>mixtures</em>, <em>output_file</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_geom.write_mat_loading" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the mat_loading information to the ALARA geometry output</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>mesh</strong> : ScdMesh object or iMesh.Mesh object</p>
+<blockquote>
+<div><p>Mesh object to read materials data from</p>
+</div></blockquote>
+<p><strong>mat_tags</strong> : ...</p>
+<blockquote>
+<div><p>...</p>
+</div></blockquote>
+<p><strong>mixtures</strong> : ...</p>
+<blockquote>
+<div><p>...</p>
+</div></blockquote>
+<p><strong>output_file</strong> : file object</p>
+<blockquote class="last">
+<div><p>Opened file for writing contents of ALARA geometry</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="r2s.io.write_alara_geom.write_mixtures">
 <tt class="descclassname">r2s.io.write_alara_geom.</tt><tt class="descname">write_mixtures</tt><big>(</big><em>mixtures</em>, <em>mat_tags</em>, <em>name_dict</em>, <em>output_file</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_geom.write_mixtures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the mixture lines to the ALARA geometry output</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>mixtures</strong> : ???</p>
+<blockquote>
+<div><p>...</p>
+</div></blockquote>
+<p><strong>mat_tags</strong> : list of iMesh.Tag entities</p>
+<blockquote>
+<div><p>...</p>
+</div></blockquote>
+<p><strong>name_dict</strong> : dictionary (optional?)</p>
+<blockquote>
+<div><p>Dictionary of names for material compositions</p>
+</div></blockquote>
+<p><strong>output_file</strong> : file object</p>
+<blockquote class="last">
+<div><p>Opened file for writing contents of ALARA geometry</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="r2s.io.write_alara_geom.write_zones">
-<tt class="descclassname">r2s.io.write_alara_geom.</tt><tt class="descname">write_zones</tt><big>(</big><em>scdmesh</em>, <em>output_file</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_geom.write_zones" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write the volume / zone lines to the ALARA geometry output</p>
+<tt class="descclassname">r2s.io.write_alara_geom.</tt><tt class="descname">write_zones</tt><big>(</big><em>mesh</em>, <em>output_file</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_geom.write_zones" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the volume and zone lines to the ALARA geometry output</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>mesh</strong> : ScdMesh object or iMesh.Mesh object</p>
+<blockquote>
+<div><p>Mesh object to read materials data from</p>
+</div></blockquote>
+<p><strong>output_file</strong> : file object</p>
+<blockquote class="last">
+<div><p>Opened file for writing contents of ALARA geometry</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -515,7 +700,7 @@ and generates the gammas file for the modified source.F90 routine.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>sm</strong> : scdmesh.ScdMesh</p>
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>sm</strong> : ScdMesh</p>
 <blockquote>
 <div><p>Structured mesh object to generate &#8216;gammas&#8217; from.</p>
 </div></blockquote>
@@ -561,7 +746,7 @@ These are passed to header creation code.</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>Requires that the structured mesh have photon source strength tags of the
+<p>Requires that the structured mesh has photon source strength tags of the
 form &#8216;phtn_src_group_###&#8217;.
 Will read photon energy bin boundary values if the root set has the tag 
 &#8216;PHTN_ERG&#8217; (a list of floats).</p>
@@ -591,7 +776,7 @@ RECEIVES: N/A</p>
         &copy; Copyright 2013, CNERG.
       </p>
       <p>
-      Last updated on Jan 29, 2013.
+      Last updated on Mar 15, 2013.
       </p>
       <p>
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.

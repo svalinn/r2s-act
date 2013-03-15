@@ -292,19 +292,126 @@ information.</p>
 </div>
 <div class="section" id="module-r2s.mmgrid">
 <span id="mmgrid-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">mmgrid</span></tt> Module<a class="headerlink" href="#module-r2s.mmgrid" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="r2s.mmgrid.MatGrid">
+<em class="property">class </em><tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">MatGrid</tt><big>(</big><em>mesh</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.MatGrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parent class for mmGrid-likes.</p>
+<p>Daughter classes should define
+- create_tags()
+- generate()</p>
+<dl class="method">
+<dt id="r2s.mmgrid.MatGrid.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>mesh</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.MatGrid.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="r2s.mmgrid.SingleMatGrid">
+<em class="property">class </em><tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">SingleMatGrid</tt><big>(</big><em>mesh</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.SingleMatGrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#r2s.mmgrid.MatGrid" title="r2s.mmgrid.MatGrid"><tt class="xref py py-class docutils literal"><span class="pre">r2s.mmgrid.MatGrid</span></tt></a></p>
+<p>Object representing a single material grid</p>
+<p>Each voxel on the grid contains a single material.</p>
+<dl class="method">
+<dt id="r2s.mmgrid.SingleMatGrid.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>mesh</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.SingleMatGrid.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a grid based on a given structured mesh</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.mmgrid.SingleMatGrid.create_tags">
+<tt class="descname">create_tags</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mmgrid.SingleMatGrid.create_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tag voxels with each material</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="r2s.mmgrid.SingleMatGrid.generate">
+<tt class="descname">generate</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mmgrid.SingleMatGrid.generate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get voxel materials by getting voxel centers and checking with DagMC</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="function">
 <dt id="r2s.mmgrid.get_mat_id">
 <tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">get_mat_id</tt><big>(</big><em>materials</em>, <em>volume_id</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.get_mat_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><strong>mat_idx</strong> : int?</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mmgrid.get_point_materials">
+<tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">get_point_materials</tt><big>(</big><em>materials</em>, <em>coords</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.get_point_materials" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query DAGMC for materials at a list of points</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>materials</strong> : dictionary</p>
+<blockquote>
+<div><p>...</p>
+</div></blockquote>
+<p><strong>coords</strong> : list of (x, y, z) float triplets</p>
+<blockquote>
+<div><p>Point coordinates; typically for voxel centers.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>mats</strong> : list of integers</p>
+<blockquote class="last">
+<div><p>List of integers corresponding material at each point in coords.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Requires that DagMC geometry has already been loaded via dagmc.load().</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="r2s.mmgrid.get_vox_centers">
+<tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">get_vox_centers</tt><big>(</big><em>mesh</em>, <em>voxels</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.get_vox_centers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the center point of voxels and return a list of (x,y,z) coords</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>mesh</strong> : iMesh.Mesh object</p>
+<blockquote>
+<div><p>Mesh on which voxels are stored.</p>
+</div></blockquote>
+<p><strong>voxels</strong> : list of iBase.EntityHandles</p>
+<blockquote>
+<div><p>List of volume entities on mesh to get center points of.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>coords</strong> : list of (x, y, z) float triplets</p>
+<blockquote class="last">
+<div><p>Coordinates of voxel centers in mesh&#8217;s canonical voxel order.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="r2s.mmgrid.load_geom">
 <tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">load_geom</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.load_geom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load geometry from the given file into dagmc</p>
-<p>This is provided as a convenience so client code doesn&#8217;t need to invoke pydagmc.</p>
-<p>Note that DagMC can only have one set of geometry loaded per program invocation.
-This means that this function should only be called once, and the resulting 
-geometry will become globally visible to all clients of mmgrid.</p>
+<p>This is provided as a convenience so client code doesn&#8217;t need to invoke 
+pydagmc.  Note that DagMC can only have one set of geometry loaded per 
+program invocation.  This means that this function should only be called 
+once, and the resulting geometry will become globally visible to all 
+clients of mmgrid.</p>
 </dd></dl>
 
 <dl class="function">
@@ -315,7 +422,8 @@ geometry will become globally visible to all clients of mmgrid.</p>
 <dl class="class">
 <dt id="r2s.mmgrid.mmGrid">
 <em class="property">class </em><tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">mmGrid</tt><big>(</big><em>scdmesh</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid" title="Permalink to this definition">¶</a></dt>
-<dd><p>Object representing a macromaterial grid</p>
+<dd><p>Bases: <a class="reference internal" href="#r2s.mmgrid.MatGrid" title="r2s.mmgrid.MatGrid"><tt class="xref py py-class docutils literal"><span class="pre">r2s.mmgrid.MatGrid</span></tt></a></p>
+<p>Object representing a macromaterial grid</p>
 <dl class="method">
 <dt id="r2s.mmgrid.mmGrid.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>scdmesh</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid.__init__" title="Permalink to this definition">¶</a></dt>
@@ -323,8 +431,8 @@ geometry will become globally visible to all clients of mmgrid.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="r2s.mmgrid.mmGrid.createTags">
-<tt class="descname">createTags</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid.createTags" title="Permalink to this definition">¶</a></dt>
+<dt id="r2s.mmgrid.mmGrid.create_tags">
+<tt class="descname">create_tags</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid.create_tags" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -365,7 +473,19 @@ DagMC has geometry loaded with a rectangular graveyard volume</p>
 <dl class="function">
 <dt id="r2s.mmgrid.prepare_materials">
 <tt class="descclassname">r2s.mmgrid.</tt><tt class="descname">prepare_materials</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mmgrid.prepare_materials" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>names</strong> : ?</p>
+<blockquote class="last">
+<div><p>?</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </div>
 <div class="section" id="module-r2s.scdmesh">
@@ -402,11 +522,11 @@ created.</p>
 <p><strong>keyword arguments:</strong> :</p>
 <blockquote class="last">
 <div><dl class="docutils">
-<dt>bdtag :</dt>
+<dt>bdtag <span class="classifier-delimiter">:</span> <span class="classifier">iMesh.Tag handle</span></dt>
 <dd><p class="first last">if the BOX_DIMS tag has already been looked up, it may
 be passed thus</p>
 </dd>
-<dt>_scdset :</dt>
+<dt>_scdset <span class="classifier-delimiter">:</span> <span class="classifier">iMesh.EntitySet handle (?)</span></dt>
 <dd><p class="first last">an existing scdset to use; clients should use 
 fromEntSet() instead of using this parameter.</p>
 </dd>
@@ -620,6 +740,15 @@ with the tag handle &#8216;PHTN_ERGS&#8217;.</p>
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="r2s.mcnp.html#module-r2s.mcnp.source_moab_doc"><tt class="docutils literal"><span class="pre">source_moab_doc</span></tt> Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="r2s.mcnp.html#mcnp-source-source-moab-f90">mcnp_source/source_moab.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="r2s.mcnp.html#id2">Summary</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="r2s.mcnp.html#parameters-not-currently-implemented">Parameters (not currently implemented)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="r2s.mcnp.html#id3">Other notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -638,7 +767,7 @@ with the tag handle &#8216;PHTN_ERGS&#8217;.</p>
         &copy; Copyright 2013, CNERG.
       </p>
       <p>
-      Last updated on Jan 29, 2013.
+      Last updated on Mar 15, 2013.
       </p>
       <p>
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
