@@ -49,14 +49,15 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
         regions of voxels, during uniform sampling, are resampled over the
         entire problem, rather than resampling just the voxel.  This has the
         potential to result in an unfair game.
-    keyword arguments::
+    keyword arguments
         Currently valid: {'title', 'isotope', 'coolingstep'} 
         These are passed to header creation code.
 
     Notes
-    ------
+    -----
     Requires that the structured mesh has photon source strength tags of the
     form 'phtn_src_group_###'.
+
     Will read photon energy bin boundary values if the root set has the tag 
     'PHTN_ERG' (a list of floats).
     """
@@ -327,8 +328,7 @@ def calc_volumes_list(sm):
 
     Notes
     -----
-    ::
-        Voxel ordering follows meshtal file convention which is
+    Voxel ordering follows meshtal file convention which is::
          -for x for y iterate z
          -for x iterate y
          -iterate x
@@ -379,11 +379,13 @@ def _tag_sumvoxelstrengths(sm, val):
 
 
 def main():
-    """ACTION: Method defines an option parser and handles command-line
+    """Method defines an option parser and handles command-line
     usage of this module.
-    REQUIRES: command line arguments to be passed - otherwise prints help
+
+    Notes
+    -----
+    Requires command line arguments to be passed - otherwise prints help
     information.
-    RECEIVES: N/A
     """
 
     usage = "usage: %prog input-h5m-file [options] arg"

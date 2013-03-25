@@ -11,7 +11,7 @@ from r2s.scdmesh import ScdMesh, ScdMeshError
 
 
 def read_to_h5m(inputfile, meshobj, isotope="TOTAL", coolingstep=0, \
-        retag=False, totals=False):
+                retag=False, totals=False):
     """Read in a phtn_src file and tag the contents to a mesh.
     
     Method reads in a phtn_src file line by line, looking for
@@ -175,12 +175,13 @@ def get_cooling_step_name(coolingstep, fr):
 
     Returns
     -------
-    A 2 value tuple: (the cooling step string name, the number of
-    photon energy bins used in the phtn_src file)
+    ... : tuple
+        A 2 value tuple: (the cooling step string name, the number of
+        photon energy bins used in the phtn_src file)
 
     Notes
     -----
-    If `coolingstep` is not an integer, the calling function must catch a
+    If **coolingstep** is not an integer, the calling function must catch a
     ValueError.
     """
     
@@ -225,7 +226,7 @@ def get_cooling_step_name(coolingstep, fr):
 def tag_phtn_src_totals(mesh, voxels, numergbins=-1, retag=False):
     """Method tags the total photon source strength for each voxel.
 
-    ACTION: Method calculate the total photon source strength, and 
+    Method calculate the total photon source strength, and 
     if retagging is enabled or the tag does not exist, tags the mesh.
 
     Parameters
@@ -292,11 +293,13 @@ def tag_phtn_src_totals(mesh, voxels, numergbins=-1, retag=False):
 
 
 def main():
-    """ACTION: Method defines an option parser and handles command-line
+    """Method defines an option parser and handles command-line
     usage of this module.
-    REQUIRES: command line arguments to be passed - otherwise prints help
+    
+    Notes
+    -----
+    Requires command line arguments to be passed - otherwise prints help
     information.
-    RECEIVES: N/A
     """
 
     usage = "usage: %prog [options] arg"
@@ -304,17 +307,17 @@ def main():
     
     # Input and mesh file names
     parser.add_option("-p","--phtn",action="store",dest="phtnsrcfile", \
-            default=False, help="The photon source strengths are read from" \
+            default=False,help="The photon source strengths are read from" \
             "FILENAME.")
     parser.add_option("-m","--mesh",action="store",dest="meshfile", \
-            default="", help="file to write source information to, or" \
+            default="",help="file to write source information to, or" \
             " file name for saving a modified mesh.")
     # Other options
     parser.add_option("-i","--isotope",action="store",dest="isotope", \
-            default="TOTAL", help="The isotope string identifier or 'TOTAL'. "\
+            default="TOTAL",help="The isotope string identifier or 'TOTAL'. "\
             "Default: %default")
     parser.add_option("-c","--coolingstep",action="store",dest="coolingstep", \
-            default=0, help="The cooling step number or string identifier. " \
+            default=0,help="The cooling step number or string identifier. " \
             "(0 is first cooling step)  Default: %default")
     parser.add_option("-r","--retag",action="store_true",dest="retag", \
             default=False,help="Option enables retagging of .h5m meshes. " \

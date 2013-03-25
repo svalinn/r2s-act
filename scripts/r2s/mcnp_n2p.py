@@ -186,6 +186,8 @@ class ModMCNPforPhotons(object):
     def change_block_2(self):
         """Modify contents of self.block2Lines for a photon problem (N/A).
         
+        Notes
+        -----
         Block 2 of MCNP input doesn't depend on particle type
         Thus nothing is done.
         """
@@ -198,11 +200,15 @@ class ModMCNPforPhotons(object):
     def change_block_3(self):
         """Modify contents of self.block3Lines for a photon problem.
         
-        Method 
+        Notes
+        -----
+        Method:
+        
         - changes the mode card from 'mode n' to 'mode p'
         - remove phys:n
         - change inp:n to inp:p
         - comments out any source-definition cards.  These cards are:
+
         sdef, si, sp, sb, sc, ds, kcode, ksrc
         """
         
@@ -433,7 +439,8 @@ class ModMCNPforPhotons(object):
 
         fw.close()
 
-        print "Modified input deck has been written to '{0}'".format(outputFileName)
+        print "Modified input deck has been written to '{0}'".format( \
+                outputFileName)
 
         return 1
 
@@ -444,7 +451,7 @@ def _is_dagmc(filename):
     The test to determine this has two cases::
     - First character of line is a number -> regular MCNP input
     - Otherwise, first character corresponds
-    with some data card... -> DAG MCNP input
+      with some data card... -> DAG MCNP input
     """
 
     fr = open(filename, 'r')
@@ -469,7 +476,7 @@ def _get_coarse_and_intervals(xdiv):
 
     Returns
     --------
-    xCoarse, xSteps - list of floats
+    xCoarse, xSteps : list of floats
         which are lists of floats ...
     """
     xCoarse = [xdiv[0]]
@@ -494,13 +501,13 @@ def _get_coarse_and_intervals(xdiv):
 
 
 def main():
-    """ACTION: Method defines an option parser and handles command-line
+    """Method defines an option parser and handles command-line
     usage of this module.
 
-    REQUIRES: command line arguments to be passed - otherwise prints help
+    Notes
+    -----
+    Requires command line arguments to be passed - otherwise prints help
     information.
-
-    RECEIVES: N/A
     """
 
     usage = "Usage: %prog INPUTFILE [options]\n\n" \

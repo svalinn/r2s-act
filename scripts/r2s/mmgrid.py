@@ -201,7 +201,7 @@ class SingleMatGrid(MatGrid):
     """
 
     def __init__( self, mesh ):
-        """Create a grid based on a given structured mesh"""
+        """Create a grid based on a given mesh"""
         MatGrid.__init__(self, mesh)
         self.mesh = mesh
 
