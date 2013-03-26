@@ -185,6 +185,7 @@ energies have been tagged to &#8216;sm.imesh.rootSet&#8217;.</p>
 <dt id="r2s.mcnp_n2p.ModMCNPforPhotons.change_block_2">
 <tt class="descname">change_block_2</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp_n2p.ModMCNPforPhotons.change_block_2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Modify contents of self.block2Lines for a photon problem (N/A).</p>
+<p class="rubric">Notes</p>
 <p>Block 2 of MCNP input doesn&#8217;t depend on particle type
 Thus nothing is done.</p>
 </dd></dl>
@@ -193,12 +194,15 @@ Thus nothing is done.</p>
 <dt id="r2s.mcnp_n2p.ModMCNPforPhotons.change_block_3">
 <tt class="descname">change_block_3</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp_n2p.ModMCNPforPhotons.change_block_3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Modify contents of self.block3Lines for a photon problem.</p>
-<p>Method 
-- changes the mode card from &#8216;mode n&#8217; to &#8216;mode p&#8217;
-- remove phys:n
-- change inp:n to inp:p
-- comments out any source-definition cards.  These cards are:
-sdef, si, sp, sb, sc, ds, kcode, ksrc</p>
+<p class="rubric">Notes</p>
+<p>Method:</p>
+<ul class="simple">
+<li>changes the mode card from &#8216;mode n&#8217; to &#8216;mode p&#8217;</li>
+<li>remove phys:n</li>
+<li>change inp:n to inp:p</li>
+<li>comments out any source-definition cards.  These cards are:</li>
+</ul>
+<p>sdef, si, sp, sb, sc, ds, kcode, ksrc</p>
 </dd></dl>
 
 <dl class="method">
@@ -282,11 +286,11 @@ name is used, with an appened _p prior to any suffix (e.g. .inp).</p>
 <dl class="function">
 <dt id="r2s.mcnp_n2p.main">
 <tt class="descclassname">r2s.mcnp_n2p.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp_n2p.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>ACTION: Method defines an option parser and handles command-line
+<dd><p>Method defines an option parser and handles command-line
 usage of this module.</p>
-<p>REQUIRES: command line arguments to be passed - otherwise prints help
+<p class="rubric">Notes</p>
+<p>Requires command line arguments to be passed - otherwise prints help
 information.</p>
-<p>RECEIVES: N/A</p>
 </dd></dl>
 
 </div>
@@ -315,7 +319,7 @@ information.</p>
 <dl class="method">
 <dt id="r2s.mmgrid.SingleMatGrid.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>mesh</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.SingleMatGrid.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a grid based on a given structured mesh</p>
+<dd><p>Create a grid based on a given mesh</p>
 </dd></dl>
 
 <dl class="method">
@@ -767,7 +771,7 @@ with the tag handle &#8216;PHTN_ERGS&#8217;.</p>
         &copy; Copyright 2013, CNERG.
       </p>
       <p>
-      Last updated on Mar 15, 2013.
+      Last updated on Mar 26, 2013.
       </p>
       <p>
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.

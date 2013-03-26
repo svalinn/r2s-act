@@ -121,25 +121,28 @@ the file stream &#8216;fr&#8217;, and determine the corresponding cooling step s
 <p><strong>fr</strong> : readable file stream</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>A 2 value tuple: (the cooling step string name, the number of</strong> :</p>
-<p class="last"><strong>photon energy bins used in the phtn_src file)</strong> :</p>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>...</strong> : tuple</p>
+<blockquote class="last">
+<div><p>A 2 value tuple: (the cooling step string name, the number of
+photon energy bins used in the phtn_src file)</p>
+</div></blockquote>
 </td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>If <cite>coolingstep</cite> is not an integer, the calling function must catch a
+<p>If <strong>coolingstep</strong> is not an integer, the calling function must catch a
 ValueError.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="r2s.io.read_alara_phtn.main">
 <tt class="descclassname">r2s.io.read_alara_phtn.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.io.read_alara_phtn.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>ACTION: Method defines an option parser and handles command-line
-usage of this module.
-REQUIRES: command line arguments to be passed - otherwise prints help
-information.
-RECEIVES: N/A</p>
+<dd><p>Method defines an option parser and handles command-line
+usage of this module.</p>
+<p class="rubric">Notes</p>
+<p>Requires command line arguments to be passed - otherwise prints help
+information.</p>
 </dd></dl>
 
 <dl class="function">
@@ -188,7 +191,7 @@ and then saves the mesh.</p>
 <dt id="r2s.io.read_alara_phtn.tag_phtn_src_totals">
 <tt class="descclassname">r2s.io.read_alara_phtn.</tt><tt class="descname">tag_phtn_src_totals</tt><big>(</big><em>mesh</em>, <em>voxels</em>, <em>numergbins=-1</em>, <em>retag=False</em><big>)</big><a class="headerlink" href="#r2s.io.read_alara_phtn.tag_phtn_src_totals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method tags the total photon source strength for each voxel.</p>
-<p>ACTION: Method calculate the total photon source strength, and 
+<p>Method calculate the total photon source strength, and 
 if retagging is enabled or the tag does not exist, tags the mesh.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -679,14 +682,10 @@ i.e. (unique_mixtures, mat_tags)</p>
 </table>
 <p class="rubric">Notes</p>
 <dl class="docutils">
-<dt>::</dt>
-<dd><dl class="first last docutils">
-<dt>Voxel ordering follows meshtal file convention which is</dt>
+<dt>Voxel ordering follows meshtal file convention which is::</dt>
 <dd>-for x for y iterate z
 -for x iterate y
 -iterate x</dd>
-</dl>
-</dd>
 </dl>
 </dd></dl>
 
@@ -736,7 +735,7 @@ regions of voxels, during uniform sampling, are resampled over the
 entire problem, rather than resampling just the voxel.  This has the
 potential to result in an unfair game.</p>
 </div></blockquote>
-<p><strong>keyword arguments::</strong> :</p>
+<p><strong>keyword arguments</strong> :</p>
 <blockquote class="last">
 <div><p>Currently valid: {&#8216;title&#8217;, &#8216;isotope&#8217;, &#8216;coolingstep&#8217;} 
 These are passed to header creation code.</p>
@@ -747,19 +746,19 @@ These are passed to header creation code.</p>
 </table>
 <p class="rubric">Notes</p>
 <p>Requires that the structured mesh has photon source strength tags of the
-form &#8216;phtn_src_group_###&#8217;.
-Will read photon energy bin boundary values if the root set has the tag 
+form &#8216;phtn_src_group_###&#8217;.</p>
+<p>Will read photon energy bin boundary values if the root set has the tag 
 &#8216;PHTN_ERG&#8217; (a list of floats).</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="r2s.io.write_gammas.main">
 <tt class="descclassname">r2s.io.write_gammas.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.io.write_gammas.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>ACTION: Method defines an option parser and handles command-line
-usage of this module.
-REQUIRES: command line arguments to be passed - otherwise prints help
-information.
-RECEIVES: N/A</p>
+<dd><p>Method defines an option parser and handles command-line
+usage of this module.</p>
+<p class="rubric">Notes</p>
+<p>Requires command line arguments to be passed - otherwise prints help
+information.</p>
 </dd></dl>
 
 </div>
@@ -776,7 +775,7 @@ RECEIVES: N/A</p>
         &copy; Copyright 2013, CNERG.
       </p>
       <p>
-      Last updated on Mar 15, 2013.
+      Last updated on Mar 26, 2013.
       </p>
       <p>
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.

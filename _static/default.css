@@ -83,7 +83,8 @@ img { border: none; }
 acronym, abbr.initialism, dfn { cursor: help; }
 abbr { speak: spell-out; }
 acronym, abbr.truncation, dfn { speak: normal; }
-cite { font-style: italic; }
+/*cite { font-style: italic; }*/
+cite { font-family:Courier; background: #ffefef; border: 1px solid #ffaaaa; margin: 0; }
 strong { font-weight: bold; }
 em { font-style: italic; }
 li h3, li p, li a { font-size: 1em; }
@@ -707,7 +708,8 @@ body {
 
 #sidebar ul ul { margin: 0 0 0 1em;}
 
-ol { list-style-type: lower-alpha; margin: 0 0 0 3em;}
+/*ol { list-style-type: lower-alpha; margin: 0 0 0 3em;}*/
+ol { list-style-type: decimal; margin: 0.5em 0 0.5em 3em; text-indent: 0px; padding: 0 1em 0}
 
 .page #sidebar .related_posts {
   margin: 16px 16px 32px;
@@ -1101,3 +1103,11 @@ img.ui-img {
   vertical-align:text-bottom !important;
   width:16px !important;
 }
+
+/*numpydocs stuff*/
+.function { margin-top: 1.5em; }
+.method { margin-top: 1.5em; }
+.descclassname { font-weight: bold; }
+.descname { font-weight: bold; border-bottom: 2px dotted black; }
+.rubric { font-size: 12px !important; font-weight: bold; }
+.field-name { font-weight: bold italic; font-size: 15px; width: 7em; }
