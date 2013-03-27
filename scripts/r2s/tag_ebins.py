@@ -48,15 +48,15 @@ def read_and_tag_phtn_ergs(fr, sm):
             return 0
 
     try:
-        phtn_ergs = sm.imesh.createTag("PHTN_ERGS", len(ergs), float)
+        phtn_ergs_tag = sm.imesh.createTag("PHTN_ERGS", len(ergs), float)
 
     except iBase.TagAlreadyExistsError:
         # We completely rewrite the tag if it already existed
         sm.imesh.destroyTag(sm.imesh.getTagHandle("PHTN_ERGS"), force=True)
-        phtn_ergs = sm.imesh.createTag("PHTN_ERGS", len(ergs), float)
+        phtn_ergs_tag = sm.imesh.createTag("PHTN_ERGS", len(ergs), float)
 
     # Give the values to the mesh tag on the scdset
-    phtn_ergs[sm.scdset] = ergs
+    phtn_ergs_tag[sm.scdset] = ergs
     print "{0} energies have been added to the mesh on the PHTN_SRC tag of " \
             "the scdset.".format(len(ergs))
 
