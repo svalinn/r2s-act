@@ -54,6 +54,8 @@ def gen_iso_cool_lists(opt_isotope, opt_cooling, phtn_src):
     opt_cooling : int or string
         The cooling step, either as a numeric index (from 0) or a string
         identifier as listed in phtn_src file
+    phtn_src : string
+        Path to phtn_src file used for finding cooling steps/isotopes
 
     Returns
     -------
@@ -139,6 +141,8 @@ def make_folders(iso_list, cool_list, thisdir=os.curdir):
         List of the isotope strings
     cool_list : list of strings
         List of the cooling step strings
+    thisdir : string (optional)
+        Path to folder where new folders will be created
 
     Returns
     -------
@@ -195,7 +199,7 @@ def create_new_files(path_list, datafile, cfgfile, mcnp_n_problem,
         newfile = os.path.join(thisdir, folder, os.path.basename(cfgfile))
 
         _copy_and_mod_r2scfg(oldfile, newfile, iso, time, mcnp_n_problem, 
-                             phtn_src)
+                             mcnp_p_problem, phtn_src, datafile)
 
         # Copy and modify mcnp input for photon transport
         oldfile = mcnp_p_problem
@@ -204,7 +208,8 @@ def create_new_files(path_list, datafile, cfgfile, mcnp_n_problem,
         _copy_and_mod_mcnpinp(oldfile, newfile, iso, time)
 
 
-def _copy_and_mod_r2scfg(oldfile, newfile, iso, time, mcnp_n_problem, phtn_src):
+def _copy_and_mod_r2scfg(oldfile, newfile, iso, time, mcnp_n_problem,
+        mcnp_p_problem, phtn_src, datafile):
     """Open r2s.cfg and copy contents with replacements to the new r2s.cfg
  
     Parameters
@@ -219,8 +224,12 @@ def _copy_and_mod_r2scfg(oldfile, newfile, iso, time, mcnp_n_problem, phtn_src):
         Cooling time string
     mcnp_n_problem : string
         Path to existing MCNP input for neutron transport
+    mcnp_p_problem : string
+        Path to MCNP input for photon transport
     phtn_src : string
         Path to phtn_src file output by ALARA
+    datafile : string
+        Path to .h5m structured mesh file
     """
     with open(oldfile, 'r') as source:
         with open(newfile, 'w') as target:
@@ -238,11 +247,22 @@ def _copy_and_mod_r2scfg(oldfile, newfile, iso, time, mcnp_n_problem, phtn_src):
 
             # Modify file paths
             changed = re.sub(
+                    'step1_datafile =.*?\n',
+                    'step1_datafile = {0}\n'.format(os.path.basename(datafile)),
+                    changed)
+
+            changed = re.sub(
                     'neutron_mcnp_input =.*?\n',
                     'neutron_mcnp_input = {0}\n'.format(
                             os.path.relpath(
                                     mcnp_n_problem, os.path.dirname(newfile) )
                             ),
+                    changed)
+
+            changed = re.sub(
+                    'photon_mcnp_input =.*?\n',
+                    'photon_mcnp_input = {0}\n'.format(
+                        os.path.basename(mcnp_p_problem)),
                     changed)
 
             changed = re.sub(
@@ -304,22 +324,23 @@ def _copy_and_mod_mcnpinp(oldfile, newfile, iso, time):
                 "not copied.".format(oldfile, newfile)
 
 
-def gen_run_script(path_list):
+def gen_run_script(path_list, outscriptdir=os.curdir):
     """Create shell script in parent directory to run all r2s_step2 cases
     
     Parameters
     ----------
     path_list : list of strings
         List of the file paths of the created folders.
+    outscriptdir : string
+        Folder to create 'run script' in.
     """
     
-    thisdir = os.curdir
     scriptdir = os.path.dirname(os.path.abspath(__file__))
     scriptpath = os.path.join(scriptdir, "r2s_step2.py")
-    with open(os.path.join(thisdir, "r2s_run_all_step2.sh"), 'w') as fw:
-        #fw.write("#! /usr/env/bin python\n\n")
+    with open(os.path.join(outscriptdir, "r2s_run_all_step2.sh"), 'w') as fw:
         fw.write("rm phtn_src_totals\n")
         for path in path_list:
+            path = os.path.relpath(path, outscriptdir)
             fw.write("cd {0}\n".format(path))
             fw.write("rm phtn_src_total\n")
             fw.write(scriptpath + '\n')
@@ -331,7 +352,7 @@ def gen_run_script(path_list):
         fw.write("cat phtn_src_totals\n")
 
     os.system("chmod +x {0}".format( \
-            os.path.join(thisdir, "r2s_run_all_step2.sh")))
+            os.path.join(outscriptdir, "r2s_run_all_step2.sh")))
 
 
 if __name__ == "__main__":
@@ -361,7 +382,8 @@ if __name__ == "__main__":
                 thisdir=os.path.dirname(mcnp_p_problem))
         create_new_files(path_list, datafile, cfgfile, mcnp_n_problem, \
                 mcnp_p_problem, phtn_src)
-        gen_run_script([x[0] for x in path_list])
+        gen_run_script([x[0] for x in path_list], \
+                os.path.dirname(mcnp_p_problem))
 
     except R2S_CFG_Error as e:
         print "ERROR: {0}\n(in r2s.cfg file {1})".format( e, \
