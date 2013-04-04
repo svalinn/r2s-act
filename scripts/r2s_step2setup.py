@@ -236,13 +236,24 @@ def _copy_and_mod_r2scfg(oldfile, newfile, iso, time, mcnp_n_problem, phtn_src):
                     'photon_cooling = {0}\n'.format(time),
                     changed)
 
-            changed = re.sub('neutron_mcnp_input =.*?\n',
-                    'neutron_mcnp_input = ../{0}\n'.format(mcnp_n_problem),
-                    changed)
-            changed = re.sub('alara_phtn_src =.*?\n',
-                    'alara_phtn_src = ../{0}\n'.format(phtn_src),
+            # Modify file paths
+            changed = re.sub(
+                    'neutron_mcnp_input =.*?\n',
+                    'neutron_mcnp_input = {0}\n'.format(
+                            os.path.relpath(
+                                    mcnp_n_problem, os.path.dirname(newfile) )
+                            ),
                     changed)
 
+            changed = re.sub(
+                    'alara_phtn_src =.*?\n',
+                    'alara_phtn_src = {0}\n'.format(
+                            os.path.relpath(
+                                phtn_src, os.path.dirname(newfile) )
+                            ),
+                    changed)
+
+            # Add header/timestamp and save changes
             target.write("### Modified file generated for isotope {0} and " \
                     "cooling step {1} at {2}\n".format(iso, time, \
                             strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime()) ))
