@@ -198,9 +198,8 @@ def create_new_files(path_list, datafile, cfgfile, mcnp_n_problem,
                              phtn_src)
 
         # Copy and modify mcnp input for photon transport
-        oldfile = os.path.join(thisdir, os.path.basename(mcnp_p_problem))
-        newfile = os.path.join(
-                thisdir, folder, os.path.basename(mcnp_p_problem))
+        oldfile = mcnp_p_problem
+        newfile = os.path.join(folder, os.path.basename(oldfile))
 
         _copy_and_mod_mcnpinp(oldfile, newfile, iso, time)
 
@@ -290,8 +289,8 @@ def _copy_and_mod_mcnpinp(oldfile, newfile, iso, time):
                 target.write(source.read())
 
     except IOError:
-        print " WARNING: {0} doesn't exist. MCNP photon input was not copied." \
-                "".format(oldfile)
+        print " WARNING: Failed to copy {0} to {1}. MCNP photon input was " \
+                "not copied.".format(oldfile, newfile)
 
 
 def gen_run_script(path_list):
