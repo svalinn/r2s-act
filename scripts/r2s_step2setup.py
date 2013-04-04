@@ -67,7 +67,7 @@ def gen_iso_cool_lists(opt_isotope, opt_cooling, phtn_src):
     Checks phtn_src file if numeric cooling step values are given and grabs the
     corresponding string values.
     """
-    #defaults
+    # defaults
     iso_list = ['TOTAL']
     cool_list = ['shutdown']
 
@@ -128,7 +128,7 @@ def gen_iso_cool_lists(opt_isotope, opt_cooling, phtn_src):
     return iso_list, cool_list
 
 
-def make_folders(iso_list, cool_list):
+def make_folders(iso_list, cool_list, thisdir=os.curdir):
     """Create directories for each case with naming isotope_cooling_time 
     
     Example naming: mn-56_1_d or TOTAL_5_h
@@ -146,11 +146,12 @@ def make_folders(iso_list, cool_list):
         List of the file paths of the created folders.
     """
     path_list = list()
-    thisdir = os.curdir
+    
     for iso in iso_list:
         for time in cool_list:
             thispath = "{0}_{1}".format(iso, time.replace(' ', '_'))
             path_list.append([os.path.join(thisdir, thispath), iso, time])
+            # Create new folder
             try:
                 os.mkdir(os.path.join(thisdir, thispath))
             except OSError:
@@ -189,15 +190,18 @@ def create_new_files(path_list, datafile, cfgfile, mcnp_n_problem,
         # Copy .h5m datafile
         copy(os.path.join(thisdir, datafile), folder)
 
+        # Copy and modify r2s.cfg file
         oldfile = os.path.join(thisdir, cfgfile)
         newfile = os.path.join(thisdir, folder, os.path.basename(cfgfile))
 
         _copy_and_mod_r2scfg(oldfile, newfile, iso, time, mcnp_n_problem, 
                              phtn_src)
 
+        # Copy and modify mcnp input for photon transport
         oldfile = os.path.join(thisdir, os.path.basename(mcnp_p_problem))
         newfile = os.path.join(
                 thisdir, folder, os.path.basename(mcnp_p_problem))
+
         _copy_and_mod_mcnpinp(oldfile, newfile, iso, time)
 
 
@@ -325,16 +329,26 @@ if __name__ == "__main__":
     cfgfile = 'r2s.cfg'
     if len(sys.argv) > 1:
         cfgfile = sys.argv[1]
+        if os.path.dirname(cfgfile):
+            print "ERROR: Script must be run in folder where config file is " \
+                    "located"
+            sys.exit()
 
     config = ConfigParser.SafeConfigParser()
-    config.read(cfgfile)
+    assert config.read(cfgfile), "File '{0}' couldn't be read".format(cfgfile)
 
     try:
         (mcnp_n_problem, mcnp_p_problem, datafile, phtn_src, opt_isotope, \
                 opt_cooling) = load_configs(config)
+
+        # Check that files to be copied exist.
+        for file in (mcnp_n_problem, mcnp_p_problem, datafile, phtn_src):
+            assert os.path.isfile(file), "File '{0}' not found.".format(file)
+
         iso_list, cool_list = gen_iso_cool_lists(opt_isotope, opt_cooling, \
                 phtn_src)
-        path_list = make_folders(iso_list, cool_list)
+        path_list = make_folders(iso_list, cool_list, \
+                thisdir=os.path.dirname(mcnp_p_problem))
         create_new_files(path_list, datafile, cfgfile, mcnp_n_problem, \
                 mcnp_p_problem, phtn_src)
         gen_run_script([x[0] for x in path_list])

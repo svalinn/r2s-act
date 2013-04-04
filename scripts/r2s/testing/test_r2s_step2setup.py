@@ -26,42 +26,41 @@ class TestLoadConfigs(unittest.TestCase):
         with NTF() as cfgNTF:
             # Create placeholder for r2s.cfg file
             cfgNTF.write("[r2s-files]\n" \
-                    "neutron_mcnp_input = mcnp_n\n" \
-                    "photon_mcnp_input = mcnp_p\n" \
-                    "step1_datafile = mesh.h5m\n" \
-                    "alara_phtn_src = phtn_src\n" \
-                    "[r2s-params]\n" \
-                    "photon_isotope = u235\n" \
-                    "photon_cooling = shutdown\n" \
-                    )
+                         "neutron_mcnp_input = mcnp_n\n" \
+                         "photon_mcnp_input = mcnp_p\n" \
+                         "step1_datafile = mesh.h5m\n" \
+                         "alara_phtn_src = phtn_src\n" \
+                         "[r2s-params]\n" \
+                         "photon_isotope = u235\n" \
+                         "photon_cooling = shutdown\n" \
+                         )
             cfgNTF.seek(0) # Goes to beginning
 
             config = ConfigParser.SafeConfigParser()
             config.read(cfgNTF.name)
 
-            mcnp_n, mcnp_p, datafile, phtn_src, iso, cool = \
-                    s2s.load_configs(config)
+        mcnp_n, mcnp_p, datafile, phtn_src, iso, cool = s2s.load_configs(config)
 
-            # Check for correctness
-            self.assertEqual(mcnp_n, 'mcnp_n')
-            self.assertEqual(mcnp_p, 'mcnp_p')
-            self.assertEqual(datafile, 'mesh.h5m')
-            self.assertEqual(phtn_src, 'phtn_src')
-            self.assertEqual(iso, 'u235')
-            self.assertEqual(cool, 'shutdown')
+        # Check for correctness
+        self.assertEqual(mcnp_n, 'mcnp_n')
+        self.assertEqual(mcnp_p, 'mcnp_p')
+        self.assertEqual(datafile, 'mesh.h5m')
+        self.assertEqual(phtn_src, 'phtn_src')
+        self.assertEqual(iso, 'u235')
+        self.assertEqual(cool, 'shutdown')
 
 
 class TestGenIsoCoolLists(unittest.TestCase):
 
     def setUp(self):
         self.NTFcontents = ("a\tshutdown\n" \
-                    "a\t1_d\n" \
-                    "a\t2 w\n" \
-                    "a\t99 y\n" \
-                    "a\twhoops\n" \
-                    "a\ttoo far\n" \
-                    "b\t1_d\n"
-                    )
+                            "a\t1_d\n" \
+                            "a\t2 w\n" \
+                            "a\t99 y\n" \
+                            "a\twhoops\n" \
+                            "a\ttoo far\n" \
+                            "b\t1_d\n"
+                            )
     
     def tearDown(self):
         pass
@@ -201,7 +200,7 @@ class TestMakeFolders(unittest.TestCase):
                 os.path.join(thisdir, "b_1_d"),
                 os.path.join(thisdir, "b_2_w"),
                 os.path.join(thisdir, "b_shutdown")]
-        s2s.make_folders(self.isolist, self.coollist)
+        s2s.make_folders(self.isolist, self.coollist, thisdir)
         for path in expected:
             self.assertTrue(os.path.isdir(path))
         pass
@@ -210,13 +209,14 @@ class TestMakeFolders(unittest.TestCase):
         """Verify list of folders to be generated
         """
         thisdir = os.curdir
+        
         expected = [ [os.path.join(thisdir, "a_1_d"), "a", "1 d"],
                 [os.path.join(thisdir, "a_2_w"), "a", "2 w"],
                 [os.path.join(thisdir, "a_shutdown"), "a", "shutdown"],
                 [os.path.join(thisdir, "b_1_d"), "b", "1 d"],
                 [os.path.join(thisdir, "b_2_w"), "b", "2 w"],
                 [os.path.join(thisdir, "b_shutdown"), "b", "shutdown"] ]
-        result = s2s.make_folders(self.isolist, self.coollist)
+        result = s2s.make_folders(self.isolist, self.coollist, thisdir)
         expected.sort()
         result.sort()
         self.assertEqual(expected, result)
@@ -238,7 +238,7 @@ class TestCreateNewFiles(unittest.TestCase):
         # Make the directories for the various cases
         self.isolist = ["a", "b"]
         self.coollist = ["1 d", "2 w", "shutdown"]
-        self.path_list = s2s.make_folders(self.isolist, self.coollist)
+        self.path_list = s2s.make_folders(self.isolist, self.coollist, self.tempdir)
         #print >>sys.stderr, [x[0] for x in self.path_list]
     
     def tearDown(self):
@@ -251,7 +251,7 @@ class TestCreateNewFiles(unittest.TestCase):
         """
         # Create placeholder for phtn_src file
         with contextlib.nested(
-                NTF(prefix='data_',dir=os.curdir),
+                NTF(prefix='data_', dir=os.curdir),
                 NTF(prefix='cfg_', dir=os.curdir),
                 NTF(prefix='inpp_', dir=os.curdir)) as \
                 (dataNTF, cfgNTF, inppNTF):
@@ -267,7 +267,8 @@ class TestCreateNewFiles(unittest.TestCase):
             inppNTF.write("Fake title card line\nAnother line.\n")
             inppNTF.seek(0) # Goes to beginning
         
-            s2s.create_new_files(self.path_list, dataNTF.name, cfgNTF.name, "mcnp_n.inp", inppNTF.name, "phtn_src")
+            s2s.create_new_files(self.path_list, dataNTF.name, cfgNTF.name, 
+                    "mcnp_n.inp", inppNTF.name, "phtn_src")
 
             # Check that files were copied
             for folder in os.listdir(os.curdir):
