@@ -28,7 +28,7 @@ def test_wwinp_to_h5m():
                 written = written_sm.imesh.getTagHandle('ww_n_group_001')[written_voxel]
                 assert_equal(written, expected)
     
-    #os.remove(output)
+    os.remove(output)
 
 
 # Run as script
