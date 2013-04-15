@@ -5,7 +5,7 @@ from itaps import iMesh, iBase
 from r2s.scdmesh import ScdMesh
 
 def test_wwinp_to_h5m():
-    wwinp = 'files_test_wwinp_to_h5m/wwinp_test.txt'
+    wwinp = 'files_test_wwinp_to_h5m/wwinp_test.e'
     output = 'wwinp_mesh.h5m'
     
     if output in os.listdir('.'):
@@ -28,7 +28,7 @@ def test_wwinp_to_h5m():
                 written = written_sm.imesh.getTagHandle('ww_n_group_001')[written_voxel]
                 assert_equal(written, expected)
     
-    os.remove(output)
+    #os.remove(output)
 
 
 # Run as script

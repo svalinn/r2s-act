@@ -111,7 +111,7 @@ def tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nf, output, particle):
        wwinp then saves to output.
     """
     # ordered voxels, z changes fastest, then y, then x.
-    voxels=list(sm.iterateHex('xyz'))
+    voxels=list(sm.iterateHex('zyx'))   
 
     # iterate over energy groups
     line_num = ww_first_line
@@ -161,10 +161,11 @@ def main(arguments=None):
     nr = linecache.getline(args[0],1).split()[3]
     if int(nr) == 10:
         cartesian(args[0], opts.output)
+        print "WW mesh saved to {0}".format(opts.output)
+
     elif int(nr) == 16:
         cylindrical(args[0], opts.output)
-
-    print "WW mesh saved to {0}".format(opts.output)       
+    
 
 if __name__ == '__main__':
     # No arguments case -> print help output
