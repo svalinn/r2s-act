@@ -5,8 +5,9 @@ from itaps import iMesh, iBase
 from r2s.scdmesh import ScdMesh
 
 def test_wwinp_to_h5m():
-    wwinp = 'files_test_wwinp_to_h5m/wwinp_test.e'
-    output = 'wwinp_mesh.h5m'
+    thisdir = os.path.dirname(__file__)
+    wwinp = os.path.join(thisdir, 'files_test_wwinp_to_h5m/wwinp_test.e')
+    output = os.path.join(os.getcwd(), 'wwinp_mesh.h5m')
     
     if output in os.listdir('.'):
         os.remove(output)
@@ -16,7 +17,7 @@ def test_wwinp_to_h5m():
     with open(output) as f:
         written = f.read()
     
-    expected_sm = ScdMesh.fromFile('files_test_wwinp_to_h5m/expected_wwinp_mesh.h5m')
+    expected_sm = ScdMesh.fromFile(os.path.join(thisdir, 'files_test_wwinp_to_h5m/expected_wwinp_mesh.h5m'))
     written_sm = ScdMesh.fromFile(output)
     
     for x in range(0,5):
