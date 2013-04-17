@@ -726,9 +726,9 @@ integer function binary_search(pos, len, table)
         ic_s = 1
         ib_s = len
         do
-           if( ib_s-ic_s==1 .or. ib_s.eq.ic_s)  exit
+           if( ib_s-ic_s.eq.1 .or. ib_s.eq.ic_s)  exit
            ih_s = (ic_s+ib_s)/2
-           if( pos>=table(ih_s) ) then
+           if( pos.ge.table(ih_s) ) then
               ic_s = ih_s
            else
               ib_s = ih_s

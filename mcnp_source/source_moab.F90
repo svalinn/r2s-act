@@ -321,7 +321,7 @@ subroutine read_moab (mymesh, filename, rpents)
 
         ! Look for custom energy groups tag.
         call iMesh_getTagHandle(%VAL(mymesh), "PHTN_ERGS", ergtagh, ierr)
-        ! If ergs tag was found, we call read_custom_ergs.  Otherwise 
+        ! If ergs tag was found, we read custom ergs.  Otherwise 
         !  we use default energies.
         if (ierr.eq.0) then 
           ! Get n_ener_grps via length of data in the tag.
@@ -780,9 +780,9 @@ integer function binary_search(pos, len, table)
         ic_s = 1
         ib_s = len
         do
-           if( ib_s-ic_s==1 .or. ib_s.eq.ic_s)  exit
+           if( ib_s-ic_s.eq.1 .or. ib_s.eq.ic_s)  exit
            ih_s = (ic_s+ib_s)/2
-           if( pos>=table(ih_s) ) then
+           if( pos.ge.table(ih_s) ) then
               ic_s = ih_s
            else
               ib_s = ih_s
