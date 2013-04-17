@@ -79,6 +79,10 @@ neutron_mcnp_input = mcnp_n.inp
 # using mcnp2cad.
 mcnp_geom = geom.sat
 
+# ALARA snippet file
+# This file will be appended to the alara_geom during step 1
+alara_snippet = alara_problem
+
 #-------------------------------------------------------------------------------
 # Files produced in Step 1
 # These files are created by r2s_step1.py. Specify the desired file names.
@@ -93,10 +97,6 @@ alara_fluxin = alara_fluxin
 
 # ALARA geometry file
 alara_geom = alara_geom
-
-# ALARA snippet file
-# This file will be appended to the alara_geom during step 1
-alara_snippet = alara_problem
 
 # To produce a visualizable file at the end of step 1,
 # uncomment the following:
