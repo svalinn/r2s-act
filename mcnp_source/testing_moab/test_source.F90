@@ -8,12 +8,10 @@ program test_source
         call RN_init_problem() ! init random number generator to defaults
 
         write(*,*) "Running Fortran tests --"
-        call test_read_custom_ergs
-        call test_read_header
-        call test_read_params
+        !call test_read_custom_ergs
+        !call test_read_params
         call test_gen_erg_alias_table
         call test_erg_sampling_distrib
-        call test_uniform_sample
 
         ! Attempt to get around 'ambiguous reference' errors.
         iBase_REGION_t = iBase_REGION

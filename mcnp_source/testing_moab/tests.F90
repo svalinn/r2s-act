@@ -32,186 +32,151 @@ end module tests_mod
 
 ! Beginning of test subroutines
 
-subroutine test_read_custom_ergs
-  use tests_mod
-  use source_data
-! Reads in values from 'test_ergs_list.txt' and matches them to expected values 
-        integer :: n_grps = 42
-        real(dknd),dimension(1:43) :: test_ener_phot
-        real(dknd) :: a, b
-
-        testunitnum = getUnit()
-        OPEN(unit=testunitnum, form='formatted', file='test_ergs_list.txt')
-        call read_custom_ergs(testunitnum)
-        CLOSE(testunitnum)
-
-        test_ener_phot = (/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
-            0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
-            1.66,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0, &
-            10.0,12.0,14.0,20.0,30.0,50.0/)
-
-        do i=1,n_grps+1
-          !assert
-          a = test_ener_phot(i)
-          b = my_ener_phot(i)
-          if (abs(a-b).gt.(1e-4*max(a,b))) then
-            write(*,*) "Mismatch in custom energies!", test_ener_phot(i), &
-                ' ', my_ener_phot(i)
-            return
-          endif
-        enddo
-
-        write(*,*) "test_custom_ergs: successfully read bins"
-
-        deallocate(my_ener_phot)
-
-end subroutine test_read_custom_ergs
-
-
-subroutine test_read_header
-! Reads in multiple sets of 5 header lines from 'test_header.txt'.
-! Tests that active_mat array is properly created
-  use tests_mod
-  use source_data
-        testunitnum = getUnit()
-        OPEN(unit=testunitnum, form='formatted', file='test_header.txt')
-
-        ! Test 1: 5 entries in materials line; verify rest of array is zeros
-        call read_header(testunitnum)
-        if (active_mat(6).ne.0.or.active_mat(100).ne.0) then
-          write(*,*) "ERROR - test_read_header test #1"
-          return
-        endif
-        
-        ! Because read_header is responsible for allocating these arrays,
-        !  we need to deallocate them before the next test
-        deallocate(i_bins)
-        deallocate(j_bins)
-        deallocate(k_bins)
-
-        ! Test 2: 105 entries in materials line; read first 100
-        call read_header(testunitnum)
-        if (active_mat(6).ne.1.or.active_mat(100).ne.5) then
-          write(*,*) "ERROR - test_read_header test #2"
-          return
-        endif
-
-        CLOSE(testunitnum)
-
-        write(*,*) "test_read_header: successfully tested"
-
-end subroutine test_read_header
+! subroutine test_read_custom_ergs
+!   use tests_mod
+!   use source_data
+! ! Reads in values from 'test_ergs_list.txt' and matches them to expected values 
+!         integer :: n_grps = 42
+!         real(dknd),dimension(1:43) :: test_ener_phot
+!         real(dknd) :: a, b
+! 
+!         testunitnum = getUnit()
+!         OPEN(unit=testunitnum, form='formatted', file='test_ergs_list.txt')
+!         call read_custom_ergs(testunitnum)
+!         CLOSE(testunitnum)
+! 
+!         test_ener_phot = (/0.0,0.01,0.02,0.03,0.045,0.06,0.07,0.075,0.1,0.15, &
+!             0.2,0.3,0.4,0.45,0.51,0.512,0.6,0.7,0.8,1.0,1.33,1.34,1.5, &
+!             1.66,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0, &
+!             10.0,12.0,14.0,20.0,30.0,50.0/)
+! 
+!         do i=1,n_grps+1
+!           !assert
+!           a = test_ener_phot(i)
+!           b = my_ener_phot(i)
+!           if (abs(a-b).gt.(1e-4*max(a,b))) then
+!             write(*,*) "Mismatch in custom energies!", test_ener_phot(i), &
+!                 ' ', my_ener_phot(i)
+!             return
+!           endif
+!         enddo
+! 
+!         write(*,*) "test_custom_ergs: successfully read bins"
+! 
+!         deallocate(my_ener_phot)
+! 
+! end subroutine test_read_custom_ergs
 
 
-subroutine test_read_params
-! Reads in several combinations of parameter specifications from the file
-!  'test_params.txt'.
-  use tests_mod
-  use source_data
-        
-        integer :: cnt = 1
-
-        testunitnum = getUnit()
-        OPEN(unit=testunitnum, form='formatted', file='test_params.txt')
-
-        do ! assertions
-          ! Test: 'p u v'
-          call read_params(testunitnum)
-          if (bias.eq.0.and.samp_uni.eq.0.and.samp_vox.eq.1) then
-            cnt = cnt + 1
-          else 
-            exit
-          endif
-          ! Test: 'p'
-          call read_params(testunitnum)
-          if (samp_vox.eq.0.and.mat_rej.eq.0.and.cumulative.eq.0) then
-            cnt = cnt + 1
-          else 
-            exit
-          endif
-          ! Test: 'p v u b'
-          call read_params(testunitnum)
-          if (samp_vox.eq.0.and.samp_uni.eq.1.and.bias.eq.0) then
-            cnt = cnt + 1
-          else 
-            exit
-          endif
-          ! Test: 'p b'
-          call read_params(testunitnum)
-          if (bias.eq.1) then
-            cnt = cnt + 1
-          else 
-            exit
-          endif
-          ! Test: 'p d'
-          call read_params(testunitnum)
-          if (debug.eq.1) then
-            cnt = cnt + 1
-          else 
-            exit
-          endif
-          ! Test: 'p e'
-          call read_params(testunitnum)
-          if (ergs.eq.1) then
-            cnt = cnt + 1
-          else 
-            exit
-          endif
-          ! Test: 'p m'
-          call read_params(testunitnum)
-          if (mat_rej.eq.1) then
-            cnt = cnt + 1
-          else 
-            exit
-          endif
-          ! Test: 'p c'
-          call read_params(testunitnum)
-          if (cumulative.eq.1) then
-            cnt = cnt + 1
-          else 
-            exit
-          endif
-          ! Test: 'p v'
-          call read_params(testunitnum)
-          if (samp_vox.eq.1) then
-            cnt = cnt + 1
-          else 
-            exit
-          endif
-          ! Test: 'p u'
-          call read_params(testunitnum)
-          if (samp_uni.eq.1) then
-            cnt = cnt + 1
-          else 
-            exit
-          endif
-          ! Test: 'p b u'
-          call read_params(testunitnum)
-          if (samp_uni.eq.1.and.bias.eq.0) then
-            cnt = cnt + 1
-          else 
-            exit
-          endif
-          ! Test: 'p u r'
-          call read_params(testunitnum)
-          if (samp_uni.eq.1.and.resample.eq.1) then
-            cnt = cnt + 1
-          else 
-            exit
-          endif
-          exit
-
-        enddo
-
-        CLOSE(testunitnum)
-
-        if (cnt.lt.13) then
-          write(*,*) "ERROR - test_read_params completed tests:", i, "/ 13"
-        else 
-          write(*,*) "test_read_params: successfully tested parameters parsing"
-        endif
-
-end subroutine test_read_params
+! subroutine test_read_params
+! ! Reads in several combinations of parameter specifications from the file
+! !  'test_params.txt'.
+!   use tests_mod
+!   use source_data
+!         
+!         integer :: cnt = 1
+! 
+!         testunitnum = getUnit()
+!         OPEN(unit=testunitnum, form='formatted', file='test_params.txt')
+! 
+!         do ! assertions
+!           ! Test: 'p u v'
+!           call read_params(testunitnum)
+!           if (bias.eq.0.and.samp_uni.eq.0.and.samp_vox.eq.1) then
+!             cnt = cnt + 1
+!           else 
+!             exit
+!           endif
+!           ! Test: 'p'
+!           call read_params(testunitnum)
+!           if (samp_vox.eq.0.and.mat_rej.eq.0.and.cumulative.eq.0) then
+!             cnt = cnt + 1
+!           else 
+!             exit
+!           endif
+!           ! Test: 'p v u b'
+!           call read_params(testunitnum)
+!           if (samp_vox.eq.0.and.samp_uni.eq.1.and.bias.eq.0) then
+!             cnt = cnt + 1
+!           else 
+!             exit
+!           endif
+!           ! Test: 'p b'
+!           call read_params(testunitnum)
+!           if (bias.eq.1) then
+!             cnt = cnt + 1
+!           else 
+!             exit
+!           endif
+!           ! Test: 'p d'
+!           call read_params(testunitnum)
+!           if (debug.eq.1) then
+!             cnt = cnt + 1
+!           else 
+!             exit
+!           endif
+!           ! Test: 'p e'
+!           call read_params(testunitnum)
+!           if (ergs.eq.1) then
+!             cnt = cnt + 1
+!           else 
+!             exit
+!           endif
+!           ! Test: 'p m'
+!           call read_params(testunitnum)
+!           if (mat_rej.eq.1) then
+!             cnt = cnt + 1
+!           else 
+!             exit
+!           endif
+!           ! Test: 'p c'
+!           call read_params(testunitnum)
+!           if (cumulative.eq.1) then
+!             cnt = cnt + 1
+!           else 
+!             exit
+!           endif
+!           ! Test: 'p v'
+!           call read_params(testunitnum)
+!           if (samp_vox.eq.1) then
+!             cnt = cnt + 1
+!           else 
+!             exit
+!           endif
+!           ! Test: 'p u'
+!           call read_params(testunitnum)
+!           if (samp_uni.eq.1) then
+!             cnt = cnt + 1
+!           else 
+!             exit
+!           endif
+!           ! Test: 'p b u'
+!           call read_params(testunitnum)
+!           if (samp_uni.eq.1.and.bias.eq.0) then
+!             cnt = cnt + 1
+!           else 
+!             exit
+!           endif
+!           ! Test: 'p u r'
+!           call read_params(testunitnum)
+!           if (samp_uni.eq.1.and.resample.eq.1) then
+!             cnt = cnt + 1
+!           else 
+!             exit
+!           endif
+!           exit
+! 
+!         enddo
+! 
+!         CLOSE(testunitnum)
+! 
+!         if (cnt.lt.13) then
+!           write(*,*) "ERROR - test_read_params completed tests:", i, "/ 13"
+!         else 
+!           write(*,*) "test_read_params: successfully tested parameters parsing"
+!         endif
+! 
+! end subroutine test_read_params
 
 
 subroutine test_gen_erg_alias_table
@@ -318,41 +283,6 @@ subroutine test_erg_sampling_distrib
         deallocate(my_ener_phot)
 
 end subroutine test_erg_sampling_distrib
-
-
-subroutine test_uniform_sample
-! Tests that sampled positions are within problem; does 1e4 test samplings.
-  use tests_mod
-  use source_data
-
-        deallocate(i_bins)
-        deallocate(j_bins)
-        deallocate(k_bins)
-
-        testunitnum = getUnit()
-        OPEN(unit=testunitnum, form='formatted', file='test_header.txt')
-
-        call read_header(testunitnum)
-        
-        do i=1,10000
-          call uniform_sample
-          if (xxx.lt.i_bins(1).or.xxx.gt.i_bins(i_ints+1)) then
-            write(*,*) "ERROR - test_uniform_sample: xxx out of bounds"
-            return
-          endif
-          if (yyy.lt.j_bins(1).or.yyy.gt.j_bins(j_ints+1)) then
-            write(*,*) "ERROR - test_uniform_sample: yyy out of bounds"
-            return
-          endif
-          if (zzz.lt.k_bins(1).or.zzz.gt.k_bins(k_ints+1)) then
-            write(*,*) "ERROR - test_uniform_sample: zzz out of bounds"
-            return
-          endif
-        enddo
-
-        write(*,*) "test_uniform_sample: successfully sampled 1e4 positions"
-
-end subroutine test_uniform_sample
 
 
 subroutine test_get_tet_vol
