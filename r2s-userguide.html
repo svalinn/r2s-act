@@ -209,7 +209,7 @@
 <ol class="arabic simple">
 <li>Python 2.6+</li>
 <li>DAG-MCNP5 compiled with R2S-ACT <cite>mcnp_source/source_gamma.F90</cite>, from <a class="reference external" href="https://github.com/svalinn/DAGMC">https://github.com/svalinn/DAGMC</a></li>
-<li>CubIt, from RSICC, <a class="reference external" href="http://rsicc.ornl.gov/">http://rsicc.ornl.gov/</a></li>
+<li>CubIt, from <a class="reference external" href="https://cubit.sandia.gov/">https://cubit.sandia.gov/</a></li>
 <li>ALARA, from <a class="reference external" href="https://github.com/svalinn/ALARA">https://github.com/svalinn/ALARA</a></li>
 <li>Mesh Oriented Data Base (MOAB), from svn.mcs.anl.gov/repos/ITAPS/MOAB/trunk</li>
 <li>PyTAPS, the Python interface for ITAPS, (Interoperable Technologies for Advanced Petascale Simulations), from <a class="reference external" href="http://pypi.python.org/pypi/PyTAPS/1.4">http://pypi.python.org/pypi/PyTAPS/1.4</a></li>
@@ -221,7 +221,7 @@
 In unix, this can be done by modifying the .bashrc file, adding the following line:</p>
 <div class="highlight-python"><pre>export PYTHONPATH=*install_directory*/r2s-act/scripts/:$PYTHONPATH</pre>
 </div>
-<p>The user guide and other documentation is available at <a class="reference external" href="http://svalinn.github.com/r2s-act/">http://svalinn.github.com/r2s-act/</a> .
+<p>The user guide and other documentation is available at <a class="reference external" href="http://svalinn.github.io/r2s-act/">http://svalinn.github.io/r2s-act/</a> .
 Building the documentation requires Sphinx, from <a class="reference external" href="http://sphinx-doc.org">http://sphinx-doc.org</a></p>
 <p>Although not a dependency, the visualization program VisIT (Lawrence Livermore National Laboratory) is useful for visualizing results data stored on MOAB meshes in the .vtk format.
 Executables are available at <a class="reference external" href="https://wci.llnl.gov/codes/visit/">https://wci.llnl.gov/codes/visit/</a>.</p>
@@ -252,7 +252,7 @@ Executables are available at <a class="reference external" href="https://wci.lln
 <li>Set up photon transport (e.g. tallies) and run modified MCNP/DAGMCNP with mesh-sampling source.F90.</li>
 <li>Examine results; Use <cite>read_meshtal.py</cite> to tag photon mesh tallies to the mesh for visualization.</li>
 </ol>
-<p><strong>1. Create geometry.</strong> Using CubIt, create the geometry and specify materials by adding volumes to materials groups. Group names should be formatted like &#8220;mat_X_rhoY&#8221; where X is the material number and Y is either mass density (negative value) or atom density (positive volume). Instructions for doing this can be found in the <cite>DAG-MCNP5 user manual &lt;http://svalinn.github.com/DAGMC/doc/usersguide/index.html&gt;</cite>. Be sure to remember to imprint and merge all of the geometry. Once completed, export the geometry as a .sat file (Standard ACIS Text format) and when prompted specify an ACIS version of 1900 and the &#8220;export attributes&#8221; option. Alternatively, if the geometry already exists in the form of an MCNP input file, MCNP2CAD can be used to convert the geometry information from the MCNP input file into a .sat file. If the geometry contains small features, users may need to specify a smaller tolerance for merging surfaces (using the -t flag).</p>
+<p><strong>1. Create geometry.</strong> Using CubIt, create the geometry and specify materials by adding volumes to materials groups. Group names should be formatted like &#8220;mat_X_rhoY&#8221; where X is the material number and Y is either mass density (negative value) or atom density (positive volume). Instructions for doing this can be found in the <cite>DAG-MCNP5 user manual &lt;http://svalinn.github.io/DAGMC/doc/usersguide/index.html&gt;</cite>. Be sure to remember to imprint and merge all of the geometry. Once completed, export the geometry as a .sat file (Standard ACIS Text format) and when prompted specify an ACIS version of 1900 and the &#8220;export attributes&#8221; option. Alternatively, if the geometry already exists in the form of an MCNP input file, MCNP2CAD can be used to convert the geometry information from the MCNP input file into a .sat file. If the geometry contains small features, users may need to specify a smaller tolerance for merging surfaces (using the -t flag).</p>
 <p>Once the .sat file exists, it can be converted to an .h5m file (binary format MOAB mesh file) using dagmc_preproc or mbconvert. This is not necessary, but it prevents DAG-MCNP5 from having to process the .sat file every time it is run. Using a .h5m file also allows for the use of of a DAG-MCNP5 version that is not built against CubIt. In either case, either DAG-MCNNP or dagmc_preproc/mbconvert creates a faceted representation of the geometry. Users can specify the maximum distance between the points in the geometry and the faceted representation on the geometry. This is known as the faceting tolerance. In dagmc_preproc, this is specified with the -f flag. In DAG-MCNP5 this can be specified on the command line by using ftol=faceting_tolerace (e.g. ftol=1E-4). In addtion, dagmc_preproc can also be used to specify a length tolerance using the -l flag. The length tolerance is the maximum length of a facet edge.</p>
 <p><strong>2. Create DAG-MCNP5 input file and run neutron transport calculation.</strong> Other than the geometry cards, the rest of the DAG-MCNP5 input file should be identical to that of a native MCNP input file. Make sure the material numbers in the input file match the numbers of the material groups in CubIt.</p>
 <p>For neutron activation, the MCNP/DAG-MCNP5 input file must contain a type 4 FMESH tally over the geometry of interest. Both structured (native MCNP) and unstructured mesh tallies are supported.</p>
@@ -845,7 +845,7 @@ In the resulting matlib file metadata will be in the form &#8220;# X:Y&#8221;. I
         &copy; Copyright 2013, CNERG.
       </p>
       <p>
-      Last updated on Mar 26, 2013.
+      Last updated on May 13, 2013.
       </p>
       <p>
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
