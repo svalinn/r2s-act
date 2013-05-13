@@ -39,7 +39,7 @@ R2S-ACT has numerous dependencies:
 
 1. Python 2.6+
 2. DAG-MCNP5 compiled with R2S-ACT `mcnp_source/source_gamma.F90`, from https://github.com/svalinn/DAGMC
-3. CubIt, from RSICC, http://rsicc.ornl.gov/
+3. CubIt, from https://cubit.sandia.gov/
 4. ALARA, from https://github.com/svalinn/ALARA
 5. Mesh Oriented Data Base (MOAB), from svn.mcs.anl.gov/repos/ITAPS/MOAB/trunk
 6. PyTAPS, the Python interface for ITAPS, (Interoperable Technologies for Advanced Petascale Simulations), from http://pypi.python.org/pypi/PyTAPS/1.4
@@ -53,7 +53,7 @@ In unix, this can be done by modifying the .bashrc file, adding the following li
 
     export PYTHONPATH=*install_directory*/r2s-act/scripts/:$PYTHONPATH
 
-The user guide and other documentation is available at http://svalinn.github.com/r2s-act/ .
+The user guide and other documentation is available at http://svalinn.github.io/r2s-act/ .
 Building the documentation requires Sphinx, from http://sphinx-doc.org
 
 Although not a dependency, the visualization program VisIT (Lawrence Livermore National Laboratory) is useful for visualizing results data stored on MOAB meshes in the .vtk format.
@@ -94,7 +94,7 @@ Executive Summary
 
 Full Summary
 ------------
-**1. Create geometry.** Using CubIt, create the geometry and specify materials by adding volumes to materials groups. Group names should be formatted like "mat_X_rhoY" where X is the material number and Y is either mass density (negative value) or atom density (positive volume). Instructions for doing this can be found in the `DAG-MCNP5 user manual <http://svalinn.github.com/DAGMC/doc/usersguide/index.html>`. Be sure to remember to imprint and merge all of the geometry. Once completed, export the geometry as a .sat file (Standard ACIS Text format) and when prompted specify an ACIS version of 1900 and the "export attributes" option. Alternatively, if the geometry already exists in the form of an MCNP input file, MCNP2CAD can be used to convert the geometry information from the MCNP input file into a .sat file. If the geometry contains small features, users may need to specify a smaller tolerance for merging surfaces (using the -t flag).
+**1. Create geometry.** Using CubIt, create the geometry and specify materials by adding volumes to materials groups. Group names should be formatted like "mat_X_rhoY" where X is the material number and Y is either mass density (negative value) or atom density (positive volume). Instructions for doing this can be found in the `DAG-MCNP5 user manual <http://svalinn.github.io/DAGMC/doc/usersguide/index.html>`. Be sure to remember to imprint and merge all of the geometry. Once completed, export the geometry as a .sat file (Standard ACIS Text format) and when prompted specify an ACIS version of 1900 and the "export attributes" option. Alternatively, if the geometry already exists in the form of an MCNP input file, MCNP2CAD can be used to convert the geometry information from the MCNP input file into a .sat file. If the geometry contains small features, users may need to specify a smaller tolerance for merging surfaces (using the -t flag).
 
 Once the .sat file exists, it can be converted to an .h5m file (binary format MOAB mesh file) using dagmc_preproc or mbconvert. This is not necessary, but it prevents DAG-MCNP5 from having to process the .sat file every time it is run. Using a .h5m file also allows for the use of of a DAG-MCNP5 version that is not built against CubIt. In either case, either DAG-MCNNP or dagmc_preproc/mbconvert creates a faceted representation of the geometry. Users can specify the maximum distance between the points in the geometry and the faceted representation on the geometry. This is known as the faceting tolerance. In dagmc_preproc, this is specified with the -f flag. In DAG-MCNP5 this can be specified on the command line by using ftol=faceting_tolerace (e.g. ftol=1E-4). In addtion, dagmc_preproc can also be used to specify a length tolerance using the -l flag. The length tolerance is the maximum length of a facet edge.
 
