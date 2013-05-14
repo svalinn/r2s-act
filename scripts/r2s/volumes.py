@@ -48,6 +48,8 @@ def calc_volume(mesh, voxel):
 
     Notes
     -----
+    Supports tetrahedral and hexahedral voxels only.
+
     Code adapted from:
     http://pythonhosted.org/PyTAPS/tutorial/example.html?highlight=volume
     """
@@ -63,5 +65,3 @@ def calc_volume(mesh, voxel):
                 topo, voxel, curr)
         assert(False)
     return volume
-
-
