@@ -40,6 +40,8 @@ class ModMCNPforPhotons(object):
         self.dagmc = dagmc
         if self.dagmc is None:
             self.dagmc = _is_dagmc(self.inputFileName)
+            if self.dagmc:
+                print "{0} is a DAG-MCNP input file.".format(self.inputFileName)
 
 
     def read(self):
@@ -446,7 +448,8 @@ class ModMCNPforPhotons(object):
 
 
 def _is_dagmc(filename):
-    """Use first non-title, non-comment line to determin if input is for DAGMCNP
+    """Use first non-title, non-comment line to determine if input is for 
+    DAGMCNP
 
     The test to determine this has two cases::
     - First character of line is a number -> regular MCNP input
@@ -456,10 +459,12 @@ def _is_dagmc(filename):
 
     fr = open(filename, 'r')
 
-    line = fr.readline()
-    line = fr.readline()
+    line = fr.readline() # skips title card
+    line = fr.readline().strip().lower()
 
-    while line[:2] == 'c ' or line == 'c':
+    # Skip current and subsequent lines if they are comments,
+    #  until non-comment line is found
+    while line[:2] == 'c ' or line == 'c' or line == 'c\n':
         line = fr.readline().strip().lower()
 
     try:

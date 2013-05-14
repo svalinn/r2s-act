@@ -134,6 +134,16 @@ class TestAutoDetermineInputType(unittest.TestCase):
         if os.path.isfile(auto_testfile_out):
             os.system("rm " + auto_testfile_out)
 
+    def test_is_not_dag(self):
+        """Tests _is_dagmc()"""
+        self.obj = mcnp_n2p.ModMCNPforPhotons(testfile)
+        self.assertEqual(self.obj.dagmc, False)
+
+    def test_is_dag(self):
+        """Tests _is_dagmc()"""
+        self.obj = mcnp_n2p.ModMCNPforPhotons(dag_testfile)
+        self.assertEqual(self.obj.dagmc, True)
+
     def test_mcnp_input_run(self):
         self.obj = mcnp_n2p.ModMCNPforPhotons(testfile)
         self.obj.read()
