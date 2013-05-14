@@ -7,7 +7,7 @@ import os.path
 from r2s.io import read_alara_phtn, write_gammas
 from r2s import mcnp_n2p
 from r2s.scdmesh import ScdMesh, ScdMeshError
-from itaps import iMesh, iMeshExtensions
+from itaps import iBase, iMesh, iMeshExtensions
 from r2s_setup import get_input_file, FileMissingError, R2S_CFG_Error
 
 
@@ -175,6 +175,8 @@ def handle_phtn_data(datafile, phtn_src, opt_isotope, opt_cooling,  \
                 resample=resample, uni_resamp_all=uni_resamp_all, \
                 coolingstep=coolingstepstring, isotope=opt_isotope)
     else:
+        voxels = list(mesh.iterate(iBase.Type.region, iMesh.Topology.all))
+        write_gammas.calc_total_source_strength(mesh, voxels)
         mesh.save(datafile)
 
     print "\n"

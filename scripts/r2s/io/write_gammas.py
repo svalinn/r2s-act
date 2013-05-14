@@ -17,15 +17,75 @@ from optparse import OptionParser
 from itaps import iBase,iMesh,iMeshExtensions
 
 from r2s.scdmesh import ScdMesh, ScdMeshError
+from r2s.volumes import calc_volume
+
+def calc_total_source_strength(mesh, voxels, tag_srcsum=False, **kwargs):
+    """
+    """
+
+    try:
+        grouptag = mesh.getTagHandle("phtn_src_group_001")
+    except iBase.TagNotFoundError, e:
+        print "ERROR: The structured mesh does not contain tags of the " \
+                "form 'phtn_src_group_#.'"
+        raise e
+
+    # Initialize list to first erg bin source strength value for each voxel
+    meshstrengths = [float(grouptag[x]) for x in voxels]
+
+    numergbins = 0
+
+    # We now go through all photon energy groups and sum the individual bins
+    #  to get the total source strength in each voxel
+    for i in xrange(2,1000): #~ Arbitrary: we look for up to 1000 groups
+        try:
+            grouptag = mesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
+            for cnt, vox in enumerate(voxels):
+                meshstrengths[cnt] += float(grouptag[vox])
+        except iBase.TagNotFoundError: 
+            numergbins = i - 1
+            break
+    
+    print "Found tags for {0} photon energy bins.".format(numergbins)
+
+    vols = [calc_volume(mesh, voxel) for voxel in voxels]
+
+    # We calculate the normalization factor as the sum over all voxels of:
+    #  voxel volumetric source strength * voxel volume
+    # Divided by the volume of all voxels with non-zero source strength.
+    # This applies for variable voxel sizes in a structured mesh.
+    numactivatedcells = 0 # number of voxels that have nonzero source strength
+    sumvoxelsourcestrengths = 0 # total photon source strength in entire model
+    sourcevolumetotal = 0 # total activated volume in model
+    for cnt, meshstr in enumerate(meshstrengths):
+        if meshstr > 0:
+            numactivatedcells += 1
+            sumvoxelsourcestrengths += vols[cnt] * meshstr
+            sourcevolumetotal += vols[cnt]
+
+    if tag_srcsum:
+        _tag_sumvoxelstrengths(mesh, sumvoxelsourcestrengths)
+
+    # Create 'phtn_src_total' file with label of cooling time and isotope
+    problemstring = ""
+    if 'coolingstep' in kwargs:
+        problemstring += " Cooling time: {0}".format(kwargs['coolingstep'])
+    if 'isotope' in kwargs:
+        problemstring += " Source isotope: {0}".format(kwargs['isotope'])
+    os.system("echo {0:03e} {1} >> phtn_src_total".format( \
+            sumvoxelsourcestrengths, problemstring))
+
+    return sumvoxelsourcestrengths, sourcevolumetotal, numergbins
 
 
 def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
         do_bias=False, cumulative=False, cust_ergbins=False, \
         resample=False, uni_resamp_all=False, **kwargs):
-    """Generate gammas file using information from tags on a MOAB mesh.
+    """Generate gammas file using information from tags on a MOAB Scd mesh.
     
     Method reads tags with photon source strengths from a structured mesh object
-    and generates the gammas file for the modified source.F90 routine.
+    and generates the gammas file for the modified source.F90 routine
+    `source_gamma.F90`.
 
     Parameters
     ----------
@@ -71,6 +131,9 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
 
     voxels = list(sm.iterateHex('xyz'))
 
+    sumvoxelstrengths, sourcevolumetotal, numergbins = \
+            calc_total_source_strength(sm, voxels)
+
     # Initialize list to first erg bin source strength value for each voxel
     meshstrengths = [float(grouptag[x]) for x in voxels]
 
@@ -87,9 +150,9 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
             numergbins = i - 1
             break
     
-    print "Found tags for for {0} photon energy bins.".format(numergbins)
+    print "Found tags for {0} photon energy bins.".format(numergbins)
 
-    vols = calc_volumes_list(sm)
+    vols = calc_sm_volumes_list(sm)
 
     if len(vols) != len(meshstrengths):
         print "ERROR: mismatch in calculated number of volumes ({0}) and " \
@@ -110,7 +173,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
             sumvoxelstrengths += vols[cnt] * meshstr
             sourcevolumetotal += vols[cnt]
 
-    _tag_sumvoxelstrengths(sm, sumvoxelstrengths)
+    _tag_sumvoxelstrengths(sm.imesh, sumvoxelstrengths)
 
     print "The number of activated voxels and total number of voxels is " \
             "{0}/{1}".format(numactivatedcells, len(meshstrengths))
@@ -313,7 +376,7 @@ def _gen_gammas_header(sm, outfile, sampling, ergbins, biasing, cumulative, \
     return fw
 
 
-def calc_volumes_list(sm):
+def calc_sm_volumes_list(sm):
     """Create a 1D list of the voxel volumes for a XYZ structured mesh
     
     Parameters
@@ -364,16 +427,16 @@ def calc_volumes_list(sm):
     return vols
 
 
-def _tag_sumvoxelstrengths(sm, val):
+def _tag_sumvoxelstrengths(mesh, val):
     """Stores total voxel source strength in tag 'PHTN_SRC_TOTAL'.
     """
-    # Get the Tag handle called PHTN_BIAS
+    # Get the Tag handle called PHTN_SRC_TOTAL
     try:
-        tag = sm.imesh.createTag("PHTN_SRC_TOTAL",1,"d")
+        tag = mesh.createTag("PHTN_SRC_TOTAL",1,"d")
     except iBase.TagAlreadyExistsError:
-        tag = sm.imesh.getTagHandle("PHTN_SRC_TOTAL")
+        tag = mesh.getTagHandle("PHTN_SRC_TOTAL")
 
-    tag[sm.imesh.rootSet] = val
+    tag[mesh.rootSet] = val
 
     return 1
 
