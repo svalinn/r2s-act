@@ -1,4 +1,5 @@
 Title that should remain unchanged imp:n=1
+c
 c Note that this is not a valid MCNP input file. imp:n=5
 1  0   -1   imp:p=1
 1  0   -1   imp:p=2 $ Should preserve importance of 2

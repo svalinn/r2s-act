@@ -464,7 +464,7 @@ def _is_dagmc(filename):
 
     # Skip current and subsequent lines if they are comments,
     #  until non-comment line is found
-    while line[:2] == 'c ' or line == 'c' or line == 'c\n':
+    while line[:2] == 'c ' or line == 'c':
         line = fr.readline().strip().lower()
 
     try:
