@@ -924,7 +924,7 @@ end subroutine sample_tetrahedra
 subroutine sample_hexahedra (co)
 ! This subroutine receives the eight vertices of a hexahedron and sets
 ! xxx, yyy, zzz, to values corresponding to a uniformly sampled point
-! within the voxel.  
+! within the hexahedral voxel.
 ! 
 ! It is assumed that the hexahedron is a parallelepiped.
 ! 
@@ -936,7 +936,9 @@ subroutine sample_hexahedra (co)
 ! 
 ! Notes
 ! ------
-! The algorithm used is ...
+! The algorithm used is to sample distances along three edge vectors that
+! originate at the first vertex of the hexahedron (MOAB canonical ordering)
+! and add these three vectors to the first vertice's coordinates.
 ! 
   use source_data
   implicit none
