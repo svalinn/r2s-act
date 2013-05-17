@@ -952,12 +952,12 @@ subroutine sample_hexahedra (co)
 
         a = co(1::8)
         b = co(2::8)
-        c = co(3::8)
+        ! c = co(3::8) ! c, f, g, h are unused
         d = co(4::8)
         e = co(5::8)
-        f = co(6::8)
-        g = co(7::8)
-        h = co(8::8)
+        ! f = co(6::8)
+        ! g = co(7::8)
+        ! h = co(8::8)
         
         ss = rang()
         tt = rang()
@@ -1107,9 +1107,18 @@ subroutine gen_voxel_alias_table
           do i=1,n_mesh_cells
             bins(i) = bins(i) * bias_list(i) / bias_probability_sum
             bias_list(i) = bias_probability_sum / bias_list(i)
-            !!! bias_list(i) value is now a weight, rather than a probabilty
+            !!! bias_list(i) value is now a weight, rather than a bias factor
           enddo
         endif
+
+        ! TODO: Insert void rejection code here.
+        ! If adjusting probabilities, change the values in bins().
+        ! If adjusting weights, 
+        !   If biasing, change the values in bias_list
+        !   Else (not biasing), we need a list of weights for each voxel
+        !     ... suggest deallocating bias_list after its use above and then
+        !         just using the weights list.
+        !         Also need to set the weights to 1.0, initially.
 
         call gen_alias_table(bins, aliases, binsProbabilities, n_mesh_cells)
 

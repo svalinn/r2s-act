@@ -72,7 +72,7 @@
 ! To do this, use a simple test problem to verify that you get the same 
 ! average energy per source
 ! particle in all test cases, and that all uniform sampling test cases have a
-! weight of 1.0 per source particle. (See the summary table in MCNP output)
+! average weight of 1.0 per source particle. (See the summary table in MCNP output)
 ! 
 ! Note that correct normalization also depends on whether
 ! material rejection is being used.
@@ -194,7 +194,8 @@ subroutine source_setup
         ALLOCATE(tot_list(1:n_mesh_cells))
         if (bias.eq.1) ALLOCATE(bias_list(1:n_mesh_cells))
          
-        ! reading in source strength and alias table for each voxel 
+        ! Reading in group-wise source densities (uniform sampling) or
+        ! source strengths (voxel sampling) and bias factors for each voxel
         i = 1 ! i keeps track of # of voxel entries
         do
           read(unitnum,*,iostat=stat) (spectrum(i,j), j=1,bias + n_ener_grps)
@@ -208,7 +209,7 @@ subroutine source_setup
         
         ! Check for correct number of voxel entries in gammas file.
         if (i.ne.n_mesh_cells) write(*,*) 'ERROR: ', i, ' voxels found in ' // &
-                        'gammas file. ', n_mesh_cells, ' expected.'
+                        'gammas file. ', n_mesh_cells, ' voxels expected.'
 
         CLOSE(unitnum)
         WRITE(*,*) 'Reading gammas file completed!'
@@ -850,7 +851,8 @@ subroutine gen_voxel_alias_table
 ! 
 ! Notes
 ! -----
-! The resulting alias table is stored in lists `aliases` and `binsProbabilities`.
+! The resulting alias table is stored in lists `aliases` and
+! `binsProbabilities`.
 ! 
 ! tot_list does not have to be normalized prior to calling this subroutine
   use source_data
