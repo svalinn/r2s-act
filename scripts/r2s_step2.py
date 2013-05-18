@@ -36,11 +36,16 @@ def load_config_files(config):
 
     # Filenames
     mcnp_p_problem = None
-    if config.has_option('r2s-files','photon_mcnp_input'):
-        mcnp_n_problem = config.get('r2s-files','neutron_mcnp_input')
-        mcnp_p_problem = config.get('r2s-files','photon_mcnp_input')
+    if config.has_option('r2s-files', 'photon_mcnp_input'):
+        mcnp_n_problem = config.get('r2s-files', 'neutron_mcnp_input')
+        mcnp_p_problem = config.get('r2s-files', 'photon_mcnp_input')
+
+    # Optional gammas file entry
+    gammas = "gammas"
+    if config.has_option('r2s-files', 'gammas'):
+        gammas = config.get('r2s-files', 'gammas')
         
-    return (datafile, phtn_src, mcnp_n_problem, mcnp_p_problem)
+    return (datafile, phtn_src, mcnp_n_problem, mcnp_p_problem, gammas)
 
 
 def load_config_params(config):
@@ -234,7 +239,7 @@ if __name__ == "__main__":
 
     try:
         # Read config file
-        (datafile, phtn_src, mcnp_n_problem, mcnp_p_problem) = \
+        (datafile, phtn_src, mcnp_n_problem, mcnp_p_problem, gammas) = \
                 load_config_files(config)
 
         (opt_isotope, opt_cooling, opt_sampling, opt_ergs, opt_bias, \
@@ -244,7 +249,7 @@ if __name__ == "__main__":
         # Do step 2
         mesh = handle_phtn_data(datafile, phtn_src, opt_isotope, opt_cooling, \
                 opt_sampling, opt_bias, opt_cumulative, opt_ergs, resampling, \
-                uni_resamp_all)
+                uni_resamp_all, gammas)
 
         gen_mcnp_p(mesh, mcnp_p_problem, mcnp_n_problem, opt_phtnfmesh)
 
