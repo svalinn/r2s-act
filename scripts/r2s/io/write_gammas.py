@@ -75,7 +75,7 @@ def calc_total_source_strength(mesh, voxels, tag_srcsum=False, **kwargs):
     os.system("echo {0:03e} {1} >> phtn_src_total".format( \
             sumvoxelsourcestrengths, problemstring))
 
-    return sumvoxelsourcestrengths, sourcevolumetotal, numergbins
+    return sumvoxelsourcestrengths, sourcevolumetotal, numergbins, vols
 
 
 def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
@@ -122,73 +122,11 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
     'PHTN_ERG' (a list of floats).
     """
 
-    try:
-        grouptag = sm.imesh.getTagHandle("phtn_src_group_001")
-    except iBase.TagNotFoundError:
-        print "ERROR: The structured mesh does not contain tags of the " \
-                "form 'phtn_src_group_#.'"
-        return 0
-
     voxels = list(sm.iterateHex('xyz'))
 
-    sumvoxelstrengths, sourcevolumetotal, numergbins = \
-            calc_total_source_strength(sm, voxels)
+    sumvoxelstrengths, sourcevolumetotal, numergbins, vols = \
+            calc_total_source_strength(sm.imesh, voxels)
 
-    # Initialize list to first erg bin source strength value for each voxel
-    meshstrengths = [float(grouptag[x]) for x in voxels]
-
-    numergbins = 0
-
-    # We now go through all photon energy groups and sum the individual bins
-    #  to get the total source strength in each voxel
-    for i in xrange(2,1000): #~ Arbitrary: we look for up to 1000 groups
-        try:
-            grouptag = sm.imesh.getTagHandle("phtn_src_group_{0:03d}".format(i))
-            for cnt, vox in enumerate(voxels):
-                meshstrengths[cnt] += float(grouptag[vox])
-        except iBase.TagNotFoundError: 
-            numergbins = i - 1
-            break
-    
-    print "Found tags for {0} photon energy bins.".format(numergbins)
-
-    vols = calc_sm_volumes_list(sm)
-
-    if len(vols) != len(meshstrengths):
-        print "ERROR: mismatch in calculated number of volumes ({0}) and " \
-                "number of voxel source strengths " \
-                "({1}).".format(len(vols), len(meshstrengths))
-        return 0
-
-    # We calculate the normalization factor as the sum over all voxels of:
-    #  voxel volumetric source strength * voxel volume
-    # Divided by the volume of all voxels with non-zero source strength.
-    # This applies for variable voxel sizes in a structured mesh.
-    numactivatedcells = 0 # number of voxels that have nonzero source strength
-    sumvoxelstrengths = 0 # total photon source strength in entire model
-    sourcevolumetotal = 0 # total activated volume in model
-    for cnt, meshstr in enumerate(meshstrengths):
-        if meshstr > 0:
-            numactivatedcells += 1
-            sumvoxelstrengths += vols[cnt] * meshstr
-            sourcevolumetotal += vols[cnt]
-
-    _tag_sumvoxelstrengths(sm.imesh, sumvoxelstrengths)
-
-    print "The number of activated voxels and total number of voxels is " \
-            "{0}/{1}".format(numactivatedcells, len(meshstrengths))
-    print "The total photon source strength of the model is {0:03e} photons/s. " \
-            "This is stored in the PHTN_SRC_TOTAL tag".format(sumvoxelstrengths)
-
-    # Create 'phtn_src_total' file with label of cooling time and isotope
-    problemstring = ""
-    if 'coolingstep' in kwargs:
-        problemstring += " Cooling time: {0}".format(kwargs['coolingstep'])
-    if 'isotope' in kwargs:
-        problemstring += " Source isotope: {0}".format(kwargs['isotope'])
-    os.system("echo {0:03e} {1} >> phtn_src_total".format(sumvoxelstrengths, \
-            problemstring))
-    
     # norm is the average volumetric source strength (phtns/s/cm3)
     try:
         norm = sumvoxelstrengths / sourcevolumetotal
