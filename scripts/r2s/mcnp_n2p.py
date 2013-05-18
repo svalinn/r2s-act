@@ -236,7 +236,7 @@ class ModMCNPforPhotons(object):
             # If line is indented 5+ spaces and the previous non-indented 
             #  line was commented out, comment out out this line too.
             if line[:5] == '     ' and commentout:
-                self.block3Lines[cnt] = "c" + line
+                self.block3Lines[cnt] = com + line
                 continue
             else:
                 commentout = False
