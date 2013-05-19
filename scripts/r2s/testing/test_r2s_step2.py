@@ -73,6 +73,7 @@ class TestLoadConfigParams(unittest.TestCase):
                     "photon_bias = True\n" \
                     "cumulative = True\n" \
                     "add_fmesh_card = False\n"
+                    "resample = True\n"
                     )
             myNTF.seek(0) # Goes to beginning
 
@@ -89,7 +90,7 @@ class TestLoadConfigParams(unittest.TestCase):
             self.assertTrue(opt_bias)
             self.assertTrue(opt_cumulative)
             self.assertFalse(opt_phtnfmesh)
-            self.assertFalse(resample)
+            self.assertTrue(resample)
             self.assertFalse(uni_resamp_all)
 
     def test_load_config_params_badisotope(self):

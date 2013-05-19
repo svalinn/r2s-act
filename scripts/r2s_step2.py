@@ -67,7 +67,7 @@ def load_config_params(config):
             [ 'photon_bias'   , False,   config.getboolean],
             [ 'cumulative'    , False,   config.getboolean],
             [ 'add_fmesh_card', True,    config.getboolean],
-            [ 'resampling'    , False,   config.getboolean],
+            [ 'resample'      , False,   config.getboolean],
             [ 'uni_resamp_all', False,   config.getboolean]
             ] 
 
