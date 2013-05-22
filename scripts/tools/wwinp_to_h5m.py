@@ -46,11 +46,11 @@ def cartesian(wwinp, output):
     # Find the first line of WW values by counting through the e_bin values
     # until the expected number of e_bins is reached
     # Then create a root level tag with energy the energy bounds.
-    e_bins = []
+    e_upper_bounds = []
     line_num = z_last_line + 1
 
-    while len(e_bins) < num_e_bins:
-        e_bins += \
+    while len(e_upper_bounds) < num_e_bins:
+        e_upper_bounds += \
             [float(x) for x in linecache.getline(wwinp, line_num).split()]
         line_num += 1
     
@@ -60,8 +60,8 @@ def cartesian(wwinp, output):
     tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nfx*nfy*nfz, output, particle)
 
     # tag root level of sm with energy bounds
-    tag_e_bin = sm.imesh.createTag("e_groups", len(e_bins), float)
-    tag_e_bin[sm.imesh.rootSet] = e_bins
+    tag_e_bin = sm.imesh.createTag("E_upper_bounds", len(e_upper_bounds), float)
+    tag_e_bin[sm.imesh.rootSet] = e_upper_bounds
 
     # save to output
     sm.scdset.save(output) 

@@ -10,7 +10,7 @@ prdmp 1E7 1E7 1 0 1E7
 mode:n
 sdef
 f5:n 0 0 90 5
-wwg 5 0 0
+wwg:n 5 0 0
 mesh origin= -100 -100 -100 ref= 0 0 0
 c
        imesh = -99 -97  97 99 100
@@ -21,4 +21,4 @@ c
 c
        kmesh = 100
        kints = 7
-
+wwge:n 1E-9 5ILOG 1E-3
