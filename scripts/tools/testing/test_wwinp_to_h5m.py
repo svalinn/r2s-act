@@ -20,9 +20,9 @@ def test_wwinp_to_h5m():
     expected_sm = ScdMesh.fromFile(os.path.join(thisdir, 'files_test_wwinp_to_h5m/expected_wwinp_mesh.h5m'))
     written_sm = ScdMesh.fromFile(output)
     
-    for x in range(0,5):
-        for y in range(0,6):
-            for z in range(0,10):
+    for x in range(0,14):
+        for y in range(0,8):
+            for z in range(0,6):
                 expected_voxel = expected_sm.getHex(x,y,z)
                 expected = expected_sm.imesh.getTagHandle('ww_n_group_001')[expected_voxel]
                 written_voxel = written_sm.getHex(x,y,z)
