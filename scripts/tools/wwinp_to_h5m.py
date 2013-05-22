@@ -145,7 +145,8 @@ def cylindrical(wwinp, output):
     """ This function has not been made yet, so right now it just returns an
         error message.
     """
-    print "Cylindrical WWINP not currently supported"
+    print >>sys.stderr, 'cylindrical wwinp not currently supported'
+    sys.exit(1)
 
 
 def main(arguments=None):

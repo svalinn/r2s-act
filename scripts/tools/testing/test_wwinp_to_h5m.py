@@ -4,9 +4,9 @@ import os
 from itaps import iMesh, iBase
 from r2s.scdmesh import ScdMesh
 
-def test_wwinp_to_h5m():
+def test_wwinp_to_h5m_3D_n():
     thisdir = os.path.dirname(__file__)
-    wwinp = os.path.join(thisdir, 'files_test_wwinp_to_h5m/wwinp_test_e')
+    wwinp = os.path.join(thisdir, 'files_test_wwinp_to_h5m/3D_n.e')
     output = os.path.join(os.getcwd(), 'wwinp_mesh.h5m')
     
     if output in os.listdir('.'):
@@ -14,18 +14,19 @@ def test_wwinp_to_h5m():
     
     wwinp_to_h5m.cartesian(wwinp, output)
     
-    expected_sm = ScdMesh.fromFile(os.path.join(thisdir, 'files_test_wwinp_to_h5m/expected_ww_mesh.h5m'))
+    expected_sm = ScdMesh.fromFile(os.path.join(thisdir, 'files_test_wwinp_to_h5m/expected_ww_mesh_3D_n.h5m'))
     written_sm = ScdMesh.fromFile(output)
     
     #verify weight window lower bounds are the same
     for x in range(0,14):
         for y in range(0,8):
             for z in range(0,6):
-                expected_voxel = expected_sm.getHex(x,y,z)
-                expected = expected_sm.imesh.getTagHandle('ww_n_group_001')[expected_voxel]
-                written_voxel = written_sm.getHex(x,y,z)
-                written = written_sm.imesh.getTagHandle('ww_n_group_001')[written_voxel]
-                assert_equal(written, expected)
+                for e_group in range(1, 8):
+                    expected_voxel = expected_sm.getHex(x,y,z)
+                    expected = expected_sm.imesh.getTagHandle('ww_n_group_00{0}'.format(e_group))[expected_voxel]
+                    written_voxel = written_sm.getHex(x,y,z)
+                    written = written_sm.imesh.getTagHandle('ww_n_group_00{0}'.format(e_group))[written_voxel]
+                    assert_equal(written, expected)
 
     #verify correct particle identifier
     assert_equal(written_sm.imesh.getTagHandle('particle')[written_sm.imesh.rootSet], 1)
@@ -39,8 +40,43 @@ def test_wwinp_to_h5m():
 
     os.remove(output)
 
+def test_wwinp_to_h5m_1D_p():
+    thisdir = os.path.dirname(__file__)
+    wwinp = os.path.join(thisdir, 'files_test_wwinp_to_h5m/1D_p.e')
+    output = os.path.join(os.getcwd(), 'wwinp_mesh.h5m')
+    
+    if output in os.listdir('.'):
+        os.remove(output)
+    
+    wwinp_to_h5m.cartesian(wwinp, output)
+    
+    expected_sm = ScdMesh.fromFile(os.path.join(thisdir, 'files_test_wwinp_to_h5m/expected_ww_mesh_1D_p.h5m'))
+    written_sm = ScdMesh.fromFile(output)
+    
+    #verify weight window lower bounds are the same
+    for x in range(0,1):
+        for y in range(0,1):
+            for z in range(0,9):
+                expected_voxel = expected_sm.getHex(x,y,z)
+                expected = expected_sm.imesh.getTagHandle('ww_n_group_001')[expected_voxel]
+                written_voxel = written_sm.getHex(x,y,z)
+                written = written_sm.imesh.getTagHandle('ww_n_group_001')[written_voxel]
+                assert_equal(written, expected)
+
+    #verify correct particle identifier
+    assert_equal(written_sm.imesh.getTagHandle('particle')[written_sm.imesh.rootSet], 1)
+
+    #verify correct energy upper bounds
+    expected_E = 100
+    written_E = written_sm.imesh.getTagHandle('E_upper_bounds')[written_sm.imesh.rootSet]
+
+    assert_equal(written_E, expected_E)
+
+    os.remove(output)
+
 
 # Run as script
 #
 if __name__ == "__main__":
-    test_wwinp_to_h5m()
+    test_wwinp_to_h5m_3D_n()
+    test_wwinp_to_h5m_1D_p()
