@@ -11,9 +11,9 @@ from itaps import iBase
 # r2s imports
 from r2s.scdmesh import ScdMesh, ScdMeshError
 
-def cartesian(wwinp, output):
-    """This function reads in a cartesian WWINP file and outputs tagged, 
-        structured mesh .h5m file with name "output".
+def cartesian(wwinp):
+    """This function reads in a cartesian WWINP file and returns a tagged, 
+        structured mesh.
     """
 
     print "Parsing Cartesian WWINP"
@@ -57,14 +57,13 @@ def cartesian(wwinp, output):
     ww_first_line = line_num
 
     # tag structured mesh with WW values
-    tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nfx*nfy*nfz, output, particle)
+    tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nfx*nfy*nfz, particle)
 
     # tag root level of sm with energy bounds
     tag_e_bin = sm.imesh.createTag("E_upper_bounds", len(e_upper_bounds), float)
     tag_e_bin[sm.imesh.rootSet] = e_upper_bounds
 
-    # save to output
-    sm.scdset.save(output) 
+    return sm
 
 
 def block_2_bounds(wwinp, line_num, nc):
@@ -106,9 +105,9 @@ def block_2_bounds(wwinp, line_num, nc):
 
     return bounds, last_line
 
-def tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nf, output, particle):
+def tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nf, particle):
     """This function reads in a structured and tags it with ww values from 
-       wwinp then saves to output.
+       wwinp.
     """
     # ordered voxels, z changes fastest, then y, then x.
     voxels=list(sm.iterateHex('zyx'))   
@@ -141,7 +140,7 @@ def tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nf, output, particle):
 
       
           
-def cylindrical(wwinp, output):
+def cylindrical(wwinp):
     """ This function has not been made yet, so right now it just returns an
         error message.
     """
@@ -161,11 +160,12 @@ def main(arguments=None):
     # nr = 10 is Cartesian and nr = 16 is cylindrical
     nr = linecache.getline(args[0],1).split()[3]
     if int(nr) == 10:
-        cartesian(args[0], opts.output)
+        ww_mesh = cartesian(args[0])
+        ww_mesh.scdset.save(output) 
         print "WW mesh saved to {0}".format(opts.output)
 
     elif int(nr) == 16:
-        cylindrical(args[0], opts.output)
+        cylindrical(args[0])
     
 
 if __name__ == '__main__':
