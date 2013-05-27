@@ -117,7 +117,7 @@ def gen_gammas_file_from_h5m(sm, outfile="gammas", sampling='v', \
     print "The total photon source strength of the model is {0:03e} photons/s. " \
             "This is stored in the PHTN_SRC_TOTAL tag".format(sumvoxelstrengths)
 
-    # Create 'phtn_src_totals' file with label of cooling time and isotope
+    # Create 'phtn_src_total' file with label of cooling time and isotope
     problemstring = ""
     if 'coolingstep' in kwargs:
         problemstring += " Cooling time: {0}".format(kwargs['coolingstep'])

@@ -172,8 +172,8 @@ def handle_phtn_data(datafile, phtn_src, opt_isotope, opt_cooling,  \
         write_gammas.gen_gammas_file_from_h5m(mesh, outfile=gammas, \
                 sampling=opt_sampling, do_bias=opt_bias, \
                 cumulative=opt_cumulative, cust_ergbins=cust_ergbins, \
-                coolingstep=coolingstepstring, isotope=opt_isotope, \
-                resample=resample, uni_resamp_all=uni_resamp_all)
+                resample=resample, uni_resamp_all=uni_resamp_all, \
+                coolingstep=coolingstepstring, isotope=opt_isotope)
     else:
         mesh.save(datafile)
 
