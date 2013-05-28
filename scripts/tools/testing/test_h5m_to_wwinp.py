@@ -1,17 +1,20 @@
 from tools import h5m_to_wwinp
 from nose.tools import assert_equal
 import os
+from r2s.scdmesh import ScdMesh
 
 def test_h5m_to_wwinp_3D_n():
     thisdir = os.path.dirname(__file__)
-    input = os.path.join(thisdir, 'files_test_wwinp_to_h5m/expected_ww_mesh_3D_n.h5m')
+    ww_sm_filename = os.path.join(thisdir, 'files_test_wwinp_to_h5m/expected_ww_mesh_3D_n.h5m')
+    ww_sm = ScdMesh.fromFile(ww_sm_filename)
     output = os.path.join(os.getcwd(), 'test.e')
     expected_output = os.path.join(thisdir, 'files_test_wwinp_to_h5m/3D_n.e')
     
     if output in os.listdir('.'):
         os.remove(output)
     
-    h5m_to_wwinp.write_wwinp(input, output)
+    totals_bool = False 
+    h5m_to_wwinp.write_wwinp(ww_sm, totals_bool, output)
     
     with open(output) as f:
         written = f.readlines()
@@ -36,14 +39,17 @@ def test_h5m_to_wwinp_3D_n():
 
 def test_h5m_to_wwinp_1D_p():
     thisdir = os.path.dirname(__file__)
-    input = os.path.join(thisdir, 'files_test_wwinp_to_h5m/expected_ww_mesh_1D_p.h5m')
+    ww_sm_filename = os.path.join(thisdir, 'files_test_wwinp_to_h5m/expected_ww_mesh_1D_p.h5m')
+    ww_sm = ScdMesh.fromFile(ww_sm_filename)
     output = os.path.join(os.getcwd(), 'test.e')
     expected_output = os.path.join(thisdir, 'files_test_wwinp_to_h5m/1D_p.e')
     
     if output in os.listdir('.'):
         os.remove(output)
+
+    totals_bool = False 
     
-    h5m_to_wwinp.write_wwinp(input, output)
+    h5m_to_wwinp.write_wwinp(ww_sm, totals_bool, output)
     
     with open(output) as f:
         written = f.readlines()

@@ -126,7 +126,7 @@ def magic(flux_mesh, totals_bool, null_value, tolerance, ww_mesh=None):
             error = flux_mesh.imesh.getTagHandle(e_group_name + '_error')[flux_voxel]
             ww = ww_mesh.imesh.getTagHandle('ww_{0}'.format(e_group_name))[ww_voxel]
 
-            if 0.0 < error and error < tolerance and ww != -1:
+            if error < tolerance and error != 0 and ww != -1:
                 ww_mesh.imesh.getTagHandle('ww_{0}'.format(e_group_name))[ww_voxel]  = flux/(2*max_fluxes[i]) # apply magic method
 
             elif ww_bool == False and (error > tolerance or error == 0.0):
