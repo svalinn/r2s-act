@@ -8,7 +8,7 @@ import re
 import ConfigParser
 from time import gmtime, strftime
 from shutil import copy
-from r2s_setup import get_input_file, R2S_CFG_Error
+from r2s_setup import R2S_CFG_Error
 
 
 def load_configs(config):
@@ -207,6 +207,8 @@ def create_new_files(path_list, datafile, cfgfile, mcnp_n_problem,
 
         _copy_and_mod_mcnpinp(oldfile, newfile, iso, time)
 
+    print "\nSetup for all r2s_step2.py calculations has been done."
+
 
 def _copy_and_mod_r2scfg(oldfile, newfile, iso, time, mcnp_n_problem,
         mcnp_p_problem, phtn_src, datafile):
@@ -353,6 +355,9 @@ def gen_run_script(path_list, outscriptdir=os.curdir):
 
     os.system("chmod +x {0}".format( \
             os.path.join(outscriptdir, "r2s_run_all_step2.sh")))
+
+    print "The script '{0}' has been created to run these calculations." \
+            "".format(os.path.join(outscriptdir, "r2s_run_all_step2.sh"))
 
 
 if __name__ == "__main__":
