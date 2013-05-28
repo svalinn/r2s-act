@@ -1,0 +1,27 @@
+Geometry for magic.py tests
+1 1 0.1 -1 imp:n=1
+2 0      1 imp:n=0
+
+1 rpp -15 15 -15 15 -15 15
+
+m1 1001 2 8016 1 $ light water
+mode:n
+sdef erg=1 dir=D1 vec=0 0 1 pos= 0 0 0 
+SI1 0 1
+SP1 0 1
+fmesh4:n origin -15 -15 -15
+         imesh=15
+         iints=3
+         jmesh=15
+         jints=3
+         kmesh=15
+         kints=3
+         emesh= 1E-1 1
+fmesh14:n origin -15 -15 -15
+         imesh=15
+         iints=3
+         jmesh=15
+         jints=3
+         kmesh=15
+         kints=3
+nps 1E3

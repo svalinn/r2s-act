@@ -51,8 +51,6 @@ def find_max_fluxes(flux_mesh, e_group_names):
             if flux > max_fluxes[i]:
                 max_fluxes[i] = flux
 
-    print max_fluxes
-
     return max_fluxes
 
 ################################################################################
@@ -87,6 +85,9 @@ def create_ww_mesh(flux_mesh, e_group_names):
 
 def magic(flux_mesh, totals_bool, null_value, tolerance, ww_mesh=None):
 
+    tolerance = float(tolerance)
+    null_value = float(null_value)
+
     e_group_names = gen_e_group_names(flux_mesh, totals_bool)
 
     max_fluxes = find_max_fluxes(flux_mesh, e_group_names)
@@ -101,7 +102,7 @@ def magic(flux_mesh, totals_bool, null_value, tolerance, ww_mesh=None):
     else:
         ww_bool = True # mesh file preexisting
 
-        # make sure the supplied meshes have the same dimenstions
+        # make sure the supplied meshes have the same dimensions
         try:
             for i in ('x', 'y', 'z'):
                 flux_mesh.getDivisions(i) == ww_mesh.getDivisions(i)
@@ -122,13 +123,13 @@ def magic(flux_mesh, totals_bool, null_value, tolerance, ww_mesh=None):
         for i, e_group_name in enumerate(e_group_names):
 
             flux = flux_mesh.imesh.getTagHandle(e_group_name)[flux_voxel]
-            error = flux_mesh.imesh.getTagHandle(e_group_name)[flux_voxel]
+            error = flux_mesh.imesh.getTagHandle(e_group_name + '_error')[flux_voxel]
             ww = ww_mesh.imesh.getTagHandle('ww_{0}'.format(e_group_name))[ww_voxel]
 
             if 0.0 < error and error < tolerance and ww != -1:
                 ww_mesh.imesh.getTagHandle('ww_{0}'.format(e_group_name))[ww_voxel]  = flux/(2*max_fluxes[i]) # apply magic method
 
-            elif ww_bool == False and error > tolerance:
+            elif ww_bool == False and (error > tolerance or error == 0.0):
                 ww_mesh.imesh.getTagHandle('ww_{0}'.format(e_group_name))[ww_voxel] = null_value
 
     return ww_mesh
@@ -136,7 +137,7 @@ def magic(flux_mesh, totals_bool, null_value, tolerance, ww_mesh=None):
 
 ################################################################################
 
-def write_magic(flux_mesh_filename, ww_inp_mesh_filename, totals_bool, null_value, output, output_mesh, tolerance):
+def write_magic(flux_mesh_filename, ww_inp_mesh_filename, totals_bool, null_value, output_mesh, tolerance):
     """Opens up h5m files, sends them to the magic function, saves resulting WW
        mesh files and converts to a wwinp
     """
@@ -169,10 +170,7 @@ def main( arguments = None ):
     parser.add_option('-w', dest='ww_mesh', default=None,\
         help='Preexisting WW mesh to apply magic to, default=%default')
 
-    parser.add_option('-o', dest='output_name', default='wwinp.out',\
-        help='Name of WWINP output file, default=%default')
-
-    parser.add_option('-m', dest='output_mesh', default='magic_ww.h5m',\
+    parser.add_option('-o', dest='output_mesh', default='magic_ww.h5m',\
         help='Name of WWINP output file, default=%default')
 
     parser.add_option('-t', action='store_true', dest='totals_bool',\
@@ -194,7 +192,7 @@ def main( arguments = None ):
         ( '\nNeed exactly 1 argument: flux mesh' )
 
 
-    write_magic(args[0], opts.ww_mesh, opts.totals_bool, opts.null_value, opts.output_name, opts.output_mesh, opts.tolerance)
+    write_magic(args[0], opts.ww_mesh, opts.totals_bool, opts.null_value, opts.output_mesh, opts.tolerance)
 
 
 
