@@ -1,191 +1,109 @@
 from tools import magic
 from nose.tools import assert_equal
 import os
+from itaps import iMesh, iBase
+from r2s.scdmesh import ScdMesh
 
-def test_block_1_2():
-    flux_h5m = 'files_test_magic/block_1_2_test.h5m'
-    expected_file = 'files_test_magic/block_1_2_test_expected_wwinp'
-    output = 'block_1_2_wwinp'
+def test_magic_it_0_2_group():
+    thisdir = os.path.dirname(__file__)
+    flux_sm_filename = os.path.join(thisdir, 'files_test_magic/iteration_0_flux_2_group.h5m')
+    flux_sm = ScdMesh.fromFile(flux_sm_filename)
+    expected_sm_filename = os.path.join(thisdir, 'files_test_magic/iteration_0_magic_2_group.h5m')   
+    expected_sm = ScdMesh.fromFile(expected_sm_filename)    
+
+    totals_bool = False
+    null_value = 1E-3
+    tolerance = 0.2
+
+    written_sm = magic.magic(flux_sm, totals_bool, null_value, tolerance)
     
-    if output in os.listdir('.'):
-        os.remove(output)
+    #verify weight window lower bounds are the same
+    for x in range(0,3):
+        for y in range(0,3):
+            for z in range(0,3):
+                for e_group in range(1, 3):
+                    expected_voxel = expected_sm.getHex(x,y,z)
+                    expected = expected_sm.imesh.getTagHandle('ww_n_group_00{0}'.format(e_group))[expected_voxel]
+                    written_voxel = written_sm.getHex(x,y,z)
+                    written = written_sm.imesh.getTagHandle('ww_n_group_00{0}'.format(e_group))[written_voxel]
+                    assert_equal(written, expected)
+
+def test_magic_it_0_total_group():
+    thisdir = os.path.dirname(__file__)
+    flux_sm_filename = os.path.join(thisdir, 'files_test_magic/iteration_0_flux_2_group.h5m')
+    flux_sm = ScdMesh.fromFile(flux_sm_filename)
+    expected_sm_filename = os.path.join(thisdir, 'files_test_magic/iteration_0_magic_total_group.h5m')   
+    expected_sm = ScdMesh.fromFile(expected_sm_filename)    
+
+    totals_bool = True
+    null_value = 1E-3
+    tolerance = 0.2
+
+    written_sm = magic.magic(flux_sm, totals_bool, null_value, tolerance)
     
-    magic.magic(flux_h5m, 'None', False, 0, output, 'None', 0.1)
-
-    f=open(output)
-    written = f.readlines()
-    f.close
-
-    g = open(expected_file)
-    expected = g.readlines()
-    g.close
-
-    # exclude first line, it contain a date
-    # everything else on the first line is the same for all wwinp files and is
-    # therefore not particularly import to test.
-    assert_equal(written[1:], expected[1:])
-    os.remove(output)
+    #verify weight window lower bounds are the same
+    for x in range(0,3):
+        for y in range(0,3):
+            for z in range(0,3):
+                expected_voxel = expected_sm.getHex(x,y,z)
+                expected = expected_sm.imesh.getTagHandle('ww_n_group_total')[expected_voxel]
+                written_voxel = written_sm.getHex(x,y,z)
+                written = written_sm.imesh.getTagHandle('ww_n_group_total')[written_voxel]
+                assert_equal(written, expected)
 
 
-def test_block_3():
-    flux_h5m = 'files_test_magic/iteration_0.h5m'
-    expected_file = 'files_test_magic/iteration_0.wwinp'
-    output = 'iteration_0_wwinp'
+def test_magic_it_0_1_group():
+    thisdir = os.path.dirname(__file__)
+    flux_sm_filename = os.path.join(thisdir, 'files_test_magic/iteration_0_flux_1_group.h5m')
+    flux_sm = ScdMesh.fromFile(flux_sm_filename)
+    expected_sm_filename = os.path.join(thisdir, 'files_test_magic/iteration_0_magic_1_group.h5m')   
+    expected_sm = ScdMesh.fromFile(expected_sm_filename)    
+
+    totals_bool = False
+    null_value = 1E-3
+    tolerance = 0.2
+
+    written_sm = magic.magic(flux_sm, totals_bool, null_value, tolerance)
     
-    if output in os.listdir('.'):
-        os.remove(output)
+    #verify weight window lower bounds are the same
+    for x in range(0,3):
+        for y in range(0,3):
+            for z in range(0,3):
+                expected_voxel = expected_sm.getHex(x,y,z)
+                expected = expected_sm.imesh.getTagHandle('ww_n_group_001')[expected_voxel]
+                written_voxel = written_sm.getHex(x,y,z)
+                written = written_sm.imesh.getTagHandle('ww_n_group_001')[written_voxel]
+                assert_equal(written, expected)
+
+def test_magic_it_1_1_group():
+    thisdir = os.path.dirname(__file__)
+    flux_sm_filename = os.path.join(thisdir, 'files_test_magic/iteration_1_flux_1_group.h5m')
+    flux_sm = ScdMesh.fromFile(flux_sm_filename)
+    ww_sm_filename = os.path.join(thisdir, 'files_test_magic/iteration_0_magic_1_group.h5m')
+    ww_sm = ScdMesh.fromFile(ww_sm_filename)
+    expected_sm_filename = os.path.join(thisdir, 'files_test_magic/iteration_1_magic_1_group.h5m')   
+    expected_sm = ScdMesh.fromFile(expected_sm_filename)    
+
+    totals_bool = False
+    null_value = 0
+    tolerance = 0.1
+
+    written_sm = magic.magic(flux_sm, totals_bool, null_value, tolerance, ww_sm)
     
-    magic.magic(flux_h5m, 'None', False, 0, output, 'None', 0.1)
-
-    f=open(output)
-    written = f.readlines()
-    f.close
-
-    g = open(expected_file)
-    expected = g.readlines()
-    g.close
-
-    assert_equal(written[1:], expected[1:])
-    os.remove(output)
-
-
-
-def test_overwrite():
-    flux_h5m = 'files_test_magic/iteration_1.h5m'
-    ww_mesh = 'files_test_magic/iteration_0.wwmesh'
-    expected_file = 'files_test_magic/iteration_1.wwinp'
-    output = 'iteration_1_wwinp'
-    
-    if output in os.listdir('.'):
-        os.remove(output)
-    
-    magic.magic(flux_h5m, ww_mesh, False, 0, output, 'None', 0.1)
-
-    f=open(output)
-    written = f.readlines()
-    f.close
-
-    g = open(expected_file)
-    expected = g.readlines()
-    g.close
-
-    assert_equal(written[1:], expected[1:])
-    os.remove(output)
-
-
-def test_null():
-    flux_h5m = 'files_test_magic/null_test.h5m'
-    expected_file = 'files_test_magic/null_test.wwinp'
-    output = 'null_wwinp'
-    
-    if output in os.listdir('.'):
-        os.remove(output)
-    
-    magic.magic(flux_h5m, 'None', False, 33333, output, 'None', 0.1)
-
-    f=open(output)
-    written = f.readlines()
-    f.close
-
-    g = open(expected_file)
-    expected = g.readlines()
-    g.close
-
-    assert_equal(written[1:], expected[1:])
-    os.remove(output)
-
-def single_group_test1():
-    flux_h5m = 'files_test_magic/single_group_test1.h5m'
-    expected_file = 'files_test_magic/single_group_test1.wwinp'
-    output = 'single_group_test1'
-    
-    if output in os.listdir('.'):
-        os.remove(output)
-    
-    magic.magic(flux_h5m, 'None', False, 0, output, 'None', 0.1)
-
-    f=open(output)
-    written = f.readlines()
-    f.close
-
-    g = open(expected_file)
-    expected = g.readlines()
-    g.close
-
-    assert_equal(written[1:], expected[1:])
-    os.remove(output)
-
-def test_single_group_test2():
-    flux_h5m = 'files_test_magic/single_group_test2.h5m'
-    ww_mesh = 'files_test_magic/single_group_test1.wwmesh'
-    expected_file = 'files_test_magic/single_group_test2.wwinp'
-    output = 'single_group_test2'
-    
-    if output in os.listdir('.'):
-        os.remove(output)
-    
-    magic.magic(flux_h5m, ww_mesh, False, 0, output, 'None', 0.1)
-
-    f=open(output)
-    written = f.readlines()
-    f.close
-
-    g = open(expected_file)
-    expected = g.readlines()
-    g.close
-
-    assert_equal(written[1:], expected[1:])
-    os.remove(output)
-
-
-def test_block_3():
-    flux_h5m = 'files_test_magic/iteration_0.h5m'
-    expected_file = 'files_test_magic/totals_test.wwinp'
-    output = 'totals_wwinp'
-    
-    if output in os.listdir('.'):
-        os.remove(output)
-    
-    magic.magic(flux_h5m, 'None', True, 0, output, 'None', 0.1)
-
-    f=open(output)
-    written = f.readlines()
-    f.close
-
-    g = open(expected_file)
-    expected = g.readlines()
-    g.close
-
-    assert_equal(written[1:], expected[1:])
-    os.remove(output)
-
-###############################################################
-def test_tolerance():
-    flux_h5m = 'files_test_magic/iteration_1.h5m'
-    ww_mesh = 'files_test_magic/iteration_0.wwmesh'
-    expected_file = 'files_test_magic/tolerance_test.wwinp'
-    output = 'tolerance_test'
-    
-    if output in os.listdir('.'):
-        os.remove(output)
-    
-    magic.magic(flux_h5m, ww_mesh, False, 0, output, 'None', 0.7)
-
-    f=open(output)
-    written = f.readlines()
-    f.close
-
-    g = open(expected_file)
-    expected = g.readlines()
-    g.close
-
-    assert_equal(written[1:], expected[1:])
-    os.remove(output)
-
+    #verify weight window lower bounds are the same
+    for x in range(0,3):
+        for y in range(0,3):
+            for z in range(0,3):
+                expected_voxel = expected_sm.getHex(x,y,z)
+                expected = expected_sm.imesh.getTagHandle('ww_n_group_001')[expected_voxel]
+                written_voxel = written_sm.getHex(x,y,z)
+                written = written_sm.imesh.getTagHandle('ww_n_group_001')[written_voxel]
+                assert_equal(written, expected)
 
 # Run as script
 #
 if __name__ == "__main__":
-    test_block_1_2()
-    test_block_3()
-    test_overwrite()
+    test_magic_it_0_2_group()
+    test_magic_it_0_total_group()
+    test_magic_it_0_1_group()
+    test_magic_it_1_1_group()

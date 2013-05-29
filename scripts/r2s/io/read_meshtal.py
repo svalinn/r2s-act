@@ -278,9 +278,19 @@ def read_meshtal( filename, tally_line, norm=1.0, **kw ):
                     "Incorrect dimension in preexisting structured mesh")
         sm = kw['smesh']
 
-    # Tagging structured mesh with e_groups (at root level)
-    # The tag will only have the upper bound, the 0.000 lower bound will not appear
-    tag_e_bin = sm.imesh.createTag("e_groups", len(e_groups) - 1, float)
+    # Tagging structured mesh with particle type at root level
+    tag_particle = sm.imesh.createTag("particle", 1, int)
+
+    if meshtal_type == 'n':
+        tag_particle[sm.imesh.rootSet] = 1
+
+    elif meshtal_type == 'p':
+        tag_particle[sm.imesh.rootSet] = 2
+
+    # Tagging structured mesh with energy lower bounds (at root level)
+    # only the upper bounds are tagged, so the first value in e_groups,
+    # which is always 0.000 is ommitted.
+    tag_e_bin = sm.imesh.createTag("E_upper_bounds", len(e_groups) - 1, float)
     tag_e_bin[sm.imesh.rootSet] = e_groups[1:]
 
     # Tagging structured mesh
@@ -291,6 +301,7 @@ def read_meshtal( filename, tally_line, norm=1.0, **kw ):
 
 ###############################################################################
 
+###############################################################################
 def main( arguments = None ) :
 
     # Instantiate option parser

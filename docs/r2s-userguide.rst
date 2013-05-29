@@ -351,8 +351,59 @@ _______________________________________________________________________________
 :Path: `r2s-act/scripts/tools/mats2ALARA.py`
 
 _______________________________________________________________________________
-tag_ebins.py
+wwinp_to_h5m.py
 _______________________________________________________________________________
+
+:Purpose: This script creates a structured .h5m tagged with weight window lower bounds from a MCNP WWINP file.
+:Inputs: MCNP WWINP file
+:Outputs: Tagged structured mesh
+:Syntax: ./wwinp_to_h5m <wwinp> options
+:Options:
+  -h, --help  show this help message and exit
+  -o OUTPUT   Name of ALARA matlib output file, default=wwinp.h5m
+:Path: `r2s-act/scripts/tools/wwinp_to_h5m.py`
+
+_______________________________________________________________________________
+h5m_to_wwinp.py
+_______________________________________________________________________________
+
+:Purpose: This scripts read an .h5m mesh tagged with weight window lower bounds and output a MCNP wwinp file.
+:Additional Instructions: When printing a WWINP created using the magic.py -t option, the -t option must be used for this scripts as well.
+:Inputs: Structured mesh file tagged with weight window lower bounds
+:Outputs: MCNP WWINP file
+:Syntax: ./h5m_to_wwinp <h5m file. [options]
+:Options:
+  -h, --help      show this help message and exit
+  -o OUTPUT_NAME  Name of WWINP output file, default=wwinp.out
+  -t              If multiple energy groups exist, only use Total
+                  default=False
+:Path: `r2s-act/scripts/tools/magic.py`
+
+_______________________________________________________________________________
+magic.py
+_______________________________________________________________________________
+
+:Purpose: This script reads in a flux mesh with N energy groups and generates weight windows using the MAGIC global variance reduction technique for either each of the N energy groups or the total. Additionally, a preexisting weight window mesh can be specified. This allows for iterations of the MAGIC method, each improving the weight windows.
+:Inputs: Structured mesh tagged with fluxes, optional structured mesh tagged with lower weight window bounds.
+:Outputs: Structured mesh tagged with lower weight window bounds.
+:Syntax: ./magic.py <flux mesh> [options]
+:Options:
+  -h, --help      show this help message and exit
+  -w WW_MESH      Preexisting WW mesh file to apply magic to, 
+                  default=none
+  -o OUTPUT_MESH  Name of WWINP output file, default=magic_ww.h5m
+  -t              If multiple energy groups exist, only use Total
+                  default=False
+  -n NULL_VALUE   WW value for voxels with error > tolerance (on
+                  the first iteration only), default=0
+  -e TOLERANCE    Specify the maximum allowable relative error for
+                  creating ww files from MAGIC or overwriting
+                  existing ww values, default=0.1
+:Path: `r2s-act/scripts/tools/magic.py`
+
+____________________________________________________________________
+tag_ebins.py
+____________________________________________________________________
 
 :Purpose: If custom energy groups are desired for activation and photon transport, a separate file listing the energy bins boundaries (one per line) can be provided to this script. Otherwise, the default 42 group structure will be used.
 :Inputs: Step 1 mesh, energy file: a list of the energy bins for each photon energy group, with a single energy per line

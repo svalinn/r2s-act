@@ -1,24 +1,28 @@
-This is the MCNP inp for the sphere test problem
-C
-C Materials
-m1 1001 2 8016 1
-m2 26056 1
-m3 82207 1
-C
-C Source
-sdef pos 5 4 0 erg=d1
-sp1 -2 0.5
-C
-C Tally
-fmesh4:n origin= -15.5 -15.5 -15.5
-         imesh= -4.25 6.75 15.5
-         iints= 1     2    1
-         jmesh= -4.25 6.75 15.5
-         jints= 1    1    2
-         kmesh= -8.25 6.25 15.5
-         kints= 1    2    3
-         emesh= 5E-2 5E-1
-C Control
-nps 1000
-mode n
-WWP:n j j j j -1
+Geometry for magic.py tests
+1 1 0.1 -1 imp:n=1
+2 0      1 imp:n=0
+
+1 rpp -15 15 -15 15 -15 15
+
+m1 1001 2 8016 1 $ light water
+mode:n
+sdef erg=1 dir=D1 vec=0 0 1 pos= 0 0 0 
+SI1 0 1
+SP1 0 1
+fmesh4:n origin -15 -15 -15
+         imesh=15
+         iints=3
+         jmesh=15
+         jints=3
+         kmesh=15
+         kints=3
+         emesh= 1E-1 1
+fmesh14:n origin -15 -15 -15
+         imesh=15
+         iints=3
+         jmesh=15
+         jints=3
+         kmesh=15
+         kints=3
+nps 1E3
+wwp:n j j j j -1

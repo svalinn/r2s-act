@@ -9,99 +9,174 @@ from itaps import iMesh
 from itaps import iBase
 # r2s imports
 from r2s.scdmesh import ScdMesh
-
-def find_num_e_groups(sm, particle):
-    
-    num_e_groups=0
-    for e_group in range(1,1000): #search for up to 1000 e_groups
-        
-        #Look for tags in the form n_group_'e_group'
-        try:
-            tag=sm.imesh.getTagHandle('{0}_group_{1:03d}'.format(particle, e_group))
-            num_e_groups = num_e_groups + 1 #increment if tag is found
-
-       # Stop iterating once a tag is not found
-        except iBase.TagNotFoundError:
-            break    
-
-    #Exit if no tags of the form n_group_XXX are found
-    else:
-        print >>sys.stderr, 'No tags of the form n/p_group_XXX found'
-        sys.exit(1)
-  
-    return num_e_groups
+from tools import h5m_to_wwinp
 
 
-def find_max_fluxes(flux_mesh, particle, e_groups, total_bool):
-        
-    max_fluxes = [0]*len(e_groups)
-    for i, e_group in enumerate(e_groups):
-        for flux_voxel in flux_mesh.iterateHex('xyz'):
-            flux = flux_mesh.imesh.getTagHandle('{0}_group_{1}'.format(particle, e_group))[flux_voxel]
-            if flux > max_fluxes[i]:
-                max_fluxes[i] = flux
+################################################################################
+def gen_e_group_names(flux_mesh, totals_bool):
+    """
+    This function reads a mesh and returns the names of the energy groups to be 
+    tagged, in the form X_group_YYY or X_group_total.
 
-    #print "\tMaximum flux(es) found to be {0}".format(max_fluxes)
-    return max_fluxes
-
-
-def magic_wwinp(flux_mesh, ww_mesh='None', total_bool=False, null_value=0, tolerance=0.1):
-    """This function reads in a flux mesh and a ww mesh as well as relevant paramters
-       then the magic method is applied and a newly tagged flux is returned.
+    Parameters
+    ----------
+    flux_mesh : ScdMesh
+        A ScdMesh tagged with fluxes in the form X_group_YYY and or
+        X_group_total, where X is the particle n or p) and YYY is the energy 
+        group (e.g. 001, 002,  etc.). Addition required tags are "particle" 
+        (1 for n, 2 for p) and E_group_bounds (vector of energy upper bounds).
+    totals_bool : True or False
+        Determines whether magic will be applied to individual energy group
+        (False), or the total group (True).
     """
 
     # find meshtal type
-    tag_names = []
-    for tag in flux_mesh.imesh.getAllTags(flux_mesh.getHex(0,0,0)):
-        tag_names.append(tag.name)
+    particle_int = flux_mesh.imesh.getTagHandle('particle')[flux_mesh.imesh.rootSet]
 
-    if 'n_group_001' in tag_names or 'n_group_total' in tag_names:
-       particle = 'n'
-    elif 'p_group_001' in tag_names or 'p_group_total' in tag_names:
+    if particle_int == 1:
+        particle = 'n' 
+    else:
         particle = 'p'
-    else:
-        print >>sys.stderr, 'Tag X_group_YYY or X_group_total not found'
-        sys.exit(1)
 
-    # find number of e_groups
-    num_e_groups = find_num_e_groups(flux_mesh, particle)
+    # find number of energy groups
+    if totals_bool == True :
+        e_group_names = ['{0}_group_total'.format(particle)]
 
-    if total_bool == False:
-        e_groups = ['{0:03d}'.format(x) for x in range(1, num_e_groups + 1)]
-        print "\tGenerating WW for {0} energy groups".format(num_e_groups)
-    else:
-        e_groups = ['total']
-        print "\tGenerating WW for Total energy group"
+    elif totals_bool == False:
+        e_upper_bounds = \
+            flux_mesh.imesh.getTagHandle("E_upper_bounds")[flux_mesh.imesh.rootSet]
 
-    # find the max flux value for each e_group, store in vector
-    max_fluxes = find_max_fluxes(flux_mesh, particle, e_groups, total_bool)
+        if isinstance(e_upper_bounds, float):
+            e_upper_bounds = [e_upper_bounds]
 
-    if ww_mesh == 'None':
+        num_e_groups = len(e_upper_bounds)    
+        e_group_names = \
+           ['{0}_group_{1:03d}'.format(particle, x) for x in range(1, num_e_groups + 1)]
+
+
+    return e_group_names
+
+################################################################################
+def find_max_fluxes(flux_mesh, e_group_names):
+    """
+    This function reads a flux mesh and returns a vector of maximum fluxes for 
+    each energy group.
+
+    Parameters
+    ----------
+    flux_mesh : ScdMesh
+        A ScdMesh tagged with fluxes in the form X_group_YYY and or
+        X_group_total. Addition required tags are "particle" (1 for n, 2 for p) 
+        and E_group_bounds (vector of energy upper bounds).
+    e_group_names : vector of energy names
+        In the form X_group_YYY or X_group_total.
+        
+    """
+
+
+    max_fluxes = [0]*len(e_group_names)
+    for i, e_group_name in enumerate(e_group_names):
+
+        for flux_voxel in flux_mesh.iterateHex('xyz'):
+            flux = flux_mesh.imesh.getTagHandle(e_group_name)[flux_voxel]
+
+            if flux > max_fluxes[i]:
+                max_fluxes[i] = flux
+
+    return max_fluxes
+
+################################################################################
+def create_ww_mesh(flux_mesh, e_group_names):
+    """
+    This function reads a flux mesh and returns a weight window mesh tagged with 
+    all zeros in every energy group. This is used for the intial MAGIC weight
+    window generation, for which no preexisting weight window mesh is given.
+
+    Parameters
+    ----------
+    flux_mesh : ScdMesh
+        A ScdMesh tagged with fluxes in the form X_group_YYY and or
+        X_group_total. Addition required tags are "particle" (1 for n, 2 for p) 
+        and E_group_bounds (vector of energy upper bounds).
+    e_group_names : vector of energy names
+        In the form X_group_YYY or X_group_total.
+        
+    """
+
+    ww_mesh = ScdMesh(flux_mesh.getDivisions('x'),\
+                       flux_mesh.getDivisions('y'),\
+                       flux_mesh.getDivisions('z'))
+
+    # create ww tags
+    for e_group_name in e_group_names:
+            ww_tag = ww_mesh.imesh.createTag('ww_{0}'.format(e_group_name), 1, float)
+            for voxel in ww_mesh.iterateHex('xyz'):
+                ww_tag[voxel] = 0
+
+    # create e_upper_bound tags
+    e_upper_bounds = \
+        flux_mesh.imesh.getTagHandle("E_upper_bounds")[flux_mesh.imesh.rootSet]
+    if isinstance(e_upper_bounds, float):
+        e_upper_bounds = [e_upper_bounds]
+
+    e_tag = ww_mesh.imesh.createTag("E_upper_bounds", len(e_upper_bounds), float)
+    e_tag[ww_mesh.imesh.rootSet] = \
+        flux_mesh.imesh.getTagHandle("E_upper_bounds")[flux_mesh.imesh.rootSet]
+
+    # create  particle tag
+    particle = flux_mesh.imesh.getTagHandle("particle")[flux_mesh.imesh.rootSet]
+    particle_tag = ww_mesh.imesh.createTag("particle", 1, int)
+    particle_tag[ww_mesh.imesh.rootSet] = particle
+
+    return ww_mesh
+
+################################################################################
+
+def magic(flux_mesh, totals_bool, null_value, tolerance, ww_mesh=None):
+    """
+    This function reads a flux mesh and an optional preexisting ww mesh, preforms
+    the MAGIC algorithm and returns the resulting weight window mesh.
+
+    Parameters
+    ----------
+    flux_mesh : ScdMesh
+        A ScdMesh tagged with fluxes in the form X_group_YYY and or
+        X_group_total. Addition required tags are "particle" (1 for n, 2 for p) 
+        and E_group_bounds (vector of energy upper bounds).
+    totals_bool : True or False
+        Determines whether magic will be applied to individual energy group
+        (False), or the total group (True)
+    null_value : float
+        The weight window lower bound value that is assigned to voxels where the
+        relative error on flux exceeds the tolerance. This is only done for 
+        initial weight window lower bound generation, not subsequent iterations.
+    tolerance: float
+        The maximum relative error allowable for the MAGIC algorithm to create
+        a weight window lower bound for for a given voxel for the intial weight
+        window lower bound generation, or overwrite preexisting weight window
+        lower bounds for subsequent iterations.  
+    ww_mesh : ScdMesh
+        A preexisting weight window mesh to apply MAGIC to.      
+    """
+
+    tolerance = float(tolerance)
+    null_value = float(null_value)
+
+    e_group_names = gen_e_group_names(flux_mesh, totals_bool)
+
+    max_fluxes = find_max_fluxes(flux_mesh, e_group_names)
+    
+    if ww_mesh == None:
         print "\tNo WW mesh file supplied; generating one based on meshtal"
         ww_bool = False # mesh file NOT preexisting
+
         # create a mesh with the same dimensions as flux_mesh
-        ww_mesh = ScdMesh(flux_mesh.getDivisions('x'),\
-                          flux_mesh.getDivisions('y'),\
-                          flux_mesh.getDivisions('z'))
-        # create a tag for each energy group
-        for e_group in e_groups:
-            group_name = "ww_{0}_group_{1}".format(particle, e_group)
-            ww_mesh.imesh.createTag(group_name, 1, float)   
-
-        # create energy bounds
-        tag_e_groups = ww_mesh.imesh.createTag("e_groups", len(e_groups), float)
-
-        if e_groups != ['total']:
-            tag_e_groups[ww_mesh.imesh.rootSet] = \
-                flux_mesh.imesh.getTagHandle("e_groups")[flux_mesh.imesh.rootSet]
-        else:
-            tag_e_groups[ww_mesh.imesh.rootSet] = 1E36 # usual MCNP value           
-
+        ww_mesh = create_ww_mesh(flux_mesh, e_group_names)
 
     else:
         ww_bool = True # mesh file preexisting
-        # make sure the supplied meshes have the same dimenstions
-        ww_mesh = ScdMesh.fromFile(ww_mesh)
+
+        # make sure the supplied meshes have the same dimensions
         try:
             for i in ('x', 'y', 'z'):
                 flux_mesh.getDivisions(i) == ww_mesh.getDivisions(i)
@@ -110,268 +185,120 @@ def magic_wwinp(flux_mesh, ww_mesh='None', total_bool=False, null_value=0, toler
             print >>sys.stderr, 'Mismatched dimensions on WWINP and flux meshes'
             sys.exit(1)
 
-    print "\tSupplied meshes confirmed to have same dimensions"
-    
-    # iterate through all voxels          
+        print "\tSupplied meshes confirmed to have same dimensions"
+
+
+    # iterate through all voxels and energy groups and apply MAGIC  
     flux_voxels = flux_mesh.iterateHex('xyz')
     ww_voxels = ww_mesh.iterateHex('xyz')
 
     for (flux_voxel, ww_voxel) in zip(flux_voxels, ww_voxels):
-        for i, e_group in enumerate(e_groups):
-            flux = flux_mesh.imesh.getTagHandle(\
-                '{0}_group_{1}'.format(particle, e_group))[flux_voxel]
-            error = flux_mesh.imesh.getTagHandle(\
-                 '{0}_group_{1}_error'.format(particle, e_group))[flux_voxel]
-            if ((ww_bool == False and error != 0.0) \
-            or (0.0 < error and error < tolerance)):
-                if ww_bool == True:
-                    if ww_mesh.imesh.getTagHandle('ww_{0}_group_{1}'\
-                    .format(particle, e_group))[ww_voxel] != -1:       
-                        ww_mesh.imesh.getTagHandle('ww_{0}_group_{1}'\
-                        .format(particle, e_group))[ww_voxel]\
-                        = flux/(2*max_fluxes[i]) # apply magic method
 
-                else:
-                    ww_mesh.imesh.getTagHandle(\
-                        'ww_{0}_group_{1}'.format(particle, e_group))[ww_voxel]\
-                         = flux/(2*max_fluxes[i]) # apply magic method
+        for i, e_group_name in enumerate(e_group_names):
 
-            elif ww_bool == False and error == 0.0 :
-                ww_mesh.imesh.getTagHandle(\
-                    'ww_{0}_group_{1}'.format(particle, e_group))[ww_voxel]\
-                     = null_value
+            flux = flux_mesh.imesh.getTagHandle(e_group_name)[flux_voxel]
+            error = flux_mesh.imesh.getTagHandle(e_group_name + '_error')[flux_voxel]
+            ww = ww_mesh.imesh.getTagHandle('ww_{0}'.format(e_group_name))[ww_voxel]
 
-    return ww_mesh, e_groups
+            if error < tolerance and error != 0 and ww != -1:
+                ww_mesh.imesh.getTagHandle('ww_{0}'.format(e_group_name))[ww_voxel]\
+                     = flux/(2*max_fluxes[i]) # apply magic method
+
+            elif ww_bool == False and (error > tolerance or error == 0.0):
+                ww_mesh.imesh.getTagHandle('ww_{0}'.format(e_group_name))[ww_voxel] \
+                    = null_value
+
+    return ww_mesh
 
 
-def write_wwinp(ww_mesh, e_groups, output):
-    """This funtion reads a WW mesh file and prints out a corresponding WWIMP
+################################################################################
+
+def write_magic(flux_mesh_filename, ww_inp_mesh_filename, totals_bool, \
+                null_value, output_mesh, tolerance):
+    """
+    This function takes the filename of the flux mesh and optional wieght window
+    mesh, as well necessary parameter, sends them to the magic funtion and
+    writes the resulting wieght window mesh.
+
+    Parameters
+    ----------
+    flux_mesh_filename: ScdMesh file name.
+        A ScdMesh tagged with fluxes in the form X_group_YYY and or
+        X_group_total. Addition required tags are "particle" (1 for n, 2 for p) 
+        and E_group_bounds (vector of energy upper bounds).
+    totals_bool : True or False
+        Determines whether magic will be applied to individual energy group
+        (False), or the total group (True)
+    null_value : float
+        The weight window lower bound value that is assigned to voxels where the
+        relative error on flux exceeds the tolerance. This is only done for 
+        initial weight window lower bound generation, not subsequent iterations.
+    output_mesh : string
+        Filename of output mesh
+    tolerance: float
+        The maximum relative error allowable for the MAGIC algorithm to create
+        a weight window lower bound for for a given voxel for the intial weight
+        window lower bound generation, or overwrite preexisting weight window
+        lower bounds for subsequent iterations.  
+    ww_inp_mesh_filename : ScdMesh file name
+        A preexisting weight window mesh to apply MAGIC to.      
     """
 
-    # find wwinp type
-    tag_names = []
-    for tag in ww_mesh.imesh.getAllTags(ww_mesh.getHex(0,0,0)):
-        tag_names.append(tag.name)
+    flux_mesh = ScdMesh.fromFile(flux_mesh_filename)
 
-    if 'ww_n_group_001' in tag_names or 'ww_n_group_total' in tag_names:
-       particle = 'n'
-    elif 'ww_p_group_001' in tag_names or 'ww_p_group_total' in tag_names:
-        particle = 'p'
+    if ww_inp_mesh_filename != None:
+        ww_inp_mesh = ScdMesh.fromFile(ww_inp_mesh_filename)
+
     else:
-        print >>sys.stderr, 'Tag ww_X_group_YYY or ww_X_group_total not found'
-        sys.exit(1)
+        ww_inp_mesh = None
+   
 
-    # create block 1 string
-    block1 = '         1         1         '
+    ww_mesh = magic(flux_mesh, totals_bool, null_value, tolerance, ww_inp_mesh)
+    ww_mesh.scdset.save(output_mesh)
+    print "\tWrote WW mesh file '{0}'".format(output_mesh)
 
-    # add particle specifier
-    if particle == 'n':
-        block1 += '1'
-    else:
-        block1 += '2'
-
-    # add 10 to specify cartesian geometry
-    block1 += '        10                     '
-    # add date and time
-    now = datetime.datetime.now()
-    block1 += '{0:02d}/{1}/{2} {3}:{4}:{5}\n'\
-        .format(now.month, now.day, str(now.year)[2:], now.hour, now.minute, \
-        now.second)
-    # if it is a photon mesh, append the number of neutron e_groups, zero.
-    if particle == 'p':
-        block1 += '         0'
-
-    # append number of e_groups
-    block1 += '         {0}\n'.format(len(e_groups))
-
-    # find mesh spacial bounds
-    x, y, z = [ww_mesh.getDivisions('x'), ww_mesh.getDivisions('y'),\
-        ww_mesh.getDivisions('z')]
-
-    # find fine/coarse mesh points
-    coarse_points = [[],[],[]]
-    nfm = [[],[],[]]
-    for i, points in enumerate([x, y, z]):
-        coarse_points[i].append(points[0])
-        j = 1
-        ###print "\n\n\nfirst coarse point in dim {0} is {1}".format(i, points[0])
-        while j < len(points)-1:
-            fine_count = 1
-             #floating point comparison: need to be careful because this characterizes
-             #coarse vs. fine. That is why 1.01E-2 is used.
-            while abs((points[j] - points[j-1]) - (points[j+1] - points[j])) <= 1.01E-2: 
-               ###print "dim {0} point {1} is a fine point".format(i, points[j])
-               fine_count += 1
-               ###print "fine count increased to {0}".format(fine_count)
-               j += 1
-               ###print "next point to be considered is {0}".format(points[j])
-               if j == len(points) - 1:
-                   ###print "j is now equal to {0}, breaking".format(j)
-                   break
-
-            ###print "appending fine count {0}".format(fine_count)
-            nfm[i].append(fine_count)
-            ###print "{0} is a coarse point".format(points[j])
-            coarse_points[i].append(points[j])
-            j += 1
-            ###if j < len(points):
-                ###print "next point to be considered is {0} (bottom)".format(points[j])
-
-        # if j is on the second to last value, then you can't restart the loop 
-        # but the last value has not been accounted for. This occures when the 
-        # last two mesh points are both coarse (with one fine mesh in between)
-        # this last case handles this final special case
-        if j == len(points)-1:
-            ###print "inside last course point loop"
-            nfm[i].append(1)
-            coarse_points[i].append(points[j])
-
-    ###print coarse_points
-    ###print nfm
-    # append the rest of block 1
-    block1 += " {0: 1.5E} {1: 1.5E} {2: 1.5E}"\
-        .format(sum(nfm[0]), sum(nfm[1]), sum(nfm[2]))
-
-    block1 += " {0: 1.5E} {1: 1.5E} {2: 1.5E}\n"\
-        .format(coarse_points[0][0], coarse_points[1][0], coarse_points[2][0])
-
-    # when printing number of coarse mesh points, must subtract 1. This code
-    # (magic.py) is considering the origin a coarse mesh point whereas MCNP
-    # does not
-    block1 += " {0: 1.5E} {1: 1.5E} {2: 1.5E}  1.0000E+00\n"\
-        .format(len(coarse_points[0])-1, len(coarse_points[1])-1, len(coarse_points[2])-1)
-    # block 1 now complete
-
-    # create vector of block2 values:
-    block2_array = [[],[],[]]
-    for i in range(0, 3):
-        block2_array[i].append(coarse_points[i][0])
-        for j in range(0, len(coarse_points[i]) - 1):
-           block2_array[i] += [nfm[i][j], coarse_points[i][j+1], 1.0000]
-
-    # translate block2 vector into a string
-    block2 = ''
-    for i in range(0,3):
-        line_count = 0 # number of entries printed to current line, max = 6
-        for j in range(0, len(block2_array[i])):
-           
-            block2 += ' {0: 1.5E}'.format(block2_array[i][j])
-            line_count += 1
-            if line_count == 6:
-                block2 += '\n'
-                line_count = 0
-
-        if line_count != 0:
-            block2 += '\n'
-    # block 2 string now complete
-
-    # create block 3 string
-    # first get energy values and added then to the block 3 string
-    block3 = ''
-    e_bounds = ww_mesh.imesh.getTagHandle("e_groups")[ww_mesh.imesh.rootSet]
-    line_count = 0
-
-    #in the single e_group case, the "e_groups" tag returns a non-iterable float,
-    # if this is the case, put this float into an array so that it can be iterated over
-    if isinstance(e_bounds, float):
-        e_bounds = [e_bounds]
-
-    for e_bound in e_bounds:
-        block3 += "  {0:1.5E}".format(e_bound)
-        line_count += 1
-        if line_count == 6:
-           block3 += '\n'
-
-    if line_count != 0:
-        block3 += '\n'
-
-    # get ww_data
-    count = 0
-    for e_group in e_groups:
-        voxels = ww_mesh.iterateHex('xyz')
-        ww_data = []
-        count += 1
-        for voxel in voxels:
-            ww_data.append(ww_mesh.imesh.getTagHandle('ww_{0}_group_{1}'.format(particle, e_group))[voxel])
-          
-        # append ww_data to block3 string
-        line_count = 0
-        for ww in ww_data:
-            if ww >= 0:
-                block3 += ' '
-                
-            block3 += " {0:1.5E}".format(ww)
-            line_count += 1
-
-            if line_count == 6:
-                block3 += '\n'
-                line_count = 0
-
-        if line_count != 0:
-            block3 += '\n'
+    #h5m_to_wwinp.write_wwinp(ww_mesh, output)
+    #print "\tWrote WWINP file '{0}'".format(output)
 
 
-    out=file(output, 'w')
-    out.write(block1)
-    out.write(block2)
-    out.write(block3)           
-
-
-
-def magic(flux_h5m, ww_mesh, total_bool, null_value, output, output_mesh, tolerance):
-    """Runs magic.py from as a module
-    """
-    flux_mesh = ScdMesh.fromFile(flux_h5m)
-
-    ww_mesh, e_groups = magic_wwinp(flux_mesh, ww_mesh, total_bool, null_value, tolerance)
-
-    if output_mesh != 'None':
-        ww_mesh.scdset.save(output_mesh)
-
-    write_wwinp(ww_mesh, e_groups, output)
-
+################################################################################
 
 def main( arguments = None ):
 
     #Instatiate options parser
     parser = OptionParser\
-             (usage='%prog <flux mesh> <ww mesh> [options]')
+             (usage='%prog <flux mesh> [options]')
 
-    parser.add_option('-w', dest='ww_mesh', default='None',\
-        help='Preexisting WW mesh to apply magic to, default=%default')
+    parser.add_option('-w', dest='ww_mesh', default=None,\
+        help='Preexisting WW mesh file to apply magic to, default=%default')
 
-    parser.add_option('-o', dest='output_name', default='wwinp.out',\
+    parser.add_option('-o', dest='output_mesh', default='magic_ww.h5m',\
         help='Name of WWINP output file, default=%default')
 
-    parser.add_option('-m', dest='output_mesh', default='None',\
-        help='Name of WWINP output file, default=%default')
-
-    parser.add_option('-t', action='store_true', dest='total_bool',\
+    parser.add_option('-t', action='store_true', dest='totals_bool',\
         default=False, \
         help='If multiple energy groups exist, only use Total \
          default=%default')
 
     parser.add_option('-n', dest='null_value', default='0',\
-        help='WW value for voxels with error > 10%, default=%default')
+        help='WW value for voxels with error > tolerance \
+              (on the first iteration only), default=%default')
 
     parser.add_option('-e', dest='tolerance', default='0.1',\
-        help='Specify the maximum allowable error for overwriting  values, default=%default')
+        help='Specify the maximum allowable relative error for \
+              creating ww files from MAGIC or \
+              overwriting existing ww values, default=%default')
 
     (opts, args) = parser.parse_args( arguments )
 
     if len(args) != 1:
         parser.error\
-        ( '\nNeed exactly 1 argument: flux mesh' )
+        ( '\nNeed exactly 1 argument: <flux mesh>' )
 
 
-    magic(args[0], opts.ww_mesh, opts.total_bool, opts.null_value, opts.output_name, opts.output_mesh, opts.tolerance)
+    write_magic(args[0], opts.ww_mesh, opts.totals_bool, opts.null_value, \
+                opts.output_mesh, opts.tolerance)
 
-    print "\tWrote WWINP file '{0}'".format(opts.output_name)
-
-    if opts.output_mesh != 'None':
-        print "\tWrote WW mesh file '{0}'".format(opts.output_mesh)
-
-    print "Complete"
 
 
 if __name__ == '__main__':
