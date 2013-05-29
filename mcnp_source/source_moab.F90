@@ -409,8 +409,10 @@ subroutine get_tet_vol (mymesh, tet_entity_handle, volume)
         ! Function type
         real(dknd) :: calc_tet_vol
         ! Other variables 
-        integer :: iverts_alloc, iverts_size
-        integer :: icoords_alloc, icoords_size
+        integer :: iverts_alloc = 0
+        integer :: iverts_size
+        integer :: icoords_alloc = 0
+        integer :: icoords_size
         iBase_EntityHandle :: verts, pointer_verts
         real(dknd) :: coords
         iBase_EntityHandle :: pointer_coords
@@ -419,14 +421,14 @@ subroutine get_tet_vol (mymesh, tet_entity_handle, volume)
         pointer (pointer_verts, verts(1,*))
         pointer (pointer_coords, coords(1,*))
 
+        save iverts_alloc, icoords_alloc, pointer_verts, pointer_coords
+
         ! Get vertices' handles
-        iverts_alloc = 0
         call iMesh_getEntAdj(%VAL(mymesh), %VAL(tet_entity_handle), &
               %VAL(iBase_VERTEX), pointer_verts, &
               iverts_alloc, iverts_size, ierr)
 
         ! Get all vertices' coordinates
-        icoords_alloc = 0
         call iMesh_getVtxArrCoords(%VAL(mymesh), %VAL(pointer_verts), &
               !%VAL(4), iBase_INTERLEAVED, pointer_coords, &
               !icoords_alloc, icoords_size, ierr)
@@ -502,8 +504,10 @@ subroutine get_hex_vol (mymesh, hex_entity_handle, volume)
         ! Function type
         real(dknd) :: calc_tet_vol
         ! Other variables 
-        integer :: iverts_alloc, iverts_size
-        integer :: icoords_alloc, icoords_size
+        integer :: iverts_alloc = 0
+        integer :: iverts_size
+        integer :: icoords_alloc = 0
+        integer :: icoords_size
         iBase_EntityHandle :: verts, pointer_verts
         real(dknd) :: coords
         iBase_EntityHandle :: pointer_coords
@@ -511,6 +515,8 @@ subroutine get_hex_vol (mymesh, hex_entity_handle, volume)
         ! cray pointers
         pointer (pointer_verts, verts(1,*))
         pointer (pointer_coords, coords(1,*))
+
+        save iverts_alloc, icoords_alloc, pointer_verts, pointer_coords
 
         ! Get vertices' handles
         iverts_alloc = 0
@@ -830,8 +836,10 @@ subroutine sample_region_entity (mymesh, entity_handle)
         iMesh_Instance, intent(IN) :: mymesh
         iBase_EntityHandle, intent(IN) :: entity_handle
         ! Other variables 
-        integer :: iverts_alloc, iverts_size
-        integer :: icoords_alloc, icoords_size
+        integer :: iverts_alloc = 0
+        integer :: iverts_size
+        integer :: icoords_alloc = 0
+        integer :: icoords_size
         iBase_EntityHandle :: verts, pointer_verts
         real(dknd) :: coords
         iBase_EntityHandle :: pointer_coords
@@ -839,14 +847,14 @@ subroutine sample_region_entity (mymesh, entity_handle)
         pointer (pointer_verts, verts(1,*))
         pointer (pointer_coords, coords(1,*))
 
+        save iverts_alloc, icoords_alloc, pointer_verts, pointer_coords
+
         ! Get vertices' handles
-        iverts_alloc = 0
         call iMesh_getEntAdj(%VAL(mymesh), %VAL(entity_handle), &
               %VAL(iBase_VERTEX), pointer_verts, &
               iverts_alloc, iverts_size, ierr)
 
         ! Get all vertices' coordinates
-        icoords_alloc = 0
         call iMesh_getVtxArrCoords(%VAL(mymesh), %VAL(pointer_verts), &
               %VAL(iverts_size), iBase_BLOCKED, pointer_coords, &
               icoords_alloc, icoords_size, ierr)
