@@ -14,6 +14,21 @@ from r2s.scdmesh import ScdMesh
 def write_wwinp(ww_mesh, totals_bool, output):
     """This funtion reads a WW mesh file and prints out a corresponding WWIMP
        with the name <output>.
+
+    Parameters
+    ----------
+    ww_mesh : ScdMesh
+        A mesh tagged with weight window lower bounds, with tag names in the 
+        form "ww_X_group_YYY" where X is the particle type (n or p) and YYY is 
+        the energy group. Tags for "particle" (1 for neutron, 2 for photon) and
+        "E_upper_bounds" (a vector of floats for the upper energy bounds) must 
+        also exist. This mesh is ostensibly created by magic.py or 
+        wwinp_to_h5m.py.
+    totals_bool : True or False
+        Determines if the function should look for tags in the form 
+        "ww_X_group_YYY" (totals_bool = False) or "ww_X_group_total" 
+        (totals_bool = True).
+    output : The name of the wwinp output file
     """
 
     # find wwinp type
@@ -174,11 +189,13 @@ def write_wwinp(ww_mesh, totals_bool, output):
     out.write(block3)           
 
 
+
+
 def main( arguments = None ):
 
     #Instatiate options parser
     parser = OptionParser\
-             (usage='%prog <flux mesh> <ww mesh> [options]')
+             (usage='%prog <ww mesh> [options]')
 
     parser.add_option('-o', dest='output_name', default='wwinp.out',\
         help='Name of WWINP output file, default=%default')

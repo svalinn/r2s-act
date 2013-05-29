@@ -12,8 +12,12 @@ from itaps import iBase
 from r2s.scdmesh import ScdMesh, ScdMeshError
 
 def cartesian(wwinp):
-    """This function reads in a cartesian WWINP file and returns a tagged, 
-        structured mesh.
+    """This function reads in a Cartesian WWINP file and returns a structured
+        mesh tagged with weight window lower bounds.
+    Parameters
+    ----------
+    wwinp : file name
+        The weight window input file to create a mesh from.
     """
 
     print "Parsing Cartesian WWINP"
@@ -67,7 +71,8 @@ def cartesian(wwinp):
 
 
 def block_2_bounds(wwinp, line_num, nc):
-    """This function reads wwinp starting at a given line, and returns bounds
+    """
+       This function reads wwinp starting at a given line, and returns bounds
        for the spacial varible beginging on that line. First it pulls out
        vectors from Block 2 data (Appendix J) in the form:
 
@@ -76,6 +81,14 @@ def block_2_bounds(wwinp, line_num, nc):
        It does this by considering the number of course mesh points, nc. Then
        The mesh bounds for the structured mesh are parsed out and returned as
        a vector.
+    Parameters
+    ----------
+    wwinp : string
+        The weight window input file name to create a mesh from.
+    line_num : int
+        The first line with block 2 values
+    nc : int
+        The number of course mesh points. 
     """
 
     # parse raw values from wwinp
@@ -108,6 +121,21 @@ def block_2_bounds(wwinp, line_num, nc):
 def tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nf, particle):
     """This function reads in a structured and tags it with ww values from 
        wwinp.
+
+    Parameters
+    ----------
+    sm : ScdMesh
+         The structured mesh with proper dimensions
+    wwinp : file name
+        The wwinp file
+    ww_first_line : int
+        The first line of weight window lower bound values in the wwinp file.
+    num_e_bins : int
+        The number of energy groups
+    nf : int
+        The total number of fine mesh points
+    particle : 'n' or 'p'
+        Specifies neutron or photon
     """
     # ordered voxels, z changes fastest, then y, then x.
     voxels=list(sm.iterateHex('zyx'))   
@@ -143,6 +171,10 @@ def tag_mesh(sm, wwinp, ww_first_line, num_e_bins, nf, particle):
 def cylindrical(wwinp):
     """ This function has not been made yet, so right now it just returns an
         error message.
+    Parameters
+    ----------
+    wwinp : string
+        Name of the wwinp file.
     """
     print >>sys.stderr, 'cylindrical wwinp not currently supported'
     sys.exit(1)
