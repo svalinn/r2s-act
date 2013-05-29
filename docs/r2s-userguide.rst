@@ -361,7 +361,7 @@ _______________________________________________________________________________
 :Options:
   -h, --help  show this help message and exit
   -o OUTPUT   Name of ALARA matlib output file, default=wwinp.h5m
-:Path:`r2s-act/scripts/tools/wwinp_to_h5m.py`
+:Path: `r2s-act/scripts/tools/wwinp_to_h5m.py`
 
 _______________________________________________________________________________
 h5m_to_wwinp.py
@@ -377,7 +377,7 @@ _______________________________________________________________________________
   -o OUTPUT_NAME  Name of WWINP output file, default=wwinp.out
   -t              If multiple energy groups exist, only use Total
                   default=False
-:Path:`r2s-act/scripts/tools/magic.py`
+:Path: `r2s-act/scripts/tools/magic.py`
 
 _______________________________________________________________________________
 magic.py
@@ -399,7 +399,7 @@ _______________________________________________________________________________
   -e TOLERANCE    Specify the maximum allowable relative error for
                   creating ww files from MAGIC or overwriting
                   existing ww values, default=0.1
-:Path:`r2s-act/scripts/tools/magic.py`
+:Path: `r2s-act/scripts/tools/magic.py`
 
 ____________________________________________________________________
 tag_ebins.py
