@@ -356,7 +356,7 @@ _______________________________________________________________________________
 
 :Purpose: This script creates a structured .h5m tagged with weight window lower bounds from a MCNP WWINP file.
 :Inputs: MCNP WWINP file
-:Outputs Tagged structured mesh
+:Outputs: Tagged structured mesh
 :Syntax: ./wwinp_to_h5m <wwinp> options
 :Options:
   -h, --help  show this help message and exit
