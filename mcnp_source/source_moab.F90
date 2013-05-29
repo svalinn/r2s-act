@@ -430,8 +430,6 @@ subroutine get_tet_vol (mymesh, tet_entity_handle, volume)
 
         ! Get all vertices' coordinates
         call iMesh_getVtxArrCoords(%VAL(mymesh), %VAL(pointer_verts), &
-              !%VAL(4), iBase_INTERLEAVED, pointer_coords, &
-              !icoords_alloc, icoords_size, ierr)
               %VAL(4), iBase_BLOCKED, pointer_coords, &
               icoords_alloc, icoords_size, ierr)
 
@@ -759,45 +757,6 @@ subroutine voxel_sample
         call sample_region_entity(mesh, entity_handles(voxel))
         
 end subroutine voxel_sample
-
-
-integer function binary_search(pos, len, table)
-! Performs binary search and returns the integer indice for searched table.
-! 
-! Parameters
-! ----------
-! pos : float
-!     Search value/key
-! len : integer
-!     Number of bins in `table`
-! table : list of floats
-!     Sorted 1D list to be searched
-! 
-! Notes
-! -----
-! Copied from algorithm used elsewhere in MCNP code.
-  use source_data
-  implicit none
-
-        real(dknd), intent(IN) :: pos
-        integer, intent (IN) :: len
-        real(dknd), intent(IN), dimension(1:len) :: table
-
-        ic_s = 1
-        ib_s = len
-        do
-           if( ib_s-ic_s.eq.1 .or. ib_s.eq.ic_s)  exit
-           ih_s = (ic_s+ib_s)/2
-           if( pos.ge.table(ih_s) ) then
-              ic_s = ih_s
-           else
-              ib_s = ih_s
-           endif
-        enddo 
-        
-        binary_search = ic_s
-
-end function binary_search
 
 
 subroutine sample_box
