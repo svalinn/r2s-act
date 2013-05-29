@@ -39,7 +39,7 @@ R2S-ACT has numerous dependencies:
 
 1. Python 2.6+
 2. DAG-MCNP5 compiled with R2S-ACT `mcnp_source/source_gamma.F90`, from https://github.com/svalinn/DAGMC
-3. CubIt, from RSICC, http://rsicc.ornl.gov/
+3. CubIt, from https://cubit.sandia.gov/
 4. ALARA, from https://github.com/svalinn/ALARA
 5. Mesh Oriented Data Base (MOAB), from svn.mcs.anl.gov/repos/ITAPS/MOAB/trunk
 6. PyTAPS, the Python interface for ITAPS, (Interoperable Technologies for Advanced Petascale Simulations), from http://pypi.python.org/pypi/PyTAPS/1.4
@@ -53,7 +53,7 @@ In unix, this can be done by modifying the .bashrc file, adding the following li
 
     export PYTHONPATH=*install_directory*/r2s-act/scripts/:$PYTHONPATH
 
-The user guide and other documentation is available at http://svalinn.github.com/r2s-act/ .
+The user guide and other documentation is available at http://svalinn.github.io/r2s-act/ .
 Building the documentation requires Sphinx, from http://sphinx-doc.org
 
 Although not a dependency, the visualization program VisIT (Lawrence Livermore National Laboratory) is useful for visualizing results data stored on MOAB meshes in the .vtk format.
@@ -94,7 +94,7 @@ Executive Summary
 
 Full Summary
 ------------
-**1. Create geometry.** Using CubIt, create the geometry and specify materials by adding volumes to materials groups. Group names should be formatted like "mat_X_rhoY" where X is the material number and Y is either mass density (negative value) or atom density (positive volume). Instructions for doing this can be found in the `DAG-MCNP5 user manual <http://svalinn.github.com/DAGMC/doc/usersguide/index.html>`. Be sure to remember to imprint and merge all of the geometry. Once completed, export the geometry as a .sat file (Standard ACIS Text format) and when prompted specify an ACIS version of 1900 and the "export attributes" option. Alternatively, if the geometry already exists in the form of an MCNP input file, MCNP2CAD can be used to convert the geometry information from the MCNP input file into a .sat file. If the geometry contains small features, users may need to specify a smaller tolerance for merging surfaces (using the -t flag).
+**1. Create geometry.** Using CubIt, create the geometry and specify materials by adding volumes to materials groups. Group names should be formatted like "mat_X_rhoY" where X is the material number and Y is either mass density (negative value) or atom density (positive volume). Instructions for doing this can be found in the `DAG-MCNP5 user manual <http://svalinn.github.io/DAGMC/doc/usersguide/index.html>`. Be sure to remember to imprint and merge all of the geometry. Once completed, export the geometry as a .sat file (Standard ACIS Text format) and when prompted specify an ACIS version of 1900 and the "export attributes" option. Alternatively, if the geometry already exists in the form of an MCNP input file, MCNP2CAD can be used to convert the geometry information from the MCNP input file into a .sat file. If the geometry contains small features, users may need to specify a smaller tolerance for merging surfaces (using the -t flag).
 
 Once the .sat file exists, it can be converted to an .h5m file (binary format MOAB mesh file) using dagmc_preproc or mbconvert. This is not necessary, but it prevents DAG-MCNP5 from having to process the .sat file every time it is run. Using a .h5m file also allows for the use of of a DAG-MCNP5 version that is not built against CubIt. In either case, either DAG-MCNNP or dagmc_preproc/mbconvert creates a faceted representation of the geometry. Users can specify the maximum distance between the points in the geometry and the faceted representation on the geometry. This is known as the faceting tolerance. In dagmc_preproc, this is specified with the -f flag. In DAG-MCNP5 this can be specified on the command line by using ftol=faceting_tolerace (e.g. ftol=1E-4). In addtion, dagmc_preproc can also be used to specify a length tolerance using the -l flag. The length tolerance is the maximum length of a facet edge.
 
@@ -351,8 +351,59 @@ _______________________________________________________________________________
 :Path: `r2s-act/scripts/tools/mats2ALARA.py`
 
 _______________________________________________________________________________
-tag_ebins.py
+wwinp_to_h5m.py
 _______________________________________________________________________________
+
+:Purpose: This script creates a structured .h5m tagged with weight window lower bounds from a MCNP WWINP file.
+:Inputs: MCNP WWINP file
+:Outputs: Tagged structured mesh
+:Syntax: ./wwinp_to_h5m <wwinp> options
+:Options:
+  -h, --help  show this help message and exit
+  -o OUTPUT   Name of ALARA matlib output file, default=wwinp.h5m
+:Path:`r2s-act/scripts/tools/wwinp_to_h5m.py`
+
+_______________________________________________________________________________
+h5m_to_wwinp.py
+_______________________________________________________________________________
+
+:Purpose: This scripts read an .h5m mesh tagged with weight window lower bounds and output a MCNP wwinp file.
+:Additional Instructions: When printing a WWINP created using the magic.py -t option, the -t option must be used for this scripts as well.
+:Inputs: Structured mesh file tagged with weight window lower bounds
+:Outputs: MCNP WWINP file
+:Syntax: ./h5m_to_wwinp <h5m file. [options]
+:Options:
+  -h, --help      show this help message and exit
+  -o OUTPUT_NAME  Name of WWINP output file, default=wwinp.out
+  -t              If multiple energy groups exist, only use Total
+                  default=False
+:Path:`r2s-act/scripts/tools/magic.py`
+
+_______________________________________________________________________________
+magic.py
+_______________________________________________________________________________
+
+:Purpose: This script reads in a flux mesh with N energy groups and generates weight windows using the MAGIC global variance reduction technique for either each of the N energy groups or the total. Additionally, a preexisting weight window mesh can be specified. This allows for iterations of the MAGIC method, each improving the weight windows.
+:Inputs: Structured mesh tagged with fluxes, optional structured mesh tagged with lower weight window bounds.
+:Outputs: Structured mesh tagged with lower weight window bounds.
+:Syntax: ./magic.py <flux mesh> [options]
+:Options:
+  -h, --help      show this help message and exit
+  -w WW_MESH      Preexisting WW mesh file to apply magic to, 
+                  default=none
+  -o OUTPUT_MESH  Name of WWINP output file, default=magic_ww.h5m
+  -t              If multiple energy groups exist, only use Total
+                  default=False
+  -n NULL_VALUE   WW value for voxels with error > tolerance (on
+                  the first iteration only), default=0
+  -e TOLERANCE    Specify the maximum allowable relative error for
+                  creating ww files from MAGIC or overwriting
+                  existing ww values, default=0.1
+:Path:`r2s-act/scripts/tools/magic.py`
+
+____________________________________________________________________
+tag_ebins.py
+____________________________________________________________________
 
 :Purpose: If custom energy groups are desired for activation and photon transport, a separate file listing the energy bins boundaries (one per line) can be provided to this script. Otherwise, the default 42 group structure will be used.
 :Inputs: Step 1 mesh, energy file: a list of the energy bins for each photon energy group, with a single energy per line

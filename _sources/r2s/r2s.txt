@@ -41,6 +41,14 @@ r2s Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`volumes` Module
+---------------------
+
+.. automodule:: r2s.volumes
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Subpackages
 -----------
 

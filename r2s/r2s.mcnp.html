@@ -181,7 +181,7 @@ one should verify that the gammas files are being generated correctly.
 To do this, use a simple test problem to verify that you get the same 
 average energy per source
 particle in all test cases, and that all uniform sampling test cases have a
-weight of 1.0 per source particle. (See the summary table in MCNP output)</p>
+average weight of 1.0 per source particle. (See the summary table in MCNP output)</p>
 <p>Note that correct normalization also depends on whether
 material rejection is being used.</p>
 <p>In either case, the last bin can be followed by a bias value for the voxel.
@@ -271,7 +271,8 @@ alias_j    aliases(j)</pre>
 <tt class="descclassname">r2s.mcnp.source_gamma_doc.</tt><tt class="descname">gen_voxel_alias_table</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_gamma_doc.gen_voxel_alias_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate alias table for voxels in the problem</p>
 <p class="rubric">Notes</p>
-<p>The resulting alias table is stored in lists <cite>aliases</cite> and <cite>binsProbabilities</cite>.</p>
+<p>The resulting alias table is stored in lists <cite>aliases</cite> and
+<cite>binsProbabilities</cite>.</p>
 <p>tot_list does not have to be normalized prior to calling this subroutine</p>
 </dd></dl>
 
@@ -688,7 +689,7 @@ in the range [1, i_ints/j_ints/k_ints].</p>
 <tt class="descclassname">r2s.mcnp.source_moab_doc.</tt><tt class="descname">sample_hexahedra</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mcnp.source_moab_doc.sample_hexahedra" title="Permalink to this definition">¶</a></dt>
 <dd><p>This subroutine receives the eight vertices of a hexahedron and sets
 xxx, yyy, zzz, to values corresponding to a uniformly sampled point
-within the voxel.</p>
+within the hexahedral voxel.</p>
 <p>It is assumed that the hexahedron is a parallelepiped.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -704,7 +705,9 @@ are in xxx.. yyy.. zzz.. order.</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>The algorithm used is ...</p>
+<p>The algorithm used is to sample distances along three edge vectors that
+originate at the first vertex of the hexahedron (MOAB canonical ordering)
+and add these three vectors to the first vertice&#8217;s coordinates.</p>
 </dd></dl>
 
 <dl class="function">
@@ -794,7 +797,7 @@ subroutine srcdx may also be needed.</p>
         &copy; Copyright 2013, CNERG.
       </p>
       <p>
-      Last updated on Mar 26, 2013.
+      Last updated on May 29, 2013.
       </p>
       <p>
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.

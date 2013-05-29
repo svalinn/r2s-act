@@ -432,10 +432,32 @@ in the original MCNP problem.</p>
 </div>
 <div class="section" id="module-r2s.io.write_alara_fluxin">
 <span id="write-alara-fluxin-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">write_alara_fluxin</span></tt> Module<a class="headerlink" href="#module-r2s.io.write_alara_fluxin" title="Permalink to this headline">¶</a></h2>
+<p><cite>write_alara_fluxin.py</cite> is used to create a fluxin file for ALARA. Fluxes are
+taken from a MOAB mesh, with tag names of the form &#8216;n_group_###&#8217; where ### is
+a 3 digit number with leading zeros as needed (e.g. 001).</p>
 <dl class="function">
 <dt id="r2s.io.write_alara_fluxin.find_num_e_groups">
 <tt class="descclassname">r2s.io.write_alara_fluxin.</tt><tt class="descname">find_num_e_groups</tt><big>(</big><em>sm</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_fluxin.find_num_e_groups" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Return the number of energy groups used for neutron flux tags on a mesh</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>sm - Scdmesh.scmesh object</strong> :</p>
+<blockquote>
+<div><p>Structured mesh object containing tags of the form &#8216;n_group_###&#8217;.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>num_e_groups - int</strong> :</p>
+<blockquote class="last">
+<div><p>Number of energy groups</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="r2s.io.write_alara_fluxin.get_flux_tag_handles">
@@ -463,7 +485,7 @@ in the original MCNP problem.</p>
 
 <dl class="function">
 <dt id="r2s.io.write_alara_fluxin.main">
-<tt class="descclassname">r2s.io.write_alara_fluxin.</tt><tt class="descname">main</tt><big>(</big><em>arguments=None</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_fluxin.main" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">r2s.io.write_alara_fluxin.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.io.write_alara_fluxin.main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -485,7 +507,8 @@ energy for each voxel</p>
 </div></blockquote>
 <p><strong>backward_bool</strong> : boolean</p>
 <blockquote>
-<div><p>If true, output data is in order from high energy to low energy.</p>
+<div><p>If true, output data is in order from high energy to low energy.
+Note that this should be true when working with the FENDL libraries.</p>
 </div></blockquote>
 <p><strong>fluxin_name</strong> : string</p>
 <blockquote>
@@ -504,7 +527,29 @@ energy for each voxel</p>
 <dl class="function">
 <dt id="r2s.io.write_alara_fluxin.write_alara_fluxin">
 <tt class="descclassname">r2s.io.write_alara_fluxin.</tt><tt class="descname">write_alara_fluxin</tt><big>(</big><em>filename</em>, <em>mesh</em>, <em>backwards=False</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_fluxin.write_alara_fluxin" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Load a MOAB mesh and create an alara_fluxin file from tags</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>filename - string</strong> :</p>
+<blockquote>
+<div><p>Output filename for the fluxin file.</p>
+</div></blockquote>
+<p><strong>mesh - ScdMesh or iMesh.Mesh object</strong> :</p>
+<blockquote>
+<div><p>MOAB mesh with tags to create fluxin file from.</p>
+</div></blockquote>
+<p><strong>backwards - boolean</strong> :</p>
+<blockquote class="last">
+<div><p>If true, prints fluxes from high energy to low energy. 
+Note that this should be true when working with the FENDL libraries.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </div>
 <div class="section" id="module-r2s.io.write_alara_geom">
@@ -775,7 +820,7 @@ information.</p>
         &copy; Copyright 2013, CNERG.
       </p>
       <p>
-      Last updated on Mar 26, 2013.
+      Last updated on May 29, 2013.
       </p>
       <p>
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
