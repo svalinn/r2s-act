@@ -183,7 +183,7 @@ def cylindrical(wwinp):
 def main(arguments=None):
     parser = OptionParser(usage='%prog <wwinp_file> <particle type (n or p)> [options]')
     parser.add_option('-o', dest='output', default='wwinp.h5m',\
-        help='Name of ALARA matlib output file, default=%default')
+        help='Name of ww mesh output file, default=%default')
     (opts, args) = parser.parse_args(arguments)
     if len(args) != 1:
         parser.error('\nNeed 1 argument: WWINP')  
