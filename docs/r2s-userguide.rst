@@ -360,7 +360,7 @@ _______________________________________________________________________________
 :Syntax: ./wwinp_to_h5m <wwinp> options
 :Options:
   -h, --help  show this help message and exit
-  -o OUTPUT   Name of ALARA matlib output file, default=wwinp.h5m
+  -o OUTPUT   Name of ww mesh output file, default=wwinp.h5m
 :Path: `r2s-act/scripts/tools/wwinp_to_h5m.py`
 
 _______________________________________________________________________________
