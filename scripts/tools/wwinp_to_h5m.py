@@ -193,7 +193,7 @@ def main(arguments=None):
     nr = linecache.getline(args[0],1).split()[3]
     if int(nr) == 10:
         ww_mesh = cartesian(args[0])
-        ww_mesh.scdset.save(output) 
+        ww_mesh.scdset.save(opts.output) 
         print "WW mesh saved to {0}".format(opts.output)
 
     elif int(nr) == 16:
