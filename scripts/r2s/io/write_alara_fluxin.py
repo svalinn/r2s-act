@@ -13,12 +13,13 @@ from r2s.scdmesh import ScdMesh
 
 
 def get_flux_tag_handles(mesh):
-    """Method identifies all tags containing flux information from a meshtally
+    """Method identifies all tags containing flux information from a DAGMC 
+    meshtally
 
     Parameters
     ----------
     mesh : iMesh.Mesh object
-        MOAB mesh file object containing tags of the form TALLY_TAG_lowE-highE
+        MOAB mesh file object containing tags of the form "TALLY_TAG_lowE-highE"
 
     Returns
     -------
@@ -35,6 +36,10 @@ def get_flux_tag_handles(mesh):
 
     for handle in handles:
         tagname = handle.name.lower().split("_")
+        # Note: in order to sort tag handles, we need to sort by
+        # bin energies. Tag names have two energies, separated by '-'
+        # but also potentially have 'e-' in the energy.  The below safely
+        # splits energies so we can do the sort.
         if tagname[0:2] == ['tally', 'tag'] and len(tagname) > 2:
             erg = tagname[2].replace("e-","ee").split("-")[0]
             erg = float(erg.replace("ee","e-"))
