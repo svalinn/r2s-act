@@ -432,7 +432,7 @@ class mmGrid(MatGrid):
 
 
     def create_tags(self):
-        """ """
+        """Tags material information to mesh"""
         mesh = self.scdmesh.imesh
         for idx, ((mat, rho), (matnum,matname)) in enumerate(self.materials.iteritems()):
             # Get tag handle
@@ -454,7 +454,7 @@ class mmGrid(MatGrid):
 
 
     def writeFile(self, filename, alara_geom_file=None ):
-        """ """
+        """Save mesh file, and optionally invoke creation of alara_geom file"""
         mesh = self.scdmesh
         mesh.scdset.save(filename)
         if alara_geom_file:
@@ -469,6 +469,11 @@ def load_geom(filename):
     program invocation.  This means that this function should only be called 
     once, and the resulting geometry will become globally visible to all 
     clients of mmgrid.
+
+    Parameters
+    ----------
+    filename : string
+        Filename with geometry information. Typically a .sat file.
     """
     dagmc.load( filename )
 
