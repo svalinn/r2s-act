@@ -98,7 +98,6 @@ module source_data
         ! Other variables
         integer :: stat
         integer :: ii, kk, jj  ! current voxel's indices on structured mesh
-        integer :: ic_s, ib_s, ih_s  ! for binary search
         integer :: i_ints, j_ints, k_ints, n_mesh_cells, n_active_mat
         real, dimension(:), allocatable :: i_bins, j_bins, k_bins
         integer, dimension(100) :: active_mat
