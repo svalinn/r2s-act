@@ -85,7 +85,7 @@ alara_snippet = alara_problem
 
 #-------------------------------------------------------------------------------
 # Files produced in Step 1
-# These files are created by r2s_step1.py. Specify the desired file names.
+# These files are created by r2s_step1.py. Specify the desired file names/paths.
 #-------------------------------------------------------------------------------
 
 # Intermediate mesh file containing data from step 1.
@@ -113,14 +113,16 @@ alara_phtn_src = phtn_src
 
 #-------------------------------------------------------------------------------
 # Files produced in Step 2
-# This file are created by r2s_step2.py. Specify the desired file names.
+# These files are created by r2s_step2.py. Specify the desired file names/paths.
 #-------------------------------------------------------------------------------
 
 # MCNP photon problem input file for last step of workflow
 photon_mcnp_input = mcnp_p.inp
 
-# The 'gammas' file is created by r2s_step2.py, but alternate names are not
-# supported currently.
+# The 'gammas' file is created by r2s_step2.py; alternate names are not
+# supported currently, but an alternate filepath relative to the location of 
+# the r2s.cfg file can be specified, e.g.:
+# gammas = photon/gammas
 
 
 ###############################################################################
@@ -151,7 +153,9 @@ gen_mmgrid = True
 # If step2setup is True, runs the r2s_step2setup.py script at the end of 
 #  r2s_step1.py.  r2s_step2setup.py creates folders for all cooling steps
 #  and isotopes specified
-step2setup = False
+# NOTE: Not currently supported; You can manually run r2s_step2setup.py after
+#  you have run ALARA.
+# step2setup = False
 
 #-------------------------------------------------------------------------------
 # Step 2 Parameters
