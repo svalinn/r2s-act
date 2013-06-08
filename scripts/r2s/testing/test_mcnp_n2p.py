@@ -44,8 +44,8 @@ class TestRegularMCNP(unittest.TestCase):
         fw1 = open(testfile_out, 'r')
         fw2 = open(testfile_compare, 'r')
    
-        for line1, line2 in itertools.izip_longest(fw1, fw2):
-            self.assertEqual(line1, line2)
+        for result, reference in itertools.izip_longest(fw1, fw2):
+            self.assertEqual(result, reference)
 
         fw1.close()
         fw2.close()
@@ -61,8 +61,8 @@ class TestRegularMCNP(unittest.TestCase):
         fw1 = open(testfile_out, 'r')
         fw2 = open(testfile_compare_ergs, 'r')
    
-        for line1, line2 in itertools.izip_longest(fw1, fw2):
-            self.assertEqual(line1, line2)
+        for result, reference in itertools.izip_longest(fw1, fw2):
+            self.assertEqual(result, reference)
 
         fw1.close()
         fw2.close()
@@ -99,8 +99,8 @@ class TestDAGMCNP(unittest.TestCase):
         fw1 = open(dag_testfile_out, 'r')
         fw2 = open(dag_testfile_compare, 'r')
    
-        for line1, line2 in itertools.izip_longest(fw1, fw2):
-            self.assertEqual(line1, line2)
+        for result, reference in itertools.izip_longest(fw1, fw2):
+            self.assertEqual(result, reference)
 
         fw1.close()
         fw2.close()
@@ -116,8 +116,8 @@ class TestDAGMCNP(unittest.TestCase):
         fw1 = open(dag_testfile_out, 'r')
         fw2 = open(dag_testfile_compare_ergs, 'r')
    
-        for line1, line2 in itertools.izip_longest(fw1, fw2):
-            self.assertEqual(line1, line2)
+        for result, reference in itertools.izip_longest(fw1, fw2):
+            self.assertEqual(result, reference)
 
         fw1.close()
         fw2.close()
@@ -165,8 +165,8 @@ class TestAutoDetermineInputType(unittest.TestCase):
         fw1 = open(auto_testfile_out, 'r')
         fw2 = open(testfile_compare, 'r')
    
-        for line1, line2 in itertools.izip_longest(fw1, fw2):
-            self.assertEqual(line1, line2)
+        for result, reference in itertools.izip_longest(fw1, fw2):
+            self.assertEqual(result, reference)
 
         fw1.close()
         fw2.close()
@@ -183,8 +183,8 @@ class TestAutoDetermineInputType(unittest.TestCase):
         fw1 = open(auto_testfile_out, 'r')
         fw2 = open(dag_testfile_compare, 'r')
    
-        for line1, line2 in itertools.izip_longest(fw1, fw2):
-            self.assertEqual(line1, line2)
+        for result, reference in itertools.izip_longest(fw1, fw2):
+            self.assertEqual(result, reference)
 
         fw1.close()
         fw2.close()

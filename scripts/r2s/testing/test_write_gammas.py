@@ -29,21 +29,6 @@ gammas8 = os.path.join(thisdir, "files_test_write_gammas/gammas_voxel_cum_bias")
 totalsfile = os.path.join(os.getcwd(), "phtn_src_total")
 
 
-class TestCalcVolumes(unittest.TestCase):
-
-    def setUp(self):
-        filename = os.path.join(thisdir, 'h5m_files/grid543.h5m')
-        self.sm = ScdMesh.fromFile(filename)
-
-    def test_calc_volumes_list_1(self):
-        """Checks that calc_volumes_list works for 3x3x3 mesh with equal voxel sizing.
-        """
-        volumes = [48,40, 60,50, 60,50, \
-                48,40, 60,50, 60,50, \
-                48,40, 60,50, 60,50, \
-                48,40, 60,50, 60,50]
-        self.assertEqual(write_gammas.calc_volumes_list(self.sm), volumes)
-    
 class TestWriteGammas_Runs(unittest.TestCase):
     # Tests in this class are done witha  3x3x3 non-void geometry
 
@@ -108,11 +93,11 @@ class TestWriteGammas_Correct(unittest.TestCase):
         fw2 = open(mygammas, 'r')
    
         # skip single metadata header line
-        line1 = fw1.readline()
-        line2 = fw2.readline()
+        fw1.readline()
+        fw2.readline()
         # compare rest of file
-        for line1, line2 in itertools.izip_longest(fw1, fw2):
-            self.assertEqual(line1, line2)
+        for result, reference in itertools.izip_longest(fw1, fw2):
+            self.assertEqual(result, reference)
 
         fw1.close()
         fw2.close()

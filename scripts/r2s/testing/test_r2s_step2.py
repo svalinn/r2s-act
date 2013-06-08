@@ -41,7 +41,7 @@ class TestLoadConfigFiles(unittest.TestCase):
             config = ConfigParser.SafeConfigParser()
             config.read(cfgNTF.name)
 
-            datafile, phtn_src, mcnp_n, mcnp_p = \
+            datafile, phtn_src, mcnp_n, mcnp_p, gammas = \
                     s2.load_config_files(config)
 
             # Check for correctness
@@ -49,6 +49,7 @@ class TestLoadConfigFiles(unittest.TestCase):
             self.assertEqual(mcnp_p, 'mcnp_p')
             self.assertEqual(datafile, dataNTF.name)
             self.assertEqual(phtn_src, phtnNTF.name)
+            self.assertEqual(gammas, 'gammas')
 
 
 class TestLoadConfigParams(unittest.TestCase):
