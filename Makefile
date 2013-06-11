@@ -61,6 +61,8 @@ html:
 
 gh-pages:
 	git checkout gh-pages
+	# Grab gh-pages commits from other users
+	git pull
 	# Clean out _build from docs/
 	rm -rf docs/_build 
 	# Clean out contents of _build/html/ from repo root.
@@ -84,6 +86,8 @@ gh-pages:
 
 gh-preview:
 	git checkout gh-pages
+	# Grab gh-pages commits from other users
+	git pull
 	# Clean out _build from docs/
 	rm -rf docs/_build 
 	# Clean out contents of _build/html/ from repo root.
