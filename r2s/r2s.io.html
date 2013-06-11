@@ -462,14 +462,15 @@ a 3 digit number with leading zeros as needed (e.g. 001).</p>
 <dl class="function">
 <dt id="r2s.io.write_alara_fluxin.get_flux_tag_handles">
 <tt class="descclassname">r2s.io.write_alara_fluxin.</tt><tt class="descname">get_flux_tag_handles</tt><big>(</big><em>mesh</em><big>)</big><a class="headerlink" href="#r2s.io.write_alara_fluxin.get_flux_tag_handles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method identifies all tags containing flux information from a meshtally</p>
+<dd><p>Method identifies all tags containing flux information from a DAGMC 
+meshtally</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>mesh</strong> : iMesh.Mesh object</p>
 <blockquote>
-<div><p>MOAB mesh file object containing tags of the form TALLY_TAG_lowE-highE</p>
+<div><p>MOAB mesh file object containing tags of the form &#8220;TALLY_TAG_lowE-highE&#8221;</p>
 </div></blockquote>
 </td>
 </tr>
@@ -704,8 +705,8 @@ i.e. (unique_mixtures, mat_tags)</p>
 <div class="section" id="module-r2s.io.write_gammas">
 <span id="write-gammas-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">write_gammas</span></tt> Module<a class="headerlink" href="#module-r2s.io.write_gammas" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="r2s.io.write_gammas.calc_volumes_list">
-<tt class="descclassname">r2s.io.write_gammas.</tt><tt class="descname">calc_volumes_list</tt><big>(</big><em>sm</em><big>)</big><a class="headerlink" href="#r2s.io.write_gammas.calc_volumes_list" title="Permalink to this definition">¶</a></dt>
+<dt id="r2s.io.write_gammas.calc_sm_volumes_list">
+<tt class="descclassname">r2s.io.write_gammas.</tt><tt class="descname">calc_sm_volumes_list</tt><big>(</big><em>sm</em><big>)</big><a class="headerlink" href="#r2s.io.write_gammas.calc_sm_volumes_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a 1D list of the voxel volumes for a XYZ structured mesh</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -735,11 +736,17 @@ i.e. (unique_mixtures, mat_tags)</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="r2s.io.write_gammas.calc_total_source_strength">
+<tt class="descclassname">r2s.io.write_gammas.</tt><tt class="descname">calc_total_source_strength</tt><big>(</big><em>mesh</em>, <em>voxels</em>, <em>tag_srcsum=False</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#r2s.io.write_gammas.calc_total_source_strength" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="r2s.io.write_gammas.gen_gammas_file_from_h5m">
 <tt class="descclassname">r2s.io.write_gammas.</tt><tt class="descname">gen_gammas_file_from_h5m</tt><big>(</big><em>sm</em>, <em>outfile='gammas'</em>, <em>sampling='v'</em>, <em>do_bias=False</em>, <em>cumulative=False</em>, <em>cust_ergbins=False</em>, <em>resample=False</em>, <em>uni_resamp_all=False</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#r2s.io.write_gammas.gen_gammas_file_from_h5m" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate gammas file using information from tags on a MOAB mesh.</p>
+<dd><p>Generate gammas file using information from tags on a MOAB Scd mesh.</p>
 <p>Method reads tags with photon source strengths from a structured mesh object
-and generates the gammas file for the modified source.F90 routine.</p>
+and generates the gammas file for the modified source.F90 routine
+<cite>source_gamma.F90</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -820,7 +827,7 @@ information.</p>
         &copy; Copyright 2013, CNERG.
       </p>
       <p>
-      Last updated on May 30, 2013.
+      Last updated on Jun 11, 2013.
       </p>
       <p>
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.

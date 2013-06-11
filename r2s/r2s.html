@@ -417,6 +417,18 @@ pydagmc.  Note that DagMC can only have one set of geometry loaded per
 program invocation.  This means that this function should only be called 
 once, and the resulting geometry will become globally visible to all 
 clients of mmgrid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>filename</strong> : string</p>
+<blockquote class="last">
+<div><p>Filename with geometry information. Typically a .sat file.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -438,7 +450,8 @@ clients of mmgrid.</p>
 <dl class="method">
 <dt id="r2s.mmgrid.mmGrid.create_tags">
 <tt class="descname">create_tags</tt><big>(</big><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid.create_tags" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Tags material information to mesh</p>
+</dd></dl>
 
 <dl class="classmethod">
 <dt id="r2s.mmgrid.mmGrid.fromDagGeom">
@@ -459,7 +472,8 @@ DagMC has geometry loaded with a rectangular graveyard volume</p>
 <dl class="method">
 <dt id="r2s.mmgrid.mmGrid.writeFile">
 <tt class="descname">writeFile</tt><big>(</big><em>filename</em>, <em>alara_geom_file=None</em><big>)</big><a class="headerlink" href="#r2s.mmgrid.mmGrid.writeFile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Save mesh file, and optionally invoke creation of alara_geom file</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -807,7 +821,7 @@ with the tag handle &#8216;PHTN_ERGS&#8217;.</p>
         &copy; Copyright 2013, CNERG.
       </p>
       <p>
-      Last updated on May 30, 2013.
+      Last updated on Jun 11, 2013.
       </p>
       <p>
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.

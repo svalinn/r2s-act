@@ -14,11 +14,19 @@ Contents:
    :maxdepth: 1
 
    r2s-userguide
+   faq
+
+Additionally, the low level scripts all support command-line calls. You can alwas do `scriptname.py -h` for information regarding this, and these capabilities are documented here:
+
+.. toctree::
+   :maxdepth: 1
+
+   r2s-scripts
 
 
 For developers, the low level scripts are directly accessible within scripts/r2s/.  Documentation from within the code is also given below.
 
-Internal code documentation:
+Internal code/API documentation:
 
 .. toctree::
    :maxdepth: 1
