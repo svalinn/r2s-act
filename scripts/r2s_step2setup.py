@@ -283,7 +283,7 @@ def _copy_and_mod_r2scfg(oldfile, newfile, iso, time, mcnp_n_problem,
 
 
 def _copy_and_mod_mcnpinp(oldfile, newfile, iso, time):
-    """Copy mcnp photon transport input to each directory
+    """Used to copy MCNP photon transport input and add a time/info-stamp.
 
     TBD: Modify title card?
 
