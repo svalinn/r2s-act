@@ -1,4 +1,4 @@
-iversity of Wisconsin-Madison Rigorous Two Step Activation Work Flow (R2S-ACT)
+University of Wisconsin-Madison Rigorous Two Step Activation Work Flow (R2S-ACT)
 ________________________________________________________________________________
 The Rigorous Two Step (R2S) method is used to determine the photon fluxes that result from neutron activation of materials for a given geometry.
 This repository is set of scripts used to carry out an R2S workflow using the DAG-MCNP and ALARA codes. For more information on the workflow itself, see the documentation_, including a user-guide_ and faq_.
