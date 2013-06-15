@@ -46,7 +46,7 @@ R2S-ACT has numerous dependencies:
 7. PyNE, *Python for Nuclear Engineering*, from http://pynesim.org/
    (Has its own dependencies listed at https://github.com/pyne/pyne)
 
-Aside from MCNP5 and CubIt, available from RSICC, all other codes are open source with well documented installation instructions.
+Aside from MCNP5 and CubIt, all other codes are open source with well documented installation instructions.
 
 You will need to add the `r2s-act/scripts` directory to the PYTHONPATH variable.
 In unix, this can be done by modifying the .bashrc file, adding the following line::
