@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="UW-R2S - CNERG" href="index.html" />
-    <link rel="next" title="R2S-ACT FAQ" href="faq.html" />
+    <link rel="next" title="Running the unstructured workflow for R2S-ACT" href="unstr_workflow.html" />
     <link rel="prev" title="Welcome to R2S-ACT’s documentation!" href="index.html" /> 
   </head>
   <body> 
@@ -60,7 +60,7 @@
              accesskey="P">previous</a>
           </li>
         <li class="menu-item" >
-          <a href="faq.html" title="R2S-ACT FAQ"
+          <a href="unstr_workflow.html" title="Running the unstructured workflow for R2S-ACT"
              accesskey="N">next</a>
           </li>
         <li class="menu-item" >
@@ -90,7 +90,11 @@
 <li><a class="reference internal" href="#compiling-dag-mcnp5-with-r2s-act-source-f90">Compiling DAG-MCNP5 with R2S-ACT source.F90</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#running-r2s-act">Running R2S-ACT</a></li>
+<li><a class="reference internal" href="#running-r2s-act">Running R2S-ACT</a><ul>
+<li><a class="reference internal" href="#executive-summary">Executive Summary</a></li>
+<li><a class="reference internal" href="#full-summary">Full Summary</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#r2s-step-1">R2S Step 1</a><ul>
 <li><a class="reference internal" href="#r2s-setup-py">r2s_setup.py</a></li>
 <li><a class="reference internal" href="#r2s-step1-py">r2s_step1.py</a></li>
@@ -135,26 +139,30 @@
 <li><a class="reference internal" href="#compiling-dag-mcnp5-with-r2s-act-source-f90" id="id6">Compiling DAG-MCNP5 with R2S-ACT source.F90</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#running-r2s-act" id="id7">Running R2S-ACT</a></li>
-<li><a class="reference internal" href="#r2s-step-1" id="id8">R2S Step 1</a><ul>
-<li><a class="reference internal" href="#r2s-setup-py" id="id9">r2s_setup.py</a></li>
-<li><a class="reference internal" href="#r2s-step1-py" id="id10">r2s_step1.py</a></li>
-<li><a class="reference internal" href="#step-1-parameters" id="id11">Step 1 Parameters</a></li>
+<li><a class="reference internal" href="#running-r2s-act" id="id7">Running R2S-ACT</a><ul>
+<li><a class="reference internal" href="#executive-summary" id="id8">Executive Summary</a></li>
+<li><a class="reference internal" href="#full-summary" id="id9">Full Summary</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#r2s-step-2" id="id12">R2S Step 2</a><ul>
-<li><a class="reference internal" href="#r2s-step2-py" id="id13">r2s_step2.py</a></li>
-<li><a class="reference internal" href="#step-2-parameters" id="id14">Step 2 Parameters</a></li>
+<li><a class="reference internal" href="#r2s-step-1" id="id10">R2S Step 1</a><ul>
+<li><a class="reference internal" href="#r2s-setup-py" id="id11">r2s_setup.py</a></li>
+<li><a class="reference internal" href="#r2s-step1-py" id="id12">r2s_step1.py</a></li>
+<li><a class="reference internal" href="#step-1-parameters" id="id13">Step 1 Parameters</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#other-scripts-pertinent-to-the-r2s-work-flow" id="id15">Other Scripts Pertinent to the R2S work flow.</a><ul>
-<li><a class="reference internal" href="#mats2alara-py" id="id16">mats2ALARA.py</a></li>
-<li><a class="reference internal" href="#get-mesh-values-py" id="id17">get_mesh_values.py</a></li>
-<li><a class="reference internal" href="#wwinp-to-h5m-py" id="id18">wwinp_to_h5m.py</a></li>
-<li><a class="reference internal" href="#h5m-to-wwinp-py" id="id19">h5m_to_wwinp.py</a></li>
-<li><a class="reference internal" href="#magic-py" id="id20">magic.py</a></li>
-<li><a class="reference internal" href="#tag-ebins-py" id="id21">tag_ebins.py</a></li>
-<li><a class="reference internal" href="#r2s-step2setup-py" id="id22">r2s_step2setup.py</a></li>
+<li><a class="reference internal" href="#r2s-step-2" id="id14">R2S Step 2</a><ul>
+<li><a class="reference internal" href="#r2s-step2-py" id="id15">r2s_step2.py</a></li>
+<li><a class="reference internal" href="#step-2-parameters" id="id16">Step 2 Parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#other-scripts-pertinent-to-the-r2s-work-flow" id="id17">Other Scripts Pertinent to the R2S work flow.</a><ul>
+<li><a class="reference internal" href="#mats2alara-py" id="id18">mats2ALARA.py</a></li>
+<li><a class="reference internal" href="#get-mesh-values-py" id="id19">get_mesh_values.py</a></li>
+<li><a class="reference internal" href="#wwinp-to-h5m-py" id="id20">wwinp_to_h5m.py</a></li>
+<li><a class="reference internal" href="#h5m-to-wwinp-py" id="id21">h5m_to_wwinp.py</a></li>
+<li><a class="reference internal" href="#magic-py" id="id22">magic.py</a></li>
+<li><a class="reference internal" href="#tag-ebins-py" id="id23">tag_ebins.py</a></li>
+<li><a class="reference internal" href="#r2s-step2setup-py" id="id24">r2s_step2setup.py</a></li>
 </ul>
 </li>
 </ul>
@@ -196,7 +204,7 @@
 <li>PyNE, <em>Python for Nuclear Engineering</em>, from <a class="reference external" href="http://pynesim.org/">http://pynesim.org/</a>
 (Has its own dependencies listed at <a class="reference external" href="https://github.com/pyne/pyne">https://github.com/pyne/pyne</a>)</li>
 </ol>
-<p>Aside from MCNP5 and CubIt, available from RSICC, all other codes are open source with well documented installation instructions.</p>
+<p>Aside from MCNP5 and CubIt, all other codes are open source with well documented installation instructions.</p>
 <p>You will need to add the <cite>r2s-act/scripts</cite> directory to the PYTHONPATH variable.
 In unix, this can be done by modifying the .bashrc file, adding the following line:</p>
 <div class="highlight-python"><pre>export PYTHONPATH=*install_directory*/r2s-act/scripts/:$PYTHONPATH</pre>
@@ -221,6 +229,8 @@ Executables are available at <a class="reference external" href="https://wci.lln
 <h2><a class="toc-backref" href="#id7">Running R2S-ACT</a><a class="headerlink" href="#running-r2s-act" title="Permalink to this headline">¶</a></h2>
 <p>R2S-ACT contains 2 wrapper scripts (r2s_step1.py, r2s_step2.py) that call all necessary scripts in the correct order. User setup is still potentially required for numerous details. These include materials, meshing, MCNP input files, and and irradiation details for ALARA.</p>
 <p>In some cases, users may want to run certain scripts individually. To do this, users should consult the R2S Step 1 and R2S Step 2 section of this manual for information about running these individual scripts. The work flow using the wrapper scripts is detailed below:</p>
+<div class="section" id="executive-summary">
+<h3><a class="toc-backref" href="#id8">Executive Summary</a><a class="headerlink" href="#executive-summary" title="Permalink to this headline">¶</a></h3>
 <ol class="arabic simple">
 <li>Create geometry, and prepare it for DAGMCNP and/or unstructured mesh.</li>
 <li>Run neutron transport problem.</li>
@@ -232,6 +242,9 @@ Executables are available at <a class="reference external" href="https://wci.lln
 <li>Set up photon transport (e.g. tallies) and run modified MCNP/DAGMCNP with mesh-sampling source.F90.</li>
 <li>Examine results; Use <cite>read_meshtal.py</cite> to tag photon mesh tallies to the mesh for visualization.</li>
 </ol>
+</div>
+<div class="section" id="full-summary">
+<h3><a class="toc-backref" href="#id9">Full Summary</a><a class="headerlink" href="#full-summary" title="Permalink to this headline">¶</a></h3>
 <p><strong>1. Create geometry.</strong> Using CubIt, create the geometry and specify materials by adding volumes to materials groups. Group names should be formatted like &#8220;mat_X_rhoY&#8221; where X is the material number and Y is either mass density (negative value) or atom density (positive volume). Instructions for doing this can be found in the <cite>DAG-MCNP5 user manual &lt;http://svalinn.github.io/DAGMC/doc/usersguide/index.html&gt;</cite>. Be sure to remember to imprint and merge all of the geometry. Once completed, export the geometry as a .sat file (Standard ACIS Text format) and when prompted specify an ACIS version of 1900 and the &#8220;export attributes&#8221; option. Alternatively, if the geometry already exists in the form of an MCNP input file, MCNP2CAD can be used to convert the geometry information from the MCNP input file into a .sat file. If the geometry contains small features, users may need to specify a smaller tolerance for merging surfaces (using the -t flag).</p>
 <p>Once the .sat file exists, it can be converted to an .h5m file (binary format MOAB mesh file) using dagmc_preproc or mbconvert. This is not necessary, but it prevents DAG-MCNP5 from having to process the .sat file every time it is run. Using a .h5m file also allows for the use of of a DAG-MCNP5 version that is not built against CubIt. In either case, either DAG-MCNNP or dagmc_preproc/mbconvert creates a faceted representation of the geometry. Users can specify the maximum distance between the points in the geometry and the faceted representation on the geometry. This is known as the faceting tolerance. In dagmc_preproc, this is specified with the -f flag. In DAG-MCNP5 this can be specified on the command line by using ftol=faceting_tolerace (e.g. ftol=1E-4). In addtion, dagmc_preproc can also be used to specify a length tolerance using the -l flag. The length tolerance is the maximum length of a facet edge.</p>
 <p><strong>2. Create DAG-MCNP5 input file and run neutron transport calculation.</strong> Other than the geometry cards, the rest of the DAG-MCNP5 input file should be identical to that of a native MCNP input file. Make sure the material numbers in the input file match the numbers of the material groups in CubIt.</p>
@@ -249,12 +262,13 @@ Executables are available at <a class="reference external" href="https://wci.lln
 <p><strong>10. Run read_meshtal.py.</strong> Run this script with the -m flag in order tag photon fluxes and/or doses onto the mesh with the rest of the information on it. This script is run by <cite>r2s_step1.py</cite>, so more information about this script can be found in the &#8220;Scripts run by r2s_step1.py&#8221; section of this manual.</p>
 <p><strong>12. Visualize Results.</strong> To visualize results, stuctured mesh .h5m files must be first converted to .vtk viles. This can be done using the MOAB mbconvert tool (syntax: <cite>mbconvert &lt;mesh_file.h5m&gt; &lt;mesh_file.vtk&gt;</cite>). The best way of visualizing the results on the resulting .vtk file is using VisIT. Fluxes/doses are best viewed as &#8220;pseudo color&#8221; or &#8220;volume&#8221; plots. The geometry can be superimposed onto these plots. To do this, save the geometry as a .stl file in CubIt. Then open this file in VisIt and visualize it as a &#8220;mesh&#8221; plot. It is often useful to visualize results during intermediate steps of the work flow. For example it may be useful to visualize the neutron flux distribution and errors prior to continuing with the work flow.</p>
 </div>
+</div>
 <hr class="docutils" />
 <div class="section" id="r2s-step-1">
-<h2><a class="toc-backref" href="#id8">R2S Step 1</a><a class="headerlink" href="#r2s-step-1" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id10">R2S Step 1</a><a class="headerlink" href="#r2s-step-1" title="Permalink to this headline">¶</a></h2>
 <p>This section provides details on the Step 1 scripts, in chronological order of when they are run.</p>
 <div class="section" id="r2s-setup-py">
-<h3><a class="toc-backref" href="#id9">r2s_setup.py</a><a class="headerlink" href="#r2s-setup-py" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id11">r2s_setup.py</a><a class="headerlink" href="#r2s-setup-py" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -275,7 +289,7 @@ Executables are available at <a class="reference external" href="https://wci.lln
 </table>
 </div>
 <div class="section" id="r2s-step1-py">
-<h3><a class="toc-backref" href="#id10">r2s_step1.py</a><a class="headerlink" href="#r2s-step1-py" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id12">r2s_step1.py</a><a class="headerlink" href="#r2s-step1-py" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -296,7 +310,7 @@ Executables are available at <a class="reference external" href="https://wci.lln
 </table>
 </div>
 <div class="section" id="step-1-parameters">
-<h3><a class="toc-backref" href="#id11">Step 1 Parameters</a><a class="headerlink" href="#step-1-parameters" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id13">Step 1 Parameters</a><a class="headerlink" href="#step-1-parameters" title="Permalink to this headline">¶</a></h3>
 <p>These settings can be modified in a problem&#8217;s <cite>r2s.cfg</cite> file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -312,10 +326,10 @@ Executables are available at <a class="reference external" href="https://wci.lln
 </div>
 <hr class="docutils" />
 <div class="section" id="r2s-step-2">
-<h2><a class="toc-backref" href="#id12">R2S Step 2</a><a class="headerlink" href="#r2s-step-2" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id14">R2S Step 2</a><a class="headerlink" href="#r2s-step-2" title="Permalink to this headline">¶</a></h2>
 <p>This section provides details on the Step 2 scripts, in chronological order of when they are run.</p>
 <div class="section" id="r2s-step2-py">
-<h3><a class="toc-backref" href="#id13">r2s_step2.py</a><a class="headerlink" href="#r2s-step2-py" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id15">r2s_step2.py</a><a class="headerlink" href="#r2s-step2-py" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -336,7 +350,7 @@ Executables are available at <a class="reference external" href="https://wci.lln
 </table>
 </div>
 <div class="section" id="step-2-parameters">
-<h3><a class="toc-backref" href="#id14">Step 2 Parameters</a><a class="headerlink" href="#step-2-parameters" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id16">Step 2 Parameters</a><a class="headerlink" href="#step-2-parameters" title="Permalink to this headline">¶</a></h3>
 <p>These settings can be modified in a problem&#8217;s <cite>r2s.cfg</cite> file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -360,10 +374,10 @@ Executables are available at <a class="reference external" href="https://wci.lln
 </div>
 <hr class="docutils" />
 <div class="section" id="other-scripts-pertinent-to-the-r2s-work-flow">
-<h2><a class="toc-backref" href="#id15">Other Scripts Pertinent to the R2S work flow.</a><a class="headerlink" href="#other-scripts-pertinent-to-the-r2s-work-flow" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id17">Other Scripts Pertinent to the R2S work flow.</a><a class="headerlink" href="#other-scripts-pertinent-to-the-r2s-work-flow" title="Permalink to this headline">¶</a></h2>
 <p>This section lists the command line interfaces for individual scripts.  In the case of most scripts, these command line interfaces are out of date.</p>
 <div class="section" id="mats2alara-py">
-<h3><a class="toc-backref" href="#id16">mats2ALARA.py</a><a class="headerlink" href="#mats2alara-py" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id18">mats2ALARA.py</a><a class="headerlink" href="#mats2alara-py" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -411,7 +425,7 @@ In the resulting matlib file metadata will be in the form &#8220;# X:Y&#8221;. I
 </table>
 </div>
 <div class="section" id="get-mesh-values-py">
-<h3><a class="toc-backref" href="#id17">get_mesh_values.py</a><a class="headerlink" href="#get-mesh-values-py" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id19">get_mesh_values.py</a><a class="headerlink" href="#get-mesh-values-py" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -447,7 +461,7 @@ In the resulting matlib file metadata will be in the form &#8220;# X:Y&#8221;. I
 </table>
 </div>
 <div class="section" id="wwinp-to-h5m-py">
-<h3><a class="toc-backref" href="#id18">wwinp_to_h5m.py</a><a class="headerlink" href="#wwinp-to-h5m-py" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id20">wwinp_to_h5m.py</a><a class="headerlink" href="#wwinp-to-h5m-py" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -487,7 +501,7 @@ In the resulting matlib file metadata will be in the form &#8220;# X:Y&#8221;. I
 </table>
 </div>
 <div class="section" id="h5m-to-wwinp-py">
-<h3><a class="toc-backref" href="#id19">h5m_to_wwinp.py</a><a class="headerlink" href="#h5m-to-wwinp-py" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id21">h5m_to_wwinp.py</a><a class="headerlink" href="#h5m-to-wwinp-py" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -536,7 +550,7 @@ default=False</p>
 </table>
 </div>
 <div class="section" id="magic-py">
-<h3><a class="toc-backref" href="#id20">magic.py</a><a class="headerlink" href="#magic-py" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id22">magic.py</a><a class="headerlink" href="#magic-py" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -597,7 +611,7 @@ existing ww values, default=0.1</p>
 </table>
 </div>
 <div class="section" id="tag-ebins-py">
-<h3><a class="toc-backref" href="#id21">tag_ebins.py</a><a class="headerlink" href="#tag-ebins-py" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id23">tag_ebins.py</a><a class="headerlink" href="#tag-ebins-py" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -618,7 +632,7 @@ existing ww values, default=0.1</p>
 </table>
 </div>
 <div class="section" id="r2s-step2setup-py">
-<h3><a class="toc-backref" href="#id22">r2s_step2setup.py</a><a class="headerlink" href="#r2s-step2setup-py" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id24">r2s_step2setup.py</a><a class="headerlink" href="#r2s-step2setup-py" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -654,7 +668,7 @@ existing ww values, default=0.1</p>
         &copy; Copyright 2013, CNERG.
       </p>
       <p>
-      Last updated on Jun 11, 2013.
+      Last updated on Jun 26, 2013.
       </p>
       <p>
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.

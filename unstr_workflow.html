@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>R2S-ACT FAQ &mdash; UW-R2S - CNERG</title>
+    <title>Running the unstructured workflow for R2S-ACT &mdash; UW-R2S - CNERG</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -26,8 +26,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="UW-R2S - CNERG" href="index.html" />
-    <link rel="next" title="Scripts run by r2s_step1.py" href="r2s-scripts.html" />
-    <link rel="prev" title="Running the unstructured workflow for R2S-ACT" href="unstr_workflow.html" /> 
+    <link rel="next" title="R2S-ACT FAQ" href="faq.html" />
+    <link rel="prev" title="University of Wisconsin Rigorous Two Step Activation Work Flow (R2S-ACT) User Manual" href="r2s-userguide.html" /> 
   </head>
   <body> 
 <div id="page-div" class="page">
@@ -56,11 +56,11 @@
       <ul id="menu-main" class="sf-menu">
         <li class="menu-item"><a href="index.html">UW-R2S</a></li>
         <li class="menu-item" style="margin-right: 10px">
-          <a href="unstr_workflow.html" title="Running the unstructured workflow for R2S-ACT"
+          <a href="r2s-userguide.html" title="University of Wisconsin Rigorous Two Step Activation Work Flow (R2S-ACT) User Manual"
              accesskey="P">previous</a>
           </li>
         <li class="menu-item" >
-          <a href="r2s-scripts.html" title="Scripts run by r2s_step1.py"
+          <a href="faq.html" title="R2S-ACT FAQ"
              accesskey="N">next</a>
           </li>
         <li class="menu-item" >
@@ -80,9 +80,9 @@
   <div id="c_container"> 
 <div id="sidebar">
  <div id="sidebar_section"> <ul>
-<li><a class="reference internal" href="#">R2S-ACT FAQ</a><ul>
-<li><a class="reference internal" href="#how-do-i">How do I...</a></li>
-<li><a class="reference internal" href="#more-questions">More questions</a></li>
+<li><a class="reference internal" href="#">Running the unstructured workflow for R2S-ACT</a><ul>
+<li><a class="reference internal" href="#unstructured-mesh-tallies">Unstructured mesh tallies</a></li>
+<li><a class="reference internal" href="#more-scraps-of-information">More scraps of information</a></li>
 </ul>
 </li>
 </ul>
@@ -91,41 +91,33 @@
     <div id="content" class="inline-block">
           <div class="post">
             
-  <div class="section" id="r2s-act-faq">
-<h1>R2S-ACT FAQ<a class="headerlink" href="#r2s-act-faq" title="Permalink to this headline">¶</a></h1>
-<p>This is a list of Frequently Asked Questions about R2S-ACT.</p>
-<div class="section" id="how-do-i">
-<h2>How do I...<a class="headerlink" href="#how-do-i" title="Permalink to this headline">¶</a></h2>
-<dl class="docutils">
-<dt>... make my MOAB mesh file viewable in VisIT?</dt>
-<dd>Use <cite>mbconvert mesh.h5m mesh.vtk</cite> to convert .h5m files to .vtk files, which can be loaded into VisIT</dd>
-<dt>... easily run different photon calculations (e.g. biased and unbiased) from the same neutron calculation?</dt>
-<dd><p class="first">You can have different <cite>r2s.cfg</cite> files and pass them to the setup scripts, e.g.</p>
-<blockquote class="last">
-<div><cite>r3s-act/scripts/r2s_step2.py r2s.cfg_1</cite></div></blockquote>
-</dd>
-<dt>... setup calculations for photon transport for several cooling steps?</dt>
-<dd>The script <cite>r2s_step2setup.py</cite> can be run once ALARA has been run.
-This script will create folders for each cooling step, and copy the mesh, MCNP input (for photons) and <cite>r2s.cfg</cite> files.</dd>
-<dt>... tag custom photon energy bins to my mesh?</dt>
-<dd>Copy and modify <cite>r2s-act/scripts/tools/tag_ebins.py</cite></dd>
-<dt>... tag bias factors to my mesh?</dt>
-<dd>Copy and modify <cite>r2s-act/scripts/tools/tag_bias_example.py</cite></dd>
-</dl>
+  <div class="section" id="running-the-unstructured-workflow-for-r2s-act">
+<h1>Running the unstructured workflow for R2S-ACT<a class="headerlink" href="#running-the-unstructured-workflow-for-r2s-act" title="Permalink to this headline">¶</a></h1>
+<p>Using the unstructured workflow requires only minimal changes.
+There are two parts to the unstructured R2S-ACT workflow.  The first of these is to set the <cite>structuredmesh</cite> variable in the <cite>r2s.cfg</cite> file.  This will ensure that all the workflow scripts treat the mesh being used as an unstructured mesh.  The second is to run photon transport with a MCNP or DAG-MCNP executable compiled with the custom source routine in <cite>source_moab.F90</cite>.</p>
+<p>The above assumes that an unstructured mesh is used in the neutron transport step to create an unstructured mesh tally.</p>
+<div class="section" id="unstructured-mesh-tallies">
+<h2>Unstructured mesh tallies<a class="headerlink" href="#unstructured-mesh-tallies" title="Permalink to this headline">¶</a></h2>
+<p>To summarize the setup of an unstructured mesh tally:</p>
+<ol class="arabic simple">
+<li>Create unstructured mesh in CubIT and save to the default .cub format</li>
+<li>Use <cite>mbconvert</cite> to convert from .cub to .h5m</li>
+<li>In the DAG-MCNP input, you need FC and FMESH cards (example follows this list)</li>
+<li>Run neutron transport.</li>
+</ol>
+<p>Example FMESH card for unstructured tally:</p>
+<div class="highlight-python"><pre>FC4 dagmc inp=mesh.h5m out=mesh.h5m
+FMESH4:n  geom=dag
+       emesh=(low to high)</pre>
 </div>
-<div class="section" id="more-questions">
-<h2>More questions<a class="headerlink" href="#more-questions" title="Permalink to this headline">¶</a></h2>
-<dl class="docutils">
-<dt>What should I do if I want to ensure zero activation in a region?</dt>
-<dd><p class="first">If the region is, e.g. air, one option is set the density of the material to zero in the <cite>matlib</cite> file.</p>
-<p class="last">Another scenario this arises in is if the MCNP models for neutron and photon transport differ, then an activation calculation using the &#8216;photon&#8217; geometry can be done.
-Counter-intuitively, this is done by specifying the photon input file in the &#8216;neutron_mcnp_input&#8217; entry in your <cite>r2s.cfg</cite> file.</p>
-</dd>
-<dt>If the parameter &#8216;u&#8217; or &#8216;v&#8217; is switched to &#8216;v&#8217; or &#8216;u&#8217; (respectively) in a <cite>gammas</cite> file, results are very different!?</dt>
-<dd><p class="first">To change sampling approach, the <cite>gammas</cite> file needs to be regenerated by modifying <cite>r2s.cfg</cite> accordingly, and running <cite>r2s_step2.py</cite> again.</p>
-<p class="last">The reason for this is that the <cite>gammas</cite> file values are preprocessed; in particular, for voxel sampling, entries are voxel <em>source strengths</em>, while for uniform sampling, entries are <em>source densities</em>.</p>
-</dd>
-</dl>
+<p>Where mesh.h5m is the mesh file created in step 2.</p>
+</div>
+<div class="section" id="more-scraps-of-information">
+<h2>More scraps of information<a class="headerlink" href="#more-scraps-of-information" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>r2s-act/mcnp_source/README.rst</li>
+<li><a class="reference external" href="https://github.com/svalinn/DAGMC/issues/48">https://github.com/svalinn/DAGMC/issues/48</a></li>
+</ul>
 </div>
 </div>
 
