@@ -14,6 +14,7 @@ Contents:
    :maxdepth: 1
 
    r2s-userguide
+   unstr_workflow
    faq
 
 Additionally, the low level scripts all support command-line calls. You can alwas do `scriptname.py -h` for information regarding this, and these capabilities are documented here:

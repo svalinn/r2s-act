@@ -2,14 +2,19 @@ docs/ folder readme
 ==================
 This folder is where documentation of the r2s-act code is managed and built using Sphinx.
 
+Note: If you are adding a *new* page (.rst file), the file name needs to be added to the Makefile in the GH_PAGES_SOURCES list.
+
 **The actual documentation is located at** http://svalinn.github.com/r2s-act
 
 To rebuild documentation, make sure you are on the `master` branch.
-Run `make gh-pages` in the base level of the repository (not in `docs/`).
-This will automatically switch to `gh-pages`,
-pull the latest documentation source from `master`, rebuild, and push to Github.
+Run `make gh-preview` in the base level of the repository (**not** in `docs/`).
+This will automatically switch to the `gh-pages` branch,
+pull the latest documentation source from `master`, and rebuild HTML.
+After you inspect pages produced, you can either run `make gh-push` to push to Github, or `make gh-revert` to discard changes and return to the `master` branch.
 
-To rebuild documentation without updating Github, run `make html` in top level of the repo. This can be re-run as errors.  The created files can be deleted with `make clean`, but git will ignore the files regardless.
+Running `make gh-pages` will combine the above two steps without providing the chance to preview before pushing to Github, and so is not recommmended.
+
+To rebuild documentation for local viewing (and without updating Github), run `make html` in top level of the repo. This can be re-run as errors.  The created files can be deleted with `make clean`, but git will ignore the files regardless.
 
 A few other notes:
 
@@ -27,5 +32,5 @@ A few other notes:
   - Since the documentation location varies, and we are using sphinx-apidoc
     various changes were made to the Makefile. Future additions may require
     some trial and error...
-- docstrings for Fortran code are created with the `docs/gen_source_gamma_doc.py` script, which creates a fake Python script which sphinx-apidoc grabs docstrings from.
+- docstrings for Fortran code are created with the `docs/gen_source_gamma_doc.py` script, which creates a fake Python script which sphinx-apidoc grabs docstrings from `source_gamma.F90` and `source_moab.F90`.
 

@@ -5,7 +5,7 @@
 # Makefile for Sphinx documentation
 #
 
-GH_PAGES_SOURCES = docs/_themes docs/_sphinxext docs/index.rst docs/conf.py docs/rebuild.sh docs/r2s-userguide.rst docs/r2s-scripts.rst docs/faq.rst scripts/r2s/*.py scripts/r2s/io/*.py docs/gen_sourceF90_doc.py mcnp_source/*.F90
+GH_PAGES_SOURCES = docs/_themes docs/_sphinxext docs/index.rst docs/conf.py docs/rebuild.sh docs/r2s-userguide.rst docs/r2s-scripts.rst docs/faq.rst scripts/r2s/*.py scripts/r2s/io/*.py docs/gen_sourceF90_doc.py mcnp_source/*.F90 docs/unstr_workflow.rst
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
