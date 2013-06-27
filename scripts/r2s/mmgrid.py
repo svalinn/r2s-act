@@ -53,6 +53,23 @@ def prepare_materials():
     return names
 
 
+def prepare_cells():
+    """
+
+    Returns
+    -------
+    cellnames: ?
+           
+    """
+    celllist = dagmc.get_volumes_list()
+    cellnames = {} 
+    for idx in celllist:
+        name = 'Cell_{0}'.format( celllist[idx] )
+        cellId = celllist[idx]
+        cellnames[ cellId ] = (idx, name)
+    return cellnames
+
+
 def get_mat_id(materials, volume_id):
     """
 
@@ -192,7 +209,7 @@ class MatGrid:
     def __init__(self, mesh):
         """ """
         self.materials = prepare_materials()
-
+        self.cells = prepare_cells()
 
 class SingleMatGrid(MatGrid):
     """Object representing a single material grid
@@ -257,9 +274,11 @@ class mmGrid(MatGrid):
         jdim = scdmesh.dims.jmax - scdmesh.dims.jmin
         kdim = scdmesh.dims.kmax - scdmesh.dims.kmin
         mat_dim = len( self.materials )
+        cell_dim = len( self.cells )
 
         self.voxel_dt = np.dtype([('mats',np.float64,mat_dim),
-                                  ('errs',np.float64,mat_dim)])
+                                  ('errs',np.float64,mat_dim),
+                                  ('cells',np.float64,cell_dim)])
         self.grid = np.zeros( (idim, jdim, kdim), dtype=self.voxel_dt )
         self.first_vol = None
 
