@@ -3,10 +3,13 @@
 import sys
 import re
 import operator
+from operator import itemgetter
+import itertools
 
 from itaps import iBase, iMesh, iMeshExtensions
 from r2s.scdmesh import ScdMesh
 from r2s.volumes import calc_volume
+from pydagmc import util as dagutil
 
 
 def _create_mixture_tuple(v):
@@ -28,7 +31,7 @@ def _create_mixture_tuple(v):
     return tuple( [ round(x, 6) for x in v ] )
 
 
-def create_mixture_definitions(mesh):
+def create_mixture_definitions(mesh,output_file):
     """Return a list of unique materials tagged onto the mesh.
 
     unique_mixtures is a dictionary mapping mixture tuples (created through
@@ -57,19 +60,21 @@ def create_mixture_definitions(mesh):
 
     # Get the list of materials in the mesh-- should be changed in the future
     # to use a solution that does not involve string parsing.
-
+    i = 0
     if isinstance(mesh, ScdMesh):
         # The material tags are a subset of all the tags on a hex of the scdmesh
         # Pick the hex at minimum (i,j,k)
         voxels = list(mesh.iterateHex('xyz'))
         tags = mesh.imesh.getAllTags( mesh.getHex( *(mesh.dims[:3]) ))
         void_tag = [mesh.imesh.getTagHandle('matVOID')]
+        i = 0
     else:
         # Grab volume entities on mesh, then grab tags off the first one
         voxels = list(mesh.iterate(iBase.Type.region, iMesh.Topology.all))
         tags = mesh.getAllTags(voxels[0])
         void_tag = [mesh.getTagHandle('matVOID')]
         print "Got {0} voxels from mesh.".format(len(voxels))
+        i = 1
 
     # material tags have the name format 'mat{int}_rho{float}'
     mat_tags = [t for t in tags if \
@@ -77,21 +82,44 @@ def create_mixture_definitions(mesh):
     # Void is always the first material, so put it at the list's beginning
     mat_tags = void_tag + mat_tags
             
-    unique_mixtures = dict()
+    materialdict = dict()
+    
+    output_file.write('geometry rectangular\n\n')
+    output_file.write('volume\n')
 
-    for voxel in voxels:
-        fracs = [t[voxel] for t in mat_tags]
+    for voxel in range(len(voxels)):
+        fracs = [t[voxels[voxel]] for t in mat_tags]
         mixture = _create_mixture_tuple(fracs)
-        if mixture[0] == 1: # a void material
-            continue
-        if mixture not in unique_mixtures:
-            unique_mixtures[mixture] = [len(unique_mixtures), voxel]
+        if i == 0:
+            hexvol = list(mesh.iterateHexVolumes('xyz'))[voxel]
         else:
-            unique_mixtures[mixture].append(voxel)
+            hexvol = calc_volume(mesh,voxels[voxel])
+        for m in range(len(mat_tags)):
+            vol = hexvol*fracs[m]
+            if m > 0:
+                # Is this a non-void material?
+                matset = dagutil.get_material_set(with_rho=True)
+                mat_set = {}
+                for idx, (mat, rho) in enumerate(sorted(matset, key=itemgetter(0))):
+                    zone = mat
+            else:
+                zone = 0
 
-    print "{0} unique mixtures in {1} voxels".format( \
-            len(unique_mixtures), len(voxels))
-    return (unique_mixtures, mat_tags)
+            if vol != 0:
+                if zone not in materialdict.keys():
+                    materialdict[zone] = [mat_tags[m].name,vol]
+                else:
+                    materialdict[zone].append(vol)
+
+                output_file.write("\t{0}\tzone_{1}\n".format(vol, zone))
+
+
+
+    # print "{0} unique mixtures in {1} voxels".format( \
+    #        len(unique_mixtures), len(voxels))
+    # return (unique_mixtures, mat_tags)
+    output_file.write('end\n\n')
+    return materialdict
 
 
 def write_zones(mesh, output_file):
@@ -120,7 +148,7 @@ def write_zones(mesh, output_file):
     output_file.write('end\n\n')
 
 
-def write_mixtures(mixtures, mat_tags, name_dict, output_file):
+def write_mixtures(materialdict, output_file):
     """Write the mixture lines to the ALARA geometry output
 
     Parameters
@@ -134,25 +162,18 @@ def write_mixtures(mixtures, mat_tags, name_dict, output_file):
     output_file : file object
         Opened file for writing contents of ALARA geometry 
     """
-    for mixture, voxels in sorted( mixtures.iteritems(), 
-                                   key=operator.itemgetter(1,0) ):
+    for key in materialdict.keys():
         # voxels[0] is the unique mixture ID
-        output_file.write("mixture\tmix_{0}\n".format(voxels[0]))
-        for idx, m in enumerate(mixture[1:], start=1):
-            if m == 0: continue 
-            material_name = mat_tags[idx].name
-            if material_name in name_dict:
-                material_name = name_dict[material_name]
-            output_file.write("\tmaterial\t{0}\t1\t{1}\n".format(
-                material_name,m))
+        output_file.write('mixture\tmix_{0}\n'.format(key))
+        output_file.write('\tmaterial\t{0}\t1\t1.0\n'.format(materialdict[key][0]))
         output_file.write('end\n\n')
 
     # Finally add pseudo void material
     output_file.write(
-            "mixture pseudo_void\n\tmaterial\tpseudo_void\t1\t1\nend\n\n")
+            "mixture pseudo_void\n\tmaterial\tpseudo_void\t1\t1.0\nend\n\n")
 
 
-def write_mat_loading(mesh, mat_tags, mixtures, output_file):
+def write_mat_loading(materialdict, output_file):
     """Write the mat_loading information to the ALARA geometry output
 
     Parameters
@@ -170,19 +191,13 @@ def write_mat_loading(mesh, mat_tags, mixtures, output_file):
     output_file.write('mat_loading\n')
 
     # Get correct iterator
-    if isinstance(mesh, ScdMesh):
-        voxels_iterator = mesh.iterateHex('xyz')
-    else:
-        voxels_iterator = mesh.iterate(iBase.Type.region, iMesh.Topology.all)
-
-    for idx, voxel in enumerate(voxels_iterator):
-        fracs = [t[voxel] for t in mat_tags]
-        mixture = _create_mixture_tuple(fracs)
-        if mixture[0] == 1: # a void material
-            output_file.write('\tzone_{0}\tpseudo_void\n'.format(idx))
+    for key in materialdict.keys():
+        if key == 0: # a void material
+            output_file.write('\tzone_{0}\tpseudo_void\n'.format(key))
         else:
-            mix_id = mixtures[mixture][0]
-            output_file.write('\tzone_{0}\tmix_{1}\n'.format(idx,mix_id))
+            output_file.write('\tzone_{0}\tmix_{0}\n'.format(key))
+
+
     output_file.write('end\n\n')
 
 
@@ -198,12 +213,13 @@ def write_alara_geom(filename, mesh, namedict={}):
     namedict : dictionary (optional)
         Dictionary of names for material compositions
     """
-    mixtures, mat_tags = create_mixture_definitions(mesh)
+    
 
     with open(filename,'w') as output_file:
-        write_zones(mesh, output_file)
-        write_mixtures(mixtures, mat_tags, namedict, output_file)
-        write_mat_loading(mesh, mat_tags, mixtures, output_file)
+        # write_zones(mesh, output_file)
+        materialdict = create_mixture_definitions(mesh,output_file)
+        write_mixtures(materialdict, output_file)
+        write_mat_loading(materialdict, output_file)
 
 
 def main():

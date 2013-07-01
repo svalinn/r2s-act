@@ -61,9 +61,9 @@ def prepare_cells():
     cellnames: ?
            
     """
-    celllist = dagmc.get_volumes_list()
+    celllist = dagmc.get_volume_list()
     cellnames = {} 
-    for idx in celllist:
+    for idx in range(len(celllist)):
         name = 'Cell_{0}'.format( celllist[idx] )
         cellId = celllist[idx]
         cellnames[ cellId ] = (idx, name)
@@ -358,7 +358,7 @@ class mmGrid(MatGrid):
                 loc = L
                 break
 
-    def _alloc_one_ray(self, start_ijk, dim, xyz, uvw, divs, samples):
+    def _alloc_one_ray(self, start_ijk, dim, xyz, uvw, divs, samples, cell_samples):
         """Fire a single ray and store the sampled data to the grid
         
         start_ijk: structured mesh coordinates of the hex from which ray begins
@@ -378,10 +378,12 @@ class mmGrid(MatGrid):
         for nxtvol, raydist, _ in dagmc.ray_iterator( vol, xyz, uvw ):
             mat_idx = get_mat_id( self.materials, vol )
             vol = nxtvol
+            vol_idx = self.cells[vol][0]
             for meshdist, meshrat, newloc in self._grid_fragments( divs, div, loc, raydist ):
                 # The ray fills this voxel for a normalized distance of
                 # meshrat = (meshdist / length_of_voxel)
                 samples[div,mat_idx] += meshrat
+                cell_samples[div,vol_idx] += meshrat
                 loc += meshdist
                 if(newloc):
                     div += 1
@@ -398,6 +400,9 @@ class mmGrid(MatGrid):
         for sample, voxel in itertools.izip_longest( samples, self.grid[idx_ijk]):
             voxel['mats'] += sample
             voxel['errs'] += sample**2
+
+        for cell_sample, voxel in itertools.izip_longest( cell_samples, self.grid[idx_ijk]):
+            voxel['cells'] += cell_sample
 
     def generate(self, N, use_grid=False ):
         """Sample the DagMC geometry and store the results on this grid.
@@ -418,6 +423,7 @@ class mmGrid(MatGrid):
             uvw[idx] = 1.0
             divs = self.scdmesh.getDivisions(dim)
             samples = np.zeros((len(divs)-1,(len(self.materials))), dtype=np.float64)
+            cell_samples = np.zeros((len(divs)-1,(len(self.cells))), dtype=np.float64)             
 
 
             def make_xyz(a,b):
@@ -430,9 +436,10 @@ class mmGrid(MatGrid):
                 _msg('\rFiring rays: {0}%'.format((100*count)/total_ray_count), False)
                 # For each ray that starts in this square, take a sample
                 for xyz in (make_xyz(a,b) for a,b in rays(*square)):
-                    self._alloc_one_ray( ijk, idx, xyz, uvw, divs, samples )
+                    self._alloc_one_ray( ijk, idx, xyz, uvw, divs, samples, cell_samples )
                     count += 1
                     samples[:,:] = 0
+                    cell_samples[:,:] = 0
         _msg('\rFiring rays: 100%')
 
         total_scores_per_vox = N*N*3
@@ -446,6 +453,7 @@ class mmGrid(MatGrid):
             errs = vox['errs'] / total_scores_per_vox
             sigma = np.sqrt( (errs - (vox['mats']**2)) / total_scores_per_vox )
             vox['errs'][:] = sigma
+            vox['cells'] /= total_scores_per_vox
             max_err = max(max_err, max(vox['errs']))
         _msg("Maximum error: {0}".format(max_err))
 
@@ -463,13 +471,29 @@ class mmGrid(MatGrid):
                 errtag = mesh.createTag( matname+'_err', 1, np.float64 )
             except iBase.TagAlreadyExistsError:
                 errtag = mesh.getTagHandle( matname + '_err')
-
+            try:
+                celltag = mesh.createTag( matname+'_cell', 1, np.float64 )
+            except iBase.TagAlreadyExistsError:
+                celltag = mesh.getTagHandle( matname+'_cell', 1, np.float64 )
             # Tag each hex
-            for ijk, (mat,err) in np.ndenumerate(self.grid):
+            for ijk, (mat,err,cell) in np.ndenumerate(self.grid):
                 offset_ijk = [x+y for x,y in zip(ijk,self.scdmesh.dims[0:3])]
                 hx = self.scdmesh.getHex(*offset_ijk)
                 mattag[hx] = mat[matnum]
                 errtag[hx] = err[matnum]
+
+
+        for idx, (cell, (cellnum,cellname)) in enumerate(self.cells.iteritems()):
+            # Get tag handle
+            try:
+                celltag = mesh.createTag( cellname, 1, np.float64 )
+            except iBase.TagAlreadyExistsError:
+                celltag = mesh.getTagHandle( cellname, 1, np.float64 )
+            # Tag each hex
+            for ijk, (mat,err,cell) in np.ndenumerate(self.grid):
+                offset_ijk = [x+y for x,y in zip(ijk,self.scdmesh.dims[0:3])]
+                hx = self.scdmesh.getHex(*offset_ijk)
+                celltag[hx] = cell[cellnum]
 
 
     def writeFile(self, filename, alara_geom_file=None ):

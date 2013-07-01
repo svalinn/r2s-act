@@ -10,7 +10,7 @@ from optparse import OptionParser
 import sys
 from itaps import iMesh, iBase
 from r2s.scdmesh import ScdMesh
-
+import re
 
 def get_flux_tag_handles(mesh):
     """Method identifies all tags containing flux information from a DAGMC 
@@ -115,16 +115,25 @@ def print_fluxes(mesh, num_e_groups, backward_bool, fluxin_name, tags=None):
     # Get list of voxels, and set meshtype
     if isinstance(mesh, ScdMesh):
         voxels = mesh.iterateHex('xyz')
+        listtags = mesh.imesh.getAllTags( mesh.getHex( *(mesh.dims[:3]) ))
+        void_tag = [mesh.imesh.getTagHandle('matVOID')]
         meshtype = 'scd'
     else:
         voxels = list(mesh.iterate(iBase.Type.region, iMesh.Topology.all))
+        listtags = mesh.getAllTags(voxels[0])
+        void_tag = [mesh.getTagHandle('matVOID')]
         meshtype = 'gen'
         print "Got {0} voxels from mesh.".format(len(voxels))
+
+    mat_tags = [t for t in listtags if \
+            re.match('^mat[0-9]+_rho[0-9\-\.eE]+$',t.name)]
+    mat_tags = void_tag + mat_tags
 
     try:
         #Print fluxes for each voxel in xyz order (z changing fastest)
         for voxel in voxels:
-            
+
+          for m in range(len(mat_tags)):
             #Establish for loop bounds based on if forward or backward printing
             #is requested
             if backward_bool == False:
