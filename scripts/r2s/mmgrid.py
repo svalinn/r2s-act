@@ -9,7 +9,7 @@ import optparse
 
 from itaps import iMesh, iBase
 from r2s import scdmesh
-from io.write_alara_geom import write_alara_geom
+from data_transfer.write_alara_geom import write_alara_geom
 from pydagmc import dagmc
 from pydagmc import util as dagutil
 
