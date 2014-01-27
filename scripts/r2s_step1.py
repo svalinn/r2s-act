@@ -6,9 +6,9 @@ import ConfigParser
 
 from itaps import iMesh
 
-from r2s.io.read_meshtal import read_meshtal, find_tallies
-from r2s.io.write_alara_fluxin import write_alara_fluxin
-from r2s.io.write_alara_geom import write_alara_geom
+from r2s.data_transfer.read_meshtal import read_meshtal, find_tallies
+from r2s.data_transfer.write_alara_fluxin import write_alara_fluxin
+from r2s.data_transfer.write_alara_geom import write_alara_geom
 from r2s import mmgrid
 from r2s_setup import get_input_file as r2s_input_file
 from r2s_setup import FileMissingError, R2S_CFG_Error

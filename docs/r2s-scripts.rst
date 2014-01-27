@@ -17,7 +17,7 @@ read_meshtal.py:
  -o MESH_OUTPUT     Name of mesh output file, default=flux_mesh.h5m
  -n NORM            Normalization factor, default=1
  -m MESH_FILE       Preexisting mesh on which to tag fluxes
-:Path: `r2s-act/scripts/r2s/io/read_meshtal.py`
+:Path: `r2s-act/scripts/r2s/data_transfer/read_meshtal.py`
 
 ...............................................................................
 write_alara_fluxin.py
@@ -30,7 +30,7 @@ write_alara_fluxin.py
 :Options:  -b              Print to ALARA fluxin in fluxes in  decreasing energy.
                            Default=False
           -o FLUXIN_NAME  Name of ALARA fluxin output file, default=ALARAflux.in
-:Path: `r2s-act/scripts/r2s/io/write_alara_fluxin.py`
+:Path: `r2s-act/scripts/r2s/data_transfer/write_alara_fluxin.py`
 
 ...............................................................................
 mmgrid.py
@@ -60,7 +60,7 @@ write_alara_geom.py
 :Outputs: alara_geom, a file with ALARA geometry and materials 
 :Syntax: `./write_alara_geom.py`
 :Options: None
-:Path: `r2s-act/scripts/r2s/io/write_alara_geom.py`
+:Path: `r2s-act/scripts/r2s/data_transfer/write_alara_geom.py`
 
 
 
@@ -84,7 +84,7 @@ read_alara_phtn.py
   -c COOLINGSTEP        The cooling step number or string identifier. (0 is first cooling step)  Default: 0
   -r, --retag           Option enables retagging of .h5m meshes. Default: False
   -t, --totals          Option enables adding the total photon source strength for all energy groups as a tag for each voxel. Default: False
-:Path: `r2s-act/scripts/r2s/io/read_alara_phtn.py`
+:Path: `r2s-act/scripts/r2s/data_transfer/read_alara_phtn.py`
 
 
 ...............................................................................
@@ -99,7 +99,7 @@ write_gammas.py
   -h                  Show message and exit
   -o OUTPUT           Option specifies the name of the 'gammas'file. Default: gammas
   -a                  Generate the gammas file with an alias table of energy bins for each voxel. Default: False. Default file name changes to 'gammas_alias.' Creates the file gammas with the photon energy bins for each voxel stored as alias tables. Reads directly from phtn_src file. Each voxel's line corresponds with an alias table of the form: [total source strength, p1, g1a, g1b, p2, g2a, g2b ... pN, gNa, gNb] Where each p#, g#a, g#b are the info for one bin in the alias table.
-:Path: `r2s-act/scripts/r2s/io/write_gammas.py`
+:Path: `r2s-act/scripts/r2s/data_transfer/write_gammas.py`
 
 ...............................................................................
 mcnp_n2p.py
