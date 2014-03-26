@@ -4,7 +4,7 @@ import sys
 import ConfigParser
 import os.path
 
-from r2s.io import read_alara_phtn, write_gammas
+from r2s.data_transfer import read_alara_phtn, write_gammas
 from r2s import mcnp_n2p
 from r2s.scdmesh import ScdMesh, ScdMeshError
 from itaps import iBase, iMesh, iMeshExtensions

@@ -19,7 +19,7 @@ To rebuild documentation for local viewing (and without updating Github), run `m
 A few other notes:
 
 - Some extensions for sphinx (numpydoc in particular) are used. These are stored in `docs/_sphinxext`
-- sphinx-apidoc grabs the docstrings from scripts in r2s/ and r2s/io/
+- sphinx-apidoc grabs the docstrings from scripts in r2s/ and r2s/data_transfer/
   - the `docs/rebuild.sh` script handles the calls to sphinx-apidoc
 - numpydoc is used, which enables docstring formatting with section headings
   - valid section headings are Parameters, Returns, Notes, See Also, Examples, References

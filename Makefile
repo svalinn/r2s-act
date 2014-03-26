@@ -5,7 +5,7 @@
 # Makefile for Sphinx documentation
 #
 
-GH_PAGES_SOURCES = docs/_themes docs/_sphinxext docs/index.rst docs/conf.py docs/rebuild.sh docs/r2s-userguide.rst docs/r2s-scripts.rst docs/faq.rst scripts/r2s/*.py scripts/r2s/io/*.py docs/gen_sourceF90_doc.py mcnp_source/*.F90 docs/unstr_workflow.rst
+GH_PAGES_SOURCES = docs/_themes docs/_sphinxext docs/index.rst docs/conf.py docs/rebuild.sh docs/r2s-userguide.rst docs/r2s-scripts.rst docs/faq.rst scripts/r2s/*.py scripts/r2s/data_transfer/*.py docs/gen_sourceF90_doc.py mcnp_source/*.F90 docs/unstr_workflow.rst
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
@@ -75,7 +75,7 @@ gh-pages:
 	mv -fv docs/_build/html/* .
 	rm -rf $(GH_PAGES_SOURCES)
 	rm -rf doc/_build doc/r2s
-	rm -rf scripts/r2s/*.py scripts/r2s/io/*.py mcnp_source/*.F90
+	rm -rf scripts/r2s/*.py scripts/r2s/data_transfer/*.py mcnp_source/*.F90
 	# Empty docs directory but preserve .gitignore
 	mv docs/.gitignore stashed.gitignore ; rm -rf docs/* ; mv stashed.gitignore docs/.gitignore
 	echo nojekyll > .nojekyll
@@ -100,7 +100,7 @@ gh-preview:
 	mv -fv docs/_build/html/* .
 	rm -rf $(GH_PAGES_SOURCES)
 	rm -rf doc/_build doc/r2s
-	rm -rf scripts/r2s/*.py scripts/r2s/io/*.py mcnp_source/*.F90
+	rm -rf scripts/r2s/*.py scripts/r2s/data_transfer/*.py mcnp_source/*.F90
 	# Empty docs directory but preserve .gitignore
 	mv docs/.gitignore stashed.gitignore ; rm -rf docs/* ; mv stashed.gitignore docs/.gitignore
 	echo nojekyll > .nojekyll

@@ -1,4 +1,4 @@
-from r2s.io import read_alara_phtn
+from r2s.data_transfer import read_alara_phtn
 from r2s.scdmesh import ScdMesh, ScdMeshError
 import os
 import os.path

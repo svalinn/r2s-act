@@ -33,7 +33,7 @@ Internal code/API documentation:
    :maxdepth: 1
 
    r2s/r2s
-   r2s/r2s.io
+   r2s/r2s.data_transfer
    r2s/r2s.mcnp
    r2s/modules
 

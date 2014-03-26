@@ -2,8 +2,8 @@ import unittest
 import os.path
 import itertools
 
-from r2s.io import read_alara_phtn
-from r2s.io import write_gammas
+from r2s.data_transfer import read_alara_phtn
+from r2s.data_transfer import write_gammas
 from r2s.scdmesh import ScdMesh, ScdMeshError
 from itaps import iMesh, iBase
 

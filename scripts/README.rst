@@ -35,19 +35,21 @@ r2s/tag_for_viz.py: Script to prepare visuzliations of volume fractions produced
                     mmGridGen.  (Not needed for newer workflows, should probably
                     be moved to legacy/)
 
-r2s/io/read_alara_phtn.py: Turn ALARA photon source output and converts it to MOAB representation.
+r2s/data_transfer/read_alara_phtn.py: Turn ALARA photon source output and converts 
+                                      it to MOAB representation.
 
-r2s/io/write_gammas.py: Takes photon source data on a mesh (as produced by PhtnSrcToH5M.py),
-               normalizes source information, and generates the 'gammas' file for 
-               our custom source.F90 routine.
+r2s/data_transfer/write_gammas.py: Takes photon source data on a mesh (as 
+               produced by PhtnSrcToH5M.py), normalizes source information, and
+               generates the 'gammas' file for our custom source.F90 routine.
 
-r2s/io/read_meshtal.py: Parses an MCNP meshtal output file and creates a structured mesh
+r2s/data_transfer/read_meshtal.py: Parses an MCNP meshtal output file and 
+                                   creates a structured mesh
 
-r2s/io/write_alara_fluxin.py: Writes an ALARA fluxin file based on flux-tagged structured
-                              mesh from read_meshtal
+r2s/data_transfer/write_alara_fluxin.py: Writes an ALARA fluxin file based on 
+                              flux-tagged structured mesh from read_meshtal.
 
-r2s/io/write_alara_geom.py: Writes ALARA geometry description for a structured mesh with
-                            material data
+r2s/data_transfer/write_alara_geom.py: Writes ALARA geometry description for a
+                              structured mesh with material data.
 
 ==================================================
 legacy/ -- retired scripts that may still be useful for compatibility with problems
