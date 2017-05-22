@@ -1,3 +1,14 @@
+DEPRECATED
+__________
+
+This code base is now deprecated.  Those interested in using an R2S workflow using DAG-MCNP and ALARA are referred to the R2S-workflow_ that is now incorporated into the PyNE_ toolkit.
+
+.. _R2S-workflow: http://pyne.io/pyapi/r2s.html
+.. _PyNE: http://pyne.io
+
+DEPRECATED
+__________
+
 University of Wisconsin-Madison Rigorous Two Step Activation Work Flow (R2S-ACT)
 ________________________________________________________________________________
 The Rigorous Two Step (R2S) method is used to determine the photon fluxes that result from neutron activation of materials for a given geometry.
@@ -34,3 +45,4 @@ Building the documentation requires Sphinx, from http://sphinx-doc.org
 
 Although not a dependency, the visualization program VisIT (Lawrence Livermore National Laboratory) is useful for visualizing results data stored on MOAB meshes in the .vtk format.
 Executables are available at https://wci.llnl.gov/codes/visit/.
+
